@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="flexmodel-core" />
+        <module name="flexmodel-graphql" />
+        <module name="meatacode-flexmodel" />
+        <module name="flexmodel-json-logic" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="inetgration-tests" target="21" />
+      <module name="json-logic" target="21" />
+      <module name="jsonlogic" target="21" />
+      <module name="metacode-flexmodel-inetgration-tests" target="21" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

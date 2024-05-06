@@ -1,0 +1,35 @@
+package tech.wetech.flexmodel.jsonlogic;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * @author cjbi
+ */
+public class MongoRendererTests {
+  private static final JsonLogic jsonLogic = new JsonLogic();
+  @Test
+  void test() throws JsonLogicException {
+    String json = """
+      {
+        "and": [
+          { ">": [{ "var": "id" }, 2] },
+          { "==": ["jack", "name" ] },
+          { "<": [{ "var": "age" }, 21] }
+        ]
+      }
+      """;
+    String bsonString = jsonLogic.evaluateMongoBsonString(json);
+    assertEquals(
+      """
+        {
+         $and: [{ id: { $gt: 2.0 } }
+        , { jack: { $eq: "name" } }
+        , { age: { $lt: 21.0 } }
+        ]
+        }
+        """,
+      bsonString);
+  }
+}
