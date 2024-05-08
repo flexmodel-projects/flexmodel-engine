@@ -135,7 +135,7 @@ public class Simple {
     // 通过数据源名称获取对应的数据源
     String dsName = "mysql";
     // 加入连接
-    connectionManager.addDataSourceProvider(dsName, new SqlDataSourceProvider(dataSource));
+    connectionManager.addDataSourceProvider(dsName, new JdbcDataSourceProvider(dataSource));
     // 创建模型映射类，保证模型创建完能够保存到数据库表中，这里使用了内置的Jdbc模型映射
     MappedModels jdbcMappedModel = new JdbcMappedModels(dataSource);
     // 创建会话工厂
@@ -155,7 +155,7 @@ public class Simple {
 ```java
 session.createEntity("teacher", entity -> entity
   // 主键，当主键为整形字段时支持设置自增，也可以使用字符串配合值计算器生成
-  .addField(new BigintField("id").setIdentity(true).setComment("Primary Key").setAutoIncrement(true))
+  .addField(new IDField("id").setComment("Primary Key"))
   // 姓名
   .addField(new StringField("name").setComment("姓名").setNullable(false).setLength(10))
   // 年龄，支持设置验证器进行业务验证
