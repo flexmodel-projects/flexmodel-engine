@@ -2,6 +2,7 @@ package tech.wetech.flexmodel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.wetech.flexmodel.mapping.TypeHandler;
 import tech.wetech.flexmodel.sql.SqlContext;
 
 import java.util.Map;

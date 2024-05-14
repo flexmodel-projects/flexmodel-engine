@@ -161,8 +161,6 @@ public class DataOperationsTest extends AbstractSessionIntegrationTest {
       )
       .setJoins(joiners -> joiners
         .addLeftJoin(joiner -> joiner
-          .setLocalField("id")
-          .setForeignField("teacher_id")
           .setFrom(teacherCourseEntityName)
         )
       )
@@ -313,8 +311,6 @@ public class DataOperationsTest extends AbstractSessionIntegrationTest {
       )
       .setJoins(joiners -> joiners
         .addInnerJoin(joiner -> joiner
-          .setLocalField("id")
-          .setForeignField("teacher_id")
           .setFrom(courseEntityName)
           .setFilter("""
             {
@@ -510,25 +506,8 @@ public class DataOperationsTest extends AbstractSessionIntegrationTest {
     Assertions.assertEquals("张三", first.get("teacher_name"));
   }
 
-//  @Test
-//  void testRelation() {
-//    String entityName = "testRelation_teacher";
-//    String courseEntityName = "testRelation_teacher_courses";
-//    createTeacherEntity(entityName);
-//    createTeacherCourseEntity(entityName, courseEntityName);
-//    // 查询关系字段
-//    List<Map<String, Object>> list = session.find(entityName, query -> query
-//      .setProjection(projection -> projection
-//        .addField("teacher_name", field("name"))
-//        .addField("teacherCourses", field("courses"))
-//      )
-//      .setSort(sort -> sort.addOrder("id"))
-//    );
-//    Assertions.assertFalse(list.isEmpty());
-//    Map<String, Object> first = list.getFirst();
-//    Assertions.assertEquals("张三", first.get("teacher_name"));
-//    Assertions.assertEquals(4, ((List<?>) first.get("teacherCourses")).size());
-//    Assertions.assertEquals("语文", ((Map<?, ?>) ((List<?>) first.get("teacherCourses")).getFirst()).get("c_name"));
-//    Assertions.assertEquals("92.0", ((Map<?, ?>) ((List<?>) first.get("teacherCourses")).getFirst()).get("c_score").toString());
-//  }
+  @Test
+  void testRelation() {
+
+  }
 }

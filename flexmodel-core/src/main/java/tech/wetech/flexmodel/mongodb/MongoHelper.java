@@ -18,44 +18,44 @@ class MongoHelper {
     PhysicalNamingStrategy physicalNamingStrategy = mongoContext.getPhysicalNamingStrategy();
     List<Document> pipeline = new ArrayList<>();
     // 匹配条件
-    if (query.filter() != null) {
-      String bsonCondition = getMongoCondition(mongoContext, query.filter());
+    if (query.getFilter() != null) {
+      String bsonCondition = getMongoCondition(mongoContext, query.getFilter());
       pipeline.add(Document.parse(String.format("{ $match: %s }", bsonCondition)));
     }
     // 排序
-    if (query.sort() != null) {
+    if (query.getSort() != null) {
       Document orders = new Document();
-      for (Query.Sort.Order order : query.sort().orders()) {
-        orders.put(order.field().fieldName(), order.direction() == Direction.ASC ? 1 : -1);
+      for (Query.Sort.Order order : query.getSort().getOrders()) {
+        orders.put(order.getField().getFieldName(), order.getDirection() == Direction.ASC ? 1 : -1);
         pipeline.add(new Document("$sort", orders));
       }
     }
     // 分页
-    if (query.offset() != null) {
-      pipeline.add(new Document("$skip", query.offset()));
+    if (query.getOffset() != null) {
+      pipeline.add(new Document("$skip", query.getOffset()));
     }
-    if (query.limit() != null) {
-      pipeline.add(new Document("$limit", query.limit()));
+    if (query.getLimit() != null) {
+      pipeline.add(new Document("$limit", query.getLimit()));
     }
     // 添加关联
-    if (query.joiners() != null) {
-      for (Query.Join join : query.joiners().joins()) {
-        String joinCollectionName = physicalNamingStrategy.toPhysicalTableName(join.from());
+    if (query.getJoins() != null) {
+      for (Query.Join join : query.getJoins().getJoins()) {
+        String joinCollectionName = physicalNamingStrategy.toPhysicalTableName(join.getFrom());
         Document lookup = new Document();
         lookup.put("from", joinCollectionName);
-        lookup.put("localField", join.localField());
-        lookup.put("foreignField", join.foreignField());
-        lookup.put("as", join.from());
-        if (join.filter() != null) {
-          lookup.put("pipeline", List.of(Document.parse(String.format("{ $match: %s }", getMongoCondition(mongoContext, join.filter())))));
+        lookup.put("localField", join.getLocalField());
+        lookup.put("foreignField", join.getForeignField());
+        lookup.put("as", join.getFrom());
+        if (join.getFilter() != null) {
+          lookup.put("pipeline", List.of(Document.parse(String.format("{ $match: %s }", getMongoCondition(mongoContext, join.getFilter())))));
         }
         pipeline.add(new Document("$lookup", lookup));
         // mongo lookup默认就是left join
-        if (join.joinType() == INNER_JOIN) {
-          pipeline.add(new Document("$match", Map.of(join.from(), Map.of("$ne", List.of())
+        if (join.getJoinType() == INNER_JOIN) {
+          pipeline.add(new Document("$match", Map.of(join.getFrom(), Map.of("$ne", List.of())
           )));
         }
-        pipeline.add(new Document("$unwind", "$" + join.from()));
+        pipeline.add(new Document("$unwind", "$" + join.getFrom()));
       }
     }
 
@@ -63,9 +63,9 @@ class MongoHelper {
     project.put("_id", false);
     Map<String, AssociationField> associationFields = QueryHelper.findAssociationFields(model, query);
     boolean hasAggFunc = false;
-    Query.Projection projection = query.projection();
+    Query.Projection projection = query.getProjection();
     if (projection != null) {
-      for (Map.Entry<String, Query.QueryCall> entry : projection.fields().entrySet()) {
+      for (Map.Entry<String, Query.QueryCall> entry : projection.getFields().entrySet()) {
         String key = entry.getKey();
         if (associationFields.containsKey(key)) {
           // 不查关联字段
@@ -77,41 +77,41 @@ class MongoHelper {
           continue;
         }
         if (entry.getValue() instanceof Query.QueryField queryField) {
-          project.put(key, "$" + queryField.fieldName());
+          project.put(key, "$" + queryField.getFieldName());
         }
       }
     } else {
-      for (Field field : model.fields()) {
-        if (associationFields.containsKey(field.name())) {
+      for (Field field : model.getFields()) {
+        if (associationFields.containsKey(field.getName())) {
           // 不查关联字段
           continue;
         }
-        project.put(field.name(), true);
+        project.put(field.getName(), true);
       }
     }
 
     if (hasAggFunc) {
       Document group = new Document();
       Map<String, Object> groupId = new HashMap<>();
-      if (query.groupBy() == null) {
+      if (query.getGroupBy() == null) {
         group.put("_id", null);
       } else {
-        Query.GroupBy groupBy = query.groupBy();
-        for (Query.QueryField field : groupBy.fields()) {
-          groupId.put(field.fieldName(), "$" + field.fieldName());
+        Query.GroupBy groupBy = query.getGroupBy();
+        for (Query.QueryField field : groupBy.getFields()) {
+          groupId.put(field.getFieldName(), "$" + field.getFieldName());
         }
         group.put("_id", groupId);
       }
 
-      for (Map.Entry<String, Query.QueryCall> entry : projection.fields().entrySet()) {
+      for (Map.Entry<String, Query.QueryCall> entry : projection.getFields().entrySet()) {
         String key = entry.getKey();
         Query.QueryCall value = entry.getValue();
         if (value instanceof Query.QueryFunc aggFunc) {
           String name = null;
-          if (aggFunc.args() != null && aggFunc.args().length > 0 && aggFunc.args()[0] instanceof Query.QueryField field) {
-            name = field.fieldName();
+          if (aggFunc.getArgs() != null && aggFunc.getArgs().length > 0 && aggFunc.getArgs()[0] instanceof Query.QueryField field) {
+            name = field.getName();
           }
-          switch (aggFunc.operator()) {
+          switch (aggFunc.getOperator()) {
             case "count" -> group.put(key, Map.of("$sum", 1));
             case "avg" -> group.put(key, Map.of("$avg", "$" + name));
             case "sum" -> group.put(key, Map.of("$sum", "$" + name));
@@ -126,7 +126,7 @@ class MongoHelper {
                 "mm", "%M",
                 "ss|SS", "%S"
               );
-              String fmt = (String) aggFunc.args()[1];
+              String fmt = (String) aggFunc.getArgs()[1];
               for (Map.Entry<String, String> e : utcMap.entrySet()) {
                 fmt = fmt.replaceAll(Objects.toString(e.getKey()), e.getValue());
               }
@@ -152,10 +152,10 @@ class MongoHelper {
               groupId.put(name, dayOfWeek);
               group.put(key, Map.of("$first", dayOfWeek));
             }
-            case null, default -> throw new IllegalStateException("Unexpected value: " + aggFunc.operator());
+            case null, default -> throw new IllegalStateException("Unexpected value: " + aggFunc.getOperator());
           }
         } else if (value instanceof Query.QueryField field) {
-          group.put(field.fieldName(), Map.of("$first", "$" + field.fieldName()));
+          group.put(field.getFieldName(), Map.of("$first", "$" + field.getFieldName()));
         }
       }
       pipeline.add(new Document("$group", group));

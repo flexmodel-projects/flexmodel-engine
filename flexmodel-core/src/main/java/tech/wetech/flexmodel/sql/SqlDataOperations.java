@@ -1,12 +1,16 @@
 package tech.wetech.flexmodel.sql;
 
 import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.graph.JoinGraphNode;
 import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 import tech.wetech.flexmodel.sql.type.SqlResultHandler;
 import tech.wetech.flexmodel.sql.type.SqlTypeHandler;
 import tech.wetech.flexmodel.sql.type.UnknownSqlTypeHandler;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -36,9 +40,9 @@ public class SqlDataOperations implements DataOperations {
   }
 
   @Override
-  public int insert(String modelName, Map<String, Object> record) {
-    String sql = getInsertSqlString(modelName, record);
-    return sqlExecutor.update(sql, record);
+  public void associate(JoinGraphNode joinGraphNode, Map<String, Object> data) {
+    String sql = getInsertSqlString(joinGraphNode.getJoinName(), data);
+    sqlExecutor.update(sql, data);
   }
 
   @Override
@@ -46,18 +50,18 @@ public class SqlDataOperations implements DataOperations {
 
     String sql = getInsertSqlString(modelName, record);
     Entity entity = mappedModels.getEntity(schemaName, modelName);
-    TypedField<?, ?> idField = entity.idField();
+    TypedField<?, ?> idField = entity.getIdField();
     if (sqlDialect.useFirstGeneratedId()) {
       return sqlExecutor.updateAndReturnFirstGeneratedKeys(sql, record, id::accept);
     }
     return sqlExecutor.updateAndReturnGeneratedKeys(sql, record,
-      new String[]{sqlDialect.getGeneratedKeyName(idField.name())}, keys -> id.accept(keys.getFirst()));
+      new String[]{sqlDialect.getGeneratedKeyName(idField.getName())}, keys -> id.accept(keys.getFirst()));
   }
 
   private String getInsertSqlString(String modelName, Map<String, Object> record) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
     StringJoiner columns = new StringJoiner(", ", "(", ")");
-    StringJoiner values = new StringJoiner(",", "(", ")");
+    StringJoiner values = new StringJoiner(", ", "(", ")");
     record.forEach((key, value) -> {
       columns.add(sqlDialect.quoteIdentifier(key));
       values.add(":" + key);
@@ -70,81 +74,29 @@ public class SqlDataOperations implements DataOperations {
   }
 
   @Override
-  public int insertAll(String modelName, List<Map<String, Object>> records) {
-    if (!sqlDialect.supportsStandardInsertManyValues()) {
-      int rows = 0;
-      for (Map<String, Object> record : records) {
-        rows += insert(modelName, record);
-      }
-      return rows;
-    }
-    String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-    Entity entity = mappedModels.getEntity(schemaName, modelName);
-    TypedField<?, ?> idField = entity.idField();
-    boolean isGeneratedId = idField != null && records.getFirst().get(idField.name()) != null;
-    List<String> intoColumns = new ArrayList<>();
-    for (TypedField<?, ?> field : entity.fields()) {
-      if (Objects.equals(idField, field) && !isGeneratedId) {
-        continue;
-      }
-      intoColumns.add(sqlDialect.quoteIdentifier(field.name()));
-    }
-    List<String> intoValues = new ArrayList<>();
-    for (int i = 0; i < records.size(); i++) {
-      StringBuilder values = new StringBuilder("( ");
-      for (TypedField<?, ?> field : entity.fields()) {
-        if (Objects.equals(idField, field) && !isGeneratedId) {
-          continue;
-        }
-        values.append(':').append(field.name()).append('_').append(i).append(", ");
-      }
-      values.deleteCharAt(values.length() - 2);
-      values.append(") ");
-      intoValues.add(values.toString());
-    }
-    String sql = "insert into \n" +
-                 physicalTableName +
-                 " (" + String.join(", ", intoColumns) + ") \n" +
-                 "values " +
-                 String.join(",\n", intoValues);
-
-    Map<String, Object> params = new HashMap<>();
-    for (int i = 0; i < records.size(); i++) {
-      Map<String, Object> record = records.get(i);
-      for (TypedField<?, ?> field : entity.fields()) {
-        if (Objects.equals(idField, field) && !isGeneratedId) {
-          continue;
-        }
-        params.put(field.name() + "_" + i, record.get(field.name()));
-      }
-    }
-    return sqlExecutor.update(sql, params);
-  }
-
-  @Override
   public int updateById(String modelName, Map<String, Object> record, Object id) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
     Entity entity = mappedModels.getEntity(schemaName, modelName);
-    TypedField<?, ?> idField = entity.idField();
+    TypedField<?, ?> idField = entity.getIdField();
 
     StringBuilder sql = new StringBuilder("update ")
       .append(physicalTableName)
       .append(" set ");
     StringJoiner assignment = new StringJoiner(", ");
 
-    record.keySet().stream().filter(col -> !col.equals(idField.name()))
+    record.keySet().stream().filter(col -> !col.equals(idField.getName()))
       .forEach(col -> assignment.add(sqlDialect.quoteIdentifier(col) + "=:" + col));
 
     sql.append(assignment);
 
     sql.append(" where (")
-      .append(sqlDialect.quoteIdentifier(idField.name()))
+      .append(sqlDialect.quoteIdentifier(idField.getName()))
       .append("=:")
-      .append(idField.name())
+      .append(idField.getName())
       .append(")");
 
     Map<String, Object> params = new HashMap<>(record);
-    params.put(idField.name(), id);
+    params.put(idField.getName(), id);
     return sqlExecutor.update(sql.toString(), params);
   }
 
@@ -152,7 +104,7 @@ public class SqlDataOperations implements DataOperations {
   public int update(String modelName, Map<String, Object> record, String filter) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
     Entity entity = mappedModels.getEntity(schemaName, modelName);
-    TypedField<?, ?> idField = entity.idField();
+    TypedField<?, ?> idField = entity.getIdField();
     SqlClauseResult sqlResult = getSqlCauseResult(filter);
 
     StringBuilder sql = new StringBuilder("update ")
@@ -160,7 +112,7 @@ public class SqlDataOperations implements DataOperations {
       .append(" set ");
     StringJoiner assignment = new StringJoiner(", ");
     record.keySet().stream()
-      .filter(col -> !col.equals(idField.name()))
+      .filter(col -> !col.equals(idField.getName()))
       .forEach(col -> assignment.add(sqlDialect.quoteIdentifier(col) + "=:" + col));
     sql.append(assignment);
 
@@ -176,9 +128,9 @@ public class SqlDataOperations implements DataOperations {
   public <T> T findById(String modelName, Object id, Class<T> resultType) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
     Entity entity = mappedModels.getEntity(schemaName, modelName);
-    TypedField<?, ?> idField = entity.idField();
-    String columnsString = entity.fields().stream()
-      .map(field -> sqlDialect.quoteIdentifier(field.name()))
+    TypedField<?, ?> idField = entity.getIdField();
+    String columnsString = entity.getFields().stream()
+      .map(field -> sqlDialect.quoteIdentifier(field.getName()))
       .collect(Collectors.joining(", "));
 
     String sql = " select " +
@@ -188,7 +140,7 @@ public class SqlDataOperations implements DataOperations {
                  " " +
                  " where (" + sqlDialect.quoteIdentifier("id") + "= :id)";
 
-    return sqlExecutor.queryForObject(sql, Map.of(idField.name(), id), getSqlResultHandler(entity, null, resultType));
+    return sqlExecutor.queryForObject(sql, Map.of(idField.getName(), id), getSqlResultHandler(entity, null, resultType));
   }
 
   @Override
@@ -209,11 +161,11 @@ public class SqlDataOperations implements DataOperations {
   public int deleteById(String modelName, Object id) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
     Entity entity = mappedModels.getEntity(schemaName, modelName);
-    TypedField<?, ?> idField = entity.idField();
+    TypedField<?, ?> idField = entity.getIdField();
     String sql = "delete from " +
                  physicalTableName +
-                 " where (" + sqlDialect.quoteIdentifier(idField.name()) + "=:" + idField.name() + ")";
-    return sqlExecutor.update(sql, Map.of(idField.name(), id));
+                 " where (" + sqlDialect.quoteIdentifier(idField.getName()) + "=:" + idField.getName() + ")";
+    return sqlExecutor.update(sql, Map.of(idField.getName(), id));
   }
 
   @Override
@@ -250,19 +202,19 @@ public class SqlDataOperations implements DataOperations {
    */
   private <T> SqlResultHandler<T> getSqlResultHandler(Model model, Query query, Class<T> resultType) {
     SqlResultHandler<T> sqlResultHandler = new SqlResultHandler<>(resultType);
-    if (query == null || query.projection() == null) {
-      for (Field field : model.fields()) {
+    if (query == null || query.getProjection() == null) {
+      for (Field field : model.getFields()) {
         if (field instanceof IDField idField) {
-          sqlResultHandler.addSqlTypeHandler(field.name(), typeHandlerMap.get(idField.generatedValue().type()));
+          sqlResultHandler.addSqlTypeHandler(field.getName(), typeHandlerMap.get(idField.getGeneratedValue().getType()));
         } else if (field instanceof TypedField<?, ?> typedField) {
-          sqlResultHandler.addSqlTypeHandler(field.name(), typeHandlerMap.get(typedField.type()));
+          sqlResultHandler.addSqlTypeHandler(field.getName(), typeHandlerMap.get(typedField.getType()));
         } else if (field instanceof Query.QueryField) {
-          sqlResultHandler.addSqlTypeHandler(field.name(), new UnknownSqlTypeHandler());
+          sqlResultHandler.addSqlTypeHandler(field.getName(), new UnknownSqlTypeHandler());
         }
       }
     } else {
-      query.projection()
-        .fields()
+      query.getProjection()
+        .getFields()
         .keySet()
         .forEach(key -> sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler()));
     }

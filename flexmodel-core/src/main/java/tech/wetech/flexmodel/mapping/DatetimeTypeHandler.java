@@ -1,4 +1,4 @@
-package tech.wetech.flexmodel;
+package tech.wetech.flexmodel.mapping;
 
 import java.time.LocalDateTime;
 

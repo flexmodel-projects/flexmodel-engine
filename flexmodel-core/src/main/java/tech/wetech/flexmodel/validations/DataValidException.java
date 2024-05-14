@@ -12,7 +12,7 @@ public class DataValidException extends RuntimeException {
 
   public DataValidException(List<ConstraintValidException> constraintValidExceptions) {
     super(constraintValidExceptions.stream()
-      .map(e -> e.getField().name() + " " + e.getMessage())
+      .map(e -> e.getField().getName() + " " + e.getMessage())
       .collect(Collectors.joining("; ")));
     this.constraintValidExceptions = constraintValidExceptions;
   }

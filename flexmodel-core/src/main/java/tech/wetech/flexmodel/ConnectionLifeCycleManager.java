@@ -1,6 +1,8 @@
 package tech.wetech.flexmodel;
 
 import com.mongodb.client.MongoDatabase;
+import tech.wetech.flexmodel.cache.Cache;
+import tech.wetech.flexmodel.cache.ConcurrentHashMapCache;
 import tech.wetech.flexmodel.mongodb.MongoDataSourceProvider;
 import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
 import tech.wetech.flexmodel.sql.SqlConnectionHolder;
@@ -17,6 +19,7 @@ public class ConnectionLifeCycleManager {
   private final SqlConnectionHolder sqlConnectionHolder = new SqlConnectionHolder();
   private final Map<String, DataSourceProvider> dataSourceProviderMap = new ConcurrentHashMap<>();
   private final Map<String, MongoDatabase> mongoDatabaseMap = new HashMap<>();
+  private Cache cache = new ConcurrentHashMapCache();
 
   public SqlConnectionHolder getSqlConnectionHolder() {
     return sqlConnectionHolder;
@@ -39,7 +42,16 @@ public class ConnectionLifeCycleManager {
     return dataSourceProviderMap.get(identifier);
   }
 
+  public Cache getCache() {
+    return cache;
+  }
+
+  public void setCache(Cache cache) {
+    this.cache = cache;
+  }
+
   public void destroy() {
+    cache.invalidateAll();
     sqlConnectionHolder.destroy();
   }
 

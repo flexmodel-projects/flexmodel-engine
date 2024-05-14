@@ -1,45 +1,84 @@
 package tech.wetech.flexmodel.calculations;
 
-import tech.wetech.flexmodel.AbstractDataOperationsDecorator;
-import tech.wetech.flexmodel.DataOperations;
-import tech.wetech.flexmodel.MappedModels;
-import tech.wetech.flexmodel.TypeHandler;
+import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.graph.JoinGraphNode;
+import tech.wetech.flexmodel.mapping.TypeHandler;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+
+import static tech.wetech.flexmodel.AssociationField.Cardinality.*;
 
 /**
  * @author cjbi
  */
 public class DataOperationsCalculationDecorator extends AbstractDataOperationsDecorator {
 
+  private final String schemaName;
+  private final MappedModels mappedModels;
   private final DataCalculator dataCalculator;
 
   public DataOperationsCalculationDecorator(String schemaName, MappedModels mappedModels, Map<String, ? extends TypeHandler<?>> typeHandlerMap, DataOperations delegate) {
     super(delegate);
+    this.schemaName = schemaName;
+    this.mappedModels = mappedModels;
     this.dataCalculator = new DataCalculator(schemaName, mappedModels, typeHandlerMap);
   }
 
   @Override
-  public int insert(String modelName, Map<String, Object> record) {
-    return delegate.insert(modelName, dataCalculator.calculateAll(modelName, record));
+  @SuppressWarnings("all")
+  public int insert(String modelName, Map<String, Object> record, Consumer<Object> idConsumer) {
+    AtomicReference<Object> atomicId = new AtomicReference<>();
+    int rows = delegate.insert(modelName, dataCalculator.calculateAll(modelName, record), atomicId::set);
+    Object id = atomicId.get();
+    idConsumer.accept(id);
+    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
+    record.forEach((key, value) -> {
+      if (value != null) {
+        if (entity.getField(key) instanceof AssociationField associationField) {
+          Entity targetEntity = mappedModels.getEntity(schemaName, associationField.getTargetEntity());
+          if (associationField.getCardinality() == ONE_TO_ONE && value instanceof Map data) {
+            Map<String, Object> associationRecord = new HashMap<>(data);
+            associationRecord.put(associationField.getTargetField(), id);
+            insert(associationField.getTargetEntity(), associationRecord);
+          } else if (associationField.getCardinality() == ONE_TO_MANY && value instanceof Collection<?> collection) {
+            for (Object obj : collection) {
+              if (obj instanceof Map data) {
+                Map<String, Object> associationRecord = new HashMap<>(data);
+                associationRecord.put(associationField.getTargetField(), id);
+                insert(associationField.getTargetEntity(), associationRecord);
+              }
+            }
+          } else if (associationField.getCardinality() == MANY_TO_MANY && value instanceof Collection<?> collection) {
+            for (Object obj : collection) {
+              if (obj instanceof Map data) {
+                Map<String, Object> associationRecord = new HashMap<>(data);
+                AtomicReference<Object> inveseAtomicId = new AtomicReference<>();
+                try {
+                  insert(associationField.getTargetEntity(), associationRecord, inveseAtomicId::set);
+                } catch (Exception e) {
+                  if (data.containsKey(targetEntity.getIdField().getName())) {
+                    inveseAtomicId.set(data.get(targetEntity.getIdField().getName()));
+                  }
+                }
+                JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, associationField);
+                associate(joinGraphNode, Map.of(
+                  joinGraphNode.getJoinFieldName(), atomicId.get(),
+                  joinGraphNode.getInverseJoinFieldName(), inveseAtomicId.get()
+                ));
+              }
+            }
+          }
+        }
+      }
+
+    });
+    return rows;
   }
 
-  @Override
-  public int insert(String modelName, Map<String, Object> record, Consumer<Object> id) {
-    return delegate.insert(modelName, dataCalculator.calculateAll(modelName, record), id);
-  }
-
-  @Override
-  public int insertAll(String modelName, List<Map<String, Object>> records) {
-    List<Map<String, Object>> newRecord = new ArrayList<>();
-    for (Map<String, Object> record : records) {
-      newRecord.add(dataCalculator.calculateAll(modelName, record));
-    }
-    return delegate.insertAll(modelName, newRecord);
-  }
 
   @Override
   public int updateById(String modelName, Map<String, Object> record, Object id) {

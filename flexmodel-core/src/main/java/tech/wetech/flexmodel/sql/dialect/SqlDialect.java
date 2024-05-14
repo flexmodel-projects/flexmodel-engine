@@ -448,10 +448,6 @@ public abstract class SqlDialect {
     return true;
   }
 
-  public boolean supportsStandardInsertManyValues() {
-    return true;
-  }
-
   public boolean supportsJSR310() {
     return true;
   }

@@ -128,8 +128,8 @@ class JdbcMappedModelTest extends AbstractIntegrationTest {
         entity.addField(sDate);
 
         jdbcMappedModel.persist(schemaName, entity);
-        Model model = jdbcMappedModel.getModel(schemaName, entity.name());
-        jdbcMappedModel.remove(schemaName, model.name());
+        Model model = jdbcMappedModel.getModel(schemaName, entity.getName());
+        jdbcMappedModel.remove(schemaName, model.getName());
       }
     });
   }

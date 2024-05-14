@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel.sql.type;
 
-import tech.wetech.flexmodel.TextTypeHandler;
+import tech.wetech.flexmodel.mapping.TextTypeHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

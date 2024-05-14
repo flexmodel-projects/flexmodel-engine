@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel;
 
+import tech.wetech.flexmodel.graph.JoinGraphNode;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -10,7 +12,6 @@ import java.util.function.UnaryOperator;
  */
 public class AbstractDataOperationsDecorator implements DataOperations {
 
-
   protected final DataOperations delegate;
 
   public AbstractDataOperationsDecorator(DataOperations delegate) {
@@ -18,18 +19,13 @@ public class AbstractDataOperationsDecorator implements DataOperations {
   }
 
   @Override
-  public int insert(String modelName, Map<String, Object> record) {
-    return delegate.insert(modelName, record);
+  public void associate(JoinGraphNode joinGraphNode, Map<String, Object> data) {
+    delegate.associate(joinGraphNode, data);
   }
 
   @Override
   public int insert(String modelName, Map<String, Object> record, Consumer<Object> id) {
     return delegate.insert(modelName, record, id);
-  }
-
-  @Override
-  public int insertAll(String modelName, List<Map<String, Object>> records) {
-    return delegate.insertAll(modelName, records);
   }
 
   @Override

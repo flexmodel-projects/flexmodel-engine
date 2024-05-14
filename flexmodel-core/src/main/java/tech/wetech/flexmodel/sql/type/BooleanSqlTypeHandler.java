@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel.sql.type;
 
-import tech.wetech.flexmodel.BooleanTypeHandler;
+import tech.wetech.flexmodel.mapping.BooleanTypeHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

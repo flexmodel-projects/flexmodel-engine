@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel;
 
+import tech.wetech.flexmodel.sql.SqlExecutionException;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -8,21 +10,21 @@ import java.util.stream.Collectors;
  */
 public class QueryHelper {
 
-  public static void validate(Query query) {
-    Query.Projection projection = query.projection();
-    Query.GroupBy groupBy = query.groupBy();
+  public static void validate(String schemaName, String modelName, MappedModels mappedModels, Query query) {
+    Query.Projection projection = query.getProjection();
+    Query.GroupBy groupBy = query.getGroupBy();
     if (groupBy != null) {
-      Set<String> groupFields = groupBy.fields().stream()
-        .map(Query.QueryField::name)
+      Set<String> groupFields = groupBy.getFields().stream()
+        .map(Query.QueryField::getName)
         .collect(Collectors.toSet());
       List<String> errorFields = new ArrayList<>();
       if (projection != null) {
-        Map<String, Query.QueryCall> projectFields = projection.fields();
+        Map<String, Query.QueryCall> projectFields = projection.getFields();
         for (Map.Entry<String, Query.QueryCall> entry : projectFields.entrySet()) {
           String key = entry.getKey();
           Query.QueryCall value = entry.getValue();
           if (value instanceof Query.QueryField queryField) {
-            if (!groupFields.contains(key) && !groupFields.contains(queryField.name())) {
+            if (!groupFields.contains(key) && !groupFields.contains(queryField.getName())) {
               errorFields.add(key);
             }
           }
@@ -34,28 +36,46 @@ public class QueryHelper {
         throw new RuntimeException("The fields " + String.join(", ", errorFields) + " has not been grouped or aggregated");
       }
     }
+    if (query.getJoins() != null) {
+      Model model = mappedModels.getModel(schemaName, modelName);
+      for (Query.Join join : query.getJoins().getJoins()) {
+        if (join.getFrom() == null) {
+          throw new SqlExecutionException("join from model must not be null");
+        }
+        if (model instanceof Entity entity && join.getLocalField() == null && join.getForeignField() == null) {
+          AssociationField associationField = entity.findAssociationFieldByEntityName(join.getFrom())
+            .orElseThrow();
+          join.setLocalField(entity.getIdField().getName());
+          join.setForeignField(associationField.getTargetField());
+        } else {
+          if (join.getLocalField() == null || join.getForeignField() == null) {
+            throw new SqlExecutionException("localField and foreignField must not be null when is not association field");
+          }
+        }
+      }
+    }
   }
 
   public static Map<String, AssociationField> findAssociationFields(Model model, Query query) {
     Map<String, AssociationField> associationFields = new HashMap<>();
     if (model instanceof Entity entity) {
-      Query.Projection projection = query.projection();
+      Query.Projection projection = query.getProjection();
       if (projection != null) {
-        for (Map.Entry<String, Query.QueryCall> entry : projection.fields().entrySet()) {
+        for (Map.Entry<String, Query.QueryCall> entry : projection.getFields().entrySet()) {
           String key = entry.getKey();
           Query.QueryCall value = entry.getValue();
           if (value instanceof Query.QueryField queryField) {
-            entity.fields().stream()
-              .filter(f -> f.name().equals(queryField.name()) && f instanceof AssociationField)
+            entity.getFields().stream()
+              .filter(f -> f.getName().equals(queryField.getName()) && f instanceof AssociationField)
               .map(f -> (AssociationField) f)
               .findFirst()
               .ifPresent(f -> associationFields.put(key, f));
           }
         }
       } else {
-        for (Field field : model.fields()) {
+        for (Field field : model.getFields()) {
           if (field instanceof AssociationField assField) {
-            associationFields.put(assField.name(), assField);
+            associationFields.put(assField.getName(), assField);
           }
         }
       }

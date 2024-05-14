@@ -140,11 +140,11 @@ public class JdbcMappedModels implements MappedModels {
       connection.setAutoCommit(false);
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
       String sqlDeleteString = getDeleteString();
-      sqlExecutor.update(sqlDeleteString, Map.of("schemaName", schemaName, "modelName", model.name()));
+      sqlExecutor.update(sqlDeleteString, Map.of("schemaName", schemaName, "modelName", model.getName()));
       String sqlInsertString = "insert into " + sqlDialect.quoteIdentifier("flex_models") +
-                               "values (:schemaName, :modelName, :content, :binaryContent)\n";
+                               " values (:schemaName, :modelName, :content, :binaryContent)\n";
       sqlExecutor.update(sqlInsertString, Map.of("schemaName", schemaName
-        , "modelName", model.name()
+        , "modelName", model.getName()
         , "content", content
         , "binaryContent", serialize(model)
       ));

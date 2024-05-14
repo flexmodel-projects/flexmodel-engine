@@ -35,11 +35,11 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
   }
 
   @Override
-  public String name() {
+  public String getName() {
     return name;
   }
 
-  public String comment() {
+  public String getComment() {
     return comment;
   }
 
@@ -57,7 +57,7 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
     return self();
   }
 
-  public T defaultValue() {
+  public T getDefaultValue() {
     return defaultValue;
   }
 
@@ -67,11 +67,11 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
     return self();
   }
 
-  public String type() {
+  public String getType() {
     return type;
   }
 
-  public String modelName() {
+  public String getModelName() {
     return modelName;
   }
 
@@ -92,10 +92,10 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
 
   @Override
   public String toString() {
-    return getClass().getName() + '(' + name() + ')';
+    return getClass().getName() + '(' + getName() + ')';
   }
 
-  public Set<ConstraintValidator<T>> validators() {
+  public Set<ConstraintValidator<T>> getValidators() {
     return validators;
   }
 
@@ -104,7 +104,7 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
     return self();
   }
 
-  public Set<ValueCalculator<T>> calculators() {
+  public Set<ValueCalculator<T>> getCalculators() {
     return calculators;
   }
 
@@ -116,8 +116,8 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
 
   @Override
   public boolean equals(Object obj) {
-    if (this.name() != null && obj instanceof TypedField) {
-      return this.name().equals(((TypedField<T, SELF>) obj).name());
+    if (this.getName() != null && obj instanceof TypedField) {
+      return this.getName().equals(((TypedField<T, SELF>) obj).getName());
     }
     return false;
   }

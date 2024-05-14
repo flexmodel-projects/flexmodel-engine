@@ -17,7 +17,7 @@ public class StandardUniqueKeyExporter implements Exporter<SqlUniqueKey> {
 
   @Override
   public String[] getSqlCreateString(SqlUniqueKey uniqueKey) {
-    String tableName = uniqueKey.getTable().getName();
+    String tableName = sqlDialect.quoteIdentifier(uniqueKey.getTable().getName());
     String constraintName = uniqueKey.getName();
 
     return new String[]{sqlDialect.getAlterTableString(tableName) + " add constraint " + constraintName + " " + uniqueConstraintSql(uniqueKey)};
@@ -43,7 +43,7 @@ public class StandardUniqueKeyExporter implements Exporter<SqlUniqueKey> {
 
   @Override
   public String[] getSqlDropString(SqlUniqueKey uniqueKey) {
-    String tableName = uniqueKey.getTable().getName();
+    String tableName = sqlDialect.quoteIdentifier(uniqueKey.getTable().getName());
     final StringBuilder buf = new StringBuilder(sqlDialect.getAlterTableString(tableName));
     buf.append(getDropUnique());
     if (sqlDialect.supportsIfExistsBeforeConstraintName()) {

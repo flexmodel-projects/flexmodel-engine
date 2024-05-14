@@ -1,12 +1,13 @@
 package tech.wetech.flexmodel;
 
 import tech.wetech.flexmodel.calculations.DataOperationsCalculationDecorator;
+import tech.wetech.flexmodel.graph.JoinGraphNode;
+import tech.wetech.flexmodel.mapping.TypeHandler;
 import tech.wetech.flexmodel.validations.DataOperationsValidationDecorator;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 
 /**
  * @author cjbi
@@ -52,8 +53,8 @@ public abstract class AbstractSession implements Session {
   }
 
   @Override
-  public Entity createEntity(String modelName, UnaryOperator<Entity> entityUnaryOperator) {
-    return schemaOperationsDelegate.createEntity(modelName, entityUnaryOperator);
+  public Entity createEntity(String modelName, Entity entity) {
+    return schemaOperationsDelegate.createEntity(modelName, entity);
   }
 
   @Override
@@ -82,18 +83,8 @@ public abstract class AbstractSession implements Session {
   }
 
   @Override
-  public int insert(String modelName, Map<String, Object> record) {
-    return dataOperationsDelegate.insert(modelName, record);
-  }
-
-  @Override
   public int insert(String modelName, Map<String, Object> record, Consumer<Object> id) {
     return dataOperationsDelegate.insert(modelName, record, id);
-  }
-
-  @Override
-  public int insertAll(String modelName, List<Map<String, Object>> records) {
-    return dataOperationsDelegate.insertAll(modelName, records);
   }
 
   @Override
@@ -137,8 +128,12 @@ public abstract class AbstractSession implements Session {
   }
 
   @Override
-  public View createView(String viewName, String viewOn, UnaryOperator<Query> queryUnaryOperator) {
-    return schemaOperationsDelegate.createView(viewName, viewOn, queryUnaryOperator);
+  public View createView(String viewName, String viewOn, Query query) {
+    return schemaOperationsDelegate.createView(viewName, viewOn, query);
   }
 
+  @Override
+  public void associate(JoinGraphNode joinGraphNode, Map<String, Object> data) {
+    dataOperationsDelegate.associate(joinGraphNode, data);
+  }
 }

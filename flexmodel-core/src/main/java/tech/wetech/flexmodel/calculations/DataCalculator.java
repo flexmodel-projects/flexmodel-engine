@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.calculations;
 
 import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.mapping.TypeHandler;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,24 +33,24 @@ public class DataCalculator {
   @SuppressWarnings({"unchecked", "rawtypes"})
   private Map<String, Object> calculate(String modelName, Map<String, Object> data, boolean calculateAll) throws ValueCalculateException {
     Entity entity = mappedModels.getEntity(schemaName, modelName);
-    List<TypedField<?, ?>> fields = entity.fields();
+    List<TypedField<?, ?>> fields = entity.getFields();
     Map<String, Object> newData = new HashMap<>();
     for (TypedField<?, ?> field : fields) {
       if (field instanceof AssociationField) {
         continue;
       }
-      boolean flag = !calculateAll && !data.containsKey(field.name());
+      boolean flag = !calculateAll && !data.containsKey(field.getName());
       if (flag) {
         continue;
       }
-      if (field.calculators().isEmpty() && data.containsKey(field.name())) {
-        newData.put(field.name(), getTypeHandler(field instanceof IDField idField ? idField.generatedValue().type() : field.type())
-          .convertParameter(data.get(field.name()))
+      if (field.getCalculators().isEmpty() && data.containsKey(field.getName())) {
+        newData.put(field.getName(), getTypeHandler(field instanceof IDField idField ? idField.getGeneratedValue().getType() : field.getType())
+          .convertParameter(data.get(field.getName()))
         );
         continue;
       }
-      for (ValueCalculator calculator : field.calculators()) {
-        newData.put(field.name(), getTypeHandler(field instanceof IDField idField ? idField.generatedValue().type() : field.type())
+      for (ValueCalculator calculator : field.getCalculators()) {
+        newData.put(field.getName(), getTypeHandler(field instanceof IDField idField ? idField.getGeneratedValue().getType() : field.getType())
           .convertParameter(calculator.calculate(field, data))
         );
       }

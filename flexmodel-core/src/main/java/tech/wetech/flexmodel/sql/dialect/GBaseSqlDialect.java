@@ -51,11 +51,6 @@ public class GBaseSqlDialect extends InformixSqlDialect {
   }
 
   @Override
-  public boolean supportsStandardInsertManyValues() {
-    return true;
-  }
-
-  @Override
   public boolean supportsJSR310() {
     return false;
   }

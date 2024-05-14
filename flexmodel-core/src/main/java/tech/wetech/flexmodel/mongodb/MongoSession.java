@@ -4,7 +4,6 @@ import tech.wetech.flexmodel.AbstractSession;
 import tech.wetech.flexmodel.Entity;
 import tech.wetech.flexmodel.TypedField;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -24,12 +23,6 @@ public class MongoSession extends AbstractSession {
 
   }
 
-  @Override
-  public int insert(String modelName, Map<String, Object> record) {
-    setId(modelName, record);
-    return super.insert(modelName, record);
-  }
-
   private void setId(String modelName, Map<String, Object> record) {
     String sequenceName = modelName + "_seq";
     try {
@@ -38,9 +31,9 @@ public class MongoSession extends AbstractSession {
     }
     long sequenceNextVal = getSequenceNextVal(sequenceName);
     Entity entity = (Entity) getModel(modelName);
-    TypedField<?, ?> idField = entity.idField();
+    TypedField<?, ?> idField = entity.getIdField();
     if (idField != null) {
-      record.put(idField.name(), sequenceNextVal);
+      record.put(idField.getName(), sequenceNextVal);
     }
   }
 
@@ -49,17 +42,9 @@ public class MongoSession extends AbstractSession {
     setId(modelName, record);
     int rows = super.insert(modelName, record, idConsumer);
     Entity entity = (Entity) getModel(modelName);
-    TypedField<?, ?> idField = entity.idField();
-    idConsumer.accept(record.get(idField.name()));
+    TypedField<?, ?> idField = entity.getIdField();
+    idConsumer.accept(record.get(idField.getName()));
     return rows;
-  }
-
-  @Override
-  public int insertAll(String modelName, List<Map<String, Object>> records) {
-    for (Map<String, Object> record : records) {
-      setId(modelName, record);
-    }
-    return super.insertAll(modelName, records);
   }
 
   @Override

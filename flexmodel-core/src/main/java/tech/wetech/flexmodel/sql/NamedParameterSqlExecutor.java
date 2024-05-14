@@ -341,8 +341,9 @@ public class NamedParameterSqlExecutor implements SqlExecutor {
     map.forEach((key, value) -> {
       sb.append(key).append("=").append(value);
       if (value != null) {
-        sb.append("(").append(value.getClass().getSimpleName()).append(")").append(", ");
+        sb.append("(").append(value.getClass().getSimpleName()).append(")");
       }
+      sb.append(", ");
     });
     if (!map.isEmpty()) {
       sb.deleteCharAt(sb.length() - 2);

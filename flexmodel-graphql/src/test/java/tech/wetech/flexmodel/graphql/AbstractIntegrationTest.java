@@ -1,3 +1,5 @@
+package tech.wetech.flexmodel.graphql;
+
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

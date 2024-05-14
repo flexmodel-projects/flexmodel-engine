@@ -21,9 +21,9 @@ public class Query {
 
   public interface QueryFunc extends QueryCall {
 
-    String operator();
+    String getOperator();
 
-    Object[] args();
+    Object[] getArgs();
   }
 
   public static class Projection {
@@ -35,7 +35,7 @@ public class Query {
       return this;
     }
 
-    public Map<String, QueryCall> fields() {
+    public Map<String, QueryCall> getFields() {
       return fields;
     }
   }
@@ -43,7 +43,7 @@ public class Query {
   public static class Joins {
     private final Map<String, Join> joinMap = new HashMap<>();
 
-    public List<Join> joins() {
+    public List<Join> getJoins() {
       return joinMap.values().stream().toList();
     }
 
@@ -51,7 +51,7 @@ public class Query {
       Join join = new Join();
       join.setJoinType(Join.JoinType.INNER_JOIN);
       joinUnaryOperator.apply(join);
-      this.joinMap.put(join.from(), join);
+      this.joinMap.put(join.getFrom(), join);
       return this;
     }
 
@@ -59,7 +59,7 @@ public class Query {
       Join join = new Join();
       join.setJoinType(Join.JoinType.LEFT_JOIN);
       joinUnaryOperator.apply(join);
-      this.joinMap.put(join.from(), join);
+      this.joinMap.put(join.getFrom(), join);
       return this;
     }
 
@@ -73,7 +73,7 @@ public class Query {
       return this;
     }
 
-    public List<QueryField> fields() {
+    public List<QueryField> getFields() {
       return fields;
     }
   }
@@ -92,7 +92,7 @@ public class Query {
     return this;
   }
 
-  public Joins joiners() {
+  public Joins getJoins() {
     return joins;
   }
 
@@ -103,7 +103,7 @@ public class Query {
     return this;
   }
 
-  public String filter() {
+  public String getFilter() {
     return filter;
   }
 
@@ -112,15 +112,15 @@ public class Query {
     return this;
   }
 
-  public Projection projection() {
+  public Projection getProjection() {
     return projection;
   }
 
-  public GroupBy groupBy() {
+  public GroupBy getGroupBy() {
     return groupBy;
   }
 
-  public Sort sort() {
+  public Sort getSort() {
     return sort;
   }
 
@@ -130,7 +130,7 @@ public class Query {
     return this;
   }
 
-  public Integer limit() {
+  public Integer getLimit() {
     return limit;
   }
 
@@ -139,7 +139,7 @@ public class Query {
     return this;
   }
 
-  public Integer offset() {
+  public Integer getOffset() {
     return offset;
   }
 
@@ -150,7 +150,13 @@ public class Query {
 
   public static class Join implements QueryCall {
     private String from;
+    /**
+     * 关联字段，非必须，当存在关联关系时候，可不指定
+     */
     private String localField;
+    /**
+     * 外键字段，非必须，当存在关联关系时，可不指定
+     */
     private String foreignField;
     private String filter;
     private JoinType joinType;
@@ -159,7 +165,7 @@ public class Query {
       INNER_JOIN, LEFT_JOIN
     }
 
-    public String from() {
+    public String getFrom() {
       return from;
     }
 
@@ -168,7 +174,7 @@ public class Query {
       return this;
     }
 
-    public String localField() {
+    public String getLocalField() {
       return localField;
     }
 
@@ -177,7 +183,7 @@ public class Query {
       return this;
     }
 
-    public String foreignField() {
+    public String getForeignField() {
       return foreignField;
     }
 
@@ -186,7 +192,7 @@ public class Query {
       return this;
     }
 
-    public String filter() {
+    public String getFilter() {
       return filter;
     }
 
@@ -195,7 +201,7 @@ public class Query {
       return this;
     }
 
-    public JoinType joinType() {
+    public JoinType getJoinType() {
       return joinType;
     }
 
@@ -223,7 +229,7 @@ public class Query {
       return this;
     }
 
-    public List<Order> orders() {
+    public List<Order> getOrders() {
       return orders;
     }
 
@@ -234,7 +240,7 @@ public class Query {
       public Order() {
       }
 
-      public QueryField field() {
+      public QueryField getField() {
         return field;
       }
 
@@ -248,26 +254,26 @@ public class Query {
         return this;
       }
 
-      public Direction direction() {
+      public Direction getDirection() {
         return direction;
       }
 
     }
   }
 
-  public record AggFunc(String operator, QueryCall... args) implements QueryFunc {
+  public record AggFunc(String getOperator, QueryCall... getArgs) implements QueryFunc {
   }
 
   public record QueryField(String name) implements Field, QueryCall {
 
-    public String modelName() {
+    public String getModelName() {
       if (name.contains(".")) {
         return name.split("\\.")[0];
       }
       return null;
     }
 
-    public String fieldName() {
+    public String getFieldName() {
       if (name.contains(".")) {
         return name.split("\\.")[1];
       }
@@ -278,6 +284,11 @@ public class Query {
     public String toString() {
       return name;
     }
+
+    @Override
+    public String getName() {
+      return name;
+    }
   }
 
   public record QueryValue(Object value) implements QueryCall {
@@ -286,12 +297,12 @@ public class Query {
 
   public record DateFormatFunc(QueryCall date, String fmt) implements QueryFunc {
     @Override
-    public String operator() {
+    public String getOperator() {
       return "date_format";
     }
 
     @Override
-    public Object[] args() {
+    public Object[] getArgs() {
       return new Object[]{date, fmt};
     }
   }
@@ -299,12 +310,12 @@ public class Query {
   public record DayOfWeekFunc(Query.QueryCall date) implements QueryFunc {
 
     @Override
-    public String operator() {
+    public String getOperator() {
       return "dayofweek";
     }
 
     @Override
-    public Object[] args() {
+    public Object[] getArgs() {
       return new Object[]{date};
     }
   }
@@ -312,12 +323,12 @@ public class Query {
   public record DayOfMonthFunc(Query.QueryCall date) implements QueryFunc {
 
     @Override
-    public String operator() {
+    public String getOperator() {
       return "dayofmonth";
     }
 
     @Override
-    public Object[] args() {
+    public Object[] getArgs() {
       return new Object[]{date};
     }
   }
@@ -325,12 +336,12 @@ public class Query {
   public record DayOfYearFunc(Query.QueryCall date) implements QueryFunc {
 
     @Override
-    public String operator() {
+    public String getOperator() {
       return "dayofyear";
     }
 
     @Override
-    public Object[] args() {
+    public Object[] getArgs() {
       return new Object[]{date};
     }
   }

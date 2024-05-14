@@ -26,11 +26,11 @@ public class AssociationField extends TypedField<Long, AssociationField> {
     super(name, BasicFieldType.ASSOCIATION.getType());
   }
 
-  public boolean cascadeDelete() {
+  public boolean isCascadeDelete() {
     return cascadeDelete;
   }
 
-  public Cardinality cardinality() {
+  public Cardinality getCardinality() {
     return cardinality;
   }
 
@@ -44,7 +44,7 @@ public class AssociationField extends TypedField<Long, AssociationField> {
     return this;
   }
 
-  public String targetEntity() {
+  public String getTargetEntity() {
     return targetEntity;
   }
 
@@ -53,10 +53,7 @@ public class AssociationField extends TypedField<Long, AssociationField> {
     return this;
   }
 
-  public String targetField() {
-    if (targetField == null) {
-      return modelName() + "_id";
-    }
+  public String getTargetField() {
     return targetField;
   }
 

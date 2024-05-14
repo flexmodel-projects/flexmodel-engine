@@ -257,8 +257,8 @@ session.createView("teacher_course_report", "teacher", query -> query
       )
       .setJoins(joiners -> joiners
         .addLeftJoin(joiner -> joiner
-          .setLocalField("id")
-          .setForeignField("teacher_id")
+          .setLocalField("id") // 主键字段，存在关联关系时可不指定
+          .setForeignField("teacher_id") // 外键字段，存在关联关系时可不指定
           .setFrom(teacherCourseEntityName)
         )
       )
@@ -364,9 +364,9 @@ List<Map<String, Object>> groupList = session.find(entityName, query -> query
   // 设置关联表
   .setJoins(joiners -> joiners
     .addInnerJoin(joiner -> joiner
-      .setLocalField("id")
-      .setForeignField("teacher_id")
       .setFrom(courseEntityName)
+      .setLocalField("id") // 主键字段，存在关联关系时可不指定
+      .setForeignField("teacher_id") // 外键字段，存在关联关系时可不指定
       .setFilter("""
         {
           "!=": [{ "var": ["teacher_id"] }, 999]

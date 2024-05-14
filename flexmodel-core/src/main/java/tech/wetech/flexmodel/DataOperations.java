@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel;
 
+import tech.wetech.flexmodel.graph.JoinGraphNode;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -12,14 +14,7 @@ import java.util.function.UnaryOperator;
  */
 public interface DataOperations {
 
-  /**
-   * 插入记录
-   *
-   * @param modelName 模型名称
-   * @param record    记录
-   * @return affected rows
-   */
-  int insert(String modelName, Map<String, Object> record);
+  void associate(JoinGraphNode joinGraphNode, Map<String, Object> data);
 
   /**
    * 插入记录
@@ -30,15 +25,6 @@ public interface DataOperations {
    * @return affected rows
    */
   int insert(String modelName, Map<String, Object> record, Consumer<Object> id);
-
-  /**
-   * 插入多条记录
-   *
-   * @param modelName
-   * @param records
-   * @return
-   */
-  int insertAll(String modelName, List<Map<String, Object>> records);
 
   /**
    * 根据id获取记录
@@ -104,6 +90,26 @@ public interface DataOperations {
    */
   int deleteAll(String modelName);
 
+  default int insert(String modelName, Map<String, Object> record) {
+    return insert(modelName, record, id -> {
+    });
+  }
+
+  /**
+   * 插入多条记录
+   *
+   * @param modelName
+   * @param records
+   * @return
+   */
+  default int insertAll(String modelName, List<Map<String, Object>> records) {
+    int rows = -1;
+    for (Map<String, Object> record : records) {
+      rows += insert(modelName, record);
+    }
+    return rows;
+  }
+
   /**
    * 根据条件查询
    *
@@ -139,6 +145,12 @@ public interface DataOperations {
   @SuppressWarnings("all")
   default List<Map<String, Object>> find(String modelName, UnaryOperator<Query> queryUnaryOperator) {
     List list = find(modelName, queryUnaryOperator, Map.class);
+    return list;
+  }
+
+  @SuppressWarnings("all")
+  default List<Map<String, Object>> find(String modelName, Query query) {
+    List list = find(modelName, query, Map.class);
     return list;
   }
 

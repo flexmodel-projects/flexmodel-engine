@@ -27,7 +27,7 @@ public class MapMappedModels implements MappedModels {
       if (value == null) {
         value = new HashMap<>();
       }
-      value.put(model.name(), model);
+      value.put(model.getName(), model);
       return value;
     });
   }

@@ -8,8 +8,15 @@ import java.util.List;
  */
 public interface Model extends Serializable {
 
-  String name();
+  String getName();
 
-  List<? extends Field> fields();
+  List<? extends Field> getFields();
+
+  default Field getField(String name) {
+    return this.getFields().stream()
+      .filter(f -> f.getName().equals(name))
+      .findFirst()
+      .orElse(null);
+  }
 
 }

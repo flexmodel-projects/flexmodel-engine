@@ -131,11 +131,6 @@ public class OracleSqlDialect extends SqlDialect {
   }
 
   @Override
-  public boolean supportsStandardInsertManyValues() {
-    return false;
-  }
-
-  @Override
   public boolean supportsGroupByColumnAlias() {
     return false;
   }

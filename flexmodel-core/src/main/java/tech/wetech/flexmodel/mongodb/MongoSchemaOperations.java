@@ -11,7 +11,6 @@ import tech.wetech.flexmodel.sql.StringHelper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.UnaryOperator;
 
 /**
  * @author cjbi
@@ -49,21 +48,17 @@ public class MongoSchemaOperations implements SchemaOperations {
   }
 
   @Override
-  public Entity createEntity(String modelName, UnaryOperator<Entity> entityUnaryOperator) {
-    Entity entity = new Entity(modelName);
-    entityUnaryOperator.apply(entity);
-    String collectionName = getCollectionName(entity.name());
+  public Entity createEntity(String modelName, Entity entity) {
+    String collectionName = getCollectionName(entity.getName());
     mongoDatabase.createCollection(collectionName);
-    for (Index index : entity.indexes()) {
+    for (Index index : entity.getIndexes()) {
       createIndex(index);
     }
     return entity;
   }
 
   @Override
-  public View createView(String viewName, String viewOn, UnaryOperator<Query> queryUnaryOperator) {
-    Query query = new Query();
-    queryUnaryOperator.apply(query);
+  public View createView(String viewName, String viewOn, Query query) {
     mongoDatabase.createView(viewName, viewOn, MongoHelper.createPipeline(viewName, mongoContext, query));
     View view = new View(viewName);
     view.setViewOn(viewOn);
@@ -75,8 +70,8 @@ public class MongoSchemaOperations implements SchemaOperations {
   public void createField(String modelName, TypedField<?, ?> field) {
     field.setModelName(modelName);
     if (field instanceof IDField) {
-      Index index = new Index(field.modelName());
-      index.addField(field.name());
+      Index index = new Index(field.getModelName());
+      index.addField(field.getName());
       createIndex(index);
     }
   }

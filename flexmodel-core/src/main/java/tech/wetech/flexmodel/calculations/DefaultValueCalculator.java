@@ -18,7 +18,7 @@ public class DefaultValueCalculator<T> extends AbstractValueCalculator<T> {
   @Override
   @SuppressWarnings("unchecked")
   public T calculate(TypedField<T, ?> field, Map<String, Object> data) throws ValueCalculateException {
-    T currentValue = (T) data.get(field.name());
+    T currentValue = (T) data.get(field.getName());
     if (currentValue == null) {
       return value;
     }

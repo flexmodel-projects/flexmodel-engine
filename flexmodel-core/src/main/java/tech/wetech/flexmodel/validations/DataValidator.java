@@ -33,19 +33,19 @@ public class DataValidator {
   @SuppressWarnings({"unchecked", "rawtypes"})
   private void validate(String modelName, Map<String, Object> data, boolean validAll) {
     Entity entity = mappedModels.getEntity(schemaName, modelName);
-    List<TypedField<?, ?>> fields = entity.fields();
+    List<TypedField<?, ?>> fields = entity.getFields();
     List<ConstraintValidException> errors = new ArrayList<>();
     for (TypedField<?, ?> field : fields) {
-      boolean flag = !validAll && !data.containsKey(field.name());
+      boolean flag = !validAll && !data.containsKey(field.getName());
       if (flag) {
         continue;
       }
       if (field instanceof AssociationField) {
         continue;
       }
-      for (ConstraintValidator validator : field.validators()) {
+      for (ConstraintValidator validator : field.getValidators()) {
         try {
-          validator.validate(field, data.get(field.name()));
+          validator.validate(field, data.get(field.getName()));
         } catch (ConstraintValidException e) {
           errors.add(e);
         }

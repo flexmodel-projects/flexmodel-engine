@@ -14,17 +14,17 @@ public class IDField extends TypedField<Object, IDField> {
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   public IDField setGeneratedValue(GeneratedValue generatedValue) {
-    if (this.generatedValue.generator() != null) {
-      this.calculators().remove(this.generatedValue.generator());
+    if (this.generatedValue.getGenerator() != null) {
+      this.getCalculators().remove(this.generatedValue.getGenerator());
     }
-    if (generatedValue.generator() != null) {
-      this.addCalculation((ValueCalculator) generatedValue.generator());
+    if (generatedValue.getGenerator() != null) {
+      this.addCalculation((ValueCalculator) generatedValue.getGenerator());
     }
     this.generatedValue = generatedValue;
     return this;
   }
 
-  public GeneratedValue generatedValue() {
+  public GeneratedValue getGeneratedValue() {
     return generatedValue;
   }
 
@@ -36,46 +36,44 @@ public class IDField extends TypedField<Object, IDField> {
     /**
      * 自增ID
      */
-    IDENTITY("bigint", "identity", null),
+    IDENTITY("bigint", null),
     /**
      * UUID
      */
-    UUID("string", "uuid", UUIDValueCalculator.INSTANCE),
+    UUID("string", UUIDValueCalculator.INSTANCE),
+    /**
+     * 长整型不自动生成
+     */
+    BIGINT_NO_GEN("bigint", null),
+    /**
+     * 字符串不自动生成
+     */
+    STRING_NO_GEN("string", null),
     ;
-
     private final String type;
-    private final String strategy;
     private final ValueCalculator<?> generator;
 
-    DefaultGeneratedValue(String type, String strategy, ValueCalculator<?> generator) {
+    DefaultGeneratedValue(String type, ValueCalculator<?> generator) {
       this.type = type;
-      this.strategy = strategy;
       this.generator = generator;
     }
 
     @Override
-    public String type() {
+    public String getType() {
       return type;
     }
 
     @Override
-    public String strategy() {
-      return strategy;
-    }
-
-    @Override
-    public ValueCalculator<?> generator() {
+    public ValueCalculator<?> getGenerator() {
       return generator;
     }
   }
 
   public interface GeneratedValue {
 
-    String type();
+    String getType();
 
-    String strategy();
-
-    ValueCalculator<?> generator();
+    ValueCalculator<?> getGenerator();
 
   }
 

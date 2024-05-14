@@ -36,19 +36,12 @@ public interface SchemaOperations {
    * 创建实体
    *
    * @param modelName
-   * @param entityUnaryOperator
+   * @param entity
    * @return
    */
-  Entity createEntity(String modelName, UnaryOperator<Entity> entityUnaryOperator);
+  Entity createEntity(String modelName, Entity entity);
 
-  /**
-   * 创建视图
-   *
-   * @param viewName
-   * @param queryUnaryOperator
-   * @return
-   */
-  View createView(String viewName, String viewOn, UnaryOperator<Query> queryUnaryOperator);
+  View createView(String viewName, String viewOn, Query query);
 
   /**
    * 创建字段
@@ -103,5 +96,31 @@ public interface SchemaOperations {
    * @return 序列值
    */
   long getSequenceNextVal(String sequenceName);
+
+  /**
+   * 创建实体
+   *
+   * @param modelName
+   * @param entityUnaryOperator
+   * @return
+   */
+  default Entity createEntity(String modelName, UnaryOperator<Entity> entityUnaryOperator) {
+    Entity entity = new Entity(modelName);
+    entityUnaryOperator.apply(entity);
+    return createEntity(modelName, entity);
+  }
+
+  /**
+   * 创建视图
+   *
+   * @param viewName
+   * @param queryUnaryOperator
+   * @return
+   */
+  default View createView(String viewName, String viewOn, UnaryOperator<Query> queryUnaryOperator) {
+    Query query = new Query();
+    queryUnaryOperator.apply(query);
+    return createView(viewName, viewOn, query);
+  }
 
 }

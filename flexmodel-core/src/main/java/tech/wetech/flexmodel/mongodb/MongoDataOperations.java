@@ -2,11 +2,11 @@ package tech.wetech.flexmodel.mongodb;
 
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.result.InsertManyResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.graph.JoinGraphNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,38 +34,32 @@ public class MongoDataOperations implements DataOperations {
     this.mappedModels = mongoContext.getMappedModels();
   }
 
-  @Override
-  public int insert(String modelName, Map<String, Object> record) {
-    String collectionName = getCollectionName(modelName);
-
-    InsertOneResult result = mongoDatabase.getCollection(collectionName, Map.class).insertOne(record);
-    return result.wasAcknowledged() ? 1 : 0;
-  }
-
   private String getCollectionName(String modelName) {
     return physicalNamingStrategy.toPhysicalTableName(modelName);
+  }
+
+  @Override
+  public void associate(JoinGraphNode joinGraphNode, Map<String, Object> data) {
+    String collectionName = getCollectionName(joinGraphNode.getJoinName());
+    mongoDatabase.getCollection(collectionName, Map.class).insertOne(data);
   }
 
   @Override
   public int insert(String modelName, Map<String, Object> record, Consumer<Object> idConsumer) {
     String collectionName = getCollectionName(modelName);
     InsertOneResult result = mongoDatabase.getCollection(collectionName, Map.class).insertOne(record);
+    Entity entity = mappedModels.getEntity(schemaName, modelName);
+    TypedField<?, ?> idField = entity.getIdField();
+    idConsumer.accept(record.get(idField.getName()));
     return result.wasAcknowledged() ? 1 : 0;
-  }
-
-  @Override
-  public int insertAll(String modelName, List<Map<String, Object>> records) {
-    String collectionName = getCollectionName(modelName);
-    InsertManyResult result = mongoDatabase.getCollection(collectionName, Map.class).insertMany(records);
-    return result.getInsertedIds().size();
   }
 
   @Override
   public int updateById(String modelName, Map<String, Object> record, Object id) {
     String collectionName = getCollectionName(modelName);
     Entity entity = mappedModels.getEntity(schemaName, modelName);
-    TypedField<?, ?> idField = entity.idField();
-    UpdateResult result = mongoDatabase.getCollection(collectionName, Map.class).updateOne(Filters.eq(idField.name(), id), new Document("$set", new Document(record)));
+    TypedField<?, ?> idField = entity.getIdField();
+    UpdateResult result = mongoDatabase.getCollection(collectionName, Map.class).updateOne(Filters.eq(idField.getName(), id), new Document("$set", new Document(record)));
     return (int) result.getModifiedCount();
   }
 
@@ -82,9 +76,9 @@ public class MongoDataOperations implements DataOperations {
   public int deleteById(String modelName, Object id) {
     String collectionName = getCollectionName(modelName);
     Entity entity = mappedModels.getEntity(schemaName, modelName);
-    TypedField<?, ?> idField = entity.idField();
+    TypedField<?, ?> idField = entity.getIdField();
     return (int) mongoDatabase.getCollection(collectionName)
-      .deleteMany(Filters.eq(idField.name(), id)).getDeletedCount();
+      .deleteMany(Filters.eq(idField.getName(), id)).getDeletedCount();
   }
 
   @Override
@@ -107,10 +101,10 @@ public class MongoDataOperations implements DataOperations {
   public <T> T findById(String modelName, Object id, Class<T> resultType) {
     String collectionName = getCollectionName(modelName);
     Entity entity = mappedModels.getEntity(schemaName, modelName);
-    TypedField<?, ?> idField = entity.idField();
+    TypedField<?, ?> idField = entity.getIdField();
 
     return mongoDatabase.getCollection(collectionName, resultType)
-      .find(Filters.eq(idField.name(), id))
+      .find(Filters.eq(idField.getName(), id))
       .first();
   }
 

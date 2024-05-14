@@ -17,7 +17,7 @@ public class View implements Model {
     this.name = name;
   }
 
-  public String viewOn() {
+  public String getViewOn() {
     return viewOn;
   }
 
@@ -27,20 +27,20 @@ public class View implements Model {
   }
 
   @Override
-  public String name() {
+  public String getName() {
     return name;
   }
 
   @Override
-  public List<? extends Field> fields() {
-    Map<String, Query.QueryCall> fields = this.query().projection().fields();
+  public List<? extends Field> getFields() {
+    Map<String, Query.QueryCall> fields = this.getQuery().getProjection().getFields();
     return fields.keySet()
       .stream()
       .map(Query.QueryField::new)
       .collect(Collectors.toList());
   }
 
-  public Query query() {
+  public Query getQuery() {
     return query;
   }
 

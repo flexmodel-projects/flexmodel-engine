@@ -1,10 +1,13 @@
 package tech.wetech.flexmodel.sql;
 
 import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.graph.JoinGraphNode;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.UnaryOperator;
+
+import static tech.wetech.flexmodel.AssociationField.Cardinality.MANY_TO_MANY;
+import static tech.wetech.flexmodel.AssociationField.Cardinality.ONE_TO_ONE;
 
 /**
  * @author cjbi
@@ -38,12 +41,10 @@ public class SqlSchemaOperations implements SchemaOperations {
   }
 
   @Override
-  public Entity createEntity(String modelName, UnaryOperator<Entity> entityUnaryOperator) {
-    Entity entity = new Entity(modelName);
-    entityUnaryOperator.apply(entity);
+  public Entity createEntity(String modelName, Entity entity) {
     SqlTable sqlTable = toSqlTable(entity);
     createTable(sqlTable);
-    for (TypedField<?, ?> typedField : entity.fields()) {
+    for (TypedField<?, ?> typedField : entity.getFields()) {
       if (typedField instanceof AssociationField associationField) {
         createForeignKey(associationField);
       }
@@ -52,9 +53,7 @@ public class SqlSchemaOperations implements SchemaOperations {
   }
 
   @Override
-  public View createView(String viewName, String viewOn, UnaryOperator<Query> viewUnaryOperator) {
-    Query query = new Query();
-    viewUnaryOperator.apply(query);
+  public View createView(String viewName, String viewOn, Query query) {
     View view = new View(viewName);
     view.setViewOn(viewOn);
     view.setQuery(query);
@@ -72,6 +71,7 @@ public class SqlSchemaOperations implements SchemaOperations {
     }
     createUniqueKeys(sqlTable);
     createIndexes(sqlTable);
+    createForeignKey(sqlTable);
   }
 
   private void dropView(SqlView sqlView) {
@@ -92,23 +92,71 @@ public class SqlSchemaOperations implements SchemaOperations {
   public void createField(String modelName, TypedField<?, ?> field) {
     field.setModelName(modelName);
     if (field instanceof AssociationField associationField) {
-      createForeignKey(associationField);
+      if (associationField.getCardinality() == MANY_TO_MANY) {
+
+        Entity entity = (Entity) getModel(modelName);
+        Entity targetEntity = (Entity) getModel(associationField.getTargetEntity());
+        JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, associationField);
+
+        SqlTable joinTable = new SqlTable();
+        joinTable.setName(joinGraphNode.getJoinName());
+        SqlColumn joinColumn = new SqlColumn();
+        joinColumn.setTableName(joinGraphNode.getJoinName());
+        joinColumn.setName(joinGraphNode.getJoinFieldName());
+        joinColumn.setSqlTypeCode(sqlContext.getTypeHandler(joinGraphNode.getJoinFieldType()).getJdbcTypeCode());
+        joinTable.addColumn(joinColumn);
+        SqlColumn inverseJoinColumn = new SqlColumn();
+        inverseJoinColumn.setTableName(joinGraphNode.getJoinName());
+        inverseJoinColumn.setName(joinGraphNode.getInverseJoinFieldName());
+        inverseJoinColumn.setSqlTypeCode(sqlContext.getTypeHandler(joinGraphNode.getInverseJoinFieldType()).getJdbcTypeCode());
+        joinTable.addColumn(inverseJoinColumn);
+
+        SqlTable sqlTable = toSqlTable(entity);
+        SqlTable targetSqlTable = toSqlTable(targetEntity);
+
+        joinTable.createForeignKey(List.of(joinColumn), sqlTable, List.of(sqlTable.getColumn(entity.getIdField().getName())));
+        joinTable.createForeignKey(List.of(inverseJoinColumn), targetSqlTable, List.of(targetSqlTable.getColumn(associationField.getTargetField())));
+        try {
+          createTable(joinTable);
+        } catch (Exception ignored) {
+        }
+      } else {
+        createForeignKey(associationField);
+      }
     } else {
       createColumn(toSqlColumn(field));
     }
   }
 
+  private void createForeignKey(SqlTable sqlTable) {
+    Iterator<SqlForeignKey> fkIte = sqlTable.getForeignKeyIterator();
+    while (fkIte.hasNext()) {
+      SqlForeignKey sqlForeignKey = fkIte.next();
+      String[] sqlCreateString = sqlContext.getSqlDialect().getForeignKeyExporter().getSqlCreateString(sqlForeignKey);
+      for (String sql : sqlCreateString) {
+        sqlContext.getJdbcOperations().update(sql);
+      }
+    }
+  }
+
   private void createForeignKey(AssociationField associationField) {
-    SqlTable sqlTable = toSqlTable(sqlContext.getMappedModels().getEntity(sqlContext.getSchemaName(), associationField.modelName()));
+    SqlTable sqlTable = toSqlTable(sqlContext.getMappedModels().getEntity(sqlContext.getSchemaName(), associationField.getModelName()));
     SqlTable referenceTable = toSqlTable(sqlContext.getMappedModels()
-      .getEntity(sqlContext.getSchemaName(), associationField.targetEntity()));
-    SqlColumn keyColumn = referenceTable.getColumn(associationField.targetField());
+      .getEntity(sqlContext.getSchemaName(), associationField.getTargetEntity()));
+    SqlColumn keyColumn = referenceTable.getColumn(associationField.getTargetField());
     if (keyColumn == null) {
-      throw new RuntimeException("Foreign key [" + associationField.targetField() + "] not exists");
+      throw new RuntimeException("Foreign key [" + associationField.getTargetField() + "] not exists in [" + associationField.getTargetEntity() + "]");
     }
     List<SqlColumn> keyColumns = List.of(keyColumn);
+    if (associationField.getCardinality() == ONE_TO_ONE) {
+      SqlUniqueKey uniqueKey = referenceTable.createUniqueKey(keyColumns);
+      String[] sqlCreateString = sqlContext.getSqlDialect().getUniqueKeyExporter().getSqlCreateString(uniqueKey);
+      for (String sql : sqlCreateString) {
+        sqlContext.getJdbcOperations().update(sql);
+      }
+    }
     SqlForeignKey foreignKey = referenceTable.createForeignKey(keyColumns, sqlTable, sqlTable.getPrimaryKey().getColumns());
-    foreignKey.setCascadeDeleteEnabled(associationField.cascadeDelete());
+    foreignKey.setCascadeDeleteEnabled(associationField.isCascadeDelete());
     String[] sqlCreateString = sqlContext.getSqlDialect().getForeignKeyExporter().getSqlCreateString(foreignKey);
     for (String sql : sqlCreateString) {
       sqlContext.getJdbcOperations().update(sql);
@@ -207,17 +255,17 @@ public class SqlSchemaOperations implements SchemaOperations {
   }
 
   private SqlTable toSqlTable(Entity entity) {
-    String physicalTableName = toPhysicalTableString(entity.name());
+    String physicalTableName = toPhysicalTableString(entity.getName());
     SqlTable sqlTable = new SqlTable();
     sqlTable.setName(physicalTableName);
-    sqlTable.setComment(entity.comment());
+    sqlTable.setComment(entity.getComment());
     SqlPrimaryKey primaryKey = new SqlPrimaryKey(sqlTable);
-    for (TypedField<?, ?> field : entity.fields()) {
+    for (TypedField<?, ?> field : entity.getFields()) {
       if (field instanceof AssociationField) {
         continue;
       }
-      if (sqlTable.getColumn(field.name()) != null) {
-        throw new RuntimeException(String.format("The field name %s already exists", field.name()));
+      if (sqlTable.getColumn(field.getName()) != null) {
+        throw new RuntimeException(String.format("The field name %s already exists", field.getName()));
       }
       SqlColumn sqlColumn = toSqlColumn(field);
       if (field instanceof IDField) {
@@ -228,84 +276,84 @@ public class SqlSchemaOperations implements SchemaOperations {
     if (!primaryKey.getColumns().isEmpty()) {
       sqlTable.setPrimaryKey(primaryKey);
     }
-    for (Index index : entity.indexes()) {
+    for (Index index : entity.getIndexes()) {
       sqlTable.addIndex(toSqlIndex(index));
     }
     return sqlTable;
   }
 
   private SqlView toSqlView(View view) {
-    Query query = view.query();
-    String physicalViewName = toPhysicalTableString(view.name());
+    Query query = view.getQuery();
+    String physicalViewName = toPhysicalTableString(view.getName());
     SqlView sqlView = new SqlView();
     sqlView.setName(physicalViewName);
     sqlView.setColumnList(
-      view.fields().stream()
-        .map(Field::name)
+      view.getFields().stream()
+        .map(Field::getName)
         .toList()
     );
-    sqlView.setQuery(SqlHelper.toQuerySql(sqlContext, view.viewOn(), query));
+    sqlView.setQuery(SqlHelper.toQuerySql(sqlContext, view.getViewOn(), query));
     return sqlView;
   }
 
   private SqlColumn toSqlColumn(TypedField<?, ?> field) {
     if (field instanceof AssociationField associationField) {
       SqlColumn associationColumn = new SqlColumn();
-      associationColumn.setName(associationField.targetField());
+      associationColumn.setName(associationField.getTargetField());
       associationColumn.setTableName(
-        toPhysicalTableString(associationField.targetEntity())
+        toPhysicalTableString(associationField.getTargetEntity())
       );
       associationColumn.setSqlTypeCode(
-        sqlContext.getTypeHandler(((Entity) getModel(field.modelName())).idField()
-          .generatedValue().type()).getJdbcTypeCode()
+        sqlContext.getTypeHandler(((Entity) getModel(field.getModelName())).getIdField()
+          .getGeneratedValue().getType()).getJdbcTypeCode()
       );
       return associationColumn;
     } else if (field instanceof IDField idField) {
       SqlColumn idColumn = new SqlColumn();
-      idColumn.setTableName(toPhysicalTableString(field.modelName()));
-      idColumn.setName(field.name());
+      idColumn.setTableName(toPhysicalTableString(field.getModelName()));
+      idColumn.setName(field.getName());
       idColumn.setPrimaryKey(true);
-      idColumn.setSqlTypeCode(sqlContext.getTypeHandler(idField.generatedValue().type()).getJdbcTypeCode());
-      idColumn.setAutoIncrement(idField.generatedValue() == IDField.DefaultGeneratedValue.IDENTITY);
-      idColumn.setComment(field.comment());
+      idColumn.setSqlTypeCode(sqlContext.getTypeHandler(idField.getGeneratedValue().getType()).getJdbcTypeCode());
+      idColumn.setAutoIncrement(idField.getGeneratedValue() == IDField.DefaultGeneratedValue.IDENTITY);
+      idColumn.setComment(field.getComment());
       return idColumn;
     } else {
       SqlColumn aSqlColumn = new SqlColumn();
       aSqlColumn.setUnique(field.isUnique());
-      aSqlColumn.setName(field.name());
+      aSqlColumn.setName(field.getName());
 
-      aSqlColumn.setSqlTypeCode(sqlContext.getTypeHandler(field.type()).getJdbcTypeCode());
+      aSqlColumn.setSqlTypeCode(sqlContext.getTypeHandler(field.getType()).getJdbcTypeCode());
       aSqlColumn.setNullable(field.isNullable());
-      aSqlColumn.setComment(field.comment());
-      aSqlColumn.setTableName(toPhysicalTableString(field.modelName()));
+      aSqlColumn.setComment(field.getComment());
+      aSqlColumn.setTableName(toPhysicalTableString(field.getModelName()));
 
       switch (field) {
         case StringField stringField -> {
           aSqlColumn.setLength(stringField.getLength());
-          if (field.defaultValue() != null) {
-            aSqlColumn.setDefaultValue(field.defaultValue().toString());
+          if (field.getDefaultValue() != null) {
+            aSqlColumn.setDefaultValue(field.getDefaultValue().toString());
           }
         }
         case DecimalField decimalField -> {
           aSqlColumn.setPrecision(decimalField.getPrecision());
           aSqlColumn.setScale(decimalField.getScale());
-          if (field.defaultValue() != null) {
-            aSqlColumn.setDefaultValue(field.defaultValue().toString());
+          if (field.getDefaultValue() != null) {
+            aSqlColumn.setDefaultValue(field.getDefaultValue().toString());
           }
         }
         case JsonField jsonField -> {
-          if (field.defaultValue() != null) {
-            aSqlColumn.setDefaultValue(JsonUtils.getInstance().stringify(jsonField.defaultValue()));
+          if (field.getDefaultValue() != null) {
+            aSqlColumn.setDefaultValue(JsonUtils.getInstance().stringify(jsonField.getDefaultValue()));
           }
         }
         case BooleanField booleanField -> {
-          if (field.defaultValue() != null) {
-            aSqlColumn.setDefaultValue(sqlContext.getSqlDialect().toBooleanValueString(booleanField.defaultValue()));
+          if (field.getDefaultValue() != null) {
+            aSqlColumn.setDefaultValue(sqlContext.getSqlDialect().toBooleanValueString(booleanField.getDefaultValue()));
           }
         }
         default -> {
-          if (field.defaultValue() != null) {
-            aSqlColumn.setDefaultValue(field.defaultValue().toString());
+          if (field.getDefaultValue() != null) {
+            aSqlColumn.setDefaultValue(field.getDefaultValue().toString());
           }
         }
       }

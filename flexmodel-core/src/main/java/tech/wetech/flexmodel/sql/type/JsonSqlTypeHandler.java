@@ -1,7 +1,7 @@
 package tech.wetech.flexmodel.sql.type;
 
-import tech.wetech.flexmodel.JsonTypeHandler;
 import tech.wetech.flexmodel.JsonUtils;
+import tech.wetech.flexmodel.mapping.JsonTypeHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -2,6 +2,7 @@ package tech.wetech.flexmodel;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
@@ -20,11 +21,11 @@ public class Entity implements Model {
   }
 
   @Override
-  public String name() {
+  public String getName() {
     return name;
   }
 
-  public String comment() {
+  public String getComment() {
     return comment;
   }
 
@@ -34,11 +35,22 @@ public class Entity implements Model {
   }
 
   @Override
-  public List<TypedField<?, ?>> fields() {
+  public List<TypedField<?, ?>> getFields() {
     return fields.stream().toList();
   }
 
-  public List<Index> indexes() {
+  public Optional<AssociationField> findAssociationFieldByEntityName(String entityName) {
+    for (TypedField<?, ?> field : fields) {
+      if (field instanceof AssociationField associationField) {
+        if (associationField.getTargetEntity().equals(entityName)) {
+          return Optional.of(associationField);
+        }
+      }
+    }
+    return Optional.empty();
+  }
+
+  public List<Index> getIndexes() {
     return indexes.stream().toList();
   }
 
@@ -68,7 +80,7 @@ public class Entity implements Model {
     indexes.remove(new Index(this.name, indexName));
   }
 
-  public IDField idField() {
+  public IDField getIdField() {
     return fields.stream()
       .filter(f -> f instanceof IDField)
       .map(f -> (IDField) f)
@@ -78,15 +90,15 @@ public class Entity implements Model {
 
   @Override
   public boolean equals(Object obj) {
-    if (this.name() != null && obj instanceof Entity) {
-      return this.name().equals(((Entity) obj).name());
+    if (this.getName() != null && obj instanceof Entity) {
+      return this.getName().equals(((Entity) obj).getName());
     }
     return false;
   }
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName() + "<" + name() + ">";
+    return this.getClass().getSimpleName() + "<" + getName() + ">";
   }
 
 }

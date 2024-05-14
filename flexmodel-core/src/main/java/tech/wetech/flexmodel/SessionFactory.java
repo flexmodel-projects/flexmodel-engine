@@ -1,6 +1,8 @@
 package tech.wetech.flexmodel;
 
 import com.mongodb.client.MongoDatabase;
+import tech.wetech.flexmodel.cache.Cache;
+import tech.wetech.flexmodel.cache.CachingMappedModels;
 import tech.wetech.flexmodel.mongodb.MongoContext;
 import tech.wetech.flexmodel.mongodb.MongoDataSourceProvider;
 import tech.wetech.flexmodel.mongodb.MongoSession;
@@ -21,7 +23,13 @@ public class SessionFactory {
 
   public SessionFactory(ConnectionLifeCycleManager connectionLifeCycleManager, MappedModels mappedModels) {
     this.connectionLifeCycleManager = connectionLifeCycleManager;
-    this.mappedModels = mappedModels;
+    this.mappedModels = new CachingMappedModels(mappedModels, connectionLifeCycleManager.getCache());
+
+  }
+
+  public Session openSession(String identifier) {
+    Cache cache = connectionLifeCycleManager.getCache();
+    return (Session) cache.retrieve(identifier, () -> createSession(identifier));
   }
 
   public Session createSession(String identifier) {

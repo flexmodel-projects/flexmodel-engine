@@ -1,7 +1,6 @@
 package tech.wetech.flexmodel;
 
 import java.util.List;
-import java.util.function.UnaryOperator;
 
 /**
  * @author cjbi
@@ -35,15 +34,15 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   }
 
   @Override
-  public Entity createEntity(String modelName, UnaryOperator<Entity> entityUnaryOperator) {
-    Entity entity = delegate.createEntity(modelName, entityUnaryOperator);
-    mappedModels.persist(schemaName, entity);
+  public Entity createEntity(String modelName, Entity entity) {
+    mappedModels.persist(schemaName, delegate.createEntity(modelName, entity));
     return entity;
   }
 
   @Override
-  public View createView(String viewName, String viewOn, UnaryOperator<Query> queryUnaryOperator) {
-    View view = delegate.createView(viewName, viewOn, queryUnaryOperator);
+  public View createView(String viewName, String viewOn, Query query) {
+    QueryHelper.validate(schemaName, viewOn, mappedModels, query);
+    View view = delegate.createView(viewName, viewOn, query);
     mappedModels.persist(schemaName, view);
     return view;
   }
@@ -51,7 +50,7 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   @Override
   public void createField(String modelName, TypedField<?, ?> field) {
     delegate.createField(modelName, field);
-    Entity entity = mappedModels.getEntity(schemaName, field.modelName());
+    Entity entity = mappedModels.getEntity(schemaName, field.getModelName());
     entity.addField(field);
     mappedModels.persist(schemaName, entity);
   }

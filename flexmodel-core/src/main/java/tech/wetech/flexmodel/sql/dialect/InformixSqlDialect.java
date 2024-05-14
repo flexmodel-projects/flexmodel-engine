@@ -115,8 +115,4 @@ public class InformixSqlDialect extends SqlDialect {
     return bool ? "'t'" : "'f'";
   }
 
-  @Override
-  public boolean supportsStandardInsertManyValues() {
-    return false;
-  }
 }

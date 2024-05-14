@@ -2,13 +2,13 @@ package tech.wetech.flexmodel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.wetech.flexmodel.graph.JoinGraphNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 
 /**
  * Multiple data sources test the agent class, and the test results return only the last one
@@ -26,16 +26,14 @@ public class MultiDbSessionDelegates implements Session {
   }
 
   @Override
-  public int insert(String modelName, Map<String, Object> record) {
-    int lastRows = 0;
+  public void associate(JoinGraphNode joinGraphNode, Map<String, Object> data) {
     for (Map.Entry<String, Session> entry : sessionMap.entrySet()) {
       String key = entry.getKey();
       Session delegate = entry.getValue();
       preExecute(key, delegate);
-      lastRows = delegate.insert(modelName, new HashMap<>(record));
+      delegate.associate(joinGraphNode, data);
       postExecute(key, delegate);
     }
-    return lastRows;
   }
 
   @Override
@@ -46,19 +44,6 @@ public class MultiDbSessionDelegates implements Session {
       Session delegate = entry.getValue();
       preExecute(key, delegate);
       lastRows = delegate.insert(modelName, record, id);
-      postExecute(key, delegate);
-    }
-    return lastRows;
-  }
-
-  @Override
-  public int insertAll(String modelName, List<Map<String, Object>> records) {
-    int lastRows = 0;
-    for (Map.Entry<String, Session> entry : sessionMap.entrySet()) {
-      String key = entry.getKey();
-      Session delegate = entry.getValue();
-      preExecute(key, delegate);
-      lastRows = delegate.insertAll(modelName, records);
       postExecute(key, delegate);
     }
     return lastRows;
@@ -195,26 +180,26 @@ public class MultiDbSessionDelegates implements Session {
   }
 
   @Override
-  public Entity createEntity(String modelName, UnaryOperator<Entity> entityUnaryOperator) {
+  public Entity createEntity(String modelName, Entity entity) {
     Entity lastEntity = null;
     for (Map.Entry<String, Session> entry : sessionMap.entrySet()) {
       String key = entry.getKey();
       Session delegate = entry.getValue();
       preExecute(key, delegate);
-      lastEntity = delegate.createEntity(modelName, entityUnaryOperator);
+      lastEntity = delegate.createEntity(modelName, entity);
       postExecute(key, delegate);
     }
     return lastEntity;
   }
 
   @Override
-  public View createView(String viewName, String viewOn, UnaryOperator<Query> queryUnaryOperator) {
+  public View createView(String viewName, String viewOn, Query query) {
     View lastView = null;
     for (Map.Entry<String, Session> entry : sessionMap.entrySet()) {
       String key = entry.getKey();
       Session delegate = entry.getValue();
       preExecute(key, delegate);
-      lastView = delegate.createView(viewName, viewOn, queryUnaryOperator);
+      lastView = delegate.createView(viewName, viewOn, query);
       postExecute(key, delegate);
     }
     return lastView;

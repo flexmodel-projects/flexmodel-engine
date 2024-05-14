@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel.sql.type;
 
-import tech.wetech.flexmodel.DecimalTypeHandler;
+import tech.wetech.flexmodel.mapping.DecimalTypeHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

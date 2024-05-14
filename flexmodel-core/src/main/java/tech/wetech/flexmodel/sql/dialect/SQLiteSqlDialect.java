@@ -55,6 +55,7 @@ public class SQLiteSqlDialect extends SqlDialect {
 
   protected final SequenceExporter sequenceExporter = new SQLiteSequenceExporter(this);
   protected final SQLiteForeignKeyExporter foreignKeyExporter = new SQLiteForeignKeyExporter(this);
+  protected final SQLiteUniqueKeyExporter uniqueKeyExporter = new SQLiteUniqueKeyExporter(this);
 
   @Override
   public SequenceExporter getSequenceExporter() {
@@ -64,6 +65,11 @@ public class SQLiteSqlDialect extends SqlDialect {
   @Override
   public StandardForeignKeyExporter getForeignKeyExporter() {
     return foreignKeyExporter;
+  }
+
+  @Override
+  public SQLiteUniqueKeyExporter getUniqueKeyExporter() {
+    return uniqueKeyExporter;
   }
 
   @Override
