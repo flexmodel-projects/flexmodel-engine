@@ -2,9 +2,11 @@ package tech.wetech.flexmodel.mongodb;
 
 import org.bson.Document;
 import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.graph.JoinGraphNode;
 
 import java.util.*;
 
+import static tech.wetech.flexmodel.AssociationField.Cardinality.MANY_TO_MANY;
 import static tech.wetech.flexmodel.Query.Join.JoinType.INNER_JOIN;
 
 /**
@@ -42,10 +44,32 @@ class MongoHelper {
       for (Query.Join join : query.getJoins().getJoins()) {
         String joinCollectionName = physicalNamingStrategy.toPhysicalTableName(join.getFrom());
         Document lookup = new Document();
-        lookup.put("from", joinCollectionName);
-        lookup.put("localField", join.getLocalField());
-        lookup.put("foreignField", join.getForeignField());
-        lookup.put("as", join.getFrom());
+        AssociationField associationField;
+        if (model instanceof Entity entity
+            && (associationField = entity.findAssociationFieldByEntityName(join.getFrom()).orElse(null)) != null
+            && associationField.getCardinality() == MANY_TO_MANY
+        ) {
+          Entity targetEntity = mongoContext.getMappedModels().getEntity(mongoContext.getSchemaName(), associationField.getTargetEntity());
+          JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, associationField);
+          Document exchangeLookup = new Document();
+          exchangeLookup.put("from", joinGraphNode.getJoinName());
+          exchangeLookup.put("localField", entity.getIdField().getName());
+          exchangeLookup.put("foreignField", joinGraphNode.getJoinFieldName());
+          exchangeLookup.put("as", joinGraphNode.getJoinName());
+          pipeline.add(new Document("$lookup", exchangeLookup));
+
+          lookup.put("from", joinCollectionName);
+          lookup.put("localField", joinGraphNode.getJoinName() + "." + joinGraphNode.getInverseJoinFieldName());
+          lookup.put("foreignField", join.getForeignField());
+          lookup.put("as", join.getFrom());
+
+        } else {
+          lookup.put("from", joinCollectionName);
+          lookup.put("localField", join.getLocalField());
+          lookup.put("foreignField", join.getForeignField());
+          lookup.put("as", join.getFrom());
+        }
+
         if (join.getFilter() != null) {
           lookup.put("pipeline", List.of(Document.parse(String.format("{ $match: %s }", getMongoCondition(mongoContext, join.getFilter())))));
         }
@@ -55,6 +79,7 @@ class MongoHelper {
           pipeline.add(new Document("$match", Map.of(join.getFrom(), Map.of("$ne", List.of())
           )));
         }
+
         pipeline.add(new Document("$unwind", "$" + join.getFrom()));
       }
     }
@@ -77,7 +102,7 @@ class MongoHelper {
           continue;
         }
         if (entry.getValue() instanceof Query.QueryField queryField) {
-          project.put(key, "$" + queryField.getFieldName());
+          project.put(key, "$" + getNameSimply(model, queryField));
         }
       }
     } else {
@@ -164,6 +189,15 @@ class MongoHelper {
     // 投影字段
     pipeline.add(new Document("$project", project));
     return pipeline;
+  }
+
+  private static String getNameSimply(Model model, Query.QueryField queryField) {
+    String modelName = queryField.getModelName();
+    String fieldName = queryField.getFieldName();
+    if (model.getName().equals(modelName)) {
+      return fieldName;
+    }
+    return queryField.getName();
   }
 
   static String getMongoCondition(MongoContext mongoContext, String condition) {

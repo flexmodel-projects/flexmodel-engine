@@ -50,7 +50,11 @@ public class SqlDataOperations implements DataOperations {
 
     String sql = getInsertSqlString(modelName, record);
     Entity entity = mappedModels.getEntity(schemaName, modelName);
-    TypedField<?, ?> idField = entity.getIdField();
+    IDField idField = entity.getIdField();
+    if (record.containsKey(idField.getName())) {
+      id.accept(record.get(idField.getName()));
+      return sqlExecutor.update(sql, record);
+    }
     if (sqlDialect.useFirstGeneratedId()) {
       return sqlExecutor.updateAndReturnFirstGeneratedKeys(sql, record, id::accept);
     }
@@ -213,12 +217,24 @@ public class SqlDataOperations implements DataOperations {
         }
       }
     } else {
-      query.getProjection()
-        .getFields()
-        .keySet()
-        .forEach(key -> sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler()));
+      Map<String, Query.QueryCall> fields = query.getProjection().getFields();
+      for (Map.Entry<String, Query.QueryCall> entry : fields.entrySet()) {
+        String key = entry.getKey();
+        Query.QueryCall value = entry.getValue();
+        if (value instanceof Query.QueryField queryField) {
+          Field field = queryField.getModelName() != null
+            ? mappedModels.getModel(schemaName, queryField.getModelName()).getField(queryField.getFieldName())
+            : model.getField(queryField.getFieldName());
+          if (field instanceof TypedField<?, ?> typedField) {
+            sqlResultHandler.addSqlTypeHandler(key, sqlContext.getTypeHandler(typedField.getType()));
+          } else {
+            sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler());
+          }
+        } else {
+          sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler());
+        }
+      }
     }
-
     return sqlResultHandler;
   }
 

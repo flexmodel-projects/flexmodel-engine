@@ -29,14 +29,14 @@ public class DataOperationAssociationTest extends AbstractSessionIntegrationTest
       .addField(new StringField("studentName"))
       .addField(new StringField("gender"))
       .addField(new IntField("age"))
-      .addField(new IntField("classId"))
+      .addField(new BigintField("classId"))
     );
   }
 
   void createStudentDetailEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(IDENTITY))
-      .addField(new IntField("studentId"))
+      .addField(new BigintField("studentId"))
       .addField(new TextField("description"))
     );
   }
@@ -324,7 +324,7 @@ public class DataOperationAssociationTest extends AbstractSessionIntegrationTest
     List<Map<String, Object>> oneToMany = session.find(classesEntityName, query -> query
       .setProjection(projection -> projection
         .addField("className", field("className"))
-        .addField("studentName", field("studentName"))
+        .addField("studentName", field(studentEntityName + ".studentName"))
       )
       .setJoins(joins -> joins
         .addLeftJoin(join -> join
@@ -350,7 +350,7 @@ public class DataOperationAssociationTest extends AbstractSessionIntegrationTest
     List<Map<String, Object>> manyToMany = session.find(studentEntityName, query -> query
       .setProjection(projection -> projection
         .addField("studentName", field("studentName"))
-        .addField("teacherName", field("teacherName"))
+        .addField(teacherEntityName + ".teacherName", field("teacherName"))
       )
       .setJoins(joins -> joins.addLeftJoin(join -> join
         .setFrom(teacherEntityName)

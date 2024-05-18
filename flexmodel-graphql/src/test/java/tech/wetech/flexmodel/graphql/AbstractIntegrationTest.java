@@ -22,7 +22,10 @@ public class AbstractIntegrationTest {
     HikariDataSource dataSource = new HikariDataSource();
     dataSource.setJdbcUrl("jdbc:sqlite:file::memory:?cache=shared");
     connectionLifeCycleManager.addDataSourceProvider("sqlite", new JdbcDataSourceProvider(dataSource));
-    SessionFactory sessionFactory = new SessionFactory(connectionLifeCycleManager, new JdbcMappedModels(dataSource));
+    SessionFactory sessionFactory = SessionFactory.builder()
+      .setConnectionLifeCycleManager(connectionLifeCycleManager)
+      .setMappedModels(new JdbcMappedModels(dataSource))
+      .build();
     session = sessionFactory.createSession("sqlite");
   }
 

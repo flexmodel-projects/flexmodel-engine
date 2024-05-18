@@ -35,7 +35,7 @@ public class GBaseContainer<SELF extends MySQLContainer<SELF>> extends JdbcDatab
   @Override
   public String getJdbcUrl() {
     return "jdbc:gbasedbt-sqli://" + this.getHost() + ":"
-           + this.getFirstMappedPort() + "/" + databaseName + ":GBASEDBTSERVER=gbase01;";
+           + this.getFirstMappedPort() + "/" + databaseName + ":GBASEDBTSERVER=gbase01;DELIMIDENT=y;";
   }
 
   @Override

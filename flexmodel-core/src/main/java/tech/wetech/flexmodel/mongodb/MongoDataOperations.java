@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static tech.wetech.flexmodel.IDField.DefaultGeneratedValue.IDENTITY;
 import static tech.wetech.flexmodel.mongodb.MongoHelper.getMongoCondition;
 
 /**
@@ -25,6 +26,7 @@ public class MongoDataOperations implements DataOperations {
   private final MappedModels mappedModels;
   private final MongoDatabase mongoDatabase;
   private final PhysicalNamingStrategy physicalNamingStrategy;
+  private final SchemaOperations schemaOperations;
 
   public MongoDataOperations(MongoContext mongoContext) {
     this.mongoContext = mongoContext;
@@ -32,6 +34,7 @@ public class MongoDataOperations implements DataOperations {
     this.mongoDatabase = mongoContext.getMongoDatabase();
     this.physicalNamingStrategy = mongoContext.getPhysicalNamingStrategy();
     this.mappedModels = mongoContext.getMappedModels();
+    this.schemaOperations = new MongoSchemaOperations(mongoContext);
   }
 
   private String getCollectionName(String modelName) {
@@ -46,12 +49,30 @@ public class MongoDataOperations implements DataOperations {
 
   @Override
   public int insert(String modelName, Map<String, Object> record, Consumer<Object> idConsumer) {
+    Entity entity = mappedModels.getEntity(schemaName, modelName);
+    IDField idField = entity.getIdField();
+    if (!record.containsKey(idField.getName()) && idField.getGeneratedValue() == IDENTITY) {
+      setId(modelName, record);
+      idConsumer.accept(record.get(idField.getName()));
+    }
     String collectionName = getCollectionName(modelName);
     InsertOneResult result = mongoDatabase.getCollection(collectionName, Map.class).insertOne(record);
-    Entity entity = mappedModels.getEntity(schemaName, modelName);
-    TypedField<?, ?> idField = entity.getIdField();
     idConsumer.accept(record.get(idField.getName()));
     return result.wasAcknowledged() ? 1 : 0;
+  }
+
+  private void setId(String modelName, Map<String, Object> record) {
+    String sequenceName = modelName + "_seq";
+    try {
+      schemaOperations.createSequence(sequenceName, 1, 1);
+    } catch (Exception ignored) {
+    }
+    long sequenceNextVal = schemaOperations.getSequenceNextVal(sequenceName);
+    Entity entity = (Entity) schemaOperations.getModel(modelName);
+    TypedField<?, ?> idField = entity.getIdField();
+    if (idField != null) {
+      record.put(idField.getName(), sequenceNextVal);
+    }
   }
 
   @Override

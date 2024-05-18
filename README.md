@@ -28,8 +28,9 @@
 | DB2        | 11.5.0.0a     | progressiveStreaming=2 |
 | SQLite     | 3.45.3        |                        |
 | Informix   | 14.10         |                        |
-| GBase      | 8s            |                        |
+| GBase      | 8s            | DELIMIDENT=y;          |
 | 达梦         | DM8           |                        |
+| TiDB       | v7.1.5        |                        |
 
 **文档型数据库**
 

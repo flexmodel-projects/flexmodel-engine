@@ -71,15 +71,15 @@ class SqlHelper {
         }
         String localField = joiner.getLocalField();
         String foreignField = joiner.getForeignField();
-        if (model instanceof Entity entity) {
-          AssociationField associationField = entity.findAssociationFieldByEntityName(joiner.getFrom())
-            .orElseThrow();
+        AssociationField associationField;
+        if (model instanceof Entity entity &&
+            (associationField = entity.findAssociationFieldByEntityName(joiner.getFrom()).orElse(null)) != null) {
           localField = entity.getIdField().getName();
           foreignField = associationField.getTargetField();
           if (associationField.getCardinality() == MANY_TO_MANY) {
             Entity targetEntity = sqlContext.getMappedModels().getEntity(sqlContext.getSchemaName(), associationField.getTargetEntity());
             JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, associationField);
-            joinCause.append(joinGraphNode.getJoinName())
+            joinCause.append(toPhysicalTableNameQuoteString(sqlContext, joinGraphNode.getJoinName()))
               .append(" \n on \n")
               .append(toFullColumnQuoteString(sqlContext, modelName, localField))
               .append("=")

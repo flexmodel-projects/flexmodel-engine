@@ -9,9 +9,9 @@ import java.util.StringJoiner;
 /**
  * @author cjbi
  */
-public class SQLiteUniqueKeyExporter extends StandardUniqueKeyExporter {
+public class CreateIndexStyleUniqueKeyExporter extends StandardUniqueKeyExporter {
 
-  public SQLiteUniqueKeyExporter(SqlDialect dialect) {
+  public CreateIndexStyleUniqueKeyExporter(SqlDialect dialect) {
     super(dialect);
   }
 

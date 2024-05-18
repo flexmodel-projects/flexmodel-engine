@@ -24,4 +24,5 @@ jobs:
           cache: maven
       - name: Build Image Test with Maven
         run: |
-          mvn -B test
+          chmod +x mvnw
+          ./mvnw -B test

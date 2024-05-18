@@ -1,8 +1,6 @@
 package tech.wetech.flexmodel.mongodb;
 
 import tech.wetech.flexmodel.AbstractSession;
-import tech.wetech.flexmodel.Entity;
-import tech.wetech.flexmodel.TypedField;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -23,28 +21,9 @@ public class MongoSession extends AbstractSession {
 
   }
 
-  private void setId(String modelName, Map<String, Object> record) {
-    String sequenceName = modelName + "_seq";
-    try {
-      createSequence(sequenceName, 1, 1);
-    } catch (Exception ignored) {
-    }
-    long sequenceNextVal = getSequenceNextVal(sequenceName);
-    Entity entity = (Entity) getModel(modelName);
-    TypedField<?, ?> idField = entity.getIdField();
-    if (idField != null) {
-      record.put(idField.getName(), sequenceNextVal);
-    }
-  }
-
   @Override
   public int insert(String modelName, Map<String, Object> record, Consumer<Object> idConsumer) {
-    setId(modelName, record);
-    int rows = super.insert(modelName, record, idConsumer);
-    Entity entity = (Entity) getModel(modelName);
-    TypedField<?, ?> idField = entity.getIdField();
-    idConsumer.accept(record.get(idField.getName()));
-    return rows;
+    return super.insert(modelName, record, idConsumer);
   }
 
   @Override

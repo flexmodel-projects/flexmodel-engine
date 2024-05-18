@@ -12,6 +12,8 @@ import tech.wetech.flexmodel.sql.StringHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import static tech.wetech.flexmodel.AssociationField.Cardinality.ONE_TO_ONE;
+
 /**
  * @author cjbi
  */
@@ -54,12 +56,19 @@ public class MongoSchemaOperations implements SchemaOperations {
     for (Index index : entity.getIndexes()) {
       createIndex(index);
     }
+    IDField idField = entity.getIdField();
+    if (idField != null) {
+      Index index = new Index(idField.getModelName());
+      index.setUnique(true);
+      index.addField(idField.getName());
+      createIndex(index);
+    }
     return entity;
   }
 
   @Override
   public View createView(String viewName, String viewOn, Query query) {
-    mongoDatabase.createView(viewName, viewOn, MongoHelper.createPipeline(viewName, mongoContext, query));
+    mongoDatabase.createView(viewName, viewOn, MongoHelper.createPipeline(viewOn, mongoContext, query));
     View view = new View(viewName);
     view.setViewOn(viewOn);
     view.setQuery(query);
@@ -71,8 +80,17 @@ public class MongoSchemaOperations implements SchemaOperations {
     field.setModelName(modelName);
     if (field instanceof IDField) {
       Index index = new Index(field.getModelName());
+      index.setUnique(true);
       index.addField(field.getName());
       createIndex(index);
+    }
+    if (field instanceof AssociationField associationField) {
+      if (associationField.getCardinality() == ONE_TO_ONE) {
+        Index index = new Index(associationField.getTargetEntity());
+        index.setUnique(true);
+        index.addField(associationField.getTargetField());
+        createIndex(index);
+      }
     }
   }
 

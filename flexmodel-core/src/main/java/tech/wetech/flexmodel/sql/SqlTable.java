@@ -145,7 +145,7 @@ public class SqlTable implements Exportable {
     SqlTable referencedTable,
     List<SqlColumn> referencedColumns
   ) {
-    String keyName = SqlConstraint.generateName("UK_", this, keyColumns);
+    String keyName = SqlConstraint.generateName("FK_", this, keyColumns);
     SqlForeignKey fk = foreignKeys.get(keyName);
     if (fk == null) {
       fk = new SqlForeignKey();

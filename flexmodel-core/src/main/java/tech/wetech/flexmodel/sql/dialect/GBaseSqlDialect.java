@@ -35,6 +35,14 @@ public class GBaseSqlDialect extends InformixSqlDialect {
     registerFunction("dayofweek", args -> "weekday(" + args[0] + ")+1", 1);
   }
 
+  protected final CreateIndexStyleUniqueKeyExporter uniqueKeyExporter = new CreateIndexStyleUniqueKeyExporter(this);
+
+  @Override
+  public CreateIndexStyleUniqueKeyExporter getUniqueKeyExporter() {
+    return uniqueKeyExporter;
+  }
+
+
   @Override
   public String getIdentityColumnString(int type) throws DialectException {
     return (type == Types.BIGINT ? "bigserial" : "serial") + " not null";

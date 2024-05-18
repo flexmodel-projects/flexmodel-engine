@@ -21,7 +21,7 @@
     <slf4j.version>2.0.12</slf4j.version>
     <jackson.version>2.16.0</jackson.version>
     <surefire-plugin.version>3.0.0</surefire-plugin.version>
-    <testcontainers.version>1.19.3</testcontainers.version>
+    <testcontainers.version>1.19.8</testcontainers.version>
   </properties>
   <dependencyManagement>
     <dependencies>

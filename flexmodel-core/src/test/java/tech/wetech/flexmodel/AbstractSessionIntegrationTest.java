@@ -57,7 +57,10 @@ public abstract class AbstractSessionIntegrationTest extends AbstractIntegration
 
   @BeforeEach
   void setUp() {
-    SessionFactory sessionFactory = new SessionFactory(CONNECTION_LIFE_CYCLE_MANAGER, MODEL_MAP);
+    SessionFactory sessionFactory = SessionFactory.builder()
+      .setMappedModels(MODEL_MAP)
+      .setConnectionLifeCycleManager(CONNECTION_LIFE_CYCLE_MANAGER)
+      .build();
     MultiDbSessionDelegates delegates = new MultiDbSessionDelegates();
     acceptCommand((key, container) -> delegates.addDelegate(key, sessionFactory.createSession(key)));
     String currentDb = System.getProperty("current_db");
