@@ -1,7 +1,7 @@
 package tech.wetech.flexmodel.cache;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 /**
@@ -9,7 +9,7 @@ import java.util.function.Supplier;
  */
 public class ConcurrentHashMapCache implements Cache {
 
-  private final Map<String, Object> store = new HashMap<>();
+  private final Map<String, Object> store = new ConcurrentHashMap<>();
 
   @Override
   public Object get(String key) {
