@@ -12,8 +12,10 @@
     <module>flexmodel-core</module>
     <module>flexmodel-json-logic</module>
     <module>flexmodel-graphql</module>
+    <module>integration-tests</module>
   </modules>
   <properties>
+    <maven.repo.local>${project.basedir}</maven.repo.local>
     <java.version>21</java.version>
     <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -23,17 +25,6 @@
     <surefire-plugin.version>3.0.0</surefire-plugin.version>
     <testcontainers.version>1.19.8</testcontainers.version>
   </properties>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.testcontainers</groupId>
-        <artifactId>testcontainers-bom</artifactId>
-        <version>${testcontainers.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <distributionManagement>
     <repository>
       <id>github</id>

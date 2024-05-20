@@ -477,3 +477,5 @@ session.deleteById(entityName, 1);
 ```
 
 #### 更多使用示例请见测试用例
+
+#### FlexModel 目前还在测试阶段，变更比较频繁，请不要用于生产环境，否则后果自负

@@ -4,41 +4,44 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>tech.wetech.flexmodel</groupId>
-    <artifactId>flexmodel-parent</artifactId>
+    <artifactId>flexmodel-integration-tests</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>flexmodel-core</artifactId>
+  <artifactId>flexmodel-integration-tests-flexmodel-core-mariadb</artifactId>
   <dependencies>
     <dependency>
       <groupId>tech.wetech.flexmodel</groupId>
-      <artifactId>flexmodel-json-logic</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <artifactId>flexmodel-integration-tests-flexmodel-core-test-common</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+      <version>5.1.0</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-jsr310</artifactId>
-      <version>${jackson.version}</version>
+      <groupId>org.mariadb.jdbc</groupId>
+      <artifactId>mariadb-java-client</artifactId>
+      <version>3.3.3</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>mariadb</artifactId>
+      <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.mongodb</groupId>
-      <artifactId>mongodb-driver-sync</artifactId>
-      <version>5.0.1</version>
-      <optional>true</optional>
-    </dependency>
+    <!--end testcontainers-->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
       <version>5.7.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>1.19.8</version>
       <scope>test</scope>
     </dependency>
     <dependency>

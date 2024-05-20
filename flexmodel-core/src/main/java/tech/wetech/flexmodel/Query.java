@@ -1,12 +1,13 @@
 package tech.wetech.flexmodel;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.function.UnaryOperator;
 
 /**
  * @author cjbi
  */
-public class Query {
+public class Query implements Serializable {
 
   private String filter;
   private Projection projection;
@@ -16,7 +17,7 @@ public class Query {
   private Integer limit;
   private Integer offset;
 
-  public interface QueryCall {
+  public interface QueryCall extends Serializable {
   }
 
   public interface QueryFunc extends QueryCall {
@@ -26,7 +27,7 @@ public class Query {
     Object[] getArgs();
   }
 
-  public static class Projection {
+  public static class Projection implements Serializable {
 
     private final Map<String, QueryCall> fields = new LinkedHashMap<>();
 
@@ -40,7 +41,7 @@ public class Query {
     }
   }
 
-  public static class Joins {
+  public static class Joins implements Serializable {
     private final Map<String, Join> joinMap = new HashMap<>();
 
     public List<Join> getJoins() {
@@ -65,7 +66,7 @@ public class Query {
 
   }
 
-  public static class GroupBy {
+  public static class GroupBy implements Serializable {
     private final List<QueryField> fields = new ArrayList<>();
 
     public GroupBy addField(String field) {
@@ -210,7 +211,7 @@ public class Query {
     }
   }
 
-  public static class Sort {
+  public static class Sort implements Serializable {
 
     private final List<Order> orders = new ArrayList<>();
 
@@ -233,7 +234,7 @@ public class Query {
       return orders;
     }
 
-    public static class Order {
+    public static class Order implements Serializable {
       private QueryField field;
       private Direction direction = Direction.ASC;
 
