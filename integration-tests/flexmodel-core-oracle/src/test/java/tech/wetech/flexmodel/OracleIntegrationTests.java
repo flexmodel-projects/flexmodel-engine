@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
 
 /**
  * @author cjbi
@@ -21,6 +22,6 @@ public class OracleIntegrationTests extends AbstractSessionTests {
     dataSource.setJdbcUrl(container.getJdbcUrl());
     dataSource.setUsername(container.getUsername());
     dataSource.setPassword(container.getPassword());
-    initSessionWithJdbc("oracle", dataSource);
+    initSession(new JdbcDataSourceProvider(dataSource));
   }
 }

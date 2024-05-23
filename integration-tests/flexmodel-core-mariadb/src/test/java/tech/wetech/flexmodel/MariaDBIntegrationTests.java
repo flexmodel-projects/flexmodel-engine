@@ -6,6 +6,7 @@ import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
 
 /**
  * @author cjbi
@@ -22,6 +23,6 @@ public class MariaDBIntegrationTests extends AbstractSessionTests {
     dataSource.setJdbcUrl(container.getJdbcUrl());
     dataSource.setUsername(container.getUsername());
     dataSource.setPassword(container.getPassword());
-    initSessionWithJdbc("mariadb", dataSource);
+    initSession(new JdbcDataSourceProvider(dataSource));
   }
 }

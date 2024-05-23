@@ -6,12 +6,8 @@ import org.junit.jupiter.api.Test;
 import tech.wetech.flexmodel.calculations.DateNowValueCalculator;
 import tech.wetech.flexmodel.calculations.DatetimeNowValueCalculator;
 import tech.wetech.flexmodel.dto.TeacherDTO;
-import tech.wetech.flexmodel.mongodb.MongoDataSourceProvider;
-import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
-import tech.wetech.flexmodel.sql.JdbcMappedModels;
 import tech.wetech.flexmodel.validations.NumberRangeValidator;
 
-import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -31,27 +27,14 @@ public abstract class AbstractSessionTests {
   public static Session session;
   private static ConnectionLifeCycleManager connectionLifeCycleManager;
 
-  protected static void initSessionWithMongoDB(String key, MongoDataSourceProvider mongoDatabase) {
+  protected static void initSession(DataSourceProvider dataSourceProvider) {
     ConnectionLifeCycleManager connectionLifeCycleManager = new ConnectionLifeCycleManager();
-    connectionLifeCycleManager.addDataSourceProvider(key, mongoDatabase);
+    connectionLifeCycleManager.addDataSourceProvider("default", dataSourceProvider);
     SessionFactory sessionFactory = SessionFactory.builder()
       .setMappedModels(new MapMappedModels())
       .setConnectionLifeCycleManager(connectionLifeCycleManager)
       .build();
-    session = sessionFactory.createSession(key);
-    AbstractSessionTests.connectionLifeCycleManager = connectionLifeCycleManager;
-  }
-
-  protected static void initSessionWithJdbc(String key, DataSource dataSource) {
-
-    ConnectionLifeCycleManager connectionLifeCycleManager = new ConnectionLifeCycleManager();
-    connectionLifeCycleManager.addDataSourceProvider(key, new JdbcDataSourceProvider(dataSource));
-
-    SessionFactory sessionFactory = SessionFactory.builder()
-      .setMappedModels(new JdbcMappedModels(dataSource))
-      .setConnectionLifeCycleManager(connectionLifeCycleManager)
-      .build();
-    session = sessionFactory.createSession(key);
+    session = sessionFactory.createSession("default");
     AbstractSessionTests.connectionLifeCycleManager = connectionLifeCycleManager;
   }
 

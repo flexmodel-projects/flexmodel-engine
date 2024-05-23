@@ -47,7 +47,6 @@ public class MongoContext extends AbstractSessionContext {
     this.conditionCalculator = conditionCalculator;
   }
 
-
   @Override
   public Map<String, TypeHandler<?>> getTypeHandlerMap() {
     return typeHandlerMap;

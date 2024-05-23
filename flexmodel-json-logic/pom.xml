@@ -12,33 +12,22 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
     </dependency>
     <!--start tests-->
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>${slf4j.version}</version>
+      <artifactId>slf4j-reload4j</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.7.0</version>
       <scope>test</scope>
     </dependency>
     <!--end tests-->
   </dependencies>
-  <distributionManagement>
-    <repository>
-      <id>github</id>
-      <name>GitHub MetaCode Apache Maven Packages</name>
-      <url>https://maven.pkg.github.com/metacode-project/metacode-maven-packages</url>
-    </repository>
-  </distributionManagement>
 </project>
