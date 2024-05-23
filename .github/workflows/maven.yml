@@ -25,4 +25,4 @@ jobs:
       - name: Build Image Test with Maven
         run: |
           chmod +x mvnw
-          ./mvnw -B test
+          ./mvnw -B -T 8 test

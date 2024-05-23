@@ -8,7 +8,7 @@ tasks:
   - init: |
       chmod +x mvnw
     command: |
-      ./mvnw -B test
+      ./mvnw -B -T 8 test
     name: Run FlexModel app
 
 vscode:
