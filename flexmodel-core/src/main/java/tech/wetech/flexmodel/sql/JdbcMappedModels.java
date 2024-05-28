@@ -168,6 +168,9 @@ public class JdbcMappedModels implements MappedModels {
                                " \nwhere " + sqlDialect.quoteIdentifier("schema_name") + "=:schemaName and " + sqlDialect.quoteIdentifier("model_name") + "=:modelName";
       Map<String, Object> map = sqlExecutor.queryForMap(sqlSelectString,
         Map.of("schemaName", schemaName, "modelName", modelName));
+      if (map == null) {
+        return null;
+      }
       Object binaryContent = map.get("binary_content");
 
       if (binaryContent instanceof Blob blob) {

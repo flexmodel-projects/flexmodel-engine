@@ -21,7 +21,9 @@ public class ConcurrentHashMapCache implements Cache {
     Object value = get(key);
     if (value == null) {
       value = supplier.get();
-      put(key, value);
+      if (value != null) {
+        put(key, value);
+      }
     }
     return value;
   }
