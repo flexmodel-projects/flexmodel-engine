@@ -30,7 +30,7 @@ public class JsonUtils {
     builder.serializationInclusion(JsonInclude.Include.NON_NULL);
     //序列化枚举是以ordinal()来输出
     builder.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    builder.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    builder.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     builder.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
     builder.disable(FAIL_ON_EMPTY_BEANS);
     SimpleModule module = new SimpleModule();
