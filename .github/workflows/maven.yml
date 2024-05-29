@@ -22,7 +22,12 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+      - name: Generate settings.xml for Maven Builds
+        uses: whelk-io/maven-settings-xml-action@v20
+        with:
+          repositories: '[{ "id": "github", "url": "https://maven.pkg.github.com/flexmodel-project/flexmodel-maven-packages", "snapshots": { "enabled" : true } }]'
+          servers: '[{ "id": "github", "username": "cjbi", "password": "${{ secrets.MAVEN_TOKEN }}" }]'
       - name: Build Image Test with Maven
         run: |
           chmod +x mvnw
-          ./mvnw -B -T 8 test
+          ./mvnw -B -T 8 clean deploy

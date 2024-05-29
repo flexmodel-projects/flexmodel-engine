@@ -82,7 +82,7 @@ public class SessionFactory {
         throw new IllegalStateException("Please set connectionLifeCycleManager");
       }
       if (mappedModels == null) {
-        throw new IllegalStateException("Please set mappedModels");
+        this.mappedModels = new MapMappedModels();
       }
       if (cache == null) {
         this.cache = new ConcurrentHashMapCache();

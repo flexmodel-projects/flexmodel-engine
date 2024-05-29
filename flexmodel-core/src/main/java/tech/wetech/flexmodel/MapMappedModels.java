@@ -1,5 +1,6 @@
 package tech.wetech.flexmodel;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class MapMappedModels implements MappedModels {
 
   @Override
   public Model getModel(String schemaName, String modelName) {
-    return map.get(schemaName).get(modelName);
+    return map.getOrDefault(schemaName, Collections.emptyMap()).get(modelName);
   }
 
 }
