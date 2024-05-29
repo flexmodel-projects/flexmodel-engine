@@ -26,8 +26,6 @@
     <module>flexmodel-core-tidb</module>
     <module>flexmodel-core-mongodb</module>
     <module>flexmodel-core-db2</module>
-    <module>quarkus</module>
-    <module>springboot</module>
   </modules>
   <dependencyManagement>
     <dependencies>

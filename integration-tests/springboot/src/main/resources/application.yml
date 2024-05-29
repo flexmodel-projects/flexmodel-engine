@@ -1,6 +1,0 @@
-spring:
-  application:
-    name: flexmodel-server
-logging:
-  level:
-    .tech.wetech.flexmodel: DEBUG
