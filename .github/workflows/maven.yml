@@ -27,7 +27,7 @@ jobs:
         with:
           repositories: '[{ "id": "github", "url": "https://maven.pkg.github.com/flexmodel-project/flexmodel-maven-packages", "snapshots": { "enabled" : true } }]'
           servers: '[{ "id": "github", "username": "cjbi", "password": "${{ secrets.MAVEN_TOKEN }}" }]'
-      - name: Build Image Test with Maven
+      - name: Build with Maven
         run: |
           chmod +x mvnw
           ./mvnw -B -T 8 clean deploy
