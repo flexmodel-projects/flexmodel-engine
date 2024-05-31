@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import tech.wetech.flexmodel.calculations.DateNowValueCalculator;
 import tech.wetech.flexmodel.calculations.DatetimeNowValueCalculator;
 import tech.wetech.flexmodel.dto.TeacherDTO;
+import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
+import tech.wetech.flexmodel.sql.JdbcMappedModels;
 import tech.wetech.flexmodel.validations.NumberRangeValidator;
 
 import java.time.LocalDate;
@@ -30,8 +32,14 @@ public abstract class AbstractSessionTests {
   protected static void initSession(DataSourceProvider dataSourceProvider) {
     ConnectionLifeCycleManager connectionLifeCycleManager = new ConnectionLifeCycleManager();
     connectionLifeCycleManager.addDataSourceProvider("default", dataSourceProvider);
+    MappedModels mappedModels;
+    if (dataSourceProvider instanceof JdbcDataSourceProvider jdbcDataSourceProvider) {
+      mappedModels = new JdbcMappedModels(jdbcDataSourceProvider.dataSource());
+    } else {
+      mappedModels = new MapMappedModels();
+    }
     SessionFactory sessionFactory = SessionFactory.builder()
-      .setMappedModels(new MapMappedModels())
+      .setMappedModels(mappedModels)
       .setConnectionLifeCycleManager(connectionLifeCycleManager)
       .build();
     session = sessionFactory.createSession("default");
@@ -57,6 +65,7 @@ public abstract class AbstractSessionTests {
       .addField(new StringField("studentName"))
       .addField(new StringField("gender"))
       .addField(new IntField("age"))
+      .addField(new DecimalField("height").setPrecision(3).setScale(2))
       .addField(new BigintField("classId"))
     );
   }
@@ -1054,6 +1063,46 @@ public abstract class AbstractSessionTests {
     }
     Assertions.assertEquals(10, sequenceNextVal);
     session.dropSequence(seqName);
+  }
+
+  @Test
+  void testSyncModels() {
+    String classesEntityName = "TestSyncModelsClasses";
+    String studentEntityName = "TestSyncModelsStudent";
+    String studentDetailEntityName = "TestSyncModelsStudentDetail";
+    String courseEntityName = "TestSyncModelsCourse";
+    String teacherEntityName = "TestSyncModelsTeacher";
+    createClassesEntity(classesEntityName);
+    createStudentEntity(studentEntityName);
+    createStudentDetailEntity(studentDetailEntityName);
+    createCourseEntity(courseEntityName);
+    createTeacherEntity(teacherEntityName);
+    createAssociations(classesEntityName, studentEntityName, studentDetailEntityName, courseEntityName, teacherEntityName);
+    createCourseData(courseEntityName);
+    createClassesData(classesEntityName);
+    createStudentData(studentEntityName);
+    createTeacherData(teacherEntityName);
+    createTeacherEntity2("TestSyncModelsteacher2");
+    DataSourceProvider dataSourceProvider = connectionLifeCycleManager.getDataSourceProvider("default");
+    String identifier = "sync_test";
+    connectionLifeCycleManager.addDataSourceProvider(identifier, dataSourceProvider);
+    MappedModels mappedModels;
+    if (dataSourceProvider instanceof JdbcDataSourceProvider jdbcDataSourceProvider) {
+      mappedModels = new JdbcMappedModels(jdbcDataSourceProvider.dataSource());
+      SessionFactory sessionFactory = SessionFactory.builder()
+        .setConnectionLifeCycleManager(connectionLifeCycleManager)
+        .setMappedModels(mappedModels)
+        .build();
+      Session newSession = sessionFactory.createSession(identifier);
+      List<Model> models = newSession.syncModels();
+      Assertions.assertFalse(models.isEmpty());
+      Entity studentDetailEntity = (Entity) models.stream().filter(m -> m.getName().equals(studentDetailEntityName)).findFirst().get();
+      Assertions.assertFalse(studentDetailEntity.getFields().isEmpty());
+      Assertions.assertFalse(studentDetailEntity.getIndexes().isEmpty());
+    } else {
+      // todo mongodb模型同步待实现
+    }
+
   }
 
 }

@@ -13,6 +13,12 @@ public class MapMappedModels implements MappedModels {
   private final Map<String, Map<String, Model>> map = new HashMap<>();
 
   @Override
+  public List<Model> sync(AbstractSessionContext context) {
+    // ignore
+    return Collections.emptyList();
+  }
+
+  @Override
   public List<Model> lookup(String schemaName) {
     return map.get(schemaName).values().stream().toList();
   }

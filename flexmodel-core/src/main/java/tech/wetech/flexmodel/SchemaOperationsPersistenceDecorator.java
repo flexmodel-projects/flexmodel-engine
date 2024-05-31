@@ -18,6 +18,11 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   }
 
   @Override
+  public List<Model> syncModels() {
+    return delegate.syncModels();
+  }
+
+  @Override
   public List<Model> getAllModels() {
     return delegate.getAllModels();
   }

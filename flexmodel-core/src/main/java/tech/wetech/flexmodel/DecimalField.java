@@ -22,16 +22,18 @@ public class DecimalField extends TypedField<Number, DecimalField> {
     return precision;
   }
 
-  public void setPrecision(int precision) {
+  public DecimalField setPrecision(int precision) {
     this.precision = precision;
+    return this;
   }
 
   public int getScale() {
     return scale;
   }
 
-  public void setScale(int scale) {
+  public DecimalField setScale(int scale) {
     this.scale = scale;
+    return this;
   }
 
 }

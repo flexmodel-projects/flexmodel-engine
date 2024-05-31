@@ -292,6 +292,10 @@ public abstract class SqlDialect {
     return identifierQuoteString + identifier + identifierQuoteString;
   }
 
+  public String quoteIndexInfoTableName(String identifier) {
+    return identifier;
+  }
+
   public String getIdentifierQuoteString() {
     return identifierQuoteString;
   }

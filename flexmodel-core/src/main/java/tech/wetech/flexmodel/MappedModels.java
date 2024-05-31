@@ -1,11 +1,14 @@
 package tech.wetech.flexmodel;
 
+
 import java.util.List;
 
 /**
  * @author cjbi
  */
 public interface MappedModels {
+
+  List<Model> sync(AbstractSessionContext sqlContext);
 
   List<Model> lookup(String schemaName);
 

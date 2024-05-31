@@ -38,6 +38,11 @@ public abstract class AbstractSession implements Session {
   }
 
   @Override
+  public List<Model> syncModels() {
+    return schemaOperationsDelegate.syncModels();
+  }
+
+  @Override
   public List<Model> getAllModels() {
     return schemaOperationsDelegate.getAllModels();
   }

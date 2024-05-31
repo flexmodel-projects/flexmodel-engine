@@ -21,6 +21,11 @@ public class SqlSchemaOperations implements SchemaOperations {
   }
 
   @Override
+  public List<Model> syncModels() {
+    return sqlContext.getMappedModels().sync(sqlContext);
+  }
+
+  @Override
   public List<Model> getAllModels() {
     return sqlContext.getMappedModels().lookup(sqlContext.getSchemaName());
   }

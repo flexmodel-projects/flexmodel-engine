@@ -1,5 +1,6 @@
 package tech.wetech.flexmodel.cache;
 
+import tech.wetech.flexmodel.AbstractSessionContext;
 import tech.wetech.flexmodel.Entity;
 import tech.wetech.flexmodel.MappedModels;
 import tech.wetech.flexmodel.Model;
@@ -17,6 +18,12 @@ public class CachingMappedModels implements MappedModels {
   public CachingMappedModels(MappedModels delegate, Cache cache) {
     this.delegate = delegate;
     this.cache = cache;
+  }
+
+  @Override
+  public List<Model> sync(AbstractSessionContext context) {
+    cache.invalidateAll();
+    return delegate.sync(context);
   }
 
   @Override

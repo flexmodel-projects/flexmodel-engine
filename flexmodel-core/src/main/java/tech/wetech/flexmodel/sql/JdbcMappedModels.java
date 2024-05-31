@@ -2,17 +2,18 @@ package tech.wetech.flexmodel.sql;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.wetech.flexmodel.JsonUtils;
-import tech.wetech.flexmodel.MappedModels;
-import tech.wetech.flexmodel.Model;
+import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 
 import javax.sql.DataSource;
 import java.io.*;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static tech.wetech.flexmodel.BasicFieldType.*;
+import static tech.wetech.flexmodel.IDField.DefaultGeneratedValue.*;
 
 /**
  * @author cjbi
@@ -94,6 +95,192 @@ public class JdbcMappedModels implements MappedModels {
       Statement statement = connection.createStatement();
       statement.executeUpdate(sql);
     }
+  }
+
+  @Override
+  public List<Model> sync(AbstractSessionContext context) {
+    SqlContext sqlContext = (SqlContext) context;
+    List<Entity> entities = Collections.emptyList();
+    try (Connection conn = dataSource.getConnection()) {
+      SqlMetadata sqlMetadata = new SqlMetadata(sqlDialect, conn);
+      entities = convert(sqlMetadata.getTables(), sqlContext);
+      for (Entity entity : entities) {
+        Model model = getModel(sqlContext.getSchemaName(), entity.getName());
+        if (model == null) {
+          this.persist(sqlContext.getSchemaName(), entity);
+        }
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return new ArrayList<>(entities);
+  }
+
+  private List<Entity> convert(List<SqlTable> tables, SqlContext sqlContext) {
+    List<Entity> modelList = new ArrayList<>();
+    Map<Integer, String> jdbcCodeMap = new HashMap<>();
+    sqlContext.getTypeHandlerMap().forEach((key, value) -> jdbcCodeMap.put(value.getJdbcTypeCode(), key));
+    sqlContext.getTypeHandlerMap().forEach((key, value) -> jdbcCodeMap.put(value.getJdbcTypeCode(), key));
+    for (SqlTable table : tables) {
+      Entity entity = new Entity(table.getName());
+      entity.setComment(table.getComment());
+      Iterator<SqlColumn> colIte = table.getColumnIterator();
+      while (colIte.hasNext()) {
+        SqlColumn sqlColumn = colIte.next();
+        BasicFieldType fieldType = sqlColumn.isPrimaryKey() ? ID
+          : BasicFieldType.fromType(jdbcCodeMap.getOrDefault(sqlColumn.getSqlTypeCode(), STRING.getType()));
+        assert fieldType != null;
+        TypedField<?, ?> field;
+        switch (fieldType) {
+          case ID: {
+            IDField idField = new IDField(sqlColumn.getName());
+            field = idField;
+            if (sqlColumn.isAutoIncrement()) {
+              idField.setGeneratedValue(IDENTITY);
+            }
+            BasicFieldType idType = BasicFieldType.fromType(jdbcCodeMap.getOrDefault(sqlColumn.getSqlTypeCode(), STRING.getType()));
+            idField.setGeneratedValue(idType == BIGINT || idType == INT || idType == DECIMAL ? BIGINT_NO_GEN : STRING_NO_GEN);
+            break;
+          }
+          default:
+          case STRING: {
+            StringField stringField = new StringField(sqlColumn.getName());
+            field = stringField;
+            if (sqlColumn.getDefaultValue() != null) {
+              try {
+                stringField.setDefaultValue(sqlColumn.getDefaultValue());
+              } catch (Exception e) {
+                log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
+              }
+            }
+            stringField.setLength(sqlColumn.getLength());
+            break;
+          }
+          case TEXT: {
+            TextField textField = new TextField(sqlColumn.getName());
+            field = textField;
+            if (sqlColumn.getDefaultValue() != null) {
+              try {
+                textField.setDefaultValue(sqlColumn.getDefaultValue());
+              } catch (Exception e) {
+                log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
+              }
+            }
+            break;
+          }
+          case DECIMAL: {
+            DecimalField decimalField = new DecimalField(sqlColumn.getName());
+            field = decimalField;
+            decimalField.setPrecision(sqlColumn.getPrecision());
+            decimalField.setScale(sqlColumn.getScale());
+            if (sqlColumn.getDefaultValue() != null) {
+              try {
+                decimalField.setDefaultValue(Double.valueOf(sqlColumn.getDefaultValue()));
+              } catch (Exception e) {
+                log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
+              }
+            }
+            break;
+          }
+          case INT: {
+            IntField intField = new IntField(sqlColumn.getName());
+            field = intField;
+            if (sqlColumn.getDefaultValue() != null) {
+              try {
+                intField.setDefaultValue(Integer.valueOf(sqlColumn.getDefaultValue()));
+              } catch (Exception e) {
+                log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
+              }
+            }
+            break;
+          }
+          case BIGINT: {
+            BigintField bigintField = new BigintField(sqlColumn.getName());
+            field = bigintField;
+            if (sqlColumn.getDefaultValue() != null && !sqlColumn.getDefaultValue().equals("NULL")) {
+              try {
+                bigintField.setDefaultValue(Long.valueOf(sqlColumn.getDefaultValue()));
+              } catch (Exception e) {
+                log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
+              }
+            }
+            break;
+          }
+          case BOOLEAN: {
+            BooleanField booleanField = new BooleanField(sqlColumn.getName());
+            field = booleanField;
+            if (sqlColumn.getDefaultValue() != null) {
+              try {
+                booleanField.setDefaultValue(Boolean.valueOf(sqlColumn.getDefaultValue()));
+              } catch (Exception e) {
+                log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
+              }
+            }
+            break;
+          }
+          case DATETIME: {
+            DatetimeField datetimeField = new DatetimeField(sqlColumn.getName());
+            field = datetimeField;
+            if (sqlColumn.getDefaultValue() != null) {
+              try {
+                datetimeField.setDefaultValue(LocalDateTime.parse(sqlColumn.getDefaultValue()));
+              } catch (Exception e) {
+                log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
+              }
+            }
+            break;
+          }
+          case DATE: {
+            DateField dateField = new DateField(sqlColumn.getName());
+            field = dateField;
+            if (sqlColumn.getDefaultValue() != null) {
+              try {
+                dateField.setDefaultValue(LocalDate.parse(sqlColumn.getDefaultValue()));
+              } catch (Exception e) {
+                log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
+              }
+            }
+            break;
+          }
+          case JSON: {
+            JsonField jsonField = new JsonField(sqlColumn.getName());
+            field = jsonField;
+            if (sqlColumn.getDefaultValue() != null) {
+              try {
+                jsonField.setDefaultValue(JsonUtils.getInstance().parseToObject(sqlColumn.getDefaultValue(), Serializable.class));
+              } catch (Exception e) {
+                log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
+              }
+            }
+            break;
+          }
+        }
+        field.setModelName(sqlColumn.getTableName());
+        field.setComment(sqlColumn.getComment());
+        field.setUnique(sqlColumn.isUnique());
+        field.setNullable(sqlColumn.isNullable());
+        entity.addField(field);
+      }
+      Iterator<SqlIndex> idxIte = table.getIndexIterator();
+      while (idxIte.hasNext()) {
+        SqlIndex sqlIndex = idxIte.next();
+        Index index = new Index(table.getName());
+        index.setName(sqlIndex.getName());
+        List<SqlColumn> columns = sqlIndex.getColumns();
+        Map<SqlColumn, String> columnOrderMap = sqlIndex.getColumnOrderMap();
+        for (SqlColumn column : columns) {
+          String order = columnOrderMap.get(column);
+          if (order != null) {
+            index.addField(column.getName(), Direction.valueOf(order));
+          } else {
+            index.addField(column.getName());
+          }
+        }
+        entity.addIndex(index);
+      }
+      modelList.add(entity);
+    }
+    return modelList;
   }
 
   @Override

@@ -3,7 +3,7 @@ package tech.wetech.flexmodel;
 /**
  * @author cjbi
  */
-public class IntField extends TypedField<Long, IntField> {
+public class IntField extends TypedField<Integer, IntField> {
 
   public IntField(String name) {
     super(name, BasicFieldType.INT.getType());

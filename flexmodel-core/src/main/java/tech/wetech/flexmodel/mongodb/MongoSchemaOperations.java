@@ -34,6 +34,11 @@ public class MongoSchemaOperations implements SchemaOperations {
   }
 
   @Override
+  public List<Model> syncModels() {
+    return mongoContext.getMappedModels().sync(mongoContext);
+  }
+
+  @Override
   public List<Model> getAllModels() {
     return mappedModels.lookup(mongoContext.getSchemaName());
   }

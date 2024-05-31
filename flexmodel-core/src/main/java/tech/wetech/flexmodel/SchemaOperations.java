@@ -11,6 +11,11 @@ import java.util.function.UnaryOperator;
 public interface SchemaOperations {
 
   /**
+   * 同步模型变更
+   */
+  List<Model> syncModels();
+
+  /**
    * 获取所有模型
    *
    * @return 模型列表

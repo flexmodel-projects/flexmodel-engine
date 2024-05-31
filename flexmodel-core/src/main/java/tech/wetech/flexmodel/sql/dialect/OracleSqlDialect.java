@@ -121,6 +121,11 @@ public class OracleSqlDialect extends SqlDialect {
   }
 
   @Override
+  public String quoteIndexInfoTableName(String identifier) {
+    return quoteIdentifier(identifier);
+  }
+
+  @Override
   public boolean supportsCommentOn() {
     return true;
   }

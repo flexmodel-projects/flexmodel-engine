@@ -24,4 +24,14 @@ public enum BasicFieldType {
   public String getType() {
     return type;
   }
+
+  public static BasicFieldType fromType(String type) {
+    for (BasicFieldType value : BasicFieldType.values()) {
+      if (type.equals(value.type)) {
+        return value;
+      }
+    }
+    return null;
+  }
+
 }
