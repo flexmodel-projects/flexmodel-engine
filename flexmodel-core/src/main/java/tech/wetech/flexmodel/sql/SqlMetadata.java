@@ -63,7 +63,6 @@ public class SqlMetadata {
       while (tableResultSet.next()) {
         SqlTable table = new SqlTable();
         table.setName(tableResultSet.getString("TABLE_NAME"));
-        log.debug("building table {} struct", table.getName());
         String comment = tableResultSet.getString("REMARKS");
         if (comment != null && !comment.isEmpty()) {
           table.setComment(comment);
@@ -119,16 +118,16 @@ public class SqlMetadata {
 
   private void traceIfEnabled(String key, ResetSetSupplier consumer) throws SQLException {
     if (log.isTraceEnabled()) {
-      log.debug("{} start========================", key);
+      log.trace("{} start========================", key);
       ResultSet rs = consumer.get();
       while (rs.next()) {
-        log.debug("--------------------------");
+        log.trace("--------------------------");
         int columnCount = rs.getMetaData().getColumnCount();
         for (int i = 1; i < columnCount; i++) {
-          log.debug(rs.getMetaData().getColumnLabel(i) + ":" + rs.getObject(i));
+          log.trace(rs.getMetaData().getColumnLabel(i) + ":" + rs.getObject(i));
         }
       }
-      log.debug("{} end========================", key);
+      log.trace("{} end========================", key);
     }
   }
 
@@ -141,16 +140,6 @@ public class SqlMetadata {
           primaryKey = new SqlPrimaryKey(table);
           table.setPrimaryKey(primaryKey);
         }
-
-        if (log.isDebugEnabled()) {
-          log.debug("sql primary key start----------------------");
-          int columnCount = pkRs.getMetaData().getColumnCount();
-          for (int i = 1; i < columnCount; i++) {
-            log.debug(pkRs.getMetaData().getColumnLabel(i) + ":" + pkRs.getObject(i));
-          }
-          log.debug("sql primary key end----------------------");
-        }
-
         primaryKey = new SqlPrimaryKey(table);
         table.setPrimaryKey(primaryKey);
         primaryKey.setName(pkRs.getString("PK_NAME"));
