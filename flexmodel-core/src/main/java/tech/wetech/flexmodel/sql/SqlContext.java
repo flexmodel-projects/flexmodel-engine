@@ -22,6 +22,7 @@ public class SqlContext extends AbstractSessionContext {
 
   private SqlExpressionCalculator conditionCalculator;
   protected final Map<String, SqlTypeHandler<?>> typeHandlerMap = new HashMap<>();
+  private final SqlMetadata sqlMetadata;
 
   public SqlContext(String schemaName, SqlExecutor sqlExecutor, MappedModels mappedModels) {
     super(schemaName, mappedModels);
@@ -35,6 +36,7 @@ public class SqlContext extends AbstractSessionContext {
       throw new IllegalStateException("获取数据库连接失败，请检查数据源");
     }
     this.sqlDialect = SqlDialectFactory.create(databaseMetaData);
+    this.sqlMetadata = new SqlMetadata(sqlDialect, connection);
     this.conditionCalculator = new DefaultSqlExpressionCalculator(sqlDialect);
 
     this.typeHandlerMap.put(BasicFieldType.STRING.getType(), new StringSqlTypeHandler());
@@ -89,5 +91,9 @@ public class SqlContext extends AbstractSessionContext {
 
   public Connection getConnection() {
     return this.getJdbcOperations().getConnection();
+  }
+
+  public SqlMetadata getSqlMetadata() {
+    return sqlMetadata;
   }
 }

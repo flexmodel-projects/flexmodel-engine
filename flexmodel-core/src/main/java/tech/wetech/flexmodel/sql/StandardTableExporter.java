@@ -39,7 +39,7 @@ public class StandardTableExporter implements Exporter<SqlTable> {
           .append(sqlDialect.getIdentityColumnString(col.getSqlTypeCode()));
       } else {
         buf.append(typeName);
-        String defaultValue = col.getDefaultValue();
+        String defaultValue = sqlDialect.getDefaultValueString(col.getSqlTypeCode(), col.getDefaultValue());
         if (sqlDialect.supportsNotNullWithoutDefaultValue()) {
           if (defaultValue != null) {
             buf.append(" default ").append(defaultValue);

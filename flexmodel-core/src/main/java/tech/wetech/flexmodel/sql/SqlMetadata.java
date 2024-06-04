@@ -19,13 +19,11 @@ public class SqlMetadata {
   private final String catalog;
   private final String schema;
   private final DatabaseMetaData metaData;
-  private final Connection connection;
   private final SqlDialect sqlDialect;
 
   public SqlMetadata(SqlDialect sqlDialect, Connection connection) {
     try {
       this.sqlDialect = sqlDialect;
-      this.connection = connection;
       this.catalog = connection.getCatalog();
       String tmpSchema = null;
       try {
@@ -76,14 +74,6 @@ public class SqlMetadata {
     } catch (SQLException e) {
       log.error("getTables error: {}", e.getMessage(), e);
       throw new IllegalStateException(e);
-    } finally {
-      try {
-        if (this.connection != null) {
-          this.connection.close();
-        }
-      } catch (SQLException e) {
-        log.error("close connection error:{}", e.getMessage(), e);
-      }
     }
   }
 
@@ -172,7 +162,7 @@ public class SqlMetadata {
         column.setLength(columnSize);
         switch (JDBCType.valueOf(dataType)) {
           case BIT, TINYINT, SMALLINT, INTEGER,
-            BIGINT, FLOAT, REAL, DOUBLE, NUMERIC, DECIMAL -> {
+            BIGINT, FLOAT, DOUBLE, NUMERIC, DECIMAL -> {
             column.setPrecision(columnSize);
             column.setScale(decimalDigits);
           }

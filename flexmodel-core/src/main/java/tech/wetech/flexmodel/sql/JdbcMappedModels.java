@@ -8,9 +8,11 @@ import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 import javax.sql.DataSource;
 import java.io.*;
 import java.sql.*;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static tech.wetech.flexmodel.BasicFieldType.*;
 import static tech.wetech.flexmodel.IDField.DefaultGeneratedValue.*;
@@ -100,20 +102,63 @@ public class JdbcMappedModels implements MappedModels {
   @Override
   public List<Model> sync(AbstractSessionContext context) {
     SqlContext sqlContext = (SqlContext) context;
-    List<Entity> entities = Collections.emptyList();
-    try (Connection conn = dataSource.getConnection()) {
-      SqlMetadata sqlMetadata = new SqlMetadata(sqlDialect, conn);
-      entities = convert(sqlMetadata.getTables(), sqlContext);
-      for (Entity entity : entities) {
-        Model model = getModel(sqlContext.getSchemaName(), entity.getName());
-        if (model == null) {
-          this.persist(sqlContext.getSchemaName(), entity);
-        }
+    List<Entity> entities = convert(sqlContext.getSqlMetadata().getTables(), sqlContext);
+    Map<String, Model> metaMap = lookup(sqlContext.getSchemaName()).stream().collect(Collectors.toMap(Model::getName, model -> model));
+    for (Entity entity : entities) {
+      Model model = getIgnoreCase(entity.getName(), metaMap);
+      if (model == null) {
+        this.persist(sqlContext.getSchemaName(), entity);
+        metaMap.put(entity.getName(), entity);
       }
-    } catch (SQLException e) {
-      e.printStackTrace();
+    }
+    Set<String> diff = new HashSet<>();
+    Map<String, Entity> entityMap = entities.stream().collect(Collectors.toMap(Model::getName, model -> model));
+    for (String key : metaMap.keySet()) {
+      if (getIgnoreCase(key, entityMap) == null) {
+        diff.add(key);
+      }
+    }
+    if (!diff.isEmpty()) {
+      deleteRedundant(sqlContext.getSchemaName(), diff);
     }
     return new ArrayList<>(entities);
+  }
+
+  private <T> T getIgnoreCase(String compareKey, Map<String, T> data) {
+    Set<Map.Entry<String, T>> entries = data.entrySet();
+    for (Map.Entry<String, T> entry : entries) {
+      String key = entry.getKey();
+      if (key.equalsIgnoreCase(compareKey)) {
+        return entry.getValue();
+      }
+    }
+    return null;
+  }
+
+  private void deleteRedundant(String schemaName, Set<String> modelNames) {
+
+    try (Connection connection = dataSource.getConnection()) {
+      Map<String, Object> paramMap = new HashMap<>();
+      paramMap.put("schemaName", schemaName);
+      StringJoiner sqlIn = new StringJoiner(", ");
+      int index = 0;
+      for (String modelName : modelNames) {
+        String named = "modelName_" + (index++);
+        paramMap.put(named, modelName);
+        sqlIn.add(":" + named);
+      }
+      String sqlDeleteString = MessageFormat.format(" \ndelete from {0} \nwhere {1}=:schemaName and {2} in ({3})",
+        sqlDialect.quoteIdentifier("flex_models"),
+        sqlDialect.quoteIdentifier("schema_name"),
+        sqlDialect.quoteIdentifier("model_name"),
+        sqlIn
+      );
+      NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
+      sqlExecutor.update(sqlDeleteString, paramMap);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
   }
 
   private List<Entity> convert(List<SqlTable> tables, SqlContext sqlContext) {

@@ -464,4 +464,22 @@ public abstract class SqlDialect {
     return false;
   }
 
+  public String getDefaultValueString(int sqlTypeCode, String defaultValue) {
+    if (defaultValue == null) {
+      return null;
+    }
+    if (isNumeric(sqlTypeCode)) {
+      return defaultValue;
+    }
+    return isNumeric(sqlTypeCode) ? defaultValue : "'" + defaultValue + "'";
+  }
+
+  public boolean isNumeric(int jdbcType) {
+    return jdbcType == Types.BIT || jdbcType == Types.TINYINT || jdbcType == Types.SMALLINT
+           || jdbcType == Types.INTEGER || jdbcType == Types.
+      BIGINT || jdbcType == Types.FLOAT || jdbcType == Types.REAL
+           || jdbcType == Types.DOUBLE ||
+           jdbcType == Types.NUMERIC || jdbcType == Types.DECIMAL;
+  }
+
 }

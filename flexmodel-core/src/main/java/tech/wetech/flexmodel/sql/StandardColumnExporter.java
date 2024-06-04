@@ -24,7 +24,7 @@ public class StandardColumnExporter implements Exporter<SqlColumn> {
       .append(' ')
       .append(sqlDialect.getTypeName(sqlColumn.getSqlTypeCode(), sqlColumn.getLength(), sqlColumn.getPrecision(), sqlColumn.getScale()));
 
-    String defaultValue = sqlColumn.getDefaultValue();
+    String defaultValue = sqlDialect.getDefaultValueString(sqlColumn.getSqlTypeCode(), sqlColumn.getDefaultValue());
 
     if (sqlDialect.supportsNotNullWithoutDefaultValue()) {
       if (defaultValue != null) {
