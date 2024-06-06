@@ -72,7 +72,7 @@ public abstract class AbstractSessionTests {
 
   void createStudentDetailEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setGeneratedValue(IDENTITY))
+      .addField(new IDField("id").setGeneratedValue(AUTO_INCREMENT))
       .addField(new BigintField("studentId"))
       .addField(new TextField("description"))
     );
@@ -411,7 +411,7 @@ public abstract class AbstractSessionTests {
   void createTeacherEntity2(String entityName) {
     session.createEntity(entityName, entity -> entity
       // 主键
-      .addField(new IDField("id").setGeneratedValue(IDField.DefaultGeneratedValue.IDENTITY).setComment("Primary Key"))
+      .addField(new IDField("id").setGeneratedValue(IDField.DefaultGeneratedValue.AUTO_INCREMENT).setComment("Primary Key"))
       // 姓名
       .addField(new StringField("name").setComment("姓名").setNullable(false).setLength(10))
       // 年龄
@@ -897,7 +897,7 @@ public abstract class AbstractSessionTests {
   void createStudentEntity2(String entityName) {
     Entity entity = session.createEntity(
       entityName, e -> e.setComment("学生")
-        .addField(new IDField("id").setGeneratedValue(IDField.DefaultGeneratedValue.IDENTITY).setComment("Primary Key"))
+        .addField(new IDField("id").setGeneratedValue(IDField.DefaultGeneratedValue.AUTO_INCREMENT).setComment("Primary Key"))
     );
     // string
     StringField name = new StringField("name");

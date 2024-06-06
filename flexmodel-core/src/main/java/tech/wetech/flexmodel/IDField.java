@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel;
 
-import tech.wetech.flexmodel.calculations.UUIDValueCalculator;
+import tech.wetech.flexmodel.calculations.ULIDValueCalculator;
 import tech.wetech.flexmodel.calculations.ValueCalculator;
 
 /**
@@ -10,7 +10,7 @@ import tech.wetech.flexmodel.calculations.ValueCalculator;
  */
 public class IDField extends TypedField<Object, IDField> {
 
-  private GeneratedValue generatedValue = DefaultGeneratedValue.IDENTITY;
+  private GeneratedValue generatedValue = DefaultGeneratedValue.AUTO_INCREMENT;
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   public IDField setGeneratedValue(GeneratedValue generatedValue) {
@@ -36,11 +36,11 @@ public class IDField extends TypedField<Object, IDField> {
     /**
      * 自增ID
      */
-    IDENTITY("bigint", null),
+    AUTO_INCREMENT("bigint", null),
     /**
      * UUID
      */
-    UUID("string", UUIDValueCalculator.INSTANCE),
+    ULID("string", ULIDValueCalculator.INSTANCE),
     /**
      * 长整型不自动生成
      */

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static tech.wetech.flexmodel.IDField.DefaultGeneratedValue.IDENTITY;
+import static tech.wetech.flexmodel.IDField.DefaultGeneratedValue.AUTO_INCREMENT;
 import static tech.wetech.flexmodel.mongodb.MongoHelper.getMongoCondition;
 
 /**
@@ -51,7 +51,7 @@ public class MongoDataOperations implements DataOperations {
   public int insert(String modelName, Map<String, Object> record, Consumer<Object> idConsumer) {
     Entity entity = mappedModels.getEntity(schemaName, modelName);
     IDField idField = entity.getIdField();
-    if (!record.containsKey(idField.getName()) && idField.getGeneratedValue() == IDENTITY) {
+    if (!record.containsKey(idField.getName()) && idField.getGeneratedValue() == AUTO_INCREMENT) {
       setId(modelName, record);
       idConsumer.accept(record.get(idField.getName()));
     }

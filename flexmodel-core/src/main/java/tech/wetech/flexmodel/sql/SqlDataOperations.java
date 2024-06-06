@@ -7,10 +7,7 @@ import tech.wetech.flexmodel.sql.type.SqlResultHandler;
 import tech.wetech.flexmodel.sql.type.SqlTypeHandler;
 import tech.wetech.flexmodel.sql.type.UnknownSqlTypeHandler;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -143,15 +140,19 @@ public class SqlDataOperations implements DataOperations {
                  physicalTableName +
                  " " +
                  " where (" + sqlDialect.quoteIdentifier("id") + "= :id)";
-
-    return sqlExecutor.queryForObject(sql, Map.of(idField.getName(), id), getSqlResultHandler(entity, null, resultType));
+    Map<String, Object> dataMap = sqlExecutor.queryForObject(sql, Map.of(idField.getName(), id), getSqlResultHandler(entity, null, Map.class));
+    return JsonUtils.getInstance().convertValue(dataMap, resultType);
   }
 
   @Override
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
     Model model = mappedModels.getModel(schemaName, modelName);
     Map.Entry<String, Map<String, Object>> entry = SqlHelper.toQuerySqlWithPrepared(sqlContext, modelName, query);
-    return sqlExecutor.queryForList(entry.getKey(), entry.getValue(), getSqlResultHandler(model, query, resultType));
+    List<T> list = new ArrayList<>();
+    sqlExecutor.queryForList(entry.getKey(), entry.getValue(), getSqlResultHandler(model, query, Map.class)).forEach(map -> {
+      list.add(JsonUtils.getInstance().convertValue(map, resultType));
+    });
+    return list;
   }
 
   @Override

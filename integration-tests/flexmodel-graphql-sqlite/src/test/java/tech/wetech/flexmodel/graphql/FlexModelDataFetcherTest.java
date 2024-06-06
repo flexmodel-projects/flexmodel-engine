@@ -44,7 +44,7 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
 
   void createStudentDetailEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setGeneratedValue(IDENTITY))
+      .addField(new IDField("id").setGeneratedValue(AUTO_INCREMENT))
       .addField(new IntField("studentId"))
       .addField(new TextField("description"))
     );

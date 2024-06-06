@@ -31,7 +31,7 @@ class DataValidatorTest {
     // 主键
     BigintField idField = new BigintField("id");
     idField.setComment("Primary Key");
-    entity.addField(new IDField("id").setGeneratedValue(IDField.DefaultGeneratedValue.IDENTITY).setComment("Primary Key"));
+    entity.addField(new IDField("id").setGeneratedValue(IDField.DefaultGeneratedValue.AUTO_INCREMENT).setComment("Primary Key"));
     entity.setComment("学生表");
     // 姓名
     StringField name = new StringField("name");

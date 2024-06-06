@@ -185,7 +185,7 @@ session.createEntity("teacher", entity -> entity
 ```java
 // 创建实体时至少要有一个ID字段
 session.createEntity("teacher_course", sScore -> sScore
-  .addField(new IDField<>("id").setGeneratedValue(IDField.DefaultGeneratedValue.IDENTITY).setComment("Primary Key"))
+  .addField(new IDField<>("id").setGeneratedValue(DefaultGeneratedValue.AUTO_INCREMENT).setComment("Primary Key"))
   .setComment("教师成绩表")
 );
 // 创建字段

@@ -1,22 +1,22 @@
 package tech.wetech.flexmodel.calculations;
 
 import tech.wetech.flexmodel.TypedField;
+import tech.wetech.flexmodel.ULID;
 
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * 生成UUID
  *
  * @author cjbi
  */
-public class UUIDValueCalculator extends AbstractValueCalculator<String> {
+public class ULIDValueCalculator extends AbstractValueCalculator<String> {
 
-  public static final UUIDValueCalculator INSTANCE = new UUIDValueCalculator();
+  public static final ULIDValueCalculator INSTANCE = new ULIDValueCalculator();
 
   @Override
   public String calculate(TypedField<String, ?> field, Map<String, Object> data) throws ValueCalculateException {
-    return UUID.randomUUID().toString();
+    return ULID.random().toString();
   }
 
 }

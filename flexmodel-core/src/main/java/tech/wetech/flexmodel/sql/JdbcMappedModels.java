@@ -181,7 +181,7 @@ public class JdbcMappedModels implements MappedModels {
             IDField idField = new IDField(sqlColumn.getName());
             field = idField;
             if (sqlColumn.isAutoIncrement()) {
-              idField.setGeneratedValue(IDENTITY);
+              idField.setGeneratedValue(AUTO_INCREMENT);
             }
             BasicFieldType idType = BasicFieldType.fromType(jdbcCodeMap.getOrDefault(sqlColumn.getSqlTypeCode(), STRING.getType()));
             idField.setGeneratedValue(idType == BIGINT || idType == INT || idType == DECIMAL ? BIGINT_NO_GEN : STRING_NO_GEN);
