@@ -3,16 +3,16 @@ package tech.wetech.flexmodel.event.record;
 /**
  * @author cjbi
  */
-public class PreDeleteEvent extends AbstractRecordEvent {
+public class PreDeleteRecordEvent extends AbstractRecordEvent {
 
   private String modelName;
   private String filter;
   private Object id;
 
-  public PreDeleteEvent() {
+  public PreDeleteRecordEvent() {
   }
 
-  public PreDeleteEvent(String schemaName, String modelName, Object id, String filter) {
+  public PreDeleteRecordEvent(String schemaName, String modelName, Object id, String filter) {
     this.schemaName = schemaName;
     this.modelName = modelName;
     this.id = id;

@@ -5,17 +5,17 @@ import java.util.Map;
 /**
  * @author cjbi
  */
-public class PostInsertEvent extends AbstractRecordEvent {
+public class PostInsertRecordEvent extends AbstractRecordEvent {
 
   private String modelName;
   private Map<String, Object> record;
   private Object id;
   private int affectedRows;
 
-  public PostInsertEvent() {
+  public PostInsertRecordEvent() {
   }
 
-  public PostInsertEvent(String modelName, String schemaName, Map<String, Object> record, Object id, int affectedRows) {
+  public PostInsertRecordEvent(String modelName, String schemaName, Map<String, Object> record, Object id, int affectedRows) {
     this.modelName = modelName;
     this.schemaName = schemaName;
     this.record = record;

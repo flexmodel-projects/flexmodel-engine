@@ -479,3 +479,55 @@ session.deleteById(entityName, 1);
 #### 更多使用示例请见测试用例
 
 #### FlexModel 目前还在测试阶段，变更比较频繁，请勿用于生产环境，否则后果自负
+
+
+### 事件
+
+flexmodel内置了大量事件来监控行为，方便支持扩展，以下为事件使用示例
+
+#### 监听插入记录
+
+```java
+// 插入记录前
+sessionFactory.subscribeEvent(PostInsertRecordEvent.class, event -> {
+  // do somethings
+});
+
+// 插入记录后
+  sessionFactory.subscribeEvent(PostInsertRecordEvent.class, event -> {
+// do somethings
+  });
+```
+
+#### 监听所有数据变更事件
+
+```java
+sessionFactory.subscribeEvent(AbstractRecordEvent.class, event -> {
+  // do somethings
+});
+```
+
+#### 监听创建实体前事件
+
+```java
+sessionFactory.subscribeEvent(PreCreateEntityEvent.class, event -> {
+  // do somethings
+});
+```
+
+#### 监听所有模型变更事件
+
+```java
+sessionFactory.subscribeEvent(AbstractSchemaEvent.class, event -> {
+  // do somethings
+});
+```
+#### 监听所有事件
+
+```java
+sessionFactory.subscribeEvent(DomainEvent.class, event -> {
+  // do somethings
+});
+```
+
+更多事件类请见`tech.wetech.flexmodel.event`

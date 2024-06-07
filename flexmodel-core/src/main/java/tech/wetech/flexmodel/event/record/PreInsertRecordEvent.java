@@ -5,15 +5,15 @@ import java.util.Map;
 /**
  * @author cjbi
  */
-public class PreInsertEvent extends AbstractRecordEvent {
+public class PreInsertRecordEvent extends AbstractRecordEvent {
 
   private String modelName;
   private Map<String, Object> record;
 
-  public PreInsertEvent() {
+  public PreInsertRecordEvent() {
   }
 
-  public PreInsertEvent(String schemaName, String modelName, Map<String, Object> record) {
+  public PreInsertRecordEvent(String schemaName, String modelName, Map<String, Object> record) {
     this.schemaName = schemaName;
     this.modelName = modelName;
     this.record = record;
