@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 public class MongoSession extends AbstractSession {
 
   public MongoSession(MongoContext mongoContext) {
-    super(mongoContext.getSchemaName(), mongoContext.getMappedModels(), mongoContext.getTypeHandlerMap(),
+    super(mongoContext,
       new MongoDataOperations(mongoContext),
       new MongoSchemaOperations(mongoContext));
   }

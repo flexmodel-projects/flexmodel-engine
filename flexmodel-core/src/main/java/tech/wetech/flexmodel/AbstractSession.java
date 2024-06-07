@@ -1,8 +1,9 @@
 package tech.wetech.flexmodel;
 
 import tech.wetech.flexmodel.calculations.DataOperationsCalculationDecorator;
+import tech.wetech.flexmodel.event.record.DataOperationsEventDecorator;
+import tech.wetech.flexmodel.event.schema.SchemaOperationsEventDecorator;
 import tech.wetech.flexmodel.graph.JoinGraphNode;
-import tech.wetech.flexmodel.mapping.TypeHandler;
 import tech.wetech.flexmodel.validations.DataOperationsValidationDecorator;
 
 import java.util.List;
@@ -17,14 +18,21 @@ public abstract class AbstractSession implements Session {
   private final DataOperations dataOperationsDelegate;
   private final SchemaOperations schemaOperationsDelegate;
 
-  public AbstractSession(String schemaName, MappedModels mappedModels, Map<String, ? extends TypeHandler<?>> typeHandlerMap, DataOperations dataOperationsDelegate,
+  public AbstractSession(AbstractSessionContext sessionContext, DataOperations dataOperationsDelegate,
                          SchemaOperations schemaOperationsDelegate) {
     this.dataOperationsDelegate =
-      new DataOperationsCalculationDecorator(schemaName, mappedModels, typeHandlerMap,
-        new DataOperationsValidationDecorator(schemaName, mappedModels, dataOperationsDelegate)
-      )
-    ;
-    this.schemaOperationsDelegate = new SchemaOperationsPersistenceDecorator(schemaName, mappedModels, schemaOperationsDelegate);
+      new DataOperationsEventDecorator(
+        sessionContext,
+        new DataOperationsCalculationDecorator(sessionContext,
+          new DataOperationsValidationDecorator(sessionContext,
+            dataOperationsDelegate
+          )
+        )
+      );
+    this.schemaOperationsDelegate =
+      new SchemaOperationsEventDecorator(
+        sessionContext,
+        new SchemaOperationsPersistenceDecorator(sessionContext, schemaOperationsDelegate));
   }
 
   @Override

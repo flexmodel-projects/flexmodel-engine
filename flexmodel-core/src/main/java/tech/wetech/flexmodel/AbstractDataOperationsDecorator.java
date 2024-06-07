@@ -1,20 +1,23 @@
 package tech.wetech.flexmodel;
 
+import tech.wetech.flexmodel.event.record.*;
 import tech.wetech.flexmodel.graph.JoinGraphNode;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 
 /**
  * @author cjbi
  */
 public class AbstractDataOperationsDecorator implements DataOperations {
 
+  protected final AbstractSessionContext sessionContext;
   protected final DataOperations delegate;
 
-  public AbstractDataOperationsDecorator(DataOperations delegate) {
+  public AbstractDataOperationsDecorator(AbstractSessionContext sessionContext, DataOperations delegate) {
+    this.sessionContext = sessionContext;
     this.delegate = delegate;
   }
 
@@ -24,8 +27,14 @@ public class AbstractDataOperationsDecorator implements DataOperations {
   }
 
   @Override
-  public int insert(String modelName, Map<String, Object> record, Consumer<Object> id) {
-    return delegate.insert(modelName, record, id);
+  public int insert(String modelName, Map<String, Object> record, Consumer<Object> idConsumer) {
+    sessionContext.publishEvent(new PreInsertEvent(sessionContext.getSchemaName(), modelName, record));
+    AtomicReference<Object> atomicId = new AtomicReference<>();
+    int rows = delegate.insert(modelName, record, atomicId::set);
+    Object id = atomicId.get();
+    idConsumer.accept(id);
+    sessionContext.publishEvent(new PostInsertEvent(sessionContext.getSchemaName(), modelName, record, id, rows));
+    return rows;
   }
 
   @Override
@@ -45,47 +54,42 @@ public class AbstractDataOperationsDecorator implements DataOperations {
 
   @Override
   public int updateById(String modelName, Map<String, Object> record, Object id) {
-    return delegate.updateById(modelName, record, id);
+    sessionContext.publishEvent(new PreUpdateEvent(sessionContext.getSchemaName(), modelName, record, id, null));
+    int rows = delegate.updateById(modelName, record, id);
+    sessionContext.publishEvent(new PostUpdateEvent(sessionContext.getSchemaName(), modelName, record, id, null, rows));
+    return rows;
   }
 
   @Override
   public int update(String modelName, Map<String, Object> record, String filter) {
-    return delegate.update(modelName, record, filter);
+    sessionContext.publishEvent(new PreUpdateEvent(sessionContext.getSchemaName(), modelName, record, null, filter));
+    int rows = delegate.update(modelName, record, filter);
+    sessionContext.publishEvent(new PostUpdateEvent(sessionContext.getSchemaName(), modelName, record, null, filter, rows));
+    return rows;
   }
 
   @Override
   public int deleteById(String modelName, Object id) {
-    return delegate.deleteById(modelName, id);
+    sessionContext.publishEvent(new PreDeleteEvent(sessionContext.getSchemaName(), modelName, id, null));
+    int rows = delegate.deleteById(modelName, id);
+    sessionContext.publishEvent(new PostDeleteEvent(sessionContext.getSchemaName(), modelName, id, null, rows));
+    return rows;
   }
 
   @Override
   public int delete(String modelName, String filter) {
-    return delegate.delete(modelName, filter);
+    sessionContext.publishEvent(new PreDeleteEvent(sessionContext.getSchemaName(), modelName, null, filter));
+    int rows = delegate.delete(modelName, filter);
+    sessionContext.publishEvent(new PostDeleteEvent(sessionContext.getSchemaName(), modelName, null, filter, rows));
+    return rows;
   }
 
   @Override
   public int deleteAll(String modelName) {
-    return delegate.deleteAll(modelName);
-  }
-
-  @Override
-  public <T> List<T> find(String modelName, UnaryOperator<Query> queryUnaryOperator, Class<T> resultType) {
-    return delegate.find(modelName, queryUnaryOperator, resultType);
-  }
-
-  @Override
-  public Map<String, Object> findById(String modelName, Object id) {
-    return delegate.findById(modelName, id);
-  }
-
-  @Override
-  public List<Map<String, Object>> find(String modelName, UnaryOperator<Query> queryUnaryOperator) {
-    return delegate.find(modelName, queryUnaryOperator);
-  }
-
-  @Override
-  public boolean existsById(String modelName, Object id) {
-    return delegate.existsById(modelName, id);
+    sessionContext.publishEvent(new PreDeleteEvent(sessionContext.getSchemaName(), modelName, null, null));
+    int rows = delegate.deleteAll(modelName);
+    sessionContext.publishEvent(new PostDeleteEvent(sessionContext.getSchemaName(), modelName, null, null, rows));
+    return rows;
   }
 
 }

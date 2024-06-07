@@ -2,6 +2,7 @@ package tech.wetech.flexmodel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.wetech.flexmodel.event.DomainEventPublisher;
 import tech.wetech.flexmodel.mapping.TypeHandler;
 import tech.wetech.flexmodel.sql.SqlContext;
 
@@ -34,9 +35,18 @@ public abstract class AbstractSessionContext {
     return schemaName;
   }
 
+  public Model getModel(String modelName) {
+    return this.getMappedModels().getModel(getSchemaName(), modelName);
+  }
+
   public MappedModels getMappedModels() {
     return mappedModels;
   }
 
   public abstract Map<String, ? extends TypeHandler<?>> getTypeHandlerMap();
+
+  public <T> void publishEvent(final T aDomainEvent) {
+    DomainEventPublisher.instance().publish(aDomainEvent);
+  }
+
 }

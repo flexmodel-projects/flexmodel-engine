@@ -16,10 +16,10 @@ public class DataCalculator {
   private final MappedModels mappedModels;
   private final Map<String, ? extends TypeHandler<?>> typeHandlerMap;
 
-  public DataCalculator(String schemaName, MappedModels mappedModels, Map<String, ? extends TypeHandler<?>> typeHandlerMap) {
-    this.schemaName = schemaName;
-    this.mappedModels = mappedModels;
-    this.typeHandlerMap = typeHandlerMap;
+  public DataCalculator(AbstractSessionContext sessionContext) {
+    this.schemaName = sessionContext.getSchemaName();
+    this.mappedModels = sessionContext.getMappedModels();
+    this.typeHandlerMap = sessionContext.getTypeHandlerMap();
   }
 
   public Map<String, Object> calculateAll(String modelName, Map<String, Object> data) throws ValueCalculateException {

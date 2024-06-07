@@ -2,7 +2,6 @@ package tech.wetech.flexmodel.calculations;
 
 import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.graph.JoinGraphNode;
-import tech.wetech.flexmodel.mapping.TypeHandler;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,20 +16,18 @@ import static tech.wetech.flexmodel.AssociationField.Cardinality.*;
  */
 public class DataOperationsCalculationDecorator extends AbstractDataOperationsDecorator {
 
-  private final String schemaName;
-  private final MappedModels mappedModels;
   private final DataCalculator dataCalculator;
 
-  public DataOperationsCalculationDecorator(String schemaName, MappedModels mappedModels, Map<String, ? extends TypeHandler<?>> typeHandlerMap, DataOperations delegate) {
-    super(delegate);
-    this.schemaName = schemaName;
-    this.mappedModels = mappedModels;
-    this.dataCalculator = new DataCalculator(schemaName, mappedModels, typeHandlerMap);
+  public DataOperationsCalculationDecorator(AbstractSessionContext sessionContext, DataOperations delegate) {
+    super(sessionContext, delegate);
+    this.dataCalculator = new DataCalculator(sessionContext);
   }
 
   @Override
   @SuppressWarnings("all")
   public int insert(String modelName, Map<String, Object> record, Consumer<Object> idConsumer) {
+    String schemaName = sessionContext.getSchemaName();
+    MappedModels mappedModels = sessionContext.getMappedModels();
     AtomicReference<Object> atomicId = new AtomicReference<>();
     int rows = delegate.insert(modelName, dataCalculator.calculateAll(modelName, record), atomicId::set);
     Object id = atomicId.get();

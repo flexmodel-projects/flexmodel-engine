@@ -13,7 +13,7 @@ public class SqlSession extends AbstractSession {
   private final Connection connection;
 
   public SqlSession(SqlContext sqlContext) {
-    super(sqlContext.getSchemaName(), sqlContext.getMappedModels(), sqlContext.getTypeHandlerMap(),
+    super(sqlContext,
       new SqlDataOperations(sqlContext), new SqlSchemaOperations(sqlContext));
     this.connection = sqlContext.getConnection();
   }

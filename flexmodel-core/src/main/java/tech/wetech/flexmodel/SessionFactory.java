@@ -4,6 +4,7 @@ import com.mongodb.client.MongoDatabase;
 import tech.wetech.flexmodel.cache.Cache;
 import tech.wetech.flexmodel.cache.CachingMappedModels;
 import tech.wetech.flexmodel.cache.ConcurrentHashMapCache;
+import tech.wetech.flexmodel.event.DomainEventPublisher;
 import tech.wetech.flexmodel.mongodb.MongoContext;
 import tech.wetech.flexmodel.mongodb.MongoDataSourceProvider;
 import tech.wetech.flexmodel.mongodb.MongoSession;
@@ -13,6 +14,7 @@ import tech.wetech.flexmodel.sql.SqlContext;
 import tech.wetech.flexmodel.sql.SqlSession;
 
 import java.sql.Connection;
+import java.util.function.Consumer;
 
 /**
  * @author cjbi
@@ -31,6 +33,10 @@ public class SessionFactory {
 
   public static Builder builder() {
     return new Builder();
+  }
+
+  public <T> void subscribeEvent(Class<T> subscribedToEventType, Consumer<T> event) {
+    DomainEventPublisher.instance().subscribe(subscribedToEventType, event);
   }
 
   public Session openSession(String identifier) {

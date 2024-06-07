@@ -10,16 +10,11 @@ import java.util.function.Consumer;
  * @author cjbi
  */
 public class DataOperationsValidationDecorator extends AbstractDataOperationsDecorator {
-
-  private final String schemaName;
-  private final MappedModels mappedModels;
   private final DataValidator dataValidator;
 
-  public DataOperationsValidationDecorator(String schemaName, MappedModels mappedModels, DataOperations dataOperations) {
-    super(dataOperations);
-    this.schemaName = schemaName;
-    this.mappedModels = mappedModels;
-    this.dataValidator = new DataValidator(schemaName, mappedModels);
+  public DataOperationsValidationDecorator(AbstractSessionContext sessionContext, DataOperations dataOperations) {
+    super(sessionContext, dataOperations);
+    this.dataValidator = new DataValidator(sessionContext.getSchemaName(), sessionContext.getMappedModels());
   }
 
   public int insert(String modelName, Map<String, Object> record, Consumer<Object> id) {
@@ -39,13 +34,13 @@ public class DataOperationsValidationDecorator extends AbstractDataOperationsDec
 
   @Override
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
-    QueryHelper.validate(schemaName, modelName, mappedModels, query);
+    QueryHelper.validate(sessionContext.getSchemaName(), modelName, sessionContext.getMappedModels(), query);
     return delegate.find(modelName, query, resultType);
   }
 
   @Override
   public long count(String modelName, Query query) {
-    QueryHelper.validate(schemaName, modelName, mappedModels, query);
+    QueryHelper.validate(sessionContext.getSchemaName(), modelName, sessionContext.getMappedModels(), query);
     return delegate.count(modelName, query);
   }
 
