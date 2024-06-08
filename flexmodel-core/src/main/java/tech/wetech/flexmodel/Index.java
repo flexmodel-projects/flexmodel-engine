@@ -15,9 +15,6 @@ public class Index implements Serializable {
   private boolean unique;
   private String validMessage;
 
-  public Index() {
-  }
-
   public Index(String modelName) {
     this.modelName = modelName;
   }

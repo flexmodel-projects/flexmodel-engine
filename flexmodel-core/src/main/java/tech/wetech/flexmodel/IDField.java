@@ -1,7 +1,8 @@
 package tech.wetech.flexmodel;
 
-import tech.wetech.flexmodel.calculations.ULIDValueCalculator;
-import tech.wetech.flexmodel.calculations.ValueCalculator;
+import tech.wetech.flexmodel.generations.ULIDValueGenerator;
+import tech.wetech.flexmodel.generations.UUIDValueGenerator;
+import tech.wetech.flexmodel.generations.ValueGenerator;
 
 /**
  * ID字段类型默认为字符串，当为自增时则为数字，为UUID时则为字符串
@@ -10,15 +11,15 @@ import tech.wetech.flexmodel.calculations.ValueCalculator;
  */
 public class IDField extends TypedField<Object, IDField> {
 
-  private GeneratedValue generatedValue = DefaultGeneratedValue.AUTO_INCREMENT;
+  private GeneratedValue generatedValue = GeneratedValue.AUTO_INCREMENT;
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   public IDField setGeneratedValue(GeneratedValue generatedValue) {
     if (this.generatedValue.getGenerator() != null) {
-      this.getCalculators().remove(this.generatedValue.getGenerator());
+      this.getGenerators().remove(this.generatedValue.getGenerator());
     }
     if (generatedValue.getGenerator() != null) {
-      this.addCalculation((ValueCalculator) generatedValue.getGenerator());
+      this.addGenration((ValueGenerator) generatedValue.getGenerator());
     }
     this.generatedValue = generatedValue;
     return this;
@@ -32,7 +33,7 @@ public class IDField extends TypedField<Object, IDField> {
     super(name, BasicFieldType.ID.getType());
   }
 
-  public enum DefaultGeneratedValue implements GeneratedValue {
+  public enum GeneratedValue {
     /**
      * 自增ID
      */
@@ -40,7 +41,11 @@ public class IDField extends TypedField<Object, IDField> {
     /**
      * UUID
      */
-    ULID("string", ULIDValueCalculator.INSTANCE),
+    UUID("string", UUIDValueGenerator.INSTANCE),
+    /**
+     * ULID
+     */
+    ULID("string", ULIDValueGenerator.INSTANCE),
     /**
      * 长整型不自动生成
      */
@@ -51,30 +56,21 @@ public class IDField extends TypedField<Object, IDField> {
     STRING_NO_GEN("string", null),
     ;
     private final String type;
-    private final ValueCalculator<?> generator;
+    private final ValueGenerator<?> generator;
 
-    DefaultGeneratedValue(String type, ValueCalculator<?> generator) {
+    GeneratedValue(String type, ValueGenerator<?> generator) {
       this.type = type;
       this.generator = generator;
     }
 
-    @Override
     public String getType() {
       return type;
     }
 
-    @Override
-    public ValueCalculator<?> getGenerator() {
+    public ValueGenerator<?> getGenerator() {
       return generator;
     }
   }
 
-  public interface GeneratedValue {
-
-    String getType();
-
-    ValueCalculator<?> getGenerator();
-
-  }
 
 }

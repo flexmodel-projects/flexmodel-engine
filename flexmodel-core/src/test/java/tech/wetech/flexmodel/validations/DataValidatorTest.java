@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tech.wetech.flexmodel.*;
-import tech.wetech.flexmodel.calculations.DatetimeNowValueCalculator;
+import tech.wetech.flexmodel.generations.DatetimeNowValueGenerator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,7 +31,7 @@ class DataValidatorTest {
     // 主键
     BigintField idField = new BigintField("id");
     idField.setComment("Primary Key");
-    entity.addField(new IDField("id").setGeneratedValue(IDField.DefaultGeneratedValue.AUTO_INCREMENT).setComment("Primary Key"));
+    entity.addField(new IDField("id").setGeneratedValue(IDField.GeneratedValue.AUTO_INCREMENT).setComment("Primary Key"));
     entity.setComment("学生表");
     // 姓名
     StringField name = new StringField("name");
@@ -64,7 +64,7 @@ class DataValidatorTest {
     DatetimeField createDatetime = new DatetimeField("createDatetime");
     createDatetime.setComment("创建日期时间");
     createDatetime.setNullable(false);
-    createDatetime.addCalculation(new DatetimeNowValueCalculator());
+    createDatetime.addGenration(new DatetimeNowValueGenerator());
     entity.addField(createDatetime);
     // 扩展信息
     JsonField extra = new JsonField("extra");

@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static tech.wetech.flexmodel.BasicFieldType.*;
-import static tech.wetech.flexmodel.IDField.DefaultGeneratedValue.*;
+import static tech.wetech.flexmodel.IDField.GeneratedValue.*;
 
 /**
  * @author cjbi

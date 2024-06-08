@@ -16,9 +16,6 @@ public class Entity implements Model {
   private final Set<TypedField<?, ?>> fields = new LinkedHashSet<>();
   private final Set<Index> indexes = new LinkedHashSet<>();
 
-  public Entity() {
-  }
-
   public Entity(String name) {
     this.name = name;
   }

@@ -1,4 +1,4 @@
-package tech.wetech.flexmodel.calculations;
+package tech.wetech.flexmodel.generations;
 
 import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.graph.JoinGraphNode;
@@ -14,13 +14,13 @@ import static tech.wetech.flexmodel.AssociationField.Cardinality.*;
 /**
  * @author cjbi
  */
-public class DataOperationsCalculationDecorator extends AbstractDataOperationsDecorator {
+public class DataOperationsGenerationDecorator extends AbstractDataOperationsDecorator {
 
-  private final DataCalculator dataCalculator;
+  private final DataValueGenerator dataValueGenerator;
 
-  public DataOperationsCalculationDecorator(AbstractSessionContext sessionContext, DataOperations delegate) {
+  public DataOperationsGenerationDecorator(AbstractSessionContext sessionContext, DataOperations delegate) {
     super(sessionContext, delegate);
-    this.dataCalculator = new DataCalculator(sessionContext);
+    this.dataValueGenerator = new DataValueGenerator(sessionContext);
   }
 
   @Override
@@ -29,7 +29,7 @@ public class DataOperationsCalculationDecorator extends AbstractDataOperationsDe
     String schemaName = sessionContext.getSchemaName();
     MappedModels mappedModels = sessionContext.getMappedModels();
     AtomicReference<Object> atomicId = new AtomicReference<>();
-    int rows = delegate.insert(modelName, dataCalculator.calculateAll(modelName, record), atomicId::set);
+    int rows = delegate.insert(modelName, dataValueGenerator.generateAll(modelName, record), atomicId::set);
     Object id = atomicId.get();
     idConsumer.accept(id);
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
@@ -79,12 +79,12 @@ public class DataOperationsCalculationDecorator extends AbstractDataOperationsDe
 
   @Override
   public int updateById(String modelName, Map<String, Object> record, Object id) {
-    return delegate.updateById(modelName, dataCalculator.calculate(modelName, record), id);
+    return delegate.updateById(modelName, dataValueGenerator.generate(modelName, record), id);
   }
 
   @Override
   public int update(String modelName, Map<String, Object> record, String filter) {
-    return delegate.update(modelName, dataCalculator.calculate(modelName, record), filter);
+    return delegate.update(modelName, dataValueGenerator.generate(modelName, record), filter);
   }
 
 }

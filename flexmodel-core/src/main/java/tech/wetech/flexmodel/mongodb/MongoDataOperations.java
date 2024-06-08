@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static tech.wetech.flexmodel.IDField.DefaultGeneratedValue.AUTO_INCREMENT;
+import static tech.wetech.flexmodel.IDField.GeneratedValue.AUTO_INCREMENT;
 import static tech.wetech.flexmodel.mongodb.MongoHelper.getMongoCondition;
 
 /**

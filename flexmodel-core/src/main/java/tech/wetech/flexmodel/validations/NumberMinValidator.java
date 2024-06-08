@@ -7,26 +7,26 @@ import tech.wetech.flexmodel.TypedField;
  */
 public class NumberMinValidator<NUM extends Number> extends AbstractConstraintValidator<NUM> {
 
-  private final int min;
+  private final Number min;
 
-  public NumberMinValidator(String message, int min) {
+  public NumberMinValidator(String message, Number min) {
     super(message);
     this.min = min;
   }
 
-  public NumberMinValidator(int min) {
+  public NumberMinValidator(Number min) {
     super("must be greater than or equal to {{min}}");
     this.min = min;
   }
 
   @Override
   public void validate(TypedField<NUM, ?> field, NUM number) throws ConstraintValidException {
-    if (number == null || number.doubleValue() < min) {
+    if (number == null || number.doubleValue() < min.doubleValue()) {
       handleThrows(field, number);
     }
   }
 
-  public int getMin() {
+  public Number getMin() {
     return min;
   }
 

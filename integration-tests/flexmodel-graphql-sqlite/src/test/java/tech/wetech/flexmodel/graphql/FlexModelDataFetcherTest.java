@@ -16,7 +16,7 @@ import java.util.Map;
 
 import static graphql.schema.idl.RuntimeWiring.newRuntimeWiring;
 import static tech.wetech.flexmodel.AssociationField.Cardinality.*;
-import static tech.wetech.flexmodel.IDField.DefaultGeneratedValue.*;
+import static tech.wetech.flexmodel.IDField.GeneratedValue.*;
 
 /**
  * @author cjbi

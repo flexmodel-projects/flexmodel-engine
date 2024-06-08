@@ -6,13 +6,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tech.wetech.flexmodel.supports.jackson.FlexModelModule;
 
 import java.io.IOException;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_BEANS;
-import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING;
 
 /**
  * @author cjbi
@@ -31,12 +30,10 @@ public class JsonUtils {
     builder.serializationInclusion(JsonInclude.Include.NON_NULL);
     builder.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     builder.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    builder.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
+    builder.disable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
     builder.disable(FAIL_ON_EMPTY_BEANS);
-    builder.enable(WRITE_ENUMS_USING_TO_STRING);
-    SimpleModule module = new SimpleModule();
     builder.addModule(new JavaTimeModule());
-    builder.addModule(module);
+    builder.addModule(new FlexModelModule());
     this.jsonMapper = builder.build();
   }
 

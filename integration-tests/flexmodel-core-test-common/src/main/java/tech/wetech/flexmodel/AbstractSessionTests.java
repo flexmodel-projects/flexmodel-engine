@@ -3,9 +3,9 @@ package tech.wetech.flexmodel;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import tech.wetech.flexmodel.calculations.DateNowValueCalculator;
-import tech.wetech.flexmodel.calculations.DatetimeNowValueCalculator;
 import tech.wetech.flexmodel.dto.TeacherDTO;
+import tech.wetech.flexmodel.generations.DateNowValueGenerator;
+import tech.wetech.flexmodel.generations.DatetimeNowValueGenerator;
 import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
 import tech.wetech.flexmodel.sql.JdbcMappedModels;
 import tech.wetech.flexmodel.validations.NumberRangeValidator;
@@ -18,7 +18,7 @@ import java.util.Map;
 
 import static tech.wetech.flexmodel.AssociationField.Cardinality.*;
 import static tech.wetech.flexmodel.Direction.DESC;
-import static tech.wetech.flexmodel.IDField.DefaultGeneratedValue.*;
+import static tech.wetech.flexmodel.IDField.GeneratedValue.*;
 import static tech.wetech.flexmodel.Projections.*;
 
 /**
@@ -413,7 +413,7 @@ public abstract class AbstractSessionTests {
   void createTeacherEntity2(String entityName) {
     session.createEntity(entityName, entity -> entity
       // 主键
-      .addField(new IDField("id").setGeneratedValue(IDField.DefaultGeneratedValue.AUTO_INCREMENT).setComment("Primary Key"))
+      .addField(new IDField("id").setGeneratedValue(IDField.GeneratedValue.AUTO_INCREMENT).setComment("Primary Key"))
       // 姓名
       .addField(new StringField("name").setComment("姓名").setNullable(false).setLength(10))
       // 年龄
@@ -425,7 +425,7 @@ public abstract class AbstractSessionTests {
       // 是否禁用
       .addField(new BooleanField("isLocked").setNullable(false).setDefaultValue(false).setComment("是否禁用"))
       // 创建时间
-      .addField(new DatetimeField("createDatetime").setComment("创建日期时间").addCalculation(new DatetimeNowValueCalculator()))
+      .addField(new DatetimeField("createDatetime").setComment("创建日期时间").addGenration(new DatetimeNowValueGenerator()))
       // 扩展信息
       .addField(new JsonField("extra").setComment("扩展信息"))
       // 创建索引
@@ -900,7 +900,7 @@ public abstract class AbstractSessionTests {
   void createStudentEntity2(String entityName) {
     Entity entity = session.createEntity(
       entityName, e -> e.setComment("学生")
-        .addField(new IDField("id").setGeneratedValue(IDField.DefaultGeneratedValue.AUTO_INCREMENT).setComment("Primary Key"))
+        .addField(new IDField("id").setGeneratedValue(IDField.GeneratedValue.AUTO_INCREMENT).setComment("Primary Key"))
     );
     // string
     StringField name = new StringField("name");
@@ -932,14 +932,14 @@ public abstract class AbstractSessionTests {
     DatetimeField createDatetime = new DatetimeField("createDatetime");
     createDatetime.setModelName(entityName);
     createDatetime.setComment("创建日期时间");
-    createDatetime.addCalculation(new DatetimeNowValueCalculator());
+    createDatetime.addGenration(new DatetimeNowValueGenerator());
     entity.addField(createDatetime);
     session.createField(createDatetime);
     // date
     DateField birthday = new DateField("birthday");
     birthday.setModelName(entityName);
     birthday.setComment("出生日期");
-    birthday.addCalculation(new DateNowValueCalculator());
+    birthday.addGenration(new DateNowValueGenerator());
     entity.addField(birthday);
     session.createField(birthday);
     // json

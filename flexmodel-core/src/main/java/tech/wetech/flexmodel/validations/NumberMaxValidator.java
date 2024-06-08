@@ -7,26 +7,26 @@ import tech.wetech.flexmodel.TypedField;
  */
 public class NumberMaxValidator<NUM extends Number> extends AbstractConstraintValidator<NUM> {
 
-  private final int max;
+  private final Number max;
 
-  public NumberMaxValidator(String message, int max) {
+  public NumberMaxValidator(String message, Number max) {
     super(message);
     this.max = max;
   }
 
-  public NumberMaxValidator(int max) {
+  public NumberMaxValidator(Number max) {
     super("must be less than or equal to {{max}}");
     this.max = max;
   }
 
   @Override
   public void validate(TypedField<NUM, ?> field, NUM number) throws ConstraintValidException {
-    if (number == null || number.doubleValue() > max) {
+    if (number == null || number.doubleValue() > max.doubleValue()) {
       handleThrows(field, number);
     }
   }
 
-  public int getMax() {
+  public Number getMax() {
     return max;
   }
 }

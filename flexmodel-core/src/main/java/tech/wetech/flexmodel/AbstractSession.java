@@ -1,8 +1,8 @@
 package tech.wetech.flexmodel;
 
-import tech.wetech.flexmodel.calculations.DataOperationsCalculationDecorator;
 import tech.wetech.flexmodel.event.record.DataOperationsEventDecorator;
 import tech.wetech.flexmodel.event.schema.SchemaOperationsEventDecorator;
+import tech.wetech.flexmodel.generations.DataOperationsGenerationDecorator;
 import tech.wetech.flexmodel.graph.JoinGraphNode;
 import tech.wetech.flexmodel.validations.DataOperationsValidationDecorator;
 
@@ -23,7 +23,7 @@ public abstract class AbstractSession implements Session {
     this.dataOperationsDelegate =
       new DataOperationsEventDecorator(
         sessionContext,
-        new DataOperationsCalculationDecorator(sessionContext,
+        new DataOperationsGenerationDecorator(sessionContext,
           new DataOperationsValidationDecorator(sessionContext,
             dataOperationsDelegate
           )

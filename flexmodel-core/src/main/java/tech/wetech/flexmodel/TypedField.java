@@ -1,7 +1,7 @@
 package tech.wetech.flexmodel;
 
-import tech.wetech.flexmodel.calculations.DefaultValueCalculator;
-import tech.wetech.flexmodel.calculations.ValueCalculator;
+import tech.wetech.flexmodel.generations.DefaultValueGenerator;
+import tech.wetech.flexmodel.generations.ValueGenerator;
 import tech.wetech.flexmodel.validations.ConstraintValidator;
 import tech.wetech.flexmodel.validations.NotNullValidator;
 
@@ -21,7 +21,7 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
   private boolean nullable = true;
   private T defaultValue;
   private final Set<ConstraintValidator<T>> validators = new HashSet<>();
-  private final Set<ValueCalculator<T>> calculators = new HashSet<>();
+  private final Set<ValueGenerator<T>> generators = new HashSet<>();
 
   public TypedField(String name, String type) {
     this.name = name;
@@ -66,7 +66,7 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
 
   public SELF setDefaultValue(T defaultValue) {
     this.defaultValue = defaultValue;
-    addCalculation(new DefaultValueCalculator<>(defaultValue));
+    addGenration(new DefaultValueGenerator<>(defaultValue));
     return self();
   }
 
@@ -107,13 +107,13 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
     return self();
   }
 
-  public Set<ValueCalculator<T>> getCalculators() {
-    return calculators;
+  public Set<ValueGenerator<T>> getGenerators() {
+    return generators;
   }
 
   @SuppressWarnings("all")
-  public SELF addCalculation(ValueCalculator<T> calculator) {
-    this.calculators.add(calculator);
+  public SELF addGenration(ValueGenerator<T> calculator) {
+    this.generators.add(calculator);
     return self();
   }
 

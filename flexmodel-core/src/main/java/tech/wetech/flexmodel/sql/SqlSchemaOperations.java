@@ -320,7 +320,7 @@ public class SqlSchemaOperations implements SchemaOperations {
       idColumn.setName(field.getName());
       idColumn.setPrimaryKey(true);
       idColumn.setSqlTypeCode(sqlContext.getTypeHandler(idField.getGeneratedValue().getType()).getJdbcTypeCode());
-      idColumn.setAutoIncrement(idField.getGeneratedValue() == IDField.DefaultGeneratedValue.AUTO_INCREMENT);
+      idColumn.setAutoIncrement(idField.getGeneratedValue() == IDField.GeneratedValue.AUTO_INCREMENT);
       idColumn.setComment(field.getComment());
       return idColumn;
     } else {

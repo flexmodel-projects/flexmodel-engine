@@ -1,9 +1,9 @@
-package tech.wetech.flexmodel.calculations;
+package tech.wetech.flexmodel.generations;
 
 /**
  * @author cjbi
  */
-public abstract class AbstractValueCalculator<T> implements ValueCalculator<T> {
+public abstract class AbstractValueGenerator<T> implements ValueGenerator<T> {
 
   @Override
   public boolean equals(Object obj) {

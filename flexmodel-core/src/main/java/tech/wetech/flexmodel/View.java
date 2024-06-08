@@ -13,9 +13,6 @@ public class View implements Model {
   private String viewOn;
   private Query query;
 
-  public View() {
-  }
-
   public View(String name) {
     this.name = name;
   }
