@@ -82,16 +82,23 @@ public class JdbcMappedModels implements MappedModels {
     content.setSqlTypeCode(Types.JAVA_OBJECT);
     sqlTable.addColumn(content);
 
-    SqlIndex sqlIndex = new SqlIndex();
-    sqlIndex.setName("idx_schema_model");
-    sqlIndex.setTable(sqlTable);
-    sqlIndex.setUnique(true);
-    sqlIndex.addColumn(schemaName);
-    sqlIndex.addColumn(modelName);
+    SqlIndex idxSchema = new SqlIndex();
+    idxSchema.setName("idx_schema");
+    idxSchema.setTable(sqlTable);
+    idxSchema.setUnique(false);
+    idxSchema.addColumn(schemaName);
+
+    SqlIndex idxSchemaModel = new SqlIndex();
+    idxSchemaModel.setName("idx_schema_model");
+    idxSchemaModel.setTable(sqlTable);
+    idxSchemaModel.setUnique(true);
+    idxSchemaModel.addColumn(schemaName);
+    idxSchemaModel.addColumn(modelName);
 
     List<String> sqlList = new ArrayList<>();
     sqlList.addAll(List.of(sqlDialect.getTableExporter().getSqlCreateString(sqlTable)));
-    sqlList.addAll(List.of(sqlDialect.getIndexExporter().getSqlCreateString(sqlIndex)));
+    sqlList.addAll(List.of(sqlDialect.getIndexExporter().getSqlCreateString(idxSchema)));
+    sqlList.addAll(List.of(sqlDialect.getIndexExporter().getSqlCreateString(idxSchemaModel)));
     log.debug("Execute Create Sql: {}", sqlList);
     for (String sql : sqlList) {
       Statement statement = connection.createStatement();
@@ -311,6 +318,7 @@ public class JdbcMappedModels implements MappedModels {
         SqlIndex sqlIndex = idxIte.next();
         Index index = new Index(table.getName());
         index.setName(sqlIndex.getName());
+        index.setUnique(sqlIndex.isUnique());
         List<SqlColumn> columns = sqlIndex.getColumns();
         Map<SqlColumn, String> columnOrderMap = sqlIndex.getColumnOrderMap();
         for (SqlColumn column : columns) {

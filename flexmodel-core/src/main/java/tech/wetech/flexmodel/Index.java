@@ -13,7 +13,6 @@ public class Index implements Serializable {
   private String modelName;
   private final List<Field> fields = new ArrayList<>();
   private boolean unique;
-  private String validMessage;
 
   public Index(String modelName) {
     this.modelName = modelName;
@@ -45,15 +44,6 @@ public class Index implements Serializable {
 
   public Index setUnique(boolean unique) {
     this.unique = unique;
-    return this;
-  }
-
-  public String getValidMessage() {
-    return validMessage;
-  }
-
-  public Index setValidMessage(String validMessage) {
-    this.validMessage = validMessage;
     return this;
   }
 

@@ -20,7 +20,7 @@ public class StandardUniqueKeyExporter implements Exporter<SqlUniqueKey> {
     String tableName = sqlDialect.quoteIdentifier(uniqueKey.getTable().getName());
     String constraintName = uniqueKey.getName();
 
-    return new String[]{sqlDialect.getAlterTableString(tableName) + " add constraint " + constraintName + " " + uniqueConstraintSql(uniqueKey)};
+    return new String[]{sqlDialect.getAlterTableString(tableName) + " add constraint " + sqlDialect.quoteIdentifier(constraintName) + " " + uniqueConstraintSql(uniqueKey)};
   }
 
   protected String uniqueConstraintSql(SqlUniqueKey uniqueKey) {
@@ -49,7 +49,7 @@ public class StandardUniqueKeyExporter implements Exporter<SqlUniqueKey> {
     if (sqlDialect.supportsIfExistsBeforeConstraintName()) {
       buf.append("if exists ");
     }
-    buf.append(uniqueKey.getName());
+    buf.append(sqlDialect.quoteIdentifier(uniqueKey.getName()));
     if (sqlDialect.supportsIfExistsAfterConstraintName()) {
       buf.append(" if exists ");
     }

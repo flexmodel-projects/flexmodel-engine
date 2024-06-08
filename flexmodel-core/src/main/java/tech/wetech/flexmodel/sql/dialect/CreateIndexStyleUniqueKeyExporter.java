@@ -21,12 +21,12 @@ public class CreateIndexStyleUniqueKeyExporter extends StandardUniqueKeyExporter
     for (SqlColumn sqlColumn : uniqueKey.getColumns()) {
       columns.add(sqlColumn.getQuotedName(sqlDialect));
     }
-    return new String[]{"create unique index " + uniqueKey.getName() +
+    return new String[]{"create unique index " + sqlDialect.quoteIdentifier(uniqueKey.getName()) +
                         " on " + sqlDialect.quoteIdentifier(uniqueKey.getTable().getName()) + " (" + columns + ")"};
   }
 
   @Override
   public String[] getSqlDropString(SqlUniqueKey uniqueKey) {
-    return new String[]{"drop index " + uniqueKey.getName()};
+    return new String[]{"drop index " + sqlDialect.quoteIdentifier(uniqueKey.getName())};
   }
 }
