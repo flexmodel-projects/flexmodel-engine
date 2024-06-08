@@ -10,12 +10,12 @@ import java.util.UUID;
  *
  * @author cjbi
  */
-public class UUIDValueGenerator extends AbstractValueGenerator<String> {
+public class UUIDValueGenerator extends AbstractValueGenerator<String, UUIDValueGenerator> {
 
   public static final UUIDValueGenerator INSTANCE = new UUIDValueGenerator();
 
   @Override
-  public String generate(TypedField<String, ?> field, Map<String, Object> data) throws ValueGenerateException {
+  protected String generateCheckedValue(TypedField<String, ?> field, Map<String, Object> data) throws ValueGenerateException {
     return UUID.randomUUID().toString();
   }
 

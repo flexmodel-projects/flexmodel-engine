@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * @author cjbi
  */
-public class DefaultValueGenerator<T> extends AbstractValueGenerator<T> {
+public class DefaultValueGenerator<T> extends AbstractValueGenerator<T, DefaultValueGenerator<T>> {
 
   private final T value;
 
@@ -17,7 +17,7 @@ public class DefaultValueGenerator<T> extends AbstractValueGenerator<T> {
 
   @Override
   @SuppressWarnings("unchecked")
-  public T generate(TypedField<T, ?> field, Map<String, Object> data) throws ValueGenerateException {
+  protected T generateCheckedValue(TypedField<T, ?> field, Map<String, Object> data) throws ValueGenerateException {
     T currentValue = (T) data.get(field.getName());
     if (currentValue == null) {
       return value;

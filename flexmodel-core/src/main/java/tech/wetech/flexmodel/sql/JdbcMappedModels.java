@@ -6,7 +6,7 @@ import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 
 import javax.sql.DataSource;
-import java.io.*;
+import java.io.Serializable;
 import java.sql.*;
 import java.text.MessageFormat;
 import java.time.LocalDate;
@@ -79,7 +79,7 @@ public class JdbcMappedModels implements MappedModels {
     SqlColumn content = new SqlColumn();
     content.setName("content");
     content.setTableName(sqlTable.getName());
-    content.setSqlTypeCode(Types.LONGVARCHAR);
+    content.setSqlTypeCode(Types.JAVA_OBJECT);
     sqlTable.addColumn(content);
 
     SqlIndex sqlIndex = new SqlIndex();
@@ -340,13 +340,6 @@ public class JdbcMappedModels implements MappedModels {
       for (Map<String, Object> data : mapList) {
         String content = (String) data.get("content");
         result.add(JsonUtils.getInstance().parseToObject(content, Model.class));
-//        if (binaryContent instanceof Blob blob) {
-//          result.add((Model) deserialize(blob.getBinaryStream().readAllBytes()));
-//        } else if (binaryContent instanceof byte[] bytes) {
-//          result.add((Model) deserialize(bytes));
-//        } else {
-//          throw new RuntimeException("get model error, unknown data type:" + binaryContent.getClass());
-//        }
       }
       return result;
     } catch (Exception e) {
@@ -407,36 +400,8 @@ public class JdbcMappedModels implements MappedModels {
       }
       String content = (String) map.get("content");
       return JsonUtils.getInstance().parseToObject(content, Model.class);
-//      Object binaryContent = map.get("binary_content");
-//      if (binaryContent instanceof Blob blob) {
-//        return (Model) deserialize(blob.getBinaryStream().readAllBytes());
-//      } else if (binaryContent instanceof byte[] bytes) {
-//        return (Model) deserialize(bytes);
-//      } else {
-//        throw new RuntimeException("get model error, unknown data type:" + binaryContent.getClass());
-//      }
     } catch (Exception e) {
       throw new RuntimeException(e);
-    }
-  }
-
-  private byte[] serialize(final Object obj) {
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    try (ObjectOutputStream out = new ObjectOutputStream(bos)) {
-      out.writeObject(obj);
-      out.flush();
-      return bos.toByteArray();
-    } catch (Exception ex) {
-      throw new RuntimeException(ex);
-    }
-  }
-
-  private Object deserialize(byte[] bytes) {
-    ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-    try (ObjectInput in = new ObjectInputStream(bis)) {
-      return in.readObject();
-    } catch (Exception ex) {
-      throw new RuntimeException(ex);
     }
   }
 

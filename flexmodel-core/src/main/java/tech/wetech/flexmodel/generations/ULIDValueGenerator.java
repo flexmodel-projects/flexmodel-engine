@@ -10,12 +10,12 @@ import java.util.Map;
  *
  * @author cjbi
  */
-public class ULIDValueGenerator extends AbstractValueGenerator<String> {
+public class ULIDValueGenerator extends AbstractValueGenerator<String, ULIDValueGenerator> {
 
   public static final ULIDValueGenerator INSTANCE = new ULIDValueGenerator();
 
   @Override
-  public String generate(TypedField<String, ?> field, Map<String, Object> data) throws ValueGenerateException {
+  protected String generateCheckedValue(TypedField<String, ?> field, Map<String, Object> data) throws ValueGenerateException {
     return ULID.random().toString();
   }
 
