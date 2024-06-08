@@ -39,10 +39,10 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   }
 
   @Override
-  public Entity createEntity(String modelName, Entity entity) {
+  public Entity createEntity(Entity entity) {
     MappedModels mappedModels = sessionContext.getMappedModels();
     String schemaName = sessionContext.getSchemaName();
-    mappedModels.persist(schemaName, delegate.createEntity(modelName, entity));
+    mappedModels.persist(schemaName, delegate.createEntity(entity));
     return entity;
   }
 
@@ -57,10 +57,10 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   }
 
   @Override
-  public TypedField<?, ?> createField(String modelName, TypedField<?, ?> field) {
+  public TypedField<?, ?> createField(TypedField<?, ?> field) {
     MappedModels mappedModels = sessionContext.getMappedModels();
     String schemaName = sessionContext.getSchemaName();
-    delegate.createField(modelName, field);
+    delegate.createField(field);
     Entity entity = mappedModels.getEntity(schemaName, field.getModelName());
     entity.addField(field);
     mappedModels.persist(schemaName, entity);
@@ -78,10 +78,10 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   }
 
   @Override
-  public Index createIndex(String indexName, Index index) {
+  public Index createIndex(Index index) {
     MappedModels mappedModels = sessionContext.getMappedModels();
     String schemaName = sessionContext.getSchemaName();
-    delegate.createIndex(indexName, index);
+    delegate.createIndex(index);
     Entity entity = mappedModels.getEntity(schemaName, index.getModelName());
     entity.addIndex(index);
     mappedModels.persist(schemaName, entity);

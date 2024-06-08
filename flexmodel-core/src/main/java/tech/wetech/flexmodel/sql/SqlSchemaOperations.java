@@ -46,7 +46,7 @@ public class SqlSchemaOperations implements SchemaOperations {
   }
 
   @Override
-  public Entity createEntity(String modelName, Entity entity) {
+  public Entity createEntity(Entity entity) {
     SqlTable sqlTable = toSqlTable(entity);
     createTable(sqlTable);
     for (TypedField<?, ?> typedField : entity.getFields()) {
@@ -94,12 +94,11 @@ public class SqlSchemaOperations implements SchemaOperations {
   }
 
   @Override
-  public TypedField<?, ?> createField(String modelName, TypedField<?, ?> field) {
-    field.setModelName(modelName);
+  public TypedField<?, ?> createField(TypedField<?, ?> field) {
     if (field instanceof AssociationField associationField) {
       if (associationField.getCardinality() == MANY_TO_MANY) {
 
-        Entity entity = (Entity) getModel(modelName);
+        Entity entity = (Entity) getModel(field.getModelName());
         Entity targetEntity = (Entity) getModel(associationField.getTargetEntity());
         JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, associationField);
 
@@ -195,8 +194,7 @@ public class SqlSchemaOperations implements SchemaOperations {
   }
 
   @Override
-  public Index createIndex(String modelName, Index index) {
-    index.setModelName(modelName);
+  public Index createIndex(Index index) {
     SqlIndex sqlIndex = toSqlIndex(index);
     StandardIndexExporter indexExporter = sqlContext.getSqlDialect().getIndexExporter();
     String[] sqlCreateString = indexExporter.getSqlCreateString(sqlIndex);

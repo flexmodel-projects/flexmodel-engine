@@ -66,18 +66,18 @@ public abstract class AbstractSession implements Session {
   }
 
   @Override
-  public Entity createEntity(String modelName, Entity entity) {
-    return schemaOperationsDelegate.createEntity(modelName, entity);
+  public Entity createEntity(Entity entity) {
+    return schemaOperationsDelegate.createEntity(entity);
   }
 
   @Override
-  public TypedField<?, ?> createField(String modelName, TypedField<?, ?> field) {
-    return schemaOperationsDelegate.createField(modelName, field);
+  public TypedField<?, ?> createField(TypedField<?, ?> field) {
+    return schemaOperationsDelegate.createField(field);
   }
 
   @Override
-  public Index createIndex(String modelName, Index index) {
-    return schemaOperationsDelegate.createIndex(modelName, index);
+  public Index createIndex(Index index) {
+    return schemaOperationsDelegate.createIndex(index);
   }
 
   @Override

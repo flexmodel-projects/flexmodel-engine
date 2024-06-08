@@ -55,18 +55,18 @@ public class MongoSchemaOperations implements SchemaOperations {
   }
 
   @Override
-  public Entity createEntity(String modelName, Entity entity) {
+  public Entity createEntity(Entity entity) {
     String collectionName = getCollectionName(entity.getName());
     mongoDatabase.createCollection(collectionName);
     for (Index index : entity.getIndexes()) {
-      createIndex(modelName, index);
+      createIndex(index);
     }
     IDField idField = entity.getIdField();
     if (idField != null) {
       Index index = new Index(idField.getModelName());
       index.setUnique(true);
       index.addField(idField.getName());
-      createIndex(modelName, index);
+      createIndex(index);
     }
     return entity;
   }
@@ -81,20 +81,19 @@ public class MongoSchemaOperations implements SchemaOperations {
   }
 
   @Override
-  public TypedField<?, ?> createField(String modelName, TypedField<?, ?> field) {
-    field.setModelName(modelName);
+  public TypedField<?, ?> createField(TypedField<?, ?> field) {
     if (field instanceof IDField) {
       Index index = new Index(field.getModelName());
       index.setUnique(true);
       index.addField(field.getName());
-      createIndex(modelName, index);
+      createIndex(index);
     }
     if (field instanceof AssociationField associationField) {
       if (associationField.getCardinality() == ONE_TO_ONE) {
         Index index = new Index(associationField.getTargetEntity());
         index.setUnique(true);
         index.addField(associationField.getTargetField());
-        createIndex(modelName, index);
+        createIndex(index);
       }
     }
     return field;
@@ -106,8 +105,7 @@ public class MongoSchemaOperations implements SchemaOperations {
   }
 
   @Override
-  public Index createIndex(String modelName, Index index) {
-    index.setModelName(modelName);
+  public Index createIndex(Index index) {
     String collectionName = getCollectionName(index.getModelName());
     List<Bson> indexes = new ArrayList<>();
     for (Index.Field field : index.getFields()) {

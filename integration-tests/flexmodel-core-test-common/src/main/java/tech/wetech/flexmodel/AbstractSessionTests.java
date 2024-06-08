@@ -96,8 +96,9 @@ public abstract class AbstractSessionTests {
   void createAssociations(String classRoomEntityName, String studentEntityName,
                           String studentDetailEntityName, String courseEntityName, String teacherEntityName) {
     // 班级:学生
-    session.createField(classRoomEntityName,
+    session.createField(
       new AssociationField("students")
+        .setModelName(classRoomEntityName)
         .setTargetEntity(studentEntityName)
         .setTargetField("classId")
         .setCardinality(ONE_TO_MANY)
@@ -105,31 +106,32 @@ public abstract class AbstractSessionTests {
     );
     // 学生:课程 -> n:n
     session.createField(
-      studentEntityName,
       new AssociationField("courses")
+        .setModelName(studentEntityName)
         .setTargetEntity(courseEntityName)
         .setTargetField("courseNo")
         .setCardinality(MANY_TO_MANY)
     );
     // 学生:学生明细 -> 1:1
-    session.createField(studentEntityName,
+    session.createField(
       new AssociationField("studentDetail")
+        .setModelName(studentEntityName)
         .setTargetEntity(studentDetailEntityName)
         .setTargetField("studentId")
         .setCardinality(ONE_TO_ONE)
     );
     // 学生:教师 -> n:n
     session.createField(
-      studentEntityName,
       new AssociationField("teachers")
+        .setModelName(studentEntityName)
         .setTargetEntity(teacherEntityName)
         .setTargetField("id")
         .setCardinality(MANY_TO_MANY)
     );
     // 教师:学生 -> n:n
     session.createField(
-      teacherEntityName,
       new AssociationField("students")
+        .setModelName(teacherEntityName)
         .setTargetEntity(studentEntityName)
         .setTargetField("id")
         .setCardinality(MANY_TO_MANY)
@@ -528,8 +530,9 @@ public abstract class AbstractSessionTests {
       .addField(new BigintField("teacher_id"))
       .setComment("教师成绩表")
     );
-    session.createField(teacherEntityName,
+    session.createField(
       new AssociationField("courses")
+        .setModelName(teacherEntityName)
         .setCardinality(ONE_TO_MANY)
         .setCascadeDelete(true)
         .setTargetEntity(teacherCourseEntity)
@@ -901,43 +904,50 @@ public abstract class AbstractSessionTests {
     );
     // string
     StringField name = new StringField("name");
+    name.setModelName(entityName);
     name.setComment("姓名");
     name.setNullable(false);
     name.setLength(10);
     entity.addField(name);
-    session.createField(entityName, name);
+    session.createField(name);
     // text
     TextField description = new TextField("description").setComment("备注");
+    description.setModelName(entityName);
     entity.addField(description);
-    session.createField(entityName, description);
+    session.createField(description);
     // number
     IntField age = new IntField("age");
+    age.setModelName(entityName);
     age.setComment("年龄");
     entity.addField(age);
-    session.createField(entityName, age);
+    session.createField(age);
     // boolean
     BooleanField deleted = new BooleanField("is_deleted");
+    deleted.setModelName(entityName);
     deleted.setComment("软删除");
     deleted.setDefaultValue(false);
     entity.addField(deleted);
-    session.createField(entityName, deleted);
+    session.createField(deleted);
     //datetime
     DatetimeField createDatetime = new DatetimeField("createDatetime");
+    createDatetime.setModelName(entityName);
     createDatetime.setComment("创建日期时间");
     createDatetime.addCalculation(new DatetimeNowValueCalculator());
     entity.addField(createDatetime);
-    session.createField(entityName, createDatetime);
+    session.createField(createDatetime);
     // date
     DateField birthday = new DateField("birthday");
+    birthday.setModelName(entityName);
     birthday.setComment("出生日期");
     birthday.addCalculation(new DateNowValueCalculator());
     entity.addField(birthday);
-    session.createField(entityName, birthday);
+    session.createField(birthday);
     // json
     JsonField interests = new JsonField("interests");
+    interests.setModelName(entityName);
     interests.setComment("兴趣爱好");
     entity.addField(interests);
-    session.createField(entityName, interests);
+    session.createField(interests);
   }
 
   private void createScoreEntity2(String scoreModelName) {
@@ -990,16 +1000,18 @@ public abstract class AbstractSessionTests {
     createStudentEntity2(entityName);
     // when include single field
     Index index = new Index(entityName, "IDX_name");
+    index.setModelName(entityName);
     index.addField("name");
-    session.createIndex(entityName, index);
+    session.createIndex(index);
     session.dropIndex(entityName, "IDX_name");
     // when include multiple field
     Index multipleFiledIndex = new Index(entityName);
+    multipleFiledIndex.setModelName(entityName);
     multipleFiledIndex.addField("birthday");
     multipleFiledIndex.addField("age", DESC);
     multipleFiledIndex.addField("is_deleted", DESC);
     multipleFiledIndex.setName("IDX_compound");
-    session.createIndex(entityName, multipleFiledIndex);
+    session.createIndex(multipleFiledIndex);
     session.dropIndex(entityName, "IDX_compound");
     dropModel(entityName);
   }

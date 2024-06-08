@@ -44,9 +44,9 @@ public class SchemaOperationsEventDecorator implements SchemaOperations {
   }
 
   @Override
-  public Entity createEntity(String modelName, Entity entity) {
+  public Entity createEntity(Entity entity) {
     sessionContext.publishEvent(new PreCreateEntityEvent(sessionContext.getSchemaName(), entity));
-    Entity rE = delegate.createEntity(modelName, entity);
+    Entity rE = delegate.createEntity(entity);
     sessionContext.publishEvent(new PostCreateEntityEvent(sessionContext.getSchemaName(), rE));
     return rE;
   }
@@ -60,10 +60,10 @@ public class SchemaOperationsEventDecorator implements SchemaOperations {
   }
 
   @Override
-  public TypedField<?, ?> createField(String modelName, TypedField<?, ?> field) {
-    Entity entity = (Entity) sessionContext.getModel(modelName);
+  public TypedField<?, ?> createField(TypedField<?, ?> field) {
+    Entity entity = (Entity) sessionContext.getModel(field.getModelName());
     sessionContext.publishEvent(new PreCreateFieldEvent(sessionContext.getSchemaName(), entity, field));
-    TypedField<?, ?> result = delegate.createField(modelName, field);
+    TypedField<?, ?> result = delegate.createField(field);
     sessionContext.publishEvent(new PostCreateFieldEvent(sessionContext.getSchemaName(), entity, field));
     return result;
   }
@@ -78,10 +78,10 @@ public class SchemaOperationsEventDecorator implements SchemaOperations {
   }
 
   @Override
-  public Index createIndex(String modelName, Index index) {
+  public Index createIndex(Index index) {
     Entity entity = (Entity) sessionContext.getModel(index.getModelName());
     sessionContext.publishEvent(new PreCreateIndexEvent(sessionContext.getSchemaName(), entity, index));
-    Index result = delegate.createIndex(modelName, index);
+    Index result = delegate.createIndex(index);
     sessionContext.publishEvent(new PostCreateIndexEvent(sessionContext.getSchemaName(), entity, index));
     return result;
   }

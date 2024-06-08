@@ -40,11 +40,10 @@ public interface SchemaOperations {
   /**
    * 创建实体
    *
-   * @param modelName
    * @param entity
    * @return
    */
-  Entity createEntity(String modelName, Entity entity);
+  Entity createEntity(Entity entity);
 
   View createView(String viewName, String viewOn, Query query);
 
@@ -53,7 +52,7 @@ public interface SchemaOperations {
    *
    * @param field
    */
-  TypedField<?, ?> createField(String modelName, TypedField<?, ?> field);
+  TypedField<?, ?> createField(TypedField<?, ?> field);
 
   /**
    * 删除字段
@@ -68,15 +67,15 @@ public interface SchemaOperations {
    *
    * @param index
    */
-  Index createIndex(String modelName, Index index);
+  Index createIndex(Index index);
 
   /**
    * 删除索引
    *
-   * @param modelName 模型名称
+   * @param entityName 模型名称
    * @param indexName 索引名称
    */
-  void dropIndex(String modelName, String indexName);
+  void dropIndex(String entityName, String indexName);
 
   /**
    * 创建序列
@@ -112,7 +111,7 @@ public interface SchemaOperations {
   default Entity createEntity(String modelName, UnaryOperator<Entity> entityUnaryOperator) {
     Entity entity = new Entity(modelName);
     entityUnaryOperator.apply(entity);
-    return createEntity(modelName, entity);
+    return createEntity(entity);
   }
 
   /**
