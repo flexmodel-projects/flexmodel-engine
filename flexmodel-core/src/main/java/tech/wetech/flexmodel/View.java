@@ -31,6 +31,11 @@ public class View implements Model {
   }
 
   @Override
+  public String getType() {
+    return "view";
+  }
+
+  @Override
   public String getName() {
     return name;
   }

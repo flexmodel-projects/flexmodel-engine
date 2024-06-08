@@ -8,6 +8,8 @@ import java.util.List;
  */
 public interface Model extends Serializable {
 
+  String getType();
+
   String getName();
 
   List<? extends Field> getFields();

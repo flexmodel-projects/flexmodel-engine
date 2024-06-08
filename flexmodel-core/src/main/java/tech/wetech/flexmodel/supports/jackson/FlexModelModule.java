@@ -13,6 +13,7 @@ public class FlexModelModule extends SimpleModule {
 
   public FlexModelModule() {
     // Model
+    setMixInAnnotation(Model.class, ModelMixIn.class);
     setMixInAnnotation(Entity.class, ModelMixIn.class);
     setMixInAnnotation(View.class, ModelMixIn.class);
     // Field
@@ -28,6 +29,8 @@ public class FlexModelModule extends SimpleModule {
     setMixInAnnotation(DateField.class, TypedFieldMixIn.class);
     setMixInAnnotation(JsonField.class, TypedFieldMixIn.class);
     setMixInAnnotation(AssociationField.class, TypedFieldMixIn.class);
+    // Index
+    setMixInAnnotation(Index.class, IndexMixIn.class);
     // ValueGenerator
     setMixInAnnotation(ValueGenerator.class, ValueGeneratorMixIn.class);
     setMixInAnnotation(DefaultValueGenerator.class, DefaultValueGeneratorMixIn.class);

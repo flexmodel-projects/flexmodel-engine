@@ -69,18 +69,18 @@ public class JdbcMappedModels implements MappedModels {
     modelName.setLength(100);
     sqlTable.addColumn(modelName);
 
+    SqlColumn modelType = new SqlColumn();
+    modelType.setName("model_type");
+    modelType.setTableName(sqlTable.getName());
+    modelType.setSqlTypeCode(Types.VARCHAR);
+    modelType.setLength(100);
+    sqlTable.addColumn(modelType);
+
     SqlColumn content = new SqlColumn();
     content.setName("content");
     content.setTableName(sqlTable.getName());
     content.setSqlTypeCode(Types.LONGVARCHAR);
     sqlTable.addColumn(content);
-
-    SqlColumn binaryContent = new SqlColumn();
-    binaryContent.setName("binary_content");
-    binaryContent.setTableName(sqlTable.getName());
-    binaryContent.setSqlTypeCode(Types.BLOB);
-    binaryContent.setLength(Integer.MAX_VALUE);
-    sqlTable.addColumn(binaryContent);
 
     SqlIndex sqlIndex = new SqlIndex();
     sqlIndex.setName("idx_schema_model");
@@ -332,20 +332,21 @@ public class JdbcMappedModels implements MappedModels {
   public List<Model> lookup(String schemaName) {
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
-      String sqlSelectString = "select " + sqlDialect.quoteIdentifier("binary_content") +
+      String sqlSelectString = "select " + sqlDialect.quoteIdentifier("content") +
                                " \nfrom " + sqlDialect.quoteIdentifier(STORED_TABLES) +
                                " \nwhere " + sqlDialect.quoteIdentifier("schema_name") + "=:schemaName";
       List<Map<String, Object>> mapList = sqlExecutor.queryForList(sqlSelectString, Map.of("schemaName", schemaName));
       List<Model> result = new ArrayList<>();
       for (Map<String, Object> data : mapList) {
-        Object binaryContent = data.get("binary_content");
-        if (binaryContent instanceof Blob blob) {
-          result.add((Model) deserialize(blob.getBinaryStream().readAllBytes()));
-        } else if (binaryContent instanceof byte[] bytes) {
-          result.add((Model) deserialize(bytes));
-        } else {
-          throw new RuntimeException("get model error, unknown data type:" + binaryContent.getClass());
-        }
+        String content = (String) data.get("content");
+        result.add(JsonUtils.getInstance().parseToObject(content, Model.class));
+//        if (binaryContent instanceof Blob blob) {
+//          result.add((Model) deserialize(blob.getBinaryStream().readAllBytes()));
+//        } else if (binaryContent instanceof byte[] bytes) {
+//          result.add((Model) deserialize(bytes));
+//        } else {
+//          throw new RuntimeException("get model error, unknown data type:" + binaryContent.getClass());
+//        }
       }
       return result;
     } catch (Exception e) {
@@ -374,12 +375,13 @@ public class JdbcMappedModels implements MappedModels {
       String sqlDeleteString = getDeleteString();
       sqlExecutor.update(sqlDeleteString, Map.of("schemaName", schemaName, "modelName", model.getName()));
       String sqlInsertString = "insert into " + sqlDialect.quoteIdentifier("flex_models") +
-                               " values (:schemaName, :modelName, :content, :binaryContent)\n";
-      sqlExecutor.update(sqlInsertString, Map.of("schemaName", schemaName
-        , "modelName", model.getName()
-        , "content", content
-        , "binaryContent", serialize(model)
-      ));
+                               " values (:schemaName, :modelName, :modelType, :content)\n";
+      sqlExecutor.update(sqlInsertString,
+        Map.of("schemaName", schemaName,
+          "modelName", model.getName(),
+          "modelType", model.getType(),
+          "content", content
+        ));
       connection.commit();
     } catch (Exception e) {
       throw new RuntimeException(e);
@@ -395,7 +397,7 @@ public class JdbcMappedModels implements MappedModels {
   public Model getModel(String schemaName, String modelName) {
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
-      String sqlSelectString = "select " + sqlDialect.quoteIdentifier("binary_content") +
+      String sqlSelectString = "select " + sqlDialect.quoteIdentifier("content") +
                                " \nfrom " + sqlDialect.quoteIdentifier("flex_models") +
                                " \nwhere " + sqlDialect.quoteIdentifier("schema_name") + "=:schemaName and " + sqlDialect.quoteIdentifier("model_name") + "=:modelName";
       Map<String, Object> map = sqlExecutor.queryForMap(sqlSelectString,
@@ -403,15 +405,16 @@ public class JdbcMappedModels implements MappedModels {
       if (map == null) {
         return null;
       }
-      Object binaryContent = map.get("binary_content");
-
-      if (binaryContent instanceof Blob blob) {
-        return (Model) deserialize(blob.getBinaryStream().readAllBytes());
-      } else if (binaryContent instanceof byte[] bytes) {
-        return (Model) deserialize(bytes);
-      } else {
-        throw new RuntimeException("get model error, unknown data type:" + binaryContent.getClass());
-      }
+      String content = (String) map.get("content");
+      return JsonUtils.getInstance().parseToObject(content, Model.class);
+//      Object binaryContent = map.get("binary_content");
+//      if (binaryContent instanceof Blob blob) {
+//        return (Model) deserialize(blob.getBinaryStream().readAllBytes());
+//      } else if (binaryContent instanceof byte[] bytes) {
+//        return (Model) deserialize(bytes);
+//      } else {
+//        throw new RuntimeException("get model error, unknown data type:" + binaryContent.getClass());
+//      }
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

@@ -25,6 +25,11 @@ public class Entity implements Model {
   }
 
   @Override
+  public String getType() {
+    return "entity";
+  }
+
+  @Override
   public String getName() {
     return name;
   }
