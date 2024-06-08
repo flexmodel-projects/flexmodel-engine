@@ -1,4 +1,4 @@
-package tech.wetech.flexmodel.supports.jackson.mixin;
+package tech.wetech.flexmodel.supports.jackson;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
