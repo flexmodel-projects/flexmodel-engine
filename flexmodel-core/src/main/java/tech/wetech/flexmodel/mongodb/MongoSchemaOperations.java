@@ -59,14 +59,14 @@ public class MongoSchemaOperations implements SchemaOperations {
     String collectionName = getCollectionName(entity.getName());
     mongoDatabase.createCollection(collectionName);
     for (Index index : entity.getIndexes()) {
-      createIndex(index);
+      createIndex(modelName, index);
     }
     IDField idField = entity.getIdField();
     if (idField != null) {
       Index index = new Index(idField.getModelName());
       index.setUnique(true);
       index.addField(idField.getName());
-      createIndex(index);
+      createIndex(modelName, index);
     }
     return entity;
   }
@@ -81,22 +81,23 @@ public class MongoSchemaOperations implements SchemaOperations {
   }
 
   @Override
-  public void createField(String modelName, TypedField<?, ?> field) {
+  public TypedField<?, ?> createField(String modelName, TypedField<?, ?> field) {
     field.setModelName(modelName);
     if (field instanceof IDField) {
       Index index = new Index(field.getModelName());
       index.setUnique(true);
       index.addField(field.getName());
-      createIndex(index);
+      createIndex(modelName, index);
     }
     if (field instanceof AssociationField associationField) {
       if (associationField.getCardinality() == ONE_TO_ONE) {
         Index index = new Index(associationField.getTargetEntity());
         index.setUnique(true);
         index.addField(associationField.getTargetField());
-        createIndex(index);
+        createIndex(modelName, index);
       }
     }
+    return field;
   }
 
   @Override
@@ -105,7 +106,8 @@ public class MongoSchemaOperations implements SchemaOperations {
   }
 
   @Override
-  public void createIndex(Index index) {
+  public Index createIndex(String modelName, Index index) {
+    index.setModelName(modelName);
     String collectionName = getCollectionName(index.getModelName());
     List<Bson> indexes = new ArrayList<>();
     for (Index.Field field : index.getFields()) {
@@ -118,6 +120,7 @@ public class MongoSchemaOperations implements SchemaOperations {
     indexOptions.name(getPhysicalIndexName(index.getModelName(), index.getName()));
     indexOptions.unique(index.isUnique());
     mongoDatabase.getCollection(collectionName).createIndex(Indexes.compoundIndex(indexes), indexOptions);
+    return index;
   }
 
   private String getPhysicalIndexName(String modelName, String indexName) {

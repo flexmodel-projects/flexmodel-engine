@@ -57,13 +57,14 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   }
 
   @Override
-  public void createField(String modelName, TypedField<?, ?> field) {
+  public TypedField<?, ?> createField(String modelName, TypedField<?, ?> field) {
     MappedModels mappedModels = sessionContext.getMappedModels();
     String schemaName = sessionContext.getSchemaName();
     delegate.createField(modelName, field);
     Entity entity = mappedModels.getEntity(schemaName, field.getModelName());
     entity.addField(field);
     mappedModels.persist(schemaName, entity);
+    return field;
   }
 
   @Override
@@ -77,13 +78,14 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   }
 
   @Override
-  public void createIndex(Index index) {
+  public Index createIndex(String indexName, Index index) {
     MappedModels mappedModels = sessionContext.getMappedModels();
     String schemaName = sessionContext.getSchemaName();
-    delegate.createIndex(index);
+    delegate.createIndex(indexName, index);
     Entity entity = mappedModels.getEntity(schemaName, index.getModelName());
     entity.addIndex(index);
     mappedModels.persist(schemaName, entity);
+    return index;
   }
 
   @Override

@@ -991,7 +991,7 @@ public abstract class AbstractSessionTests {
     // when include single field
     Index index = new Index(entityName, "IDX_name");
     index.addField("name");
-    session.createIndex(index);
+    session.createIndex(entityName, index);
     session.dropIndex(entityName, "IDX_name");
     // when include multiple field
     Index multipleFiledIndex = new Index(entityName);
@@ -999,7 +999,7 @@ public abstract class AbstractSessionTests {
     multipleFiledIndex.addField("age", DESC);
     multipleFiledIndex.addField("is_deleted", DESC);
     multipleFiledIndex.setName("IDX_compound");
-    session.createIndex(multipleFiledIndex);
+    session.createIndex(entityName, multipleFiledIndex);
     session.dropIndex(entityName, "IDX_compound");
     dropModel(entityName);
   }

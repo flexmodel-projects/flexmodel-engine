@@ -9,11 +9,18 @@ import java.util.stream.Collectors;
  */
 public class View implements Model {
 
-  private final String name;
+  private String name;
   private String viewOn;
   private Query query;
 
+  public View() {
+  }
+
   public View(String name) {
+    this.name = name;
+  }
+
+  public void setName(String name) {
     this.name = name;
   }
 

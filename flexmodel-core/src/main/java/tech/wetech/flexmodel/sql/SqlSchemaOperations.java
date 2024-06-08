@@ -94,7 +94,7 @@ public class SqlSchemaOperations implements SchemaOperations {
   }
 
   @Override
-  public void createField(String modelName, TypedField<?, ?> field) {
+  public TypedField<?, ?> createField(String modelName, TypedField<?, ?> field) {
     field.setModelName(modelName);
     if (field instanceof AssociationField associationField) {
       if (associationField.getCardinality() == MANY_TO_MANY) {
@@ -131,6 +131,7 @@ public class SqlSchemaOperations implements SchemaOperations {
     } else {
       createColumn(toSqlColumn(field));
     }
+    return field;
   }
 
   private void createForeignKey(SqlTable sqlTable) {
@@ -194,13 +195,15 @@ public class SqlSchemaOperations implements SchemaOperations {
   }
 
   @Override
-  public void createIndex(Index index) {
+  public Index createIndex(String modelName, Index index) {
+    index.setModelName(modelName);
     SqlIndex sqlIndex = toSqlIndex(index);
     StandardIndexExporter indexExporter = sqlContext.getSqlDialect().getIndexExporter();
     String[] sqlCreateString = indexExporter.getSqlCreateString(sqlIndex);
     for (String sql : sqlCreateString) {
       sqlContext.getJdbcOperations().update(sql);
     }
+    return index;
   }
 
   @Override

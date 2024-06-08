@@ -11,12 +11,19 @@ import java.util.function.UnaryOperator;
  */
 public class Entity implements Model {
 
-  private final String name;
+  private String name;
   private String comment;
   private final Set<TypedField<?, ?>> fields = new LinkedHashSet<>();
   private final Set<Index> indexes = new LinkedHashSet<>();
 
+  public Entity() {
+  }
+
   public Entity(String name) {
+    this.name = name;
+  }
+
+  public void setName(String name) {
     this.name = name;
   }
 

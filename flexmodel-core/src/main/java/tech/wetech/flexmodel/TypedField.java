@@ -13,7 +13,7 @@ import java.util.Set;
  */
 @SuppressWarnings("unchecked")
 public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
-  private final String name;
+  private String name;
   private final String type;
   private String modelName;
   private String comment;
@@ -23,15 +23,18 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
   private final Set<ConstraintValidator<T>> validators = new HashSet<>();
   private final Set<ValueCalculator<T>> calculators = new HashSet<>();
 
+  public TypedField(String name, String type) {
+    this.name = name;
+    this.type = type;
+  }
+
   public SELF setModelName(String modelName) {
     this.modelName = modelName;
     return self();
   }
 
-
-  public TypedField(String name, String type) {
+  public void setName(String name) {
     this.name = name;
-    this.type = type;
   }
 
   @Override

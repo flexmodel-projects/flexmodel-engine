@@ -471,10 +471,10 @@ public abstract class SqlDialect {
     if (isNumeric(sqlTypeCode)) {
       return defaultValue;
     }
-    return isNumeric(sqlTypeCode) ? defaultValue : "'" + defaultValue + "'";
+    return isNumeric(sqlTypeCode) || sqlTypeCode == Types.BOOLEAN ? defaultValue : "'" + defaultValue + "'";
   }
 
-  public boolean isNumeric(int jdbcType) {
+  private boolean isNumeric(int jdbcType) {
     return jdbcType == Types.BIT || jdbcType == Types.TINYINT || jdbcType == Types.SMALLINT
            || jdbcType == Types.INTEGER || jdbcType == Types.
       BIGINT || jdbcType == Types.FLOAT || jdbcType == Types.REAL

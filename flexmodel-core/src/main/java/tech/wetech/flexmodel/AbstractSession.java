@@ -71,13 +71,13 @@ public abstract class AbstractSession implements Session {
   }
 
   @Override
-  public void createField(String modelName, TypedField<?, ?> field) {
-    schemaOperationsDelegate.createField(modelName, field);
+  public TypedField<?, ?> createField(String modelName, TypedField<?, ?> field) {
+    return schemaOperationsDelegate.createField(modelName, field);
   }
 
   @Override
-  public void createIndex(Index index) {
-    schemaOperationsDelegate.createIndex(index);
+  public Index createIndex(String modelName, Index index) {
+    return schemaOperationsDelegate.createIndex(modelName, index);
   }
 
   @Override

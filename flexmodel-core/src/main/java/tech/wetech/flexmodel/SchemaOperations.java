@@ -53,7 +53,7 @@ public interface SchemaOperations {
    *
    * @param field
    */
-  void createField(String modelName, TypedField<?, ?> field);
+  TypedField<?, ?> createField(String modelName, TypedField<?, ?> field);
 
   /**
    * 删除字段
@@ -68,7 +68,7 @@ public interface SchemaOperations {
    *
    * @param index
    */
-  void createIndex(Index index);
+  Index createIndex(String modelName, Index index);
 
   /**
    * 删除索引

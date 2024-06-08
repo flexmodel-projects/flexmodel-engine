@@ -60,11 +60,12 @@ public class SchemaOperationsEventDecorator implements SchemaOperations {
   }
 
   @Override
-  public void createField(String modelName, TypedField<?, ?> field) {
+  public TypedField<?, ?> createField(String modelName, TypedField<?, ?> field) {
     Entity entity = (Entity) sessionContext.getModel(modelName);
     sessionContext.publishEvent(new PreCreateFieldEvent(sessionContext.getSchemaName(), entity, field));
-    delegate.createField(modelName, field);
+    TypedField<?, ?> result = delegate.createField(modelName, field);
     sessionContext.publishEvent(new PostCreateFieldEvent(sessionContext.getSchemaName(), entity, field));
+    return result;
   }
 
   @Override
@@ -77,11 +78,12 @@ public class SchemaOperationsEventDecorator implements SchemaOperations {
   }
 
   @Override
-  public void createIndex(Index index) {
+  public Index createIndex(String modelName, Index index) {
     Entity entity = (Entity) sessionContext.getModel(index.getModelName());
     sessionContext.publishEvent(new PreCreateIndexEvent(sessionContext.getSchemaName(), entity, index));
-    delegate.createIndex(index);
+    Index result = delegate.createIndex(modelName, index);
     sessionContext.publishEvent(new PostCreateIndexEvent(sessionContext.getSchemaName(), entity, index));
+    return result;
   }
 
   @Override

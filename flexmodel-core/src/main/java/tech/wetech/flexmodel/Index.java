@@ -10,10 +10,13 @@ import java.util.List;
 public class Index implements Serializable {
 
   private String name;
-  private final String modelName;
+  private String modelName;
   private final List<Field> fields = new ArrayList<>();
   private boolean unique;
   private String validMessage;
+
+  public Index() {
+  }
 
   public Index(String modelName) {
     this.modelName = modelName;
@@ -25,6 +28,10 @@ public class Index implements Serializable {
   }
 
   public record Field(String fieldName, Direction direction) implements Serializable {
+  }
+
+  public void setModelName(String modelName) {
+    this.modelName = modelName;
   }
 
   public String getModelName() {
