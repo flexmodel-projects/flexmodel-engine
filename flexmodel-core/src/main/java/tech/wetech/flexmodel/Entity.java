@@ -48,11 +48,11 @@ public class Entity implements Model {
     return fields.stream().toList();
   }
 
-  public Optional<AssociationField> findAssociationFieldByEntityName(String entityName) {
+  public Optional<RelationField> findRelationByEntityName(String entityName) {
     for (TypedField<?, ?> field : fields) {
-      if (field instanceof AssociationField associationField) {
-        if (associationField.getTargetEntity().equals(entityName)) {
-          return Optional.of(associationField);
+      if (field instanceof RelationField relationField) {
+        if (relationField.getTargetEntity().equals(entityName)) {
+          return Optional.of(relationField);
         }
       }
     }

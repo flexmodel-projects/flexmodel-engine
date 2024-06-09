@@ -43,10 +43,10 @@ public class QueryHelper {
           throw new SqlExecutionException("join from model must not be null");
         }
         if (model instanceof Entity entity && join.getLocalField() == null && join.getForeignField() == null) {
-          AssociationField associationField = entity.findAssociationFieldByEntityName(join.getFrom())
+          RelationField relationField = entity.findRelationByEntityName(join.getFrom())
             .orElseThrow();
           join.setLocalField(entity.getIdField().getName());
-          join.setForeignField(associationField.getTargetField());
+          join.setForeignField(relationField.getTargetField());
         } else {
           if (join.getLocalField() == null || join.getForeignField() == null) {
             throw new SqlExecutionException("localField and foreignField must not be null when is not association field");
@@ -56,8 +56,8 @@ public class QueryHelper {
     }
   }
 
-  public static Map<String, AssociationField> findAssociationFields(Model model, Query query) {
-    Map<String, AssociationField> associationFields = new HashMap<>();
+  public static Map<String, RelationField> findRelationFields(Model model, Query query) {
+    Map<String, RelationField> relationFields = new HashMap<>();
     if (model instanceof Entity entity) {
       Query.Projection projection = query.getProjection();
       if (projection != null) {
@@ -66,21 +66,21 @@ public class QueryHelper {
           Query.QueryCall value = entry.getValue();
           if (value instanceof Query.QueryField queryField) {
             entity.getFields().stream()
-              .filter(f -> f.getName().equals(queryField.getName()) && f instanceof AssociationField)
-              .map(f -> (AssociationField) f)
+              .filter(f -> f.getName().equals(queryField.getName()) && f instanceof RelationField)
+              .map(f -> (RelationField) f)
               .findFirst()
-              .ifPresent(f -> associationFields.put(key, f));
+              .ifPresent(f -> relationFields.put(key, f));
           }
         }
       } else {
         for (Field field : model.getFields()) {
-          if (field instanceof AssociationField assField) {
-            associationFields.put(assField.getName(), assField);
+          if (field instanceof RelationField assField) {
+            relationFields.put(assField.getName(), assField);
           }
         }
       }
     }
-    return associationFields;
+    return relationFields;
   }
 
 }

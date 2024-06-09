@@ -6,8 +6,8 @@ import tech.wetech.flexmodel.graph.JoinGraphNode;
 
 import java.util.*;
 
-import static tech.wetech.flexmodel.AssociationField.Cardinality.MANY_TO_MANY;
 import static tech.wetech.flexmodel.Query.Join.JoinType.INNER_JOIN;
+import static tech.wetech.flexmodel.RelationField.Cardinality.MANY_TO_MANY;
 
 /**
  * @author cjbi
@@ -44,13 +44,13 @@ class MongoHelper {
       for (Query.Join join : query.getJoins().getJoins()) {
         String joinCollectionName = physicalNamingStrategy.toPhysicalTableName(join.getFrom());
         Document lookup = new Document();
-        AssociationField associationField;
+        RelationField relationField;
         if (model instanceof Entity entity
-            && (associationField = entity.findAssociationFieldByEntityName(join.getFrom()).orElse(null)) != null
-            && associationField.getCardinality() == MANY_TO_MANY
+            && (relationField = entity.findRelationByEntityName(join.getFrom()).orElse(null)) != null
+            && relationField.getCardinality() == MANY_TO_MANY
         ) {
-          Entity targetEntity = mongoContext.getMappedModels().getEntity(mongoContext.getSchemaName(), associationField.getTargetEntity());
-          JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, associationField);
+          Entity targetEntity = mongoContext.getMappedModels().getEntity(mongoContext.getSchemaName(), relationField.getTargetEntity());
+          JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, relationField);
           Document exchangeLookup = new Document();
           exchangeLookup.put("from", joinGraphNode.getJoinName());
           exchangeLookup.put("localField", entity.getIdField().getName());
@@ -86,13 +86,13 @@ class MongoHelper {
 
     Document project = new Document();
     project.put("_id", false);
-    Map<String, AssociationField> associationFields = QueryHelper.findAssociationFields(model, query);
+    Map<String, RelationField> relationFields = QueryHelper.findRelationFields(model, query);
     boolean hasAggFunc = false;
     Query.Projection projection = query.getProjection();
     if (projection != null) {
       for (Map.Entry<String, Query.QueryCall> entry : projection.getFields().entrySet()) {
         String key = entry.getKey();
-        if (associationFields.containsKey(key)) {
+        if (relationFields.containsKey(key)) {
           // 不查关联字段
           continue;
         }
@@ -107,7 +107,7 @@ class MongoHelper {
       }
     } else {
       for (Field field : model.getFields()) {
-        if (associationFields.containsKey(field.getName())) {
+        if (relationFields.containsKey(field.getName())) {
           // 不查关联字段
           continue;
         }

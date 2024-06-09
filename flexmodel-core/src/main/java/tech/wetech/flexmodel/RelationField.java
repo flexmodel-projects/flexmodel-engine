@@ -3,7 +3,7 @@ package tech.wetech.flexmodel;
 /**
  * @author cjbi
  */
-public class AssociationField extends TypedField<Long, AssociationField> {
+public class RelationField extends TypedField<Long, RelationField> {
 
   /**
    * 关联方式
@@ -22,8 +22,8 @@ public class AssociationField extends TypedField<Long, AssociationField> {
    */
   private String targetField;
 
-  public AssociationField(String name) {
-    super(name, BasicFieldType.ASSOCIATION.getType());
+  public RelationField(String name) {
+    super(name, BasicFieldType.RELATION.getType());
   }
 
   public boolean isCascadeDelete() {
@@ -34,12 +34,12 @@ public class AssociationField extends TypedField<Long, AssociationField> {
     return cardinality;
   }
 
-  public AssociationField setCascadeDelete(boolean cascadeDelete) {
+  public RelationField setCascadeDelete(boolean cascadeDelete) {
     this.cascadeDelete = cascadeDelete;
     return this;
   }
 
-  public AssociationField setCardinality(Cardinality cardinality) {
+  public RelationField setCardinality(Cardinality cardinality) {
     this.cardinality = cardinality;
     return this;
   }
@@ -48,7 +48,7 @@ public class AssociationField extends TypedField<Long, AssociationField> {
     return targetEntity;
   }
 
-  public AssociationField setTargetEntity(String targetEntity) {
+  public RelationField setTargetEntity(String targetEntity) {
     this.targetEntity = targetEntity;
     return this;
   }
@@ -57,7 +57,7 @@ public class AssociationField extends TypedField<Long, AssociationField> {
     return targetField;
   }
 
-  public AssociationField setTargetField(String targetField) {
+  public RelationField setTargetField(String targetField) {
     this.targetField = targetField;
     return this;
   }

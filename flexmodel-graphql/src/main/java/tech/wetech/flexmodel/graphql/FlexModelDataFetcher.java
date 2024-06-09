@@ -3,8 +3,8 @@ package tech.wetech.flexmodel.graphql;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
-import tech.wetech.flexmodel.AssociationField;
 import tech.wetech.flexmodel.Entity;
+import tech.wetech.flexmodel.RelationField;
 import tech.wetech.flexmodel.Session;
 import tech.wetech.flexmodel.TypedField;
 
@@ -35,7 +35,7 @@ public class FlexModelDataFetcher implements DataFetcher<List<Map<String, Object
   public List<Map<String, Object>> findRootData(DataFetchingEnvironment env, String modelName) {
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     Entity entity = (Entity) session.getModel(modelName);
-    List<AssociationField> associationFields = new ArrayList<>();
+    List<RelationField> relationFields = new ArrayList<>();
     List<Map<String, Object>> list = session.find(entity.getName(), query -> query
       .setProjection(projection -> {
         for (SelectedField selectedField : selectedFields) {
@@ -43,8 +43,8 @@ public class FlexModelDataFetcher implements DataFetcher<List<Map<String, Object
           if (flexModelField == null) {
             continue;
           }
-          if (flexModelField instanceof AssociationField secondaryAssociationField) {
-            associationFields.add(secondaryAssociationField);
+          if (flexModelField instanceof RelationField secondaryRelationField) {
+            relationFields.add(secondaryRelationField);
             continue;
           }
           projection.addField(selectedField.getName(), field(flexModelField.getModelName() + "." + flexModelField.getName()));
@@ -56,23 +56,23 @@ public class FlexModelDataFetcher implements DataFetcher<List<Map<String, Object
     for (Map<String, Object> map : list) {
       Map<String, Object> resultData = new HashMap<>(map);
       result.add(resultData);
-      for (AssociationField sencondaryAssociationField : associationFields) {
+      for (RelationField sencondaryRelationField : relationFields) {
         Object secondaryId = map.get(entity.getIdField().getName());
-        resultData.put(sencondaryAssociationField.getName(),
-          sencondaryAssociationField.getCardinality() == AssociationField.Cardinality.ONE_TO_ONE ?
-            findAssociationDataList(env, null, sencondaryAssociationField.getTargetEntity(), sencondaryAssociationField, secondaryId).stream()
+        resultData.put(sencondaryRelationField.getName(),
+          sencondaryRelationField.getCardinality() == RelationField.Cardinality.ONE_TO_ONE ?
+            findAssociationDataList(env, null, sencondaryRelationField.getTargetEntity(), sencondaryRelationField, secondaryId).stream()
               .findFirst()
               .orElse(null)
-            : findAssociationDataList(env, null, sencondaryAssociationField.getTargetEntity(), sencondaryAssociationField, secondaryId));
+            : findAssociationDataList(env, null, sencondaryRelationField.getTargetEntity(), sencondaryRelationField, secondaryId));
       }
     }
     return result;
   }
 
-  public List<Map<String, Object>> findAssociationDataList(DataFetchingEnvironment env, String path, String modelName, AssociationField associationField, Object id) {
-    Entity entity = (Entity) session.getModel(associationField.getModelName());
-    Entity targetEntity = (Entity) session.getModel(associationField.getTargetEntity());
-    path = path == null ? associationField.getName() : path + "/" + associationField.getName();
+  public List<Map<String, Object>> findAssociationDataList(DataFetchingEnvironment env, String path, String modelName, RelationField relationField, Object id) {
+    Entity entity = (Entity) session.getModel(relationField.getModelName());
+    Entity targetEntity = (Entity) session.getModel(relationField.getTargetEntity());
+    path = path == null ? relationField.getName() : path + "/" + relationField.getName();
     List<SelectedField> selectedFields = env.getSelectionSet().getFields(path + "/*");
     String filter = String.format("""
         {
@@ -85,7 +85,7 @@ public class FlexModelDataFetcher implements DataFetcher<List<Map<String, Object
       entity.getName() + "." + entity.getIdField().getName(),
       id instanceof Number ? id : "\"" + id + "\""
     );
-    List<AssociationField> associationFields = new ArrayList<>();
+    List<RelationField> relationFields = new ArrayList<>();
     List<Map<String, Object>> list = session.find(entity.getName(), query -> query
       .setProjection(projection -> {
         for (SelectedField selectedField : selectedFields) {
@@ -93,8 +93,8 @@ public class FlexModelDataFetcher implements DataFetcher<List<Map<String, Object
           if (flexModelField == null) {
             continue;
           }
-          if (flexModelField instanceof AssociationField secondaryAssociationField) {
-            associationFields.add(secondaryAssociationField);
+          if (flexModelField instanceof RelationField secondaryRelationField) {
+            relationFields.add(secondaryRelationField);
             continue;
           }
           projection.addField(selectedField.getName(), field(targetEntity.getName() + "." + flexModelField.getName()));
@@ -108,14 +108,14 @@ public class FlexModelDataFetcher implements DataFetcher<List<Map<String, Object
     for (Map<String, Object> map : list) {
       Map<String, Object> resultData = new HashMap<>(map);
       result.add(resultData);
-      for (AssociationField sencondaryAssociationField : associationFields) {
+      for (RelationField sencondaryRelationField : relationFields) {
         Object secondaryId = map.get(entity.getIdField().getName());
-        resultData.put(sencondaryAssociationField.getName(),
-          sencondaryAssociationField.getCardinality() == AssociationField.Cardinality.ONE_TO_ONE ?
-            findAssociationDataList(env, path, sencondaryAssociationField.getTargetEntity(), sencondaryAssociationField, secondaryId).stream()
+        resultData.put(sencondaryRelationField.getName(),
+          sencondaryRelationField.getCardinality() == RelationField.Cardinality.ONE_TO_ONE ?
+            findAssociationDataList(env, path, sencondaryRelationField.getTargetEntity(), sencondaryRelationField, secondaryId).stream()
               .findFirst()
               .orElse(null)
-            : findAssociationDataList(env, path, sencondaryAssociationField.getTargetEntity(), sencondaryAssociationField, secondaryId));
+            : findAssociationDataList(env, path, sencondaryRelationField.getTargetEntity(), sencondaryRelationField, secondaryId));
       }
     }
     return result;

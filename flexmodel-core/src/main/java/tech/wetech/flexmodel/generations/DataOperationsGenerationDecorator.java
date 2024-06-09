@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import static tech.wetech.flexmodel.AssociationField.Cardinality.*;
+import static tech.wetech.flexmodel.RelationField.Cardinality.*;
 
 /**
  * @author cjbi
@@ -35,33 +35,33 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     record.forEach((key, value) -> {
       if (value != null) {
-        if (entity.getField(key) instanceof AssociationField associationField) {
-          Entity targetEntity = mappedModels.getEntity(schemaName, associationField.getTargetEntity());
-          if (associationField.getCardinality() == ONE_TO_ONE && value instanceof Map data) {
+        if (entity.getField(key) instanceof RelationField relationField) {
+          Entity targetEntity = mappedModels.getEntity(schemaName, relationField.getTargetEntity());
+          if (relationField.getCardinality() == ONE_TO_ONE && value instanceof Map data) {
             Map<String, Object> associationRecord = new HashMap<>(data);
-            associationRecord.put(associationField.getTargetField(), id);
-            insert(associationField.getTargetEntity(), associationRecord);
-          } else if (associationField.getCardinality() == ONE_TO_MANY && value instanceof Collection<?> collection) {
+            associationRecord.put(relationField.getTargetField(), id);
+            insert(relationField.getTargetEntity(), associationRecord);
+          } else if (relationField.getCardinality() == ONE_TO_MANY && value instanceof Collection<?> collection) {
             for (Object obj : collection) {
               if (obj instanceof Map data) {
                 Map<String, Object> associationRecord = new HashMap<>(data);
-                associationRecord.put(associationField.getTargetField(), id);
-                insert(associationField.getTargetEntity(), associationRecord);
+                associationRecord.put(relationField.getTargetField(), id);
+                insert(relationField.getTargetEntity(), associationRecord);
               }
             }
-          } else if (associationField.getCardinality() == MANY_TO_MANY && value instanceof Collection<?> collection) {
+          } else if (relationField.getCardinality() == MANY_TO_MANY && value instanceof Collection<?> collection) {
             for (Object obj : collection) {
               if (obj instanceof Map data) {
                 Map<String, Object> associationRecord = new HashMap<>(data);
                 AtomicReference<Object> inveseAtomicId = new AtomicReference<>();
                 try {
-                  insert(associationField.getTargetEntity(), associationRecord, inveseAtomicId::set);
+                  insert(relationField.getTargetEntity(), associationRecord, inveseAtomicId::set);
                 } catch (Exception e) {
                   if (data.containsKey(targetEntity.getIdField().getName())) {
                     inveseAtomicId.set(data.get(targetEntity.getIdField().getName()));
                   }
                 }
-                JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, associationField);
+                JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, relationField);
                 associate(joinGraphNode, Map.of(
                   joinGraphNode.getJoinFieldName(), atomicId.get(),
                   joinGraphNode.getInverseJoinFieldName(), inveseAtomicId.get()

@@ -36,7 +36,7 @@ public class DataValueGenerator {
     List<TypedField<?, ?>> fields = entity.getFields();
     Map<String, Object> newData = new HashMap<>();
     for (TypedField<?, ?> field : fields) {
-      if (field instanceof AssociationField) {
+      if (field instanceof RelationField) {
         continue;
       }
       boolean flag = !calculateAll && !data.containsKey(field.getName());

@@ -6,9 +6,9 @@ import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 
 import java.util.*;
 
-import static tech.wetech.flexmodel.AssociationField.Cardinality.MANY_TO_MANY;
 import static tech.wetech.flexmodel.Query.Join.JoinType.INNER_JOIN;
 import static tech.wetech.flexmodel.Query.Join.JoinType.LEFT_JOIN;
+import static tech.wetech.flexmodel.RelationField.Cardinality.MANY_TO_MANY;
 
 /**
  * @author cjbi
@@ -33,13 +33,13 @@ class SqlHelper {
     StringBuilder sql = new StringBuilder("\nselect ");
     Query.Projection projection = query.getProjection();
     Map<String, String> aliasColumnMap = new HashMap<>();
-    Map<String, AssociationField> associationFields = QueryHelper.findAssociationFields(model, query);
+    Map<String, RelationField> relationFields = QueryHelper.findRelationFields(model, query);
     StringJoiner columns = new StringJoiner(", ");
     if (projection != null) {
       for (Map.Entry<String, Query.QueryCall> entry : projection.getFields().entrySet()) {
         Query.QueryCall value = entry.getValue();
         String key = entry.getKey();
-        if (associationFields.containsKey(key)) {
+        if (relationFields.containsKey(key)) {
           // 不查关联字段
           continue;
         }
@@ -49,7 +49,7 @@ class SqlHelper {
       }
     } else {
       for (Field field : model.getFields()) {
-        if (associationFields.containsKey(field.getName())) {
+        if (relationFields.containsKey(field.getName())) {
           // 不查关联字段
           continue;
         }
@@ -71,14 +71,14 @@ class SqlHelper {
         }
         String localField = joiner.getLocalField();
         String foreignField = joiner.getForeignField();
-        AssociationField associationField;
+        RelationField relationField;
         if (model instanceof Entity entity &&
-            (associationField = entity.findAssociationFieldByEntityName(joiner.getFrom()).orElse(null)) != null) {
+            (relationField = entity.findRelationByEntityName(joiner.getFrom()).orElse(null)) != null) {
           localField = entity.getIdField().getName();
-          foreignField = associationField.getTargetField();
-          if (associationField.getCardinality() == MANY_TO_MANY) {
-            Entity targetEntity = sqlContext.getMappedModels().getEntity(sqlContext.getSchemaName(), associationField.getTargetEntity());
-            JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, associationField);
+          foreignField = relationField.getTargetField();
+          if (relationField.getCardinality() == MANY_TO_MANY) {
+            Entity targetEntity = sqlContext.getMappedModels().getEntity(sqlContext.getSchemaName(), relationField.getTargetEntity());
+            JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, relationField);
             joinCause.append(toPhysicalTableNameQuoteString(sqlContext, joinGraphNode.getJoinName()))
               .append(" \n on \n")
               .append(toFullColumnQuoteString(sqlContext, modelName, localField))

@@ -1,8 +1,8 @@
 package tech.wetech.flexmodel.graph;
 
-import tech.wetech.flexmodel.AssociationField;
 import tech.wetech.flexmodel.Entity;
 import tech.wetech.flexmodel.IDField;
+import tech.wetech.flexmodel.RelationField;
 import tech.wetech.flexmodel.TypedField;
 
 import java.util.ArrayList;
@@ -20,17 +20,17 @@ public class JoinGraphNode {
   private final String inverseJoinFieldName;
   private final String inverseJoinFieldType;
 
-  public JoinGraphNode(Entity entity, Entity targetEntity, AssociationField associationField) {
+  public JoinGraphNode(Entity entity, Entity targetEntity, RelationField relationField) {
     List<String> modelNames = new ArrayList<>();
     modelNames.add(entity.getName());
-    modelNames.add(associationField.getTargetEntity());
+    modelNames.add(relationField.getTargetEntity());
     Collections.sort(modelNames);
     this.joinName = String.join("_", modelNames);
     this.joinFieldName = entity.getName() + "_" + entity.getIdField().getName();
     this.joinFieldType = entity.getIdField().getGeneratedValue().getType();
-    this.inverseJoinFieldName = associationField.getTargetEntity() + "_" + associationField.getTargetField();
+    this.inverseJoinFieldName = relationField.getTargetEntity() + "_" + relationField.getTargetField();
 
-    TypedField<?, ?> targetField = (TypedField<?, ?>) targetEntity.getField(associationField.getTargetField());
+    TypedField<?, ?> targetField = (TypedField<?, ?>) targetEntity.getField(relationField.getTargetField());
     this.inverseJoinFieldType = targetField instanceof IDField idField
       ? idField.getGeneratedValue().getType()
       : targetField.getType();

@@ -346,8 +346,18 @@ public class JdbcMappedModels implements MappedModels {
       List<Map<String, Object>> mapList = sqlExecutor.queryForList(sqlSelectString, Map.of("schemaName", schemaName));
       List<Model> result = new ArrayList<>();
       for (Map<String, Object> data : mapList) {
-        String content = (String) data.get("content");
-        result.add(JsonUtils.getInstance().parseToObject(content, Model.class));
+        Object content = data.get("content");
+        switch (content) {
+          case String contentStr -> result.add(JsonUtils.getInstance().parseToObject(contentStr, Model.class));
+          case Blob blob ->
+            result.add(JsonUtils.getInstance().parseToObject(Arrays.toString(blob.getBinaryStream().readAllBytes()), Model.class));
+          case byte[] bytes -> result.add(JsonUtils.getInstance().parseToObject(Arrays.toString(bytes), Model.class));
+          case null, default -> {
+              assert content != null;
+              throw new RuntimeException("get model error, unknown data type:" + content.getClass());
+          }
+        }
+
       }
       return result;
     } catch (Exception e) {
@@ -401,12 +411,8 @@ public class JdbcMappedModels implements MappedModels {
       String sqlSelectString = "select " + sqlDialect.quoteIdentifier("content") +
                                " \nfrom " + sqlDialect.quoteIdentifier("flex_models") +
                                " \nwhere " + sqlDialect.quoteIdentifier("schema_name") + "=:schemaName and " + sqlDialect.quoteIdentifier("model_name") + "=:modelName";
-      Map<String, Object> map = sqlExecutor.queryForMap(sqlSelectString,
-        Map.of("schemaName", schemaName, "modelName", modelName));
-      if (map == null) {
-        return null;
-      }
-      String content = (String) map.get("content");
+      String content = sqlExecutor.queryForScalar(sqlSelectString,
+        Map.of("schemaName", schemaName, "modelName", modelName), String.class);
       return JsonUtils.getInstance().parseToObject(content, Model.class);
     } catch (Exception e) {
       throw new RuntimeException(e);

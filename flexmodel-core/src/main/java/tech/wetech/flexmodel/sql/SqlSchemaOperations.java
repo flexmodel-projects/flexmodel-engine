@@ -6,8 +6,8 @@ import tech.wetech.flexmodel.graph.JoinGraphNode;
 import java.util.Iterator;
 import java.util.List;
 
-import static tech.wetech.flexmodel.AssociationField.Cardinality.MANY_TO_MANY;
-import static tech.wetech.flexmodel.AssociationField.Cardinality.ONE_TO_ONE;
+import static tech.wetech.flexmodel.RelationField.Cardinality.MANY_TO_MANY;
+import static tech.wetech.flexmodel.RelationField.Cardinality.ONE_TO_ONE;
 
 /**
  * @author cjbi
@@ -50,8 +50,8 @@ public class SqlSchemaOperations implements SchemaOperations {
     SqlTable sqlTable = toSqlTable(entity);
     createTable(sqlTable);
     for (TypedField<?, ?> typedField : entity.getFields()) {
-      if (typedField instanceof AssociationField associationField) {
-        createForeignKey(associationField);
+      if (typedField instanceof RelationField relationField) {
+        createForeignKey(relationField);
       }
     }
     return entity;
@@ -95,12 +95,12 @@ public class SqlSchemaOperations implements SchemaOperations {
 
   @Override
   public TypedField<?, ?> createField(TypedField<?, ?> field) {
-    if (field instanceof AssociationField associationField) {
-      if (associationField.getCardinality() == MANY_TO_MANY) {
+    if (field instanceof RelationField relationField) {
+      if (relationField.getCardinality() == MANY_TO_MANY) {
 
         Entity entity = (Entity) getModel(field.getModelName());
-        Entity targetEntity = (Entity) getModel(associationField.getTargetEntity());
-        JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, associationField);
+        Entity targetEntity = (Entity) getModel(relationField.getTargetEntity());
+        JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, relationField);
 
         SqlTable joinTable = new SqlTable();
         joinTable.setName(joinGraphNode.getJoinName());
@@ -119,13 +119,13 @@ public class SqlSchemaOperations implements SchemaOperations {
         SqlTable targetSqlTable = toSqlTable(targetEntity);
 
         joinTable.createForeignKey(List.of(joinColumn), sqlTable, List.of(sqlTable.getColumn(entity.getIdField().getName())));
-        joinTable.createForeignKey(List.of(inverseJoinColumn), targetSqlTable, List.of(targetSqlTable.getColumn(associationField.getTargetField())));
+        joinTable.createForeignKey(List.of(inverseJoinColumn), targetSqlTable, List.of(targetSqlTable.getColumn(relationField.getTargetField())));
         try {
           createTable(joinTable);
         } catch (Exception ignored) {
         }
       } else {
-        createForeignKey(associationField);
+        createForeignKey(relationField);
       }
     } else {
       createColumn(toSqlColumn(field));
@@ -144,16 +144,16 @@ public class SqlSchemaOperations implements SchemaOperations {
     }
   }
 
-  private void createForeignKey(AssociationField associationField) {
-    SqlTable sqlTable = toSqlTable(sqlContext.getMappedModels().getEntity(sqlContext.getSchemaName(), associationField.getModelName()));
+  private void createForeignKey(RelationField relationField) {
+    SqlTable sqlTable = toSqlTable(sqlContext.getMappedModels().getEntity(sqlContext.getSchemaName(), relationField.getModelName()));
     SqlTable referenceTable = toSqlTable(sqlContext.getMappedModels()
-      .getEntity(sqlContext.getSchemaName(), associationField.getTargetEntity()));
-    SqlColumn keyColumn = referenceTable.getColumn(associationField.getTargetField());
+      .getEntity(sqlContext.getSchemaName(), relationField.getTargetEntity()));
+    SqlColumn keyColumn = referenceTable.getColumn(relationField.getTargetField());
     if (keyColumn == null) {
-      throw new RuntimeException("Foreign key [" + associationField.getTargetField() + "] not exists in [" + associationField.getTargetEntity() + "]");
+      throw new RuntimeException("Foreign key [" + relationField.getTargetField() + "] not exists in [" + relationField.getTargetEntity() + "]");
     }
     List<SqlColumn> keyColumns = List.of(keyColumn);
-    if (associationField.getCardinality() == ONE_TO_ONE) {
+    if (relationField.getCardinality() == ONE_TO_ONE) {
       SqlUniqueKey uniqueKey = referenceTable.createUniqueKey(keyColumns);
       String[] sqlCreateString = sqlContext.getSqlDialect().getUniqueKeyExporter().getSqlCreateString(uniqueKey);
       for (String sql : sqlCreateString) {
@@ -161,7 +161,7 @@ public class SqlSchemaOperations implements SchemaOperations {
       }
     }
     SqlForeignKey foreignKey = referenceTable.createForeignKey(keyColumns, sqlTable, sqlTable.getPrimaryKey().getColumns());
-    foreignKey.setCascadeDeleteEnabled(associationField.isCascadeDelete());
+    foreignKey.setCascadeDeleteEnabled(relationField.isCascadeDelete());
     String[] sqlCreateString = sqlContext.getSqlDialect().getForeignKeyExporter().getSqlCreateString(foreignKey);
     for (String sql : sqlCreateString) {
       sqlContext.getJdbcOperations().update(sql);
@@ -267,7 +267,7 @@ public class SqlSchemaOperations implements SchemaOperations {
     sqlTable.setComment(entity.getComment());
     SqlPrimaryKey primaryKey = new SqlPrimaryKey(sqlTable);
     for (TypedField<?, ?> field : entity.getFields()) {
-      if (field instanceof AssociationField) {
+      if (field instanceof RelationField) {
         continue;
       }
       if (sqlTable.getColumn(field.getName()) != null) {
@@ -303,11 +303,11 @@ public class SqlSchemaOperations implements SchemaOperations {
   }
 
   private SqlColumn toSqlColumn(TypedField<?, ?> field) {
-    if (field instanceof AssociationField associationField) {
+    if (field instanceof RelationField relationField) {
       SqlColumn associationColumn = new SqlColumn();
-      associationColumn.setName(associationField.getTargetField());
+      associationColumn.setName(relationField.getTargetField());
       associationColumn.setTableName(
-        toPhysicalTableString(associationField.getTargetEntity())
+        toPhysicalTableString(relationField.getTargetEntity())
       );
       associationColumn.setSqlTypeCode(
         sqlContext.getTypeHandler(((Entity) getModel(field.getModelName())).getIdField()

@@ -12,7 +12,7 @@ import tech.wetech.flexmodel.sql.StringHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import static tech.wetech.flexmodel.AssociationField.Cardinality.ONE_TO_ONE;
+import static tech.wetech.flexmodel.RelationField.Cardinality.ONE_TO_ONE;
 
 /**
  * @author cjbi
@@ -88,11 +88,11 @@ public class MongoSchemaOperations implements SchemaOperations {
       index.addField(field.getName());
       createIndex(index);
     }
-    if (field instanceof AssociationField associationField) {
-      if (associationField.getCardinality() == ONE_TO_ONE) {
-        Index index = new Index(associationField.getTargetEntity());
+    if (field instanceof RelationField relationField) {
+      if (relationField.getCardinality() == ONE_TO_ONE) {
+        Index index = new Index(relationField.getTargetEntity());
         index.setUnique(true);
-        index.addField(associationField.getTargetField());
+        index.addField(relationField.getTargetField());
         createIndex(index);
       }
     }

@@ -197,7 +197,7 @@ session.createField(entityName, new DecimalField("c_score"));
 新增关联关系字段
 ```java
 // 此功能会建立外键约束
-session.createField("teacher", new AssociationField("teacher_course")
+session.createField("teacher", new RelationField("teacher_course")
   .setCardinality(ONE_TO_MANY) // 关联方式，如果是ONE_TO_ONE时，外键字段的会存在唯一索引约束，当关联关系是MANY_TO_MANY时，会建立中间表保存多对多的关联关系
   .setCascadeDelete(true) // 级联删除，依赖于外键字段 on delete cascade
   .setTargetEntity("teacher_course") // 目标实体

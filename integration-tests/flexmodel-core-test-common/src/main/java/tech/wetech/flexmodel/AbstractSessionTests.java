@@ -16,10 +16,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static tech.wetech.flexmodel.AssociationField.Cardinality.*;
 import static tech.wetech.flexmodel.Direction.DESC;
 import static tech.wetech.flexmodel.IDField.GeneratedValue.*;
 import static tech.wetech.flexmodel.Projections.*;
+import static tech.wetech.flexmodel.RelationField.Cardinality.*;
 
 /**
  * @author cjbi
@@ -97,7 +97,7 @@ public abstract class AbstractSessionTests {
                           String studentDetailEntityName, String courseEntityName, String teacherEntityName) {
     // 班级:学生
     session.createField(
-      new AssociationField("students")
+      new RelationField("students")
         .setModelName(classRoomEntityName)
         .setTargetEntity(studentEntityName)
         .setTargetField("classId")
@@ -106,7 +106,7 @@ public abstract class AbstractSessionTests {
     );
     // 学生:课程 -> n:n
     session.createField(
-      new AssociationField("courses")
+      new RelationField("courses")
         .setModelName(studentEntityName)
         .setTargetEntity(courseEntityName)
         .setTargetField("courseNo")
@@ -114,7 +114,7 @@ public abstract class AbstractSessionTests {
     );
     // 学生:学生明细 -> 1:1
     session.createField(
-      new AssociationField("studentDetail")
+      new RelationField("studentDetail")
         .setModelName(studentEntityName)
         .setTargetEntity(studentDetailEntityName)
         .setTargetField("studentId")
@@ -122,7 +122,7 @@ public abstract class AbstractSessionTests {
     );
     // 学生:教师 -> n:n
     session.createField(
-      new AssociationField("teachers")
+      new RelationField("teachers")
         .setModelName(studentEntityName)
         .setTargetEntity(teacherEntityName)
         .setTargetField("id")
@@ -130,7 +130,7 @@ public abstract class AbstractSessionTests {
     );
     // 教师:学生 -> n:n
     session.createField(
-      new AssociationField("students")
+      new RelationField("students")
         .setModelName(teacherEntityName)
         .setTargetEntity(studentEntityName)
         .setTargetField("id")
@@ -531,7 +531,7 @@ public abstract class AbstractSessionTests {
       .setComment("教师成绩表")
     );
     session.createField(
-      new AssociationField("courses")
+      new RelationField("courses")
         .setModelName(teacherEntityName)
         .setCardinality(ONE_TO_MANY)
         .setCascadeDelete(true)

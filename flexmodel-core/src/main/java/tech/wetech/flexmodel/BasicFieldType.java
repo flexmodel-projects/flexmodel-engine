@@ -5,7 +5,7 @@ package tech.wetech.flexmodel;
  */
 public enum BasicFieldType {
   ID("id"),
-  ASSOCIATION("association"),
+  RELATION("relation"),
   STRING("string"),
   TEXT("text"),
   DECIMAL("decimal"),

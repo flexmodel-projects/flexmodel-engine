@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import static graphql.schema.idl.RuntimeWiring.newRuntimeWiring;
-import static tech.wetech.flexmodel.AssociationField.Cardinality.*;
 import static tech.wetech.flexmodel.IDField.GeneratedValue.*;
+import static tech.wetech.flexmodel.RelationField.Cardinality.*;
 
 /**
  * @author cjbi
@@ -69,7 +69,7 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
                           String studentDetailEntityName, String courseEntityName, String teacherEntityName) {
     // 班级:学生
     session.createField(classRoomEntityName,
-      new AssociationField("students")
+      new RelationField("students")
         .setTargetEntity(studentEntityName)
         .setTargetField("classId")
         .setCardinality(ONE_TO_MANY)
@@ -78,14 +78,14 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
     // 学生:课程 -> n:n
     session.createField(
       studentEntityName,
-      new AssociationField("courses")
+      new RelationField("courses")
         .setTargetEntity(courseEntityName)
         .setTargetField("courseNo")
         .setCardinality(MANY_TO_MANY)
     );
     // 学生:学生明细 -> 1:1
     session.createField(studentEntityName,
-      new AssociationField("studentDetail")
+      new RelationField("studentDetail")
         .setTargetEntity(studentDetailEntityName)
         .setTargetField("studentId")
         .setCardinality(ONE_TO_ONE)
@@ -93,7 +93,7 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
     // 学生:教师 -> n:n
     session.createField(
       studentEntityName,
-      new AssociationField("teachers")
+      new RelationField("teachers")
         .setTargetEntity(teacherEntityName)
         .setTargetField("id")
         .setCardinality(MANY_TO_MANY)
@@ -101,7 +101,7 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
     // 教师:学生 -> n:n
     session.createField(
       teacherEntityName,
-      new AssociationField("students")
+      new RelationField("students")
         .setTargetEntity(studentEntityName)
         .setTargetField("id")
         .setCardinality(MANY_TO_MANY)

@@ -1,8 +1,8 @@
 package tech.wetech.flexmodel.validations;
 
-import tech.wetech.flexmodel.AssociationField;
 import tech.wetech.flexmodel.Entity;
 import tech.wetech.flexmodel.MappedModels;
+import tech.wetech.flexmodel.RelationField;
 import tech.wetech.flexmodel.TypedField;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class DataValidator {
       if (flag) {
         continue;
       }
-      if (field instanceof AssociationField) {
+      if (field instanceof RelationField) {
         continue;
       }
       for (ConstraintValidator validator : field.getValidators()) {
