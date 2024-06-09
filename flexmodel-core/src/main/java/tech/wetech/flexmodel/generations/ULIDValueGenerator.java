@@ -1,7 +1,6 @@
 package tech.wetech.flexmodel.generations;
 
 import tech.wetech.flexmodel.TypedField;
-import tech.wetech.flexmodel.ULID;
 
 import java.util.Map;
 

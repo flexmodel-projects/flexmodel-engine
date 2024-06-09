@@ -1,4 +1,4 @@
-package tech.wetech.flexmodel;
+package tech.wetech.flexmodel.generations;
 import java.io.Serializable;
 import java.util.Random;
 import java.util.UUID;
