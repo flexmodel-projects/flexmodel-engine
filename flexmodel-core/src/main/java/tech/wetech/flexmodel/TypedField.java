@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel;
 
-import tech.wetech.flexmodel.generations.DefaultValueGenerator;
+import tech.wetech.flexmodel.generations.FixedValueGenerator;
 import tech.wetech.flexmodel.generations.ValueGenerator;
 import tech.wetech.flexmodel.validations.ConstraintValidator;
 import tech.wetech.flexmodel.validations.NotNullValidator;
@@ -66,7 +66,7 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
 
   public SELF setDefaultValue(T defaultValue) {
     this.defaultValue = defaultValue;
-    addGenration(new DefaultValueGenerator<>(defaultValue));
+    addGenration(new FixedValueGenerator<>(defaultValue));
     return self();
   }
 

@@ -26,7 +26,7 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
 
   void createClassesEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setGeneratedValue(BIGINT_NO_GEN))
+      .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("classCode"))
       .addField(new StringField("className"))
     );
@@ -34,7 +34,7 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
 
   void createStudentEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setGeneratedValue(BIGINT_NO_GEN))
+      .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("studentName"))
       .addField(new StringField("gender"))
       .addField(new IntField("age"))
@@ -52,14 +52,14 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
 
   void createCourseEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("courseNo").setGeneratedValue(STRING_NO_GEN))
+      .addField(new IDField("courseNo").setGeneratedValue(STRING_NOT_GENERATED))
       .addField(new StringField("courseName"))
     );
   }
 
   void createTeacherEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setGeneratedValue(BIGINT_NO_GEN))
+      .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("teacherName"))
       .addField(new StringField("subject"))
     );
@@ -68,40 +68,32 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
   void createAssociations(String classRoomEntityName, String studentEntityName,
                           String studentDetailEntityName, String courseEntityName, String teacherEntityName) {
     // 班级:学生
-    session.createField(classRoomEntityName,
-      new RelationField("students")
+    session.createField(new RelationField("students")
         .setTargetEntity(studentEntityName)
         .setTargetField("classId")
         .setCardinality(ONE_TO_MANY)
         .setCascadeDelete(true)
     );
     // 学生:课程 -> n:n
-    session.createField(
-      studentEntityName,
-      new RelationField("courses")
+    session.createField(new RelationField("courses")
         .setTargetEntity(courseEntityName)
         .setTargetField("courseNo")
         .setCardinality(MANY_TO_MANY)
     );
     // 学生:学生明细 -> 1:1
-    session.createField(studentEntityName,
-      new RelationField("studentDetail")
+    session.createField(new RelationField("studentDetail")
         .setTargetEntity(studentDetailEntityName)
         .setTargetField("studentId")
         .setCardinality(ONE_TO_ONE)
     );
     // 学生:教师 -> n:n
-    session.createField(
-      studentEntityName,
-      new RelationField("teachers")
+    session.createField(new RelationField("teachers")
         .setTargetEntity(teacherEntityName)
         .setTargetField("id")
         .setCardinality(MANY_TO_MANY)
     );
     // 教师:学生 -> n:n
-    session.createField(
-      teacherEntityName,
-      new RelationField("students")
+    session.createField(new RelationField("students")
         .setTargetEntity(studentEntityName)
         .setTargetField("id")
         .setCardinality(MANY_TO_MANY)

@@ -56,13 +56,15 @@
 |----------|------|-------------------------|
 | string   | 字符串  | java.lang.String        |
 | text     | 文本   | java.lang.String        |
-| decimal  | 小数   | java.lang.Double        |
 | int      | 整型   | java.lang.Integer       |
 | bigint   | 长整型  | java.lang.Long          |
+| decimal  | 小数   | java.lang.Double        |
 | boolean  | 布尔   | java.lang.Boolean       |
 | datetime | 日期时间 | java.time.LocalDateTime |
 | date     | 日期   | java.time.LocalDate     |
 | json     | JSON | N/A                     |
+| id       | ID   | N/A                     |
+| relation | 关系   | N/A                     |
 
 ### 视图（View）
 

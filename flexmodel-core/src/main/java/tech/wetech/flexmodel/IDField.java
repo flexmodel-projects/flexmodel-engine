@@ -49,11 +49,11 @@ public class IDField extends TypedField<Object, IDField> {
     /**
      * 长整型不自动生成
      */
-    BIGINT_NO_GEN("bigint", null),
+    BIGINT_NOT_GENERATED("bigint", null),
     /**
      * 字符串不自动生成
      */
-    STRING_NO_GEN("string", null),
+    STRING_NOT_GENERATED("string", null),
     ;
     private final String type;
     private final ValueGenerator<?> generator;

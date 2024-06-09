@@ -7,11 +7,11 @@ import java.util.Map;
 /**
  * @author cjbi
  */
-public class DefaultValueGenerator<T> extends AbstractValueGenerator<T, DefaultValueGenerator<T>> {
+public class FixedValueGenerator<T> extends AbstractValueGenerator<T, FixedValueGenerator<T>> {
 
   private final T value;
 
-  public DefaultValueGenerator(T value) {
+  public FixedValueGenerator(T value) {
     this.value = value;
   }
 

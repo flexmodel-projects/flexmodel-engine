@@ -11,7 +11,7 @@ import tech.wetech.flexmodel.generations.*;
 @JsonSubTypes({
   @JsonSubTypes.Type(value = DateNowValueGenerator.class, name = "DateNowValueGenerator"),
   @JsonSubTypes.Type(value = DatetimeNowValueGenerator.class, name = "DatetimeNowValueGenerator"),
-  @JsonSubTypes.Type(value = DefaultValueGenerator.class, name = "DefaultValueGenerator"),
+  @JsonSubTypes.Type(value = FixedValueGenerator.class, name = "DefaultValueGenerator"),
   @JsonSubTypes.Type(value = UUIDValueGenerator.class, name = "UUIDValueGenerator"),
   @JsonSubTypes.Type(value = ULIDValueGenerator.class, name = "ULIDValueGenerator"),
 })

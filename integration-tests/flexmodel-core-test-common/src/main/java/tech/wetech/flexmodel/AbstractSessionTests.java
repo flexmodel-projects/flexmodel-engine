@@ -53,7 +53,7 @@ public abstract class AbstractSessionTests {
 
   void createClassesEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setGeneratedValue(BIGINT_NO_GEN))
+      .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("classCode"))
       .addField(new StringField("className"))
     );
@@ -61,7 +61,7 @@ public abstract class AbstractSessionTests {
 
   void createStudentEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setGeneratedValue(BIGINT_NO_GEN))
+      .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("studentName"))
       .addField(new StringField("gender"))
       .addField(new IntField("age"))
@@ -80,14 +80,14 @@ public abstract class AbstractSessionTests {
 
   void createCourseEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("courseNo").setGeneratedValue(STRING_NO_GEN))
+      .addField(new IDField("courseNo").setGeneratedValue(STRING_NOT_GENERATED))
       .addField(new StringField("courseName"))
     );
   }
 
   void createTeacherEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setGeneratedValue(BIGINT_NO_GEN))
+      .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("teacherName"))
       .addField(new StringField("subject"))
     );

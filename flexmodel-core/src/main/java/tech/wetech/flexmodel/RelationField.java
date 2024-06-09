@@ -10,10 +10,6 @@ public class RelationField extends TypedField<Long, RelationField> {
    */
   private Cardinality cardinality = Cardinality.ONE_TO_MANY;
   /**
-   * 级联删除，此功能依赖外键约束
-   */
-  private boolean cascadeDelete;
-  /**
    * 目标实体
    */
   private String targetEntity;
@@ -21,6 +17,10 @@ public class RelationField extends TypedField<Long, RelationField> {
    * 目标字段，如果存在则不创建外键字段，可不指定，不指定则为{entityName} + "Id"
    */
   private String targetField;
+  /**
+   * 级联删除，此功能依赖外键约束
+   */
+  private boolean cascadeDelete;
 
   public RelationField(String name) {
     super(name, BasicFieldType.RELATION.getType());
