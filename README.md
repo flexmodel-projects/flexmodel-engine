@@ -162,7 +162,7 @@ session.createEntity("teacher", entity -> entity
   // 姓名
   .addField(new StringField("name").setComment("姓名").setNullable(false).setLength(10))
   // 年龄，支持设置验证器进行业务验证
-  .addField(new IntField("age").setComment("年龄").addValidation(new NumberRangeValidator<>(1, 300)))
+  .addField(new IntField("age").setComment("年龄").addValidator(new NumberRangeValidator<>(1, 300)))
   // 备注
   .addField(new TextField("description").setComment("备注"))
   // 生日
