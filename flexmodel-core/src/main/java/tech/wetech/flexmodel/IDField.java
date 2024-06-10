@@ -1,8 +1,10 @@
 package tech.wetech.flexmodel;
 
-import tech.wetech.flexmodel.generations.ULIDValueGenerator;
-import tech.wetech.flexmodel.generations.UUIDValueGenerator;
-import tech.wetech.flexmodel.generations.ValueGenerator;
+import tech.wetech.flexmodel.generator.ULIDValueGenerator;
+import tech.wetech.flexmodel.generator.UUIDValueGenerator;
+import tech.wetech.flexmodel.generator.ValueGenerator;
+
+import static tech.wetech.flexmodel.generator.GenerationTime.INSERT;
 
 /**
  * ID字段类型默认为字符串，当为自增时则为数字，为UUID时则为字符串
@@ -15,13 +17,8 @@ public class IDField extends TypedField<Object, IDField> {
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   public IDField setGeneratedValue(GeneratedValue generatedValue) {
-    if (this.generatedValue.getGenerator() != null) {
-      this.getGenerators().remove(this.generatedValue.getGenerator());
-    }
-    if (generatedValue.getGenerator() != null) {
-      this.addGenration((ValueGenerator) generatedValue.getGenerator());
-    }
     this.generatedValue = generatedValue;
+    this.setGenerator((ValueGenerator) generatedValue.getGenerator());
     return this;
   }
 
@@ -41,11 +38,11 @@ public class IDField extends TypedField<Object, IDField> {
     /**
      * UUID
      */
-    UUID("string", UUIDValueGenerator.INSTANCE),
+    UUID("string", UUIDValueGenerator.INSTANCE.setGenerationTime(INSERT)),
     /**
      * ULID
      */
-    ULID("string", ULIDValueGenerator.INSTANCE),
+    ULID("string", ULIDValueGenerator.INSTANCE.setGenerationTime(INSERT)),
     /**
      * 长整型不自动生成
      */

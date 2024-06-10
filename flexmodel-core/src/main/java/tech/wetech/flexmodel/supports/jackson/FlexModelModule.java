@@ -2,9 +2,9 @@ package tech.wetech.flexmodel.supports.jackson;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import tech.wetech.flexmodel.*;
-import tech.wetech.flexmodel.generations.FixedValueGenerator;
-import tech.wetech.flexmodel.generations.ValueGenerator;
-import tech.wetech.flexmodel.validations.*;
+import tech.wetech.flexmodel.generator.FixedValueGenerator;
+import tech.wetech.flexmodel.generator.ValueGenerator;
+import tech.wetech.flexmodel.validator.*;
 
 /**
  * @author cjbi
@@ -33,7 +33,7 @@ public class FlexModelModule extends SimpleModule {
     setMixInAnnotation(Index.class, IndexMixIn.class);
     // ValueGenerator
     setMixInAnnotation(ValueGenerator.class, ValueGeneratorMixIn.class);
-    setMixInAnnotation(FixedValueGenerator.class, DefaultValueGeneratorMixIn.class);
+    setMixInAnnotation(FixedValueGenerator.class, FixedValueGeneratorMixIn.class);
     // ConstraintValidator
     setMixInAnnotation(ConstraintValidator.class, ConstraintValidatorMixIn.class);
     setMixInAnnotation(DateMaxValidator.class, DateMaxValidatorMixIn.class);

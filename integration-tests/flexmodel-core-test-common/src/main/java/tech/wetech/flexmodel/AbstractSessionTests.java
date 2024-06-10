@@ -4,11 +4,11 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import tech.wetech.flexmodel.dto.TeacherDTO;
-import tech.wetech.flexmodel.generations.DateNowValueGenerator;
-import tech.wetech.flexmodel.generations.DatetimeNowValueGenerator;
+import tech.wetech.flexmodel.generator.DateNowValueGenerator;
+import tech.wetech.flexmodel.generator.DatetimeNowValueGenerator;
 import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
 import tech.wetech.flexmodel.sql.JdbcMappedModels;
-import tech.wetech.flexmodel.validations.NumberRangeValidator;
+import tech.wetech.flexmodel.validator.NumberRangeValidator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -417,7 +417,7 @@ public abstract class AbstractSessionTests {
       // 姓名
       .addField(new StringField("name").setComment("姓名").setNullable(false).setLength(10))
       // 年龄
-      .addField(new IntField("age").setComment("年龄").addValidation(new NumberRangeValidator<>(1, 300)))
+      .addField(new IntField("age").setComment("年龄").addValidator(new NumberRangeValidator<>(1, 300)))
       // 备注
       .addField(new TextField("description").setComment("备注"))
       // 生日
@@ -425,7 +425,7 @@ public abstract class AbstractSessionTests {
       // 是否禁用
       .addField(new BooleanField("isLocked").setNullable(false).setDefaultValue(false).setComment("是否禁用"))
       // 创建时间
-      .addField(new DatetimeField("createDatetime").setComment("创建日期时间").addGenration(new DatetimeNowValueGenerator()))
+      .addField(new DatetimeField("createDatetime").setComment("创建日期时间").setGenerator(new DatetimeNowValueGenerator()))
       // 扩展信息
       .addField(new JsonField("extra").setComment("扩展信息"))
       // 创建索引
@@ -438,7 +438,6 @@ public abstract class AbstractSessionTests {
         {
           "birthday": "1995-03-15",
           "isLocked": false,
-          "createDatetime": "2024-04-24T19:30:41.0035688",
           "name": "张三",
           "description": "软件工程师",
           "age": 25
@@ -446,7 +445,6 @@ public abstract class AbstractSessionTests {
         {
           "birthday": "1995-03-28",
           "isLocked": true,
-          "createDatetime": "2024-04-24T19:30:41.0035688",
           "name": "李四",
           "description": "市场营销经理",
           "age": 37
@@ -454,7 +452,6 @@ public abstract class AbstractSessionTests {
         {
           "birthday": "1991-01-12",
           "isLocked": false,
-          "createDatetime": "2024-04-24T19:30:41.0035688",
           "name": "王五",
           "description": "人力资源专员",
           "age": 42
@@ -462,7 +459,6 @@ public abstract class AbstractSessionTests {
         {
           "birthday": "1965-01-07",
           "isLocked": true,
-          "createDatetime": "2024-04-24T19:30:41.0035688",
           "name": "赵六",
           "description": "退休教师",
           "age": 55
@@ -470,7 +466,6 @@ public abstract class AbstractSessionTests {
         {
           "birthday": "1991-10-23",
           "isLocked": false,
-          "createDatetime": "2024-04-24T19:30:41.0035688",
           "name": "孙七",
           "description": "设计师",
           "age": 29
@@ -478,7 +473,6 @@ public abstract class AbstractSessionTests {
         {
           "birthday": "1995-05-01",
           "isLocked": true,
-          "createDatetime": "2024-04-24T19:30:41.0035688",
           "name": "周八",
           "description": "产品经理",
           "age": 32
@@ -486,7 +480,6 @@ public abstract class AbstractSessionTests {
         {
           "birthday": "1991-10-20",
           "isLocked": false,
-          "createDatetime": "2024-04-24T19:30:41.0035688",
           "name": "吴九",
           "description": "会计",
           "age": 45
@@ -932,14 +925,14 @@ public abstract class AbstractSessionTests {
     DatetimeField createDatetime = new DatetimeField("createDatetime");
     createDatetime.setModelName(entityName);
     createDatetime.setComment("创建日期时间");
-    createDatetime.addGenration(new DatetimeNowValueGenerator());
+    createDatetime.setGenerator(new DatetimeNowValueGenerator());
     entity.addField(createDatetime);
     session.createField(createDatetime);
     // date
     DateField birthday = new DateField("birthday");
     birthday.setModelName(entityName);
     birthday.setComment("出生日期");
-    birthday.addGenration(new DateNowValueGenerator());
+    birthday.setGenerator(new DateNowValueGenerator());
     entity.addField(birthday);
     session.createField(birthday);
     // json

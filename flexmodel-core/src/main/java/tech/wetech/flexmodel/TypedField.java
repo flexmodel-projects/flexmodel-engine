@@ -1,9 +1,9 @@
 package tech.wetech.flexmodel;
 
-import tech.wetech.flexmodel.generations.FixedValueGenerator;
-import tech.wetech.flexmodel.generations.ValueGenerator;
-import tech.wetech.flexmodel.validations.ConstraintValidator;
-import tech.wetech.flexmodel.validations.NotNullValidator;
+import tech.wetech.flexmodel.generator.FixedValueGenerator;
+import tech.wetech.flexmodel.generator.ValueGenerator;
+import tech.wetech.flexmodel.validator.ConstraintValidator;
+import tech.wetech.flexmodel.validator.NotNullValidator;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,7 +11,6 @@ import java.util.Set;
 /**
  * @author cjbi
  */
-@SuppressWarnings("unchecked")
 public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
   private String name;
   private final String type;
@@ -21,7 +20,7 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
   private boolean nullable = true;
   private T defaultValue;
   private final Set<ConstraintValidator<T>> validators = new HashSet<>();
-  private final Set<ValueGenerator<T>> generators = new HashSet<>();
+  private ValueGenerator<T> generator;
 
   public TypedField(String name, String type) {
     this.name = name;
@@ -66,7 +65,9 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
 
   public SELF setDefaultValue(T defaultValue) {
     this.defaultValue = defaultValue;
-    addGenration(new FixedValueGenerator<>(defaultValue));
+    if (defaultValue != null) {
+      this.generator = new FixedValueGenerator<>(defaultValue);
+    }
     return self();
   }
 
@@ -86,7 +87,7 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
   public SELF setNullable(boolean nullable) {
     this.nullable = nullable;
     if (!nullable) {
-      addValidation(NotNullValidator.INSTANCE);
+      addValidator(NotNullValidator.INSTANCE);
     } else {
       validators.remove(NotNullValidator.INSTANCE);
     }
@@ -102,22 +103,27 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
     return validators;
   }
 
-  public SELF addValidation(ConstraintValidator<T> constraintValidator) {
+  public SELF addValidator(ConstraintValidator<T> constraintValidator) {
     this.validators.add(constraintValidator);
     return self();
   }
 
-  public Set<ValueGenerator<T>> getGenerators() {
-    return generators;
+
+  public ValueGenerator<T> getGenerator() {
+    return generator;
   }
 
   @SuppressWarnings("all")
-  public SELF addGenration(ValueGenerator<T> calculator) {
-    this.generators.add(calculator);
+  public SELF setGenerator(ValueGenerator<T> generator) {
+    if (generator instanceof FixedValueGenerator<T> fixedValueGenerator) {
+      this.defaultValue = fixedValueGenerator.getValue();
+    }
+    this.generator = generator;
     return self();
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public boolean equals(Object obj) {
     if (this.getName() != null && obj instanceof TypedField) {
       return this.getName().equals(((TypedField<T, SELF>) obj).getName());
@@ -125,6 +131,7 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
     return false;
   }
 
+  @SuppressWarnings("unchecked")
   private SELF self() {
     return (SELF) this;
   }

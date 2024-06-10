@@ -2,9 +2,9 @@ package tech.wetech.flexmodel;
 
 import tech.wetech.flexmodel.event.record.DataOperationsEventDecorator;
 import tech.wetech.flexmodel.event.schema.SchemaOperationsEventDecorator;
-import tech.wetech.flexmodel.generations.DataOperationsGenerationDecorator;
+import tech.wetech.flexmodel.generator.DataOperationsGenerationDecorator;
 import tech.wetech.flexmodel.graph.JoinGraphNode;
-import tech.wetech.flexmodel.validations.DataOperationsValidationDecorator;
+import tech.wetech.flexmodel.validator.DataOperationsValidationDecorator;
 
 import java.util.List;
 import java.util.Map;

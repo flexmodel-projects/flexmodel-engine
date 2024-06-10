@@ -21,7 +21,7 @@ import tech.wetech.flexmodel.*;
   @JsonSubTypes.Type(value = DatetimeField.class, name = "datetime"),
   @JsonSubTypes.Type(value = DateField.class, name = "date"),
   @JsonSubTypes.Type(value = JsonField.class, name = "json"),
-  @JsonSubTypes.Type(value = RelationField.class, name = "association"),
+  @JsonSubTypes.Type(value = RelationField.class, name = "relation"),
 })
 public abstract class TypedFieldMixIn {
 
