@@ -40,7 +40,7 @@ public class QueryHelper {
       Model model = mappedModels.getModel(schemaName, modelName);
       for (Query.Join join : query.getJoins().getJoins()) {
         if (join.getFrom() == null) {
-          throw new SqlExecutionException("join from model must not be null");
+          throw new SqlExecutionException("Join from model must not be null");
         }
         if (model instanceof Entity entity && join.getLocalField() == null && join.getForeignField() == null) {
           RelationField relationField = entity.findRelationByEntityName(join.getFrom())
@@ -49,7 +49,7 @@ public class QueryHelper {
           join.setForeignField(relationField.getTargetField());
         } else {
           if (join.getLocalField() == null || join.getForeignField() == null) {
-            throw new SqlExecutionException("localField and foreignField must not be null when is not association field");
+            throw new SqlExecutionException("LocalField and foreignField must not be null when is not association field");
           }
         }
       }

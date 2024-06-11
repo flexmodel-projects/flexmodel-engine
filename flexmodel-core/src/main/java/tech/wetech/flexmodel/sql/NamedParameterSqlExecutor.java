@@ -50,7 +50,7 @@ public class NamedParameterSqlExecutor implements SqlExecutor {
         }
         return null;
       } catch (SQLException e) {
-        throw new SqlExecutionException("Could not execute JDBC Statement: " + sql, e);
+        throw new SqlExecutionException("Could not execute JDBC Statement: " + sql + ", Reason: " + e.getMessage(), e);
       } finally {
         closeResultSet(rs);
         closeStatement(stmt);
@@ -93,7 +93,7 @@ public class NamedParameterSqlExecutor implements SqlExecutor {
           return null;
         }
       } catch (SQLException e) {
-        throw new SqlExecutionException("Could not execute JDBC Statement: " + sql, e);
+        throw new SqlExecutionException("Could not execute JDBC Statement: " + sql + ", Reason: " + e.getMessage(), e);
       } finally {
         closeResultSet(rs);
         closeStatement(stmt);
@@ -128,7 +128,7 @@ public class NamedParameterSqlExecutor implements SqlExecutor {
         rs = stmt.executeQuery();
         return sqlResultHandler.convertResultSetToList(rs);
       } catch (SQLException e) {
-        throw new SqlExecutionException("Could not execute JDBC Statement: " + sql, e);
+        throw new SqlExecutionException("Could not execute JDBC Statement: " + sql + ", Reason: " + e.getMessage(), e);
       } finally {
         closeResultSet(rs);
         closeStatement(stmt);
@@ -218,7 +218,7 @@ public class NamedParameterSqlExecutor implements SqlExecutor {
         setParameters(stmt, paramMap);
         return stmt.executeUpdate();
       } catch (SQLException e) {
-        throw new SqlExecutionException("Could not execute JDBC Statement: " + sql, e);
+        throw new SqlExecutionException("Could not execute JDBC Statement: " + sql + ", Reason: " + e.getMessage(), e);
       } finally {
         closeStatement(stmt);
       }
@@ -248,7 +248,7 @@ public class NamedParameterSqlExecutor implements SqlExecutor {
         keyConsumer.accept(keyList.getFirst());
         return rows;
       } catch (SQLException e) {
-        throw new SqlExecutionException("Could not execute JDBC Statement: " + sql, e);
+        throw new SqlExecutionException("Could not execute JDBC Statement: " + sql + ", Reason: " + e.getMessage(), e);
       } finally {
         closeResultSet(krs);
         closeStatement(stmt);
@@ -273,7 +273,7 @@ public class NamedParameterSqlExecutor implements SqlExecutor {
         keyConsumer.accept(keyList);
         return rows;
       } catch (SQLException e) {
-        throw new SqlExecutionException("Could not execute JDBC Statement: " + sql, e);
+        throw new SqlExecutionException("Could not execute JDBC Statement: " + sql + ", Reason: " + e.getMessage(), e);
       } finally {
         closeResultSet(krs);
         closeStatement(stmt);

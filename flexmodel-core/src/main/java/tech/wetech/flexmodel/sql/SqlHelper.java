@@ -188,7 +188,7 @@ class SqlHelper {
     try {
       return conditionCalculator.calculateIncludeValue(condition);
     } catch (ExpressionCalculatorException e) {
-      throw new SqlExecutionException("calculate sql where error", e);
+      throw new SqlExecutionException("Calculate sql where error: " + e.getMessage(), e);
     }
   }
 
@@ -197,7 +197,7 @@ class SqlHelper {
     try {
       return conditionCalculator.calculate(condition, null);
     } catch (ExpressionCalculatorException e) {
-      throw new SqlExecutionException("calculate sql where error", e);
+      throw new SqlExecutionException("Calculate sql where error: " + e.getMessage(), e);
     }
   }
 
