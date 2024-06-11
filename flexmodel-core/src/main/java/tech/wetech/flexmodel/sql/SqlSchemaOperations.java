@@ -381,7 +381,7 @@ public class SqlSchemaOperations implements SchemaOperations {
     for (Index.Field field : index.getFields()) {
       SqlColumn sqlColumn = new SqlColumn();
       sqlColumn.setName(field.fieldName());
-      sqlIndex.addColumn(sqlColumn, field.direction().toString());
+      sqlIndex.addColumn(sqlColumn, field.direction() != null ? field.direction().toString() : null);
     }
     return sqlIndex;
   }
