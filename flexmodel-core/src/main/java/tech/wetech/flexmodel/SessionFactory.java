@@ -22,7 +22,6 @@ public class SessionFactory {
 
   private MappedModels mappedModels;
   private final Map<String, DataSourceProvider> dataSourceProviderMap = new HashMap<>();
-  private final CurrentSessionContext currentSessionContext;
   private final Cache cache;
 
   SessionFactory(String defaultIdentifier, DataSourceProvider defaultDataSourceProvider, Cache cache) {
@@ -33,15 +32,6 @@ public class SessionFactory {
     } else if (defaultDataSourceProvider instanceof MongoDataSourceProvider mongoDataSourceProvider) {
       this.mappedModels = new MapMappedModels();
     }
-    this.currentSessionContext = buildConnectionLifeCycleManager();
-  }
-
-  private CurrentSessionContext buildConnectionLifeCycleManager() {
-    return new ThreadLocalCurrentSessionContext(this);
-  }
-
-  public CurrentSessionContext getCurrentSessionContext() {
-    return currentSessionContext;
   }
 
   public Map<String, DataSourceProvider> getDataSourceProviderMap() {
@@ -70,10 +60,6 @@ public class SessionFactory {
 
   public <T> void subscribeEvent(Class<T> subscribedToEventType, Consumer<T> event) {
     DomainEventPublisher.instance().subscribe(subscribedToEventType, event);
-  }
-
-  public Session openSession(String identifier) {
-    return currentSessionContext.currentSession(identifier);
   }
 
   public Session createSession(String identifier) {
