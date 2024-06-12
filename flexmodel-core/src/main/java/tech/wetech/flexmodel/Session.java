@@ -1,9 +1,11 @@
 package tech.wetech.flexmodel;
 
+import java.io.Closeable;
+
 /**
  * @author cjbi
  */
-public interface Session extends SchemaOperations, DataOperations {
+public interface Session extends SchemaOperations, DataOperations, Closeable {
 
   /**
    * 开启事务
