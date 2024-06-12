@@ -38,6 +38,15 @@ public class Index implements Serializable {
     return fields;
   }
 
+  public boolean containsField(String fieldName) {
+    for (Field field : fields) {
+      if (field.fieldName.equals(fieldName)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public boolean isUnique() {
     return unique;
   }

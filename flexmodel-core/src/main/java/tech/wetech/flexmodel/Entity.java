@@ -48,6 +48,21 @@ public class Entity implements Model {
     return fields.stream().toList();
   }
 
+  @Override
+  public TypedField<?, ?> getField(String name) {
+    return this.getFields().stream()
+      .filter(f -> f.getName().equals(name))
+      .findFirst()
+      .orElse(null);
+  }
+
+  public Index getIndex(String name) {
+    return this.getIndexes().stream()
+      .filter(i -> i.getName().equals(name))
+      .findFirst()
+      .orElse(null);
+  }
+
   public Optional<RelationField> findRelationByEntityName(String entityName) {
     for (TypedField<?, ?> field : fields) {
       if (field instanceof RelationField relationField) {
@@ -70,7 +85,7 @@ public class Entity implements Model {
   }
 
   public void removeField(String fieldName) {
-    fields.remove(new TypedField<>(this.name, fieldName));
+    fields.remove((TypedField<?, ?>) getField(fieldName));
   }
 
   public Entity addIndex(Index index) {
@@ -86,7 +101,7 @@ public class Entity implements Model {
   }
 
   public void removeIndex(String indexName) {
-    indexes.remove(new Index(this.name, indexName));
+    indexes.remove(getIndex(indexName));
   }
 
   public IDField getIdField() {

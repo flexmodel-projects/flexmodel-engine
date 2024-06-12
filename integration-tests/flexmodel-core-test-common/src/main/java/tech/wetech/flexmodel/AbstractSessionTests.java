@@ -941,6 +941,13 @@ public abstract class AbstractSessionTests {
     interests.setComment("兴趣爱好");
     entity.addField(interests);
     session.createField(interests);
+    session.createIndex(new Index(entityName, "IDX_name").addField("name"));
+    session.createIndex(
+      new Index(entityName, "IDX_age_is_deleted")
+        .addField("name")
+        .addField("is_deleted")
+        .setUnique(true)
+    );
   }
 
   private void createScoreEntity2(String scoreModelName) {
@@ -978,13 +985,25 @@ public abstract class AbstractSessionTests {
   void testDropField() {
     String entityName = "testDropField_students";
     createStudentEntity2(entityName);
+    session.dropIndex(entityName,"IDX_name");
+    session.dropIndex(entityName,"IDX_age_is_deleted");
     session.dropField(entityName, "name");
     session.dropField(entityName, "description");
     session.dropField(entityName, "age");
     session.dropField(entityName, "is_deleted");
     session.dropField(entityName, "createDatetime");
     session.dropField(entityName, "birthday");
+    Entity entity = (Entity) session.getModel(entityName);
+    Assertions.assertNull(entity.getField("name"));
+    Assertions.assertNull(entity.getField("description"));
+    Assertions.assertNull(entity.getField("age"));
+    Assertions.assertNull(entity.getField("is_deleted"));
+    Assertions.assertNull(entity.getField("createDatetime"));
+    Assertions.assertNull(entity.getField("birthday"));
+    Assertions.assertNull(entity.getIndex("IDX_name"));
+    Assertions.assertNull(entity.getIndex("IDX_age_is_deleted"));
     dropModel(entityName);
+    Assertions.assertNull(session.getModel(entityName));
   }
 
   @Test
@@ -1006,6 +1025,8 @@ public abstract class AbstractSessionTests {
     multipleFiledIndex.setName("IDX_compound");
     session.createIndex(multipleFiledIndex);
     session.dropIndex(entityName, "IDX_compound");
+    Entity entity = (Entity) session.getModel(entityName);
+    Assertions.assertNull(entity.getIndex("IDX_compound"));
     dropModel(entityName);
   }
 

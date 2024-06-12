@@ -74,6 +74,10 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
     delegate.dropField(entityName, fieldName);
     Entity entity = mappedModels.getEntity(schemaName, entityName);
     entity.removeField(fieldName);
+    for (Index index : entity.getIndexes()) {
+      index.containsField(fieldName);
+      entity.removeIndex(index.getName());
+    }
     mappedModels.persist(schemaName, entity);
   }
 
