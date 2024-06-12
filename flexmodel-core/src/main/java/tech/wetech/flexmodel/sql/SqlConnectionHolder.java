@@ -2,6 +2,7 @@ package tech.wetech.flexmodel.sql;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.wetech.flexmodel.DataSourceProvider;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -16,11 +17,11 @@ public class SqlConnectionHolder {
 
   Logger log = LoggerFactory.getLogger(SqlConnectionHolder.class);
 
-  private final Map<String, DataSource> dataSources = new HashMap<>();
+  private final Map<String, DataSourceProvider> dataSourceProviderMap;
   private final Map<String, Connection> connections = new HashMap<>();
 
-  public void addDataSource(String identifier, DataSource dataSource) {
-    dataSources.put(identifier, dataSource);
+  public SqlConnectionHolder(Map<String, DataSourceProvider> dataSourceProviderMap) {
+    this.dataSourceProviderMap = dataSourceProviderMap;
   }
 
   public Connection getOrCreateConnection(String identifier) {
@@ -30,11 +31,11 @@ public class SqlConnectionHolder {
           try {
             return v;
           } catch (Exception e) {
-            DataSource dataSource = dataSources.get(identifier);
+            DataSource dataSource = ((JdbcDataSourceProvider) dataSourceProviderMap.get(identifier)).dataSource();
             return dataSource.getConnection();
           }
         }
-        DataSource dataSource = dataSources.get(identifier);
+        DataSource dataSource = ((JdbcDataSourceProvider) dataSourceProviderMap.get(identifier)).dataSource();
         return dataSource.getConnection();
       } catch (SQLException e) {
         throw new RuntimeException(e);
@@ -47,6 +48,7 @@ public class SqlConnectionHolder {
     for (Map.Entry<String, Connection> entry : connections.entrySet()) {
       closeConnection(entry.getValue());
     }
+    connections.clear();
   }
 
   private void closeConnection(Connection conn) {

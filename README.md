@@ -133,16 +133,14 @@ public class Simple {
     dataSource.setJdbcUrl("jdbc:mysql://localhost:3306/test_db");
     dataSource.setUsername("root");
     dataSource.setPassword("123456");
-    // 新建连接管理器
-    ConnectionLifeCycleManager connectionManager = new ConnectionLifeCycleManager();
     // 通过数据源名称获取对应的数据源
     String dsName = "mysql";
-    // 加入连接
-    connectionManager.addDataSourceProvider(dsName, new JdbcDataSourceProvider(dataSource));
-    // 创建模型映射类，保证模型创建完能够保存到数据库表中，这里使用了内置的Jdbc模型映射
-    MappedModels jdbcMappedModel = new JdbcMappedModels(dataSource);
-    // 创建会话工厂
-    SessionFactory sessionFactory = new SessionFactory(connectionManager, jdbcMappedModel);
+
+    // 设置默认数据源
+    JdbcDataSourceProvider jdbcDataSourceProvider = new JdbcDataSourceProvider(dataSource);
+    SessionFactory sessionFactory = SessionFactory.builder()
+      .setDefaultDataSourceProvider(jdbcDataSourceProvider)
+      .build();
     // 创建会话，开始使用
     Session session = sessionFactory.createSession(dsName);
   }

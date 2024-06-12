@@ -7,7 +7,6 @@ import tech.wetech.flexmodel.dto.TeacherDTO;
 import tech.wetech.flexmodel.generator.DateNowValueGenerator;
 import tech.wetech.flexmodel.generator.DatetimeNowValueGenerator;
 import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
-import tech.wetech.flexmodel.sql.JdbcMappedModels;
 import tech.wetech.flexmodel.validator.NumberRangeValidator;
 
 import java.time.LocalDate;
@@ -26,29 +25,19 @@ import static tech.wetech.flexmodel.RelationField.Cardinality.*;
  */
 public abstract class AbstractSessionTests {
 
+  public static SessionFactory sessionFactory;
   public static Session session;
-  private static ConnectionLifeCycleManager connectionLifeCycleManager;
 
   protected static void initSession(DataSourceProvider dataSourceProvider) {
-    ConnectionLifeCycleManager connectionLifeCycleManager = new ConnectionLifeCycleManager();
-    connectionLifeCycleManager.addDataSourceProvider("default", dataSourceProvider);
-    MappedModels mappedModels;
-    if (dataSourceProvider instanceof JdbcDataSourceProvider jdbcDataSourceProvider) {
-      mappedModels = new JdbcMappedModels(jdbcDataSourceProvider.dataSource());
-    } else {
-      mappedModels = new MapMappedModels();
-    }
-    SessionFactory sessionFactory = SessionFactory.builder()
-      .setMappedModels(mappedModels)
-      .setConnectionLifeCycleManager(connectionLifeCycleManager)
+    sessionFactory = SessionFactory.builder()
+      .setDefaultDataSourceProvider("default", dataSourceProvider)
       .build();
     session = sessionFactory.createSession("default");
-    AbstractSessionTests.connectionLifeCycleManager = connectionLifeCycleManager;
   }
 
   @AfterAll
   static void afterAll() {
-    connectionLifeCycleManager.destroy();
+
   }
 
   void createClassesEntity(String entityName) {
@@ -985,8 +974,8 @@ public abstract class AbstractSessionTests {
         .addField("is_deleted")
         .setUnique(true)
     );
-    session.dropIndex(entityName,"IDX_name");
-    session.dropIndex(entityName,"IDX_age_is_deleted");
+    session.dropIndex(entityName, "IDX_name");
+    session.dropIndex(entityName, "IDX_age_is_deleted");
     session.dropField(entityName, "name");
     session.dropField(entityName, "description");
     session.dropField(entityName, "age");
@@ -1109,16 +1098,14 @@ public abstract class AbstractSessionTests {
     createStudentData(studentEntityName);
     createTeacherData(teacherEntityName);
     createTeacherEntity2("TestSyncModelsteacher2");
-    DataSourceProvider dataSourceProvider = connectionLifeCycleManager.getDataSourceProvider("default");
+    DataSourceProvider dataSourceProvider = sessionFactory.getDataSourceProvider("system");
     String identifier = "sync_test";
-    connectionLifeCycleManager.addDataSourceProvider(identifier, dataSourceProvider);
-    MappedModels mappedModels;
+    sessionFactory.addDataSourceProvider(identifier, dataSourceProvider);
     if (dataSourceProvider instanceof JdbcDataSourceProvider jdbcDataSourceProvider) {
-      mappedModels = new JdbcMappedModels(jdbcDataSourceProvider.dataSource());
       SessionFactory sessionFactory = SessionFactory.builder()
-        .setConnectionLifeCycleManager(connectionLifeCycleManager)
-        .setMappedModels(mappedModels)
+        .setDefaultDataSourceProvider(jdbcDataSourceProvider)
         .build();
+      sessionFactory.addDataSourceProvider(identifier, dataSourceProvider);
       Session newSession = sessionFactory.createSession(identifier);
       List<Model> models = newSession.syncModels();
       Assertions.assertFalse(models.isEmpty());

@@ -8,12 +8,11 @@ import tech.wetech.flexmodel.event.DomainEventPublisher;
 import tech.wetech.flexmodel.mongodb.MongoContext;
 import tech.wetech.flexmodel.mongodb.MongoDataSourceProvider;
 import tech.wetech.flexmodel.mongodb.MongoSession;
-import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
-import tech.wetech.flexmodel.sql.NamedParameterSqlExecutor;
-import tech.wetech.flexmodel.sql.SqlContext;
-import tech.wetech.flexmodel.sql.SqlSession;
+import tech.wetech.flexmodel.sql.*;
 
 import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -21,18 +20,52 @@ import java.util.function.Consumer;
  */
 public class SessionFactory {
 
-  private final MappedModels mappedModels;
-  private final ConnectionLifeCycleManager connectionLifeCycleManager;
+  private MappedModels mappedModels;
+  private final Map<String, DataSourceProvider> dataSourceProviderMap = new HashMap<>();
+  private final CurrentSessionContext currentSessionContext;
   private final Cache cache;
 
-  public SessionFactory(ConnectionLifeCycleManager connectionLifeCycleManager, MappedModels mappedModels, Cache cache) {
-    this.connectionLifeCycleManager = connectionLifeCycleManager;
-    this.mappedModels = mappedModels;
+  SessionFactory(String defaultIdentifier, DataSourceProvider defaultDataSourceProvider, Cache cache) {
     this.cache = cache;
+    addDataSourceProvider(defaultIdentifier, defaultDataSourceProvider);
+    if (defaultDataSourceProvider instanceof JdbcDataSourceProvider jdbcDataSourceProvider) {
+      this.mappedModels = new CachingMappedModels(new JdbcMappedModels(jdbcDataSourceProvider.dataSource()), cache);
+    } else if (defaultDataSourceProvider instanceof MongoDataSourceProvider mongoDataSourceProvider) {
+      this.mappedModels = new MapMappedModels();
+    }
+    this.currentSessionContext = buildConnectionLifeCycleManager();
+  }
+
+  private CurrentSessionContext buildConnectionLifeCycleManager() {
+    return new ThreadLocalCurrentSessionContext(this);
+  }
+
+  public CurrentSessionContext getCurrentSessionContext() {
+    return currentSessionContext;
+  }
+
+  public Map<String, DataSourceProvider> getDataSourceProviderMap() {
+    return dataSourceProviderMap;
+  }
+
+  public Cache getCache() {
+    return cache;
   }
 
   public static Builder builder() {
     return new Builder();
+  }
+
+  public void addDataSourceProvider(String identifier, DataSourceProvider dataSource) {
+    dataSourceProviderMap.put(identifier, dataSource);
+  }
+
+  public DataSourceProvider getDataSourceProvider(String identifier) {
+    return dataSourceProviderMap.get(identifier);
+  }
+
+  public void removeDataSourceProvider(String identifier) {
+    dataSourceProviderMap.remove(identifier);
   }
 
   public <T> void subscribeEvent(Class<T> subscribedToEventType, Consumer<T> event) {
@@ -40,42 +73,36 @@ public class SessionFactory {
   }
 
   public Session openSession(String identifier) {
-    return (Session) cache.retrieve(identifier, () -> createSession(identifier));
+    return currentSessionContext.currentSession(identifier);
   }
 
   public Session createSession(String identifier) {
-    return switch (connectionLifeCycleManager.getDataSourceProvider(identifier)) {
-      case JdbcDataSourceProvider ignored -> {
-        Connection connection = connectionLifeCycleManager.getSqlConnectionHolder().getOrCreateConnection(identifier);
-        SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), mappedModels);
-        yield new SqlSession(sqlContext);
-      }
-      case MongoDataSourceProvider ignored -> {
-        MongoDatabase mongoDatabase = connectionLifeCycleManager.getMongoDatabaseMap().get(identifier);
-        MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, mappedModels);
-        yield new MongoSession(mongoContext);
-      }
-      case null,
-        default -> throw new IllegalStateException("Unexpected identifier: " + identifier);
-    };
+    try {
+      return switch (dataSourceProviderMap.get(identifier)) {
+        case JdbcDataSourceProvider jdbc -> {
+          Connection connection = jdbc.dataSource().getConnection();
+          SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), mappedModels);
+          yield new SqlSession(sqlContext);
+        }
+        case MongoDataSourceProvider mongodb -> {
+          MongoDatabase mongoDatabase = mongodb.mongoDatabase();
+          MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, mappedModels);
+          yield new MongoSession(mongoContext);
+        }
+        case null,
+          default -> throw new IllegalStateException("Unexpected identifier: " + identifier);
+      };
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public static class Builder {
-    private MappedModels mappedModels;
-    private ConnectionLifeCycleManager connectionLifeCycleManager;
     private Cache cache;
+    private String defaultIdentifier = "default";
+    private DataSourceProvider defaultDataSourceProvider = null;
 
     Builder() {
-    }
-
-    public Builder setMappedModels(MappedModels mappedModels) {
-      this.mappedModels = mappedModels;
-      return this;
-    }
-
-    public Builder setConnectionLifeCycleManager(ConnectionLifeCycleManager connectionLifeCycleManager) {
-      this.connectionLifeCycleManager = connectionLifeCycleManager;
-      return this;
     }
 
     public Builder setCache(Cache cache) {
@@ -83,18 +110,25 @@ public class SessionFactory {
       return this;
     }
 
+    public Builder setDefaultDataSourceProvider(String defaultIdentifier, DataSourceProvider dataSourceProvider) {
+      this.defaultIdentifier = defaultIdentifier;
+      this.defaultDataSourceProvider = dataSourceProvider;
+      return this;
+    }
+
+    public Builder setDefaultDataSourceProvider(DataSourceProvider defaultDataSourceProvider) {
+      this.defaultDataSourceProvider = defaultDataSourceProvider;
+      return this;
+    }
+
     public SessionFactory build() {
-      if (connectionLifeCycleManager == null) {
-        throw new IllegalStateException("Please set connectionLifeCycleManager");
-      }
-      if (mappedModels == null) {
-        this.mappedModels = new MapMappedModels();
+      if (defaultDataSourceProvider == null) {
+        throw new IllegalStateException("Please set defaultDataSourceProvider");
       }
       if (cache == null) {
         this.cache = new ConcurrentHashMapCache();
       }
-      connectionLifeCycleManager.setCache(cache);
-      return new SessionFactory(connectionLifeCycleManager, new CachingMappedModels(mappedModels, cache), cache);
+      return new SessionFactory(defaultIdentifier, defaultDataSourceProvider, cache);
     }
 
   }

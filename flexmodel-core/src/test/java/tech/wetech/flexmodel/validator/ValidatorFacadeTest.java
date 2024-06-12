@@ -25,7 +25,7 @@ class ValidatorFacadeTest {
   @BeforeEach
   void setUp() {
     this.mappedModels = new MapMappedModels();
-    this.validatorFacade = new ValidatorFacade("default", mappedModels);
+    this.validatorFacade = new ValidatorFacade("system", mappedModels);
 
     Entity entity = new Entity(MODEL_NAME);
     // 主键
@@ -76,14 +76,14 @@ class ValidatorFacadeTest {
     email.setLength(20);
     email.addValidator(new EmailValidator());
     entity.addField(email);
-    mappedModels.persist("default", entity);
+    mappedModels.persist("system", entity);
 
     // 路径
     StringField baseUrl = new StringField("url");
     baseUrl.setComment("路径");
     baseUrl.addValidator(new URLValidator());
     entity.addField(baseUrl);
-    mappedModels.persist("default", entity);
+    mappedModels.persist("system", entity);
 
     // 日期时间验证
     DatetimeField sDatetime = new DatetimeField("s_datetime");
