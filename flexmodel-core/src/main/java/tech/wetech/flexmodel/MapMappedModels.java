@@ -25,7 +25,7 @@ public class MapMappedModels implements MappedModels {
 
   @Override
   public void remove(String schemaName, String modelName) {
-    map.remove(modelName);
+    map.get(schemaName).remove(modelName);
   }
 
   @Override

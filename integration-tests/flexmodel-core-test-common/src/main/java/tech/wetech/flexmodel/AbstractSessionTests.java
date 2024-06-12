@@ -941,13 +941,6 @@ public abstract class AbstractSessionTests {
     interests.setComment("兴趣爱好");
     entity.addField(interests);
     session.createField(interests);
-    session.createIndex(new Index(entityName, "IDX_name").addField("name"));
-    session.createIndex(
-      new Index(entityName, "IDX_age_is_deleted")
-        .addField("name")
-        .addField("is_deleted")
-        .setUnique(true)
-    );
   }
 
   private void createScoreEntity2(String scoreModelName) {
@@ -985,6 +978,13 @@ public abstract class AbstractSessionTests {
   void testDropField() {
     String entityName = "testDropField_students";
     createStudentEntity2(entityName);
+    session.createIndex(new Index(entityName, "IDX_name").addField("name"));
+    session.createIndex(
+      new Index(entityName, "IDX_age_is_deleted")
+        .addField("name")
+        .addField("is_deleted")
+        .setUnique(true)
+    );
     session.dropIndex(entityName,"IDX_name");
     session.dropIndex(entityName,"IDX_age_is_deleted");
     session.dropField(entityName, "name");
