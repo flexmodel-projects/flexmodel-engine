@@ -97,7 +97,7 @@
 ```xml
 <dependencies>
   <groupId>tech.wetech.flexmodel</groupId>
-  <artifactId>flexmodel</artifactId>
+  <artifactId>flexmodel-core</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 </dependencies>
 ```
