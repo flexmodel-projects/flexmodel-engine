@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import tech.wetech.flexmodel.supports.jackson.FlexModelModule;
+import tech.wetech.flexmodel.supports.jackson.FlexModelCoreModule;
 
 import java.io.IOException;
+import java.util.ServiceLoader;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_BEANS;
 
@@ -33,7 +35,8 @@ public class JsonUtils {
     builder.disable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
     builder.disable(FAIL_ON_EMPTY_BEANS);
     builder.addModule(new JavaTimeModule());
-    builder.addModule(new FlexModelModule());
+    builder.addModule(new FlexModelCoreModule());
+    ServiceLoader.load(Module.class).forEach(builder::addModule);
     this.jsonMapper = builder.build();
   }
 

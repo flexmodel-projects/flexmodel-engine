@@ -36,7 +36,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
     record.forEach((key, value) -> {
       if (value != null) {
         if (entity.getField(key) instanceof RelationField relationField) {
-          Entity targetEntity = mappedModels.getEntity(schemaName, relationField.getTargetEntity());
+          Entity targetEntity = (Entity) mappedModels.getModel(schemaName, relationField.getTargetEntity());
           if (relationField.getCardinality() == ONE_TO_ONE && value instanceof Map data) {
             Map<String, Object> associationRecord = new HashMap<>(data);
             associationRecord.put(relationField.getTargetField(), id);

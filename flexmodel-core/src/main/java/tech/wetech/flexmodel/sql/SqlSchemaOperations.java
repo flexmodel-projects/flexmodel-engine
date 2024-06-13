@@ -145,9 +145,9 @@ public class SqlSchemaOperations implements SchemaOperations {
   }
 
   private void createForeignKey(RelationField relationField) {
-    SqlTable sqlTable = toSqlTable(sqlContext.getMappedModels().getEntity(sqlContext.getSchemaName(), relationField.getModelName()));
-    SqlTable referenceTable = toSqlTable(sqlContext.getMappedModels()
-      .getEntity(sqlContext.getSchemaName(), relationField.getTargetEntity()));
+    SqlTable sqlTable = toSqlTable((Entity) sqlContext.getMappedModels().getModel(sqlContext.getSchemaName(), relationField.getModelName()));
+    SqlTable referenceTable = toSqlTable((Entity) sqlContext.getMappedModels()
+      .getModel(sqlContext.getSchemaName(), relationField.getTargetEntity()));
     SqlColumn keyColumn = referenceTable.getColumn(relationField.getTargetField());
     if (keyColumn == null) {
       throw new RuntimeException("Foreign key [" + relationField.getTargetField() + "] not exists in [" + relationField.getTargetEntity() + "]");

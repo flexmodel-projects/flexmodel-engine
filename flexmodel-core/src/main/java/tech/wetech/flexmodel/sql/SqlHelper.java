@@ -77,7 +77,7 @@ class SqlHelper {
           localField = entity.getIdField().getName();
           foreignField = relationField.getTargetField();
           if (relationField.getCardinality() == MANY_TO_MANY) {
-            Entity targetEntity = sqlContext.getMappedModels().getEntity(sqlContext.getSchemaName(), relationField.getTargetEntity());
+            Entity targetEntity = (Entity) sqlContext.getMappedModels().getModel(sqlContext.getSchemaName(), relationField.getTargetEntity());
             JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, relationField);
             joinCause.append(toPhysicalTableNameQuoteString(sqlContext, joinGraphNode.getJoinName()))
               .append(" \n on \n")

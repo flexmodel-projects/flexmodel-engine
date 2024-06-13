@@ -49,7 +49,7 @@ class MongoHelper {
             && (relationField = entity.findRelationByEntityName(join.getFrom()).orElse(null)) != null
             && relationField.getCardinality() == MANY_TO_MANY
         ) {
-          Entity targetEntity = mongoContext.getMappedModels().getEntity(mongoContext.getSchemaName(), relationField.getTargetEntity());
+          Entity targetEntity = (Entity) mongoContext.getMappedModels().getModel(mongoContext.getSchemaName(), relationField.getTargetEntity());
           JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, relationField);
           Document exchangeLookup = new Document();
           exchangeLookup.put("from", joinGraphNode.getJoinName());

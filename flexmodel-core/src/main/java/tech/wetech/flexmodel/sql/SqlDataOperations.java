@@ -46,7 +46,7 @@ public class SqlDataOperations implements DataOperations {
   public int insert(String modelName, Map<String, Object> record, Consumer<Object> id) {
 
     String sql = getInsertSqlString(modelName, record);
-    Entity entity = mappedModels.getEntity(schemaName, modelName);
+    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     IDField idField = entity.getIdField();
     if (record.containsKey(idField.getName())) {
       id.accept(record.get(idField.getName()));
@@ -77,7 +77,7 @@ public class SqlDataOperations implements DataOperations {
   @Override
   public int updateById(String modelName, Map<String, Object> record, Object id) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-    Entity entity = mappedModels.getEntity(schemaName, modelName);
+    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     TypedField<?, ?> idField = entity.getIdField();
 
     StringBuilder sql = new StringBuilder("update ")
@@ -104,7 +104,7 @@ public class SqlDataOperations implements DataOperations {
   @Override
   public int update(String modelName, Map<String, Object> record, String filter) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-    Entity entity = mappedModels.getEntity(schemaName, modelName);
+    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     TypedField<?, ?> idField = entity.getIdField();
     SqlClauseResult sqlResult = getSqlCauseResult(filter);
 
@@ -128,7 +128,7 @@ public class SqlDataOperations implements DataOperations {
   @Override
   public <T> T findById(String modelName, Object id, Class<T> resultType) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-    Entity entity = mappedModels.getEntity(schemaName, modelName);
+    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     TypedField<?, ?> idField = entity.getIdField();
     String columnsString = entity.getFields().stream()
       .map(field -> sqlDialect.quoteIdentifier(field.getName()))
@@ -165,7 +165,7 @@ public class SqlDataOperations implements DataOperations {
   @Override
   public int deleteById(String modelName, Object id) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-    Entity entity = mappedModels.getEntity(schemaName, modelName);
+    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     TypedField<?, ?> idField = entity.getIdField();
     String sql = "delete from " +
                  physicalTableName +

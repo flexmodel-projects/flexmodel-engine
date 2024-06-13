@@ -32,7 +32,7 @@ public class ValidatorFacade {
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   private void validate(String modelName, Map<String, Object> data, boolean validAll) {
-    Entity entity = mappedModels.getEntity(schemaName, modelName);
+    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     List<TypedField<?, ?>> fields = entity.getFields();
     List<ConstraintValidException> errors = new ArrayList<>();
     for (TypedField<?, ?> field : fields) {

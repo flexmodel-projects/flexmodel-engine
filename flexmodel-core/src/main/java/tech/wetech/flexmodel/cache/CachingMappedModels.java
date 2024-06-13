@@ -1,7 +1,6 @@
 package tech.wetech.flexmodel.cache;
 
 import tech.wetech.flexmodel.AbstractSessionContext;
-import tech.wetech.flexmodel.Entity;
 import tech.wetech.flexmodel.MappedModels;
 import tech.wetech.flexmodel.Model;
 
@@ -32,6 +31,12 @@ public class CachingMappedModels implements MappedModels {
   }
 
   @Override
+  public void removeAll(String schemaName) {
+    cache.invalidateAll();
+    delegate.removeAll(schemaName);
+  }
+
+  @Override
   public void remove(String schemaName, String modelName) {
     cache.invalidate(schemaName + ":" + modelName);
     delegate.remove(schemaName, modelName);
@@ -46,11 +51,6 @@ public class CachingMappedModels implements MappedModels {
   @Override
   public Model getModel(String schemaName, String modelName) {
     return (Model) cache.retrieve(schemaName + ":" + modelName, () -> delegate.getModel(schemaName, modelName));
-  }
-
-  @Override
-  public Entity getEntity(String schemaName, String modelName) {
-    return delegate.getEntity(schemaName, modelName);
   }
 
 }

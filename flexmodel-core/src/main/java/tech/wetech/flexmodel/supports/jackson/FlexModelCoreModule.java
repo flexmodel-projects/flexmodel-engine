@@ -9,9 +9,9 @@ import tech.wetech.flexmodel.validator.*;
 /**
  * @author cjbi
  */
-public class FlexModelModule extends SimpleModule {
+public class FlexModelCoreModule extends SimpleModule {
 
-  public FlexModelModule() {
+  public FlexModelCoreModule() {
     // Model
     setMixInAnnotation(Model.class, ModelMixIn.class);
     setMixInAnnotation(Entity.class, ModelMixIn.class);

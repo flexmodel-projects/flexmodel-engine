@@ -24,7 +24,7 @@ public class DataValueGeneratorFacade {
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   public Map<String, Object> generateValue(String modelName, Map<String, Object> data, boolean isUpdate) throws ValueGenerationException {
-    Entity entity = mappedModels.getEntity(schemaName, modelName);
+    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     List<TypedField<?, ?>> fields = entity.getFields();
     Map<String, Object> newData = new HashMap<>();
     // 类型转换

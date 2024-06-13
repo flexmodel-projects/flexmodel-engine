@@ -49,7 +49,7 @@ public class MongoDataOperations implements DataOperations {
 
   @Override
   public int insert(String modelName, Map<String, Object> record, Consumer<Object> idConsumer) {
-    Entity entity = mappedModels.getEntity(schemaName, modelName);
+    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     IDField idField = entity.getIdField();
     if (!record.containsKey(idField.getName()) && idField.getGeneratedValue() == AUTO_INCREMENT) {
       setId(modelName, record);
@@ -78,7 +78,7 @@ public class MongoDataOperations implements DataOperations {
   @Override
   public int updateById(String modelName, Map<String, Object> record, Object id) {
     String collectionName = getCollectionName(modelName);
-    Entity entity = mappedModels.getEntity(schemaName, modelName);
+    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     TypedField<?, ?> idField = entity.getIdField();
     UpdateResult result = mongoDatabase.getCollection(collectionName, Map.class).updateOne(Filters.eq(idField.getName(), id), new Document("$set", new Document(record)));
     return (int) result.getModifiedCount();
@@ -96,7 +96,7 @@ public class MongoDataOperations implements DataOperations {
   @Override
   public int deleteById(String modelName, Object id) {
     String collectionName = getCollectionName(modelName);
-    Entity entity = mappedModels.getEntity(schemaName, modelName);
+    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     TypedField<?, ?> idField = entity.getIdField();
     return (int) mongoDatabase.getCollection(collectionName)
       .deleteMany(Filters.eq(idField.getName(), id)).getDeletedCount();
@@ -121,7 +121,7 @@ public class MongoDataOperations implements DataOperations {
   @Override
   public <T> T findById(String modelName, Object id, Class<T> resultType) {
     String collectionName = getCollectionName(modelName);
-    Entity entity = mappedModels.getEntity(schemaName, modelName);
+    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     TypedField<?, ?> idField = entity.getIdField();
 
     return mongoDatabase.getCollection(collectionName, resultType)

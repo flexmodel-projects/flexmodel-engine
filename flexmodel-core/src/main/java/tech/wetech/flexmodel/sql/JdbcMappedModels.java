@@ -353,13 +353,25 @@ public class JdbcMappedModels implements MappedModels {
             result.add(JsonUtils.getInstance().parseToObject(Arrays.toString(blob.getBinaryStream().readAllBytes()), Model.class));
           case byte[] bytes -> result.add(JsonUtils.getInstance().parseToObject(Arrays.toString(bytes), Model.class));
           case null, default -> {
-              assert content != null;
-              throw new RuntimeException("get model error, unknown data type:" + content.getClass());
+            assert content != null;
+            throw new RuntimeException("get model error, unknown data type:" + content.getClass());
           }
         }
 
       }
       return result;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public void removeAll(String schemaName) {
+    try (Connection connection = dataSource.getConnection()) {
+      NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
+      String sqlDeleteString = "delete from " + sqlDialect.quoteIdentifier(STORED_TABLES) +
+                               " \nwhere " + sqlDialect.quoteIdentifier("schema_name") + "=:schemaName and ";
+      sqlExecutor.update(sqlDeleteString, Map.of("schemaName", schemaName));
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
