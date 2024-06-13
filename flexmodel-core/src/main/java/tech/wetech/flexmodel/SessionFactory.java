@@ -56,7 +56,6 @@ public class SessionFactory {
 
   public void removeDataSourceProvider(String identifier) {
     dataSourceProviderMap.remove(identifier);
-    mappedModels.removeAll(identifier);
   }
 
   public <T> void subscribeEvent(Class<T> subscribedToEventType, Consumer<T> event) {

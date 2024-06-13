@@ -139,8 +139,8 @@ public class SqlDataOperations implements DataOperations {
                  " from " +
                  physicalTableName +
                  " " +
-                 " where (" + sqlDialect.quoteIdentifier("id") + "= :id)";
-    Map<String, Object> dataMap = sqlExecutor.queryForObject(sql, Map.of(idField.getName(), id), getSqlResultHandler(entity, null, Map.class));
+                 " where (" + sqlDialect.quoteIdentifier(idField.getName()) + "= :id)";
+    Map<String, Object> dataMap = sqlExecutor.queryForObject(sql, Map.of("id", id), getSqlResultHandler(entity, null, Map.class));
     return JsonUtils.getInstance().convertValue(dataMap, resultType);
   }
 
