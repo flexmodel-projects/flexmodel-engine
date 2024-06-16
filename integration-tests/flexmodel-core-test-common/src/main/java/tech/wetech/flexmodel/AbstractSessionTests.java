@@ -973,8 +973,11 @@ public abstract class AbstractSessionTests {
     createClassesData(classesEntityName);
     createStudentData(studentEntityName);
     createTeacherData(teacherEntityName);
+    Assertions.assertEquals(4, ((Entity) session.getModel(classesEntityName)).getFields().size());
     session.modifyField(new StringField("classCode").setModelName(classesEntityName).setLength(100));
+    Assertions.assertEquals(4, ((Entity) session.getModel(classesEntityName)).getFields().size());
     session.modifyField(new TextField("className").setModelName(classesEntityName));
+    Assertions.assertEquals(4, ((Entity) session.getModel(classesEntityName)).getFields().size());
   }
 
   @Test

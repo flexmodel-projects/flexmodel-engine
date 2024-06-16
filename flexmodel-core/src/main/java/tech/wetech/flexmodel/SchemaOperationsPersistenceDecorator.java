@@ -62,7 +62,7 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
     String schemaName = sessionContext.getSchemaName();
     delegate.modifyField(field);
     Entity entity = (Entity) mappedModels.getModel(schemaName, field.getModelName());
-    entity.removeField(entity.getName());
+    entity.removeField(field.getName());
     entity.addField(field);
     mappedModels.persist(schemaName, entity);
     return field;
