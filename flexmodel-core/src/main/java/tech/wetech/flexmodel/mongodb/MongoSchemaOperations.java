@@ -100,6 +100,12 @@ public class MongoSchemaOperations implements SchemaOperations {
   }
 
   @Override
+  public TypedField<?, ?> modifyField(TypedField<?, ?> field) {
+    // mongodb无需修改schema
+    return field;
+  }
+
+  @Override
   public void dropField(String entityName, String fieldName) {
     // ignored
   }

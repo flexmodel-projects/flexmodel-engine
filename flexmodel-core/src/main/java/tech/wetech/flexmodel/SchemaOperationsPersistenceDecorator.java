@@ -57,6 +57,18 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   }
 
   @Override
+  public TypedField<?, ?> modifyField(TypedField<?, ?> field) {
+    MappedModels mappedModels = sessionContext.getMappedModels();
+    String schemaName = sessionContext.getSchemaName();
+    delegate.modifyField(field);
+    Entity entity = (Entity) mappedModels.getModel(schemaName, field.getModelName());
+    entity.removeField(entity.getName());
+    entity.addField(field);
+    mappedModels.persist(schemaName, entity);
+    return field;
+  }
+
+  @Override
   public TypedField<?, ?> createField(TypedField<?, ?> field) {
     MappedModels mappedModels = sessionContext.getMappedModels();
     String schemaName = sessionContext.getSchemaName();

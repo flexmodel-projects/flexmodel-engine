@@ -90,6 +90,11 @@ public class DB2SqlDialect extends SqlDialect {
   }
 
   @Override
+  public String getModifyColumnString() {
+    return "alter column";
+  }
+
+  @Override
   public boolean supportsGroupByColumnAlias() {
     return false;
   }

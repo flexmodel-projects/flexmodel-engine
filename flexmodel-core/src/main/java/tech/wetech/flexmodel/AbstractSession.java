@@ -71,6 +71,11 @@ public abstract class AbstractSession implements Session {
   }
 
   @Override
+  public TypedField<?, ?> modifyField(TypedField<?, ?> field) {
+    return schemaOperationsDelegate.modifyField(field);
+  }
+
+  @Override
   public TypedField<?, ?> createField(TypedField<?, ?> field) {
     return schemaOperationsDelegate.createField(field);
   }

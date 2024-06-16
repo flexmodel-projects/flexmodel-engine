@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel.sql;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.graph.JoinGraphNode;
 
@@ -15,6 +17,8 @@ import static tech.wetech.flexmodel.RelationField.Cardinality.ONE_TO_ONE;
 public class SqlSchemaOperations implements SchemaOperations {
 
   private final SqlContext sqlContext;
+
+  private final Logger log = LoggerFactory.getLogger(SqlSchemaOperations.class);
 
   public SqlSchemaOperations(SqlContext sqlContext) {
     this.sqlContext = sqlContext;
@@ -133,6 +137,51 @@ public class SqlSchemaOperations implements SchemaOperations {
     return field;
   }
 
+  @Override
+  public TypedField<?, ?> modifyField(TypedField<?, ?> field) {
+    try {
+      if (field instanceof RelationField relationField) {
+        if (relationField.getCardinality() == MANY_TO_MANY) {
+          Entity entity = (Entity) getModel(field.getModelName());
+          Entity targetEntity = (Entity) getModel(relationField.getTargetEntity());
+          JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, relationField);
+
+          SqlTable joinTable = new SqlTable();
+          joinTable.setName(joinGraphNode.getJoinName());
+          SqlColumn joinColumn = new SqlColumn();
+          joinColumn.setTableName(joinGraphNode.getJoinName());
+          joinColumn.setName(joinGraphNode.getJoinFieldName());
+          joinColumn.setSqlTypeCode(sqlContext.getTypeHandler(joinGraphNode.getJoinFieldType()).getJdbcTypeCode());
+          joinTable.addColumn(joinColumn);
+          SqlColumn inverseJoinColumn = new SqlColumn();
+          inverseJoinColumn.setTableName(joinGraphNode.getJoinName());
+          inverseJoinColumn.setName(joinGraphNode.getInverseJoinFieldName());
+          inverseJoinColumn.setSqlTypeCode(sqlContext.getTypeHandler(joinGraphNode.getInverseJoinFieldType()).getJdbcTypeCode());
+          joinTable.addColumn(inverseJoinColumn);
+
+          SqlTable sqlTable = toSqlTable(entity);
+          SqlTable targetSqlTable = toSqlTable(targetEntity);
+
+          joinTable.createForeignKey(List.of(joinColumn), sqlTable, List.of(sqlTable.getColumn(entity.getIdField().getName())));
+          joinTable.createForeignKey(List.of(inverseJoinColumn), targetSqlTable, List.of(targetSqlTable.getColumn(relationField.getTargetField())));
+          try {
+            createTable(joinTable);
+          } catch (Exception e) {
+            log.warn("modify relation field occurred exception： {}", e.getMessage());
+          }
+
+        } else {
+          createForeignKey(relationField);
+        }
+      } else {
+        modifyColumn(toSqlColumn(field));
+      }
+    } catch (Exception e) {
+      log.error("modify field occurred exception： {}", e.getMessage(), e);
+    }
+    return field;
+  }
+
   private void createForeignKey(SqlTable sqlTable) {
     Iterator<SqlForeignKey> fkIte = sqlTable.getForeignKeyIterator();
     while (fkIte.hasNext()) {
@@ -165,6 +214,17 @@ public class SqlSchemaOperations implements SchemaOperations {
     String[] sqlCreateString = sqlContext.getSqlDialect().getForeignKeyExporter().getSqlCreateString(foreignKey);
     for (String sql : sqlCreateString) {
       sqlContext.getJdbcOperations().update(sql);
+    }
+  }
+
+  private void modifyColumn(SqlColumn sqlColumn) {
+    String sqlAlterModifyColumnString = sqlContext.getSqlDialect().getSqlAlterTableModifyColumnString(sqlColumn);
+    sqlContext.getJdbcOperations().update(sqlAlterModifyColumnString);
+    SqlTable sqlTable = new SqlTable();
+    sqlTable.setName(sqlColumn.getTableName());
+    if (sqlColumn.isUnique()) {
+      sqlTable.createUniqueKey(List.of(sqlColumn));
+      createUniqueKeys(sqlTable);
     }
   }
 

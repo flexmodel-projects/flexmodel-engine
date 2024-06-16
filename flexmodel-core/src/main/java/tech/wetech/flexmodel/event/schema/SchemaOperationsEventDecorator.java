@@ -69,6 +69,15 @@ public class SchemaOperationsEventDecorator implements SchemaOperations {
   }
 
   @Override
+  public TypedField<?, ?> modifyField(TypedField<?, ?> field) {
+    Entity entity = (Entity) sessionContext.getModel(field.getModelName());
+    sessionContext.publishEvent(new PreModifyFieldEvent(sessionContext.getSchemaName(), entity, field));
+    TypedField<?, ?> result = delegate.modifyField(field);
+    sessionContext.publishEvent(new PostModifyFieldEvent(sessionContext.getSchemaName(), entity, field));
+    return result;
+  }
+
+  @Override
   public void dropField(String entityName, String fieldName) {
     Entity entity = (Entity) sessionContext.getModel(entityName);
     TypedField<?, ?> field = entity.getField(fieldName);

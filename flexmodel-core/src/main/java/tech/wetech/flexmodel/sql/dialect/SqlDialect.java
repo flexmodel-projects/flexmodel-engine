@@ -482,4 +482,49 @@ public abstract class SqlDialect {
            jdbcType == Types.NUMERIC || jdbcType == Types.DECIMAL;
   }
 
+  public String getModifyColumnString() {
+    return "modify";
+  }
+
+  public String getSqlAlterTableModifyColumnString(SqlColumn sqlColumn) {
+    StringBuilder alter = new StringBuilder()
+      .append(this.getAlterTableString(this.quoteIdentifier(sqlColumn.getTableName())))
+      .append(' ')
+      .append(this.getModifyColumnString())
+      .append(' ')
+      .append(this.quoteIdentifier(sqlColumn.getName()))
+      .append(' ')
+      .append(this.getTypeName(sqlColumn.getSqlTypeCode(), sqlColumn.getLength(), sqlColumn.getPrecision(), sqlColumn.getScale()));
+
+    String defaultValue = this.getDefaultValueString(sqlColumn.getSqlTypeCode(), sqlColumn.getDefaultValue());
+    if (this.supportsNotNullWithoutDefaultValue()) {
+      if (defaultValue != null) {
+        alter.append(" default ").append(defaultValue);
+      }
+      if (sqlColumn.isNullable()) {
+        alter.append(this.getNullColumnString());
+      } else {
+        alter.append(" not null");
+      }
+    } else {
+      if (defaultValue != null) {
+        alter.append(" default ").append(defaultValue);
+        if (sqlColumn.isNullable()) {
+          alter.append(this.getNullColumnString());
+        } else {
+          alter.append(" not null");
+        }
+      }
+    }
+
+    String columnComment = sqlColumn.getComment();
+    if (columnComment != null) {
+      alter.append(this.getColumnComment(columnComment));
+    }
+
+    alter.append(this.getAddColumnSuffixString());
+
+    return alter.toString();
+  }
+
 }

@@ -225,4 +225,9 @@ public class SQLServerSqlDialect extends SqlDialect {
     return false;
   }
 
+    @Override
+    public String getModifyColumnString() {
+        return "alter column";
+    }
+
 }

@@ -105,4 +105,9 @@ public class PostgreSQLSqlDialect extends SqlDialect {
     return bool + "";
   }
 
+    @Override
+    public String getModifyColumnString() {
+        return "alter column";
+    }
+
 }

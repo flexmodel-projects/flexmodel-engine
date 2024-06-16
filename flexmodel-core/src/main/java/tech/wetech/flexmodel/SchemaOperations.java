@@ -54,6 +54,8 @@ public interface SchemaOperations {
    */
   TypedField<?, ?> createField(TypedField<?, ?> field);
 
+  TypedField<?, ?> modifyField(TypedField<?, ?> field);
+
   /**
    * 删除字段
    *
@@ -73,7 +75,7 @@ public interface SchemaOperations {
    * 删除索引
    *
    * @param entityName 模型名称
-   * @param indexName 索引名称
+   * @param indexName  索引名称
    */
   void dropIndex(String entityName, String indexName);
 

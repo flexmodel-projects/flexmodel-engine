@@ -957,6 +957,27 @@ public abstract class AbstractSessionTests {
   }
 
   @Test
+  void testModifyField() {
+    String classesEntityName = "TestModifyFieldClasses";
+    String studentEntityName = "TestModifyFieldStudent";
+    String studentDetailEntityName = "TestModifyFieldStudentDetail";
+    String courseEntityName = "TestModifyFieldCourse";
+    String teacherEntityName = "TestModifyFieldTeacher";
+    createClassesEntity(classesEntityName);
+    createStudentEntity(studentEntityName);
+    createStudentDetailEntity(studentDetailEntityName);
+    createCourseEntity(courseEntityName);
+    createTeacherEntity(teacherEntityName);
+    createAssociations(classesEntityName, studentEntityName, studentDetailEntityName, courseEntityName, teacherEntityName);
+    createCourseData(courseEntityName);
+    createClassesData(classesEntityName);
+    createStudentData(studentEntityName);
+    createTeacherData(teacherEntityName);
+    session.modifyField(new StringField("classCode").setModelName(classesEntityName).setLength(100));
+    session.modifyField(new TextField("className").setModelName(classesEntityName));
+  }
+
+  @Test
   void testCreateField() {
     String entityName = "testCreateField_students";
     createStudentEntity2(entityName);
