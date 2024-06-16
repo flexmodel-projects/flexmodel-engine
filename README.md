@@ -489,7 +489,7 @@ flexmodel内置了大量事件来监控行为，方便支持扩展，以下为�
 
 ```java
 // 插入记录前
-sessionFactory.subscribeEvent(PostInsertRecordEvent.class, event -> {
+sessionFactory.subscribeEvent(PreInsertRecordEvent.class, event -> {
   // do somethings
 });
 
