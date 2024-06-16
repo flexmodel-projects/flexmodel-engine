@@ -267,6 +267,7 @@ public class SqlSchemaOperations implements SchemaOperations {
     sqlTable.setComment(entity.getComment());
     SqlPrimaryKey primaryKey = new SqlPrimaryKey(sqlTable);
     for (TypedField<?, ?> field : entity.getFields()) {
+      field.setModelName(entity.getName());
       if (field instanceof RelationField) {
         continue;
       }
@@ -283,6 +284,7 @@ public class SqlSchemaOperations implements SchemaOperations {
       sqlTable.setPrimaryKey(primaryKey);
     }
     for (Index index : entity.getIndexes()) {
+      index.setModelName(entity.getName());
       sqlTable.addIndex(toSqlIndex(index));
     }
     return sqlTable;

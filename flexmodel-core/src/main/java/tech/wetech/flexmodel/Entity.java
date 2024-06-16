@@ -89,6 +89,7 @@ public class Entity implements Model {
   }
 
   public Entity addIndex(Index index) {
+    index.setModelName(name);
     indexes.add(index);
     return this;
   }
