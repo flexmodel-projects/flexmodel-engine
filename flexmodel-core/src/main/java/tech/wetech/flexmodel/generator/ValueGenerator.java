@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * 值计算器
+ * 值生成器
  *
  * @author cjbi
  */
