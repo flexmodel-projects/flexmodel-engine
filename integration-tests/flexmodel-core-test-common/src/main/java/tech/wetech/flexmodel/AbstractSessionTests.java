@@ -1142,4 +1142,9 @@ public abstract class AbstractSessionTests {
 
   }
 
+  @Test
+  void testLoadScript() {
+    sessionFactory.loadScript("system", "import2.sql");
+  }
+
 }

@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * @author cjbi
@@ -32,35 +33,34 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
 
   @Override
   public void dropModel(String modelName) {
-    MappedModels mappedModels = sessionContext.getMappedModels();
+    inspect(() -> delegate.dropModel(modelName));
     String schemaName = sessionContext.getSchemaName();
-    delegate.dropModel(modelName);
-    mappedModels.remove(schemaName, modelName);
+    sessionContext.getMappedModels().remove(schemaName, modelName);
   }
 
   @Override
   public Entity createEntity(Entity entity) {
-    MappedModels mappedModels = sessionContext.getMappedModels();
+    inspect(() -> delegate.createEntity(entity));
     String schemaName = sessionContext.getSchemaName();
-    mappedModels.persist(schemaName, delegate.createEntity(entity));
+    sessionContext.getMappedModels().persist(schemaName, entity);
     return entity;
   }
 
   @Override
   public View createView(String viewName, String viewOn, Query query) {
+    View view = inspect(() -> delegate.createView(viewName, viewOn, query), null);
     MappedModels mappedModels = sessionContext.getMappedModels();
     String schemaName = sessionContext.getSchemaName();
     QueryHelper.validate(schemaName, viewOn, mappedModels, query);
-    View view = delegate.createView(viewName, viewOn, query);
     mappedModels.persist(schemaName, view);
     return view;
   }
 
   @Override
   public TypedField<?, ?> modifyField(TypedField<?, ?> field) {
+    inspect(() -> delegate.modifyField(field));
     MappedModels mappedModels = sessionContext.getMappedModels();
     String schemaName = sessionContext.getSchemaName();
-    delegate.modifyField(field);
     Entity entity = (Entity) mappedModels.getModel(schemaName, field.getModelName());
     entity.removeField(field.getName());
     entity.addField(field);
@@ -70,9 +70,9 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
 
   @Override
   public TypedField<?, ?> createField(TypedField<?, ?> field) {
-    MappedModels mappedModels = sessionContext.getMappedModels();
+    inspect(() -> delegate.createField(field));
     String schemaName = sessionContext.getSchemaName();
-    delegate.createField(field);
+    MappedModels mappedModels = sessionContext.getMappedModels();
     Entity entity = (Entity) mappedModels.getModel(schemaName, field.getModelName());
     entity.addField(field);
     mappedModels.persist(schemaName, entity);
@@ -81,9 +81,9 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
 
   @Override
   public void dropField(String entityName, String fieldName) {
-    MappedModels mappedModels = sessionContext.getMappedModels();
     String schemaName = sessionContext.getSchemaName();
-    delegate.dropField(entityName, fieldName);
+    inspect(() -> delegate.dropField(entityName, fieldName));
+    MappedModels mappedModels = sessionContext.getMappedModels();
     Entity entity = (Entity) mappedModels.getModel(schemaName, entityName);
     entity.removeField(fieldName);
     for (Index index : entity.getIndexes()) {
@@ -95,9 +95,9 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
 
   @Override
   public Index createIndex(Index index) {
-    MappedModels mappedModels = sessionContext.getMappedModels();
+    inspect(() -> delegate.createIndex(index));
     String schemaName = sessionContext.getSchemaName();
-    delegate.createIndex(index);
+    MappedModels mappedModels = sessionContext.getMappedModels();
     Entity entity = (Entity) mappedModels.getModel(schemaName, index.getModelName());
     entity.addIndex(index);
     mappedModels.persist(schemaName, entity);
@@ -106,9 +106,9 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
 
   @Override
   public void dropIndex(String modelName, String indexName) {
-    MappedModels mappedModels = sessionContext.getMappedModels();
+    inspect(() -> delegate.dropIndex(modelName, indexName));
     String schemaName = sessionContext.getSchemaName();
-    delegate.dropIndex(modelName, indexName);
+    MappedModels mappedModels = sessionContext.getMappedModels();
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     entity.removeIndex(indexName);
     mappedModels.persist(schemaName, entity);
@@ -127,6 +127,32 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   @Override
   public long getSequenceNextVal(String sequenceName) {
     return delegate.getSequenceNextVal(sequenceName);
+  }
+
+  private <T> T inspect(Supplier<T> supplier, T orElse) {
+    try {
+      return supplier.get();
+    } catch (Exception e) {
+      if (!sessionContext.isFailSafe()) {
+        throw e;
+      }
+      return orElse;
+    }
+  }
+
+  @FunctionalInterface
+  interface NoArg {
+    void exec();
+  }
+
+  private void inspect(NoArg noArg) {
+    try {
+      noArg.exec();
+    } catch (Exception e) {
+      if (!sessionContext.isFailSafe()) {
+        throw e;
+      }
+    }
   }
 
 }

@@ -17,6 +17,7 @@ public abstract class AbstractSessionContext {
   protected final Logger log = LoggerFactory.getLogger(SqlContext.class);
   private final MappedModels mappedModels;
   protected PhysicalNamingStrategy physicalNamingStrategy = new DefaultPhysicalNamingStrategy();
+  private boolean failSafe = false;
 
   protected AbstractSessionContext(String schemaName, MappedModels mappedModels) {
     this.schemaName = schemaName;
@@ -49,4 +50,11 @@ public abstract class AbstractSessionContext {
     DomainEventPublisher.instance().publish(aDomainEvent);
   }
 
+  public boolean isFailSafe() {
+    return failSafe;
+  }
+
+  public void setFailSafe(boolean failSafe) {
+    this.failSafe = failSafe;
+  }
 }

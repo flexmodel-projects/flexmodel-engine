@@ -1,0 +1,324 @@
+{
+  "schema": [
+    {
+      "name": "Datasource",
+      "type": "entity",
+      "fields": [
+        {
+          "name": "name",
+          "type": "id",
+          "unique": false,
+          "nullable": true,
+          "modelName": "Datasource",
+          "validators": [],
+          "generatedValue": "STRING_NOT_GENERATED"
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "length": 255,
+          "unique": false,
+          "nullable": true,
+          "modelName": "Datasource",
+          "validators": []
+        },
+        {
+          "name": "config",
+          "type": "json",
+          "unique": false,
+          "nullable": true,
+          "modelName": "Datasource",
+          "validators": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "unique": false,
+          "nullable": true,
+          "generator": {
+            "type": "DatetimeNowValueGenerator",
+            "generationTime": "INSERT"
+          },
+          "modelName": "Datasource",
+          "validators": []
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "unique": false,
+          "nullable": true,
+          "generator": {
+            "type": "DatetimeNowValueGenerator",
+            "generationTime": "ALWAYS"
+          },
+          "modelName": "Datasource",
+          "validators": []
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "name": "ApiInfo",
+      "type": "entity",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "unique": false,
+          "nullable": true,
+          "generator": {
+            "type": "ULIDValueGenerator",
+            "generationTime": "INSERT"
+          },
+          "modelName": "ApiInfo",
+          "validators": [],
+          "generatedValue": "ULID"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "length": 255,
+          "unique": false,
+          "nullable": false,
+          "modelName": "ApiInfo",
+          "validators": [
+            {
+              "type": "NotNullValidator",
+              "message": "must not be null"
+            }
+          ]
+        },
+        {
+          "name": "parentId",
+          "type": "string",
+          "length": 255,
+          "unique": false,
+          "nullable": true,
+          "modelName": "ApiInfo",
+          "validators": []
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "length": 255,
+          "unique": false,
+          "nullable": false,
+          "generator": {
+            "type": "FixedValueGenerator",
+            "value": "FOLDER",
+            "generationTime": "ALWAYS"
+          },
+          "modelName": "ApiInfo",
+          "validators": [
+            {
+              "type": "NotNullValidator",
+              "message": "must not be null"
+            }
+          ],
+          "defaultValue": "FOLDER"
+        },
+        {
+          "name": "method",
+          "type": "string",
+          "length": 255,
+          "unique": false,
+          "nullable": true,
+          "modelName": "ApiInfo",
+          "validators": []
+        },
+        {
+          "name": "path",
+          "type": "string",
+          "length": 255,
+          "unique": false,
+          "nullable": true,
+          "modelName": "ApiInfo",
+          "validators": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "unique": false,
+          "nullable": false,
+          "generator": {
+            "type": "DatetimeNowValueGenerator",
+            "generationTime": "INSERT"
+          },
+          "modelName": "ApiInfo",
+          "validators": [
+            {
+              "type": "NotNullValidator",
+              "message": "must not be null"
+            }
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "unique": false,
+          "nullable": false,
+          "generator": {
+            "type": "DatetimeNowValueGenerator",
+            "generationTime": "ALWAYS"
+          },
+          "modelName": "ApiInfo",
+          "validators": [
+            {
+              "type": "NotNullValidator",
+              "message": "must not be null"
+            }
+          ]
+        },
+        {
+          "name": "meta",
+          "type": "json",
+          "unique": false,
+          "nullable": true,
+          "modelName": "ApiInfo",
+          "validators": []
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "name": "ApiLog",
+      "type": "entity",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "unique": false,
+          "nullable": true,
+          "generator": {
+            "type": "ULIDValueGenerator",
+            "generationTime": "INSERT"
+          },
+          "modelName": "ApiLog",
+          "validators": [],
+          "generatedValue": "ULID"
+        },
+        {
+          "name": "level",
+          "type": "string",
+          "length": 255,
+          "unique": false,
+          "nullable": false,
+          "modelName": "ApiLog",
+          "validators": [
+            {
+              "type": "NotNullValidator",
+              "message": "must not be null"
+            }
+          ]
+        },
+        {
+          "name": "uri",
+          "type": "text",
+          "unique": false,
+          "nullable": false,
+          "modelName": "ApiLog",
+          "validators": [
+            {
+              "type": "NotNullValidator",
+              "message": "must not be null"
+            }
+          ]
+        },
+        {
+          "name": "data",
+          "type": "json",
+          "unique": false,
+          "nullable": false,
+          "modelName": "ApiLog",
+          "validators": [
+            {
+              "type": "NotNullValidator",
+              "message": "must not be null"
+            }
+          ]
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "unique": false,
+          "nullable": false,
+          "generator": {
+            "type": "DatetimeNowValueGenerator",
+            "generationTime": "INSERT"
+          },
+          "modelName": "ApiLog",
+          "validators": [
+            {
+              "type": "NotNullValidator",
+              "message": "must not be null"
+            }
+          ]
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "name": "IdentityProvider",
+      "type": "entity",
+      "fields": [
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "unique": false,
+          "nullable": false,
+          "generator": {
+            "type": "DatetimeNowValueGenerator",
+            "generationTime": "INSERT"
+          },
+          "modelName": "IdentityProvider",
+          "validators": [
+            {
+              "type": "NotNullValidator",
+              "message": "must not be null"
+            }
+          ]
+        },
+        {
+          "name": "provider",
+          "type": "json",
+          "unique": false,
+          "nullable": true,
+          "modelName": "IdentityProvider",
+          "validators": [
+            {
+              "type": "NotNullValidator",
+              "message": "must not be null"
+            }
+          ]
+        },
+        {
+          "name": "name",
+          "type": "id",
+          "unique": false,
+          "nullable": true,
+          "modelName": "Datasource",
+          "validators": [],
+          "generatedValue": "STRING_NOT_GENERATED"
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "unique": false,
+          "nullable": false,
+          "generator": {
+            "type": "DatetimeNowValueGenerator",
+            "generationTime": "ALWAYS"
+          },
+          "modelName": "IdentityProvider",
+          "validators": [
+            {
+              "type": "NotNullValidator",
+              "message": "must not be null"
+            }
+          ]
+        }
+      ],
+      "indexes": []
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "schema": [
+    {
+      "name": "DatasourceSimple",
+      "type": "entity",
+      "fields": [
+        {
+          "name": "name",
+          "type": "id",
+          "unique": false,
+          "nullable": true,
+          "modelName": "Datasource",
+          "validators": [],
+          "generatedValue": "STRING_NOT_GENERATED"
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "length": 255,
+          "unique": false,
+          "nullable": true,
+          "modelName": "Datasource",
+          "validators": []
+        },
+        {
+          "name": "config",
+          "type": "json",
+          "unique": false,
+          "nullable": true,
+          "modelName": "Datasource",
+          "validators": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "unique": false,
+          "nullable": true,
+          "generator": {
+            "type": "DatetimeNowValueGenerator",
+            "generationTime": "INSERT"
+          },
+          "modelName": "Datasource",
+          "validators": []
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "unique": false,
+          "nullable": true,
+          "generator": {
+            "type": "DatetimeNowValueGenerator",
+            "generationTime": "ALWAYS"
+          },
+          "modelName": "Datasource",
+          "validators": []
+        }
+      ],
+      "indexes": []
+    }
+  ]
+}
