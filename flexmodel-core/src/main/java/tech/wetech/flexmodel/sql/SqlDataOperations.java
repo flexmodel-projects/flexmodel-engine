@@ -47,7 +47,7 @@ public class SqlDataOperations implements DataOperations {
 
     String sql = getInsertSqlString(modelName, record);
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
-    IDField idField = entity.getIdField();
+    IDField idField = entity.findIdField().orElseThrow();
     if (record.containsKey(idField.getName())) {
       id.accept(record.get(idField.getName()));
       return sqlExecutor.update(sql, record);
@@ -78,7 +78,7 @@ public class SqlDataOperations implements DataOperations {
   public int updateById(String modelName, Map<String, Object> record, Object id) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
-    TypedField<?, ?> idField = entity.getIdField();
+    TypedField<?, ?> idField = entity.findIdField().orElseThrow();
 
     StringBuilder sql = new StringBuilder("update ")
       .append(physicalTableName)
@@ -105,7 +105,7 @@ public class SqlDataOperations implements DataOperations {
   public int update(String modelName, Map<String, Object> record, String filter) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
-    TypedField<?, ?> idField = entity.getIdField();
+    TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     SqlClauseResult sqlResult = getSqlCauseResult(filter);
 
     StringBuilder sql = new StringBuilder("update ")
@@ -129,7 +129,7 @@ public class SqlDataOperations implements DataOperations {
   public <T> T findById(String modelName, Object id, Class<T> resultType) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
-    TypedField<?, ?> idField = entity.getIdField();
+    TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     String columnsString = entity.getFields().stream()
       .map(field -> sqlDialect.quoteIdentifier(field.getName()))
       .collect(Collectors.joining(", "));
@@ -166,7 +166,7 @@ public class SqlDataOperations implements DataOperations {
   public int deleteById(String modelName, Object id) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
-    TypedField<?, ?> idField = entity.getIdField();
+    TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     String sql = "delete from " +
                  physicalTableName +
                  " where (" + sqlDialect.quoteIdentifier(idField.getName()) + "=:" + idField.getName() + ")";

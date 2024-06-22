@@ -57,8 +57,8 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
                 try {
                   insert(relationField.getTargetEntity(), associationRecord, inveseAtomicId::set);
                 } catch (Exception e) {
-                  if (data.containsKey(targetEntity.getIdField().getName())) {
-                    inveseAtomicId.set(data.get(targetEntity.getIdField().getName()));
+                  if (data.containsKey(targetEntity.findIdField().map(IDField::getName).orElseThrow())) {
+                    inveseAtomicId.set(data.get(targetEntity.findIdField().map(IDField::getName).orElseThrow()));
                   }
                 }
                 JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, relationField);

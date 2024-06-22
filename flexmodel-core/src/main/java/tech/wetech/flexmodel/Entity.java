@@ -105,12 +105,11 @@ public class Entity implements Model {
     indexes.remove(getIndex(indexName));
   }
 
-  public IDField getIdField() {
+  public Optional<IDField> findIdField() {
     return fields.stream()
       .filter(f -> f instanceof IDField)
       .map(f -> (IDField) f)
-      .findFirst()
-      .orElse(null);
+      .findFirst();
   }
 
   @Override

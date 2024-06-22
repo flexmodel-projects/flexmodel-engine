@@ -53,7 +53,7 @@ class MongoHelper {
           JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, relationField);
           Document exchangeLookup = new Document();
           exchangeLookup.put("from", joinGraphNode.getJoinName());
-          exchangeLookup.put("localField", entity.getIdField().getName());
+          exchangeLookup.put("localField", entity.findIdField().map(IDField::getName).orElseThrow());
           exchangeLookup.put("foreignField", joinGraphNode.getJoinFieldName());
           exchangeLookup.put("as", joinGraphNode.getJoinName());
           pipeline.add(new Document("$lookup", exchangeLookup));

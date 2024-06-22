@@ -61,13 +61,12 @@ public class MongoSchemaOperations implements SchemaOperations {
     for (Index index : entity.getIndexes()) {
       createIndex(index);
     }
-    IDField idField = entity.getIdField();
-    if (idField != null) {
+    entity.findIdField().ifPresent(idField ->{
       Index index = new Index(idField.getModelName());
       index.setUnique(true);
       index.addField(idField.getName());
       createIndex(index);
-    }
+    });
     return entity;
   }
 

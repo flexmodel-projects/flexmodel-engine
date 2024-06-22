@@ -74,7 +74,7 @@ class SqlHelper {
         RelationField relationField;
         if (model instanceof Entity entity &&
             (relationField = entity.findRelationByEntityName(joiner.getFrom()).orElse(null)) != null) {
-          localField = entity.getIdField().getName();
+          localField = entity.findIdField().map(IDField::getName).orElseThrow();
           foreignField = relationField.getTargetField();
           if (relationField.getCardinality() == MANY_TO_MANY) {
             Entity targetEntity = (Entity) sqlContext.getMappedModels().getModel(sqlContext.getSchemaName(), relationField.getTargetEntity());

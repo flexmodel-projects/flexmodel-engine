@@ -122,7 +122,7 @@ public class SqlSchemaOperations implements SchemaOperations {
         SqlTable sqlTable = toSqlTable(entity);
         SqlTable targetSqlTable = toSqlTable(targetEntity);
 
-        joinTable.createForeignKey(List.of(joinColumn), sqlTable, List.of(sqlTable.getColumn(entity.getIdField().getName())));
+        joinTable.createForeignKey(List.of(joinColumn), sqlTable, List.of(sqlTable.getColumn(entity.findIdField().map(IDField::getName).orElseThrow())));
         joinTable.createForeignKey(List.of(inverseJoinColumn), targetSqlTable, List.of(targetSqlTable.getColumn(relationField.getTargetField())));
         try {
           createTable(joinTable);
@@ -162,7 +162,7 @@ public class SqlSchemaOperations implements SchemaOperations {
           SqlTable sqlTable = toSqlTable(entity);
           SqlTable targetSqlTable = toSqlTable(targetEntity);
 
-          joinTable.createForeignKey(List.of(joinColumn), sqlTable, List.of(sqlTable.getColumn(entity.getIdField().getName())));
+          joinTable.createForeignKey(List.of(joinColumn), sqlTable, List.of(sqlTable.getColumn(entity.findIdField().map(IDField::getName).orElseThrow())));
           joinTable.createForeignKey(List.of(inverseJoinColumn), targetSqlTable, List.of(targetSqlTable.getColumn(relationField.getTargetField())));
           try {
             createTable(joinTable);
@@ -372,7 +372,7 @@ public class SqlSchemaOperations implements SchemaOperations {
         toPhysicalTableString(relationField.getTargetEntity())
       );
       associationColumn.setSqlTypeCode(
-        sqlContext.getTypeHandler(((Entity) getModel(field.getModelName())).getIdField()
+        sqlContext.getTypeHandler(((Entity) getModel(field.getModelName())).findIdField().orElseThrow()
           .getGeneratedValue().getType()).getJdbcTypeCode()
       );
       return associationColumn;

@@ -57,7 +57,7 @@ public class FlexModelDataFetcher implements DataFetcher<List<Map<String, Object
       Map<String, Object> resultData = new HashMap<>(map);
       result.add(resultData);
       for (RelationField sencondaryRelationField : relationFields) {
-        Object secondaryId = map.get(entity.getIdField().getName());
+        Object secondaryId = map.get(entity.findIdField().map(IDField::getName).orElseThrow());
         resultData.put(sencondaryRelationField.getName(),
           sencondaryRelationField.getCardinality() == RelationField.Cardinality.ONE_TO_ONE ?
             findAssociationDataList(env, null, sencondaryRelationField.getTargetEntity(), sencondaryRelationField, secondaryId).stream()
@@ -82,7 +82,7 @@ public class FlexModelDataFetcher implements DataFetcher<List<Map<String, Object
           ]
         }
         """,
-      entity.getName() + "." + entity.getIdField().getName(),
+      entity.getName() + "." + entity.findIdField().map(IDField::getName).orElseThrow(),
       id instanceof Number ? id : "\"" + id + "\""
     );
     List<RelationField> relationFields = new ArrayList<>();
@@ -109,7 +109,7 @@ public class FlexModelDataFetcher implements DataFetcher<List<Map<String, Object
       Map<String, Object> resultData = new HashMap<>(map);
       result.add(resultData);
       for (RelationField sencondaryRelationField : relationFields) {
-        Object secondaryId = map.get(entity.getIdField().getName());
+        Object secondaryId = map.get(entity.findIdField().map(IDField::getName).orElseThrow());
         resultData.put(sencondaryRelationField.getName(),
           sencondaryRelationField.getCardinality() == RelationField.Cardinality.ONE_TO_ONE ?
             findAssociationDataList(env, path, sencondaryRelationField.getTargetEntity(), sencondaryRelationField, secondaryId).stream()

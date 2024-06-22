@@ -45,7 +45,7 @@ public class QueryHelper {
         if (model instanceof Entity entity && join.getLocalField() == null && join.getForeignField() == null) {
           RelationField relationField = entity.findRelationByEntityName(join.getFrom())
             .orElseThrow();
-          join.setLocalField(entity.getIdField().getName());
+          join.setLocalField(entity.findIdField().map(IDField::getName).orElseThrow());
           join.setForeignField(relationField.getTargetField());
         } else {
           if (join.getLocalField() == null || join.getForeignField() == null) {

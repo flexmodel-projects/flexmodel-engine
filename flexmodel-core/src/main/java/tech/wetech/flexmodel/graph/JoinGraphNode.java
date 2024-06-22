@@ -26,8 +26,8 @@ public class JoinGraphNode {
     modelNames.add(relationField.getTargetEntity());
     Collections.sort(modelNames);
     this.joinName = String.join("_", modelNames);
-    this.joinFieldName = entity.getName() + "_" + entity.getIdField().getName();
-    this.joinFieldType = entity.getIdField().getGeneratedValue().getType();
+    this.joinFieldName = entity.getName() + "_" + entity.findIdField().map(IDField::getName).orElseThrow();
+    this.joinFieldType = entity.findIdField().orElseThrow().getGeneratedValue().getType();
     this.inverseJoinFieldName = relationField.getTargetEntity() + "_" + relationField.getTargetField();
 
     TypedField<?, ?> targetField = (TypedField<?, ?>) targetEntity.getField(relationField.getTargetField());

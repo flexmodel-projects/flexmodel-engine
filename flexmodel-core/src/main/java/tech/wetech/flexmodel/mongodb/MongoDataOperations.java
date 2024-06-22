@@ -50,7 +50,7 @@ public class MongoDataOperations implements DataOperations {
   @Override
   public int insert(String modelName, Map<String, Object> record, Consumer<Object> idConsumer) {
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
-    IDField idField = entity.getIdField();
+    IDField idField = entity.findIdField().orElseThrow();
     if (!record.containsKey(idField.getName()) && idField.getGeneratedValue() == AUTO_INCREMENT) {
       setId(modelName, record);
       idConsumer.accept(record.get(idField.getName()));
@@ -69,7 +69,7 @@ public class MongoDataOperations implements DataOperations {
     }
     long sequenceNextVal = schemaOperations.getSequenceNextVal(sequenceName);
     Entity entity = (Entity) schemaOperations.getModel(modelName);
-    TypedField<?, ?> idField = entity.getIdField();
+    TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     if (idField != null) {
       record.put(idField.getName(), sequenceNextVal);
     }
@@ -79,7 +79,7 @@ public class MongoDataOperations implements DataOperations {
   public int updateById(String modelName, Map<String, Object> record, Object id) {
     String collectionName = getCollectionName(modelName);
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
-    TypedField<?, ?> idField = entity.getIdField();
+    TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     UpdateResult result = mongoDatabase.getCollection(collectionName, Map.class).updateOne(Filters.eq(idField.getName(), id), new Document("$set", new Document(record)));
     return (int) result.getModifiedCount();
   }
@@ -97,7 +97,7 @@ public class MongoDataOperations implements DataOperations {
   public int deleteById(String modelName, Object id) {
     String collectionName = getCollectionName(modelName);
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
-    TypedField<?, ?> idField = entity.getIdField();
+    TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     return (int) mongoDatabase.getCollection(collectionName)
       .deleteMany(Filters.eq(idField.getName(), id)).getDeletedCount();
   }
@@ -122,7 +122,7 @@ public class MongoDataOperations implements DataOperations {
   public <T> T findById(String modelName, Object id, Class<T> resultType) {
     String collectionName = getCollectionName(modelName);
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
-    TypedField<?, ?> idField = entity.getIdField();
+    TypedField<?, ?> idField = entity.findIdField().orElseThrow();
 
     return mongoDatabase.getCollection(collectionName, resultType)
       .find(Filters.eq(idField.getName(), id))
