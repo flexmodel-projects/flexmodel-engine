@@ -18,7 +18,6 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 /**
@@ -44,39 +43,37 @@ public class SessionFactory {
 
   @SuppressWarnings("unchecked")
   public void loadScript(String schemaName, String scriptName) {
-    CompletableFuture.runAsync(() -> {
-      try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(scriptName)) {
-        if (is != null) {
-          String scriptJSON = new String(is.readAllBytes());
-          Map<?, ?> map = JsonUtils.getInstance().parseToObject(scriptJSON, Map.class);
-          List<Map<String, Object>> entityList = (List<Map<String, Object>>) map.get("schema");
-          try (Session session = createFailSafeSession(schemaName)) {
-            for (Map<String, Object> entityMap : entityList) {
-              try {
-                Entity newer = JsonUtils.getInstance().convertValue(entityMap, Entity.class);
-                Entity older = (Entity) session.getModel(newer.getName());
-                if (older == null) {
-                  session.createEntity(newer);
-                } else {
-                  List<TypedField<?, ?>> fields = older.getFields();
-                  for (TypedField<?, ?> field : fields) {
-                    if (older.getField(field.getName()) == null) {
-                      session.createField(field);
-                    } else {
-                      session.modifyField(field);
-                    }
+    try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(scriptName)) {
+      if (is != null) {
+        String scriptJSON = new String(is.readAllBytes());
+        Map<?, ?> map = JsonUtils.getInstance().parseToObject(scriptJSON, Map.class);
+        List<Map<String, Object>> entityList = (List<Map<String, Object>>) map.get("schema");
+        try (Session session = createFailSafeSession(schemaName)) {
+          for (Map<String, Object> entityMap : entityList) {
+            try {
+              Entity newer = JsonUtils.getInstance().convertValue(entityMap, Entity.class);
+              Entity older = (Entity) session.getModel(newer.getName());
+              if (older == null) {
+                session.createEntity(newer);
+              } else {
+                List<TypedField<?, ?>> fields = older.getFields();
+                for (TypedField<?, ?> field : fields) {
+                  if (older.getField(field.getName()) == null) {
+                    session.createField(field);
+                  } else {
+                    session.modifyField(field);
                   }
                 }
-              } catch (Exception e) {
-                log.debug("Import script error: {}", e.getMessage(), e);
               }
+            } catch (Exception e) {
+              log.debug("Import script error: {}", e.getMessage(), e);
             }
           }
         }
-      } catch (IOException e) {
-        log.debug("Read import script error: {}", e.getMessage(), e);
       }
-    });
+    } catch (IOException e) {
+      log.debug("Read import script error: {}", e.getMessage(), e);
+    }
   }
 
   public Map<String, DataSourceProvider> getDataSourceProviderMap() {
