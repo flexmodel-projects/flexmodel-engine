@@ -1,4 +1,4 @@
-package tech.wetech.flexmodel;
+package tech.wetech.flexmodel.supports.jackson;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import tech.wetech.flexmodel.supports.jackson.FlexModelCoreModule;
+import tech.wetech.flexmodel.JsonObjectConverter;
 
 import java.io.IOException;
 import java.util.ServiceLoader;
@@ -18,13 +18,11 @@ import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_
 /**
  * @author cjbi
  */
-public class JsonUtils {
+public class JacksonObjectConverter implements JsonObjectConverter {
 
   private final JsonMapper jsonMapper;
 
-  private static JsonUtils jsonUtils;
-
-  public JsonUtils() {
+  public JacksonObjectConverter() {
     JsonMapper.Builder builder = new JsonMapper().rebuild();
     builder.serializationInclusion(JsonInclude.Include.NON_NULL);
 //        JSON.configure(SerializationFeature.INDENT_OUTPUT, false);
@@ -40,14 +38,8 @@ public class JsonUtils {
     this.jsonMapper = builder.build();
   }
 
-  public static JsonUtils getInstance() {
-    if (jsonUtils == null) {
-      jsonUtils = new JsonUtils();
-    }
-    return jsonUtils;
-  }
-
-  public String stringify(Object obj) {
+  @Override
+  public String toJsonString(Object obj) {
     try {
       return jsonMapper.writeValueAsString(obj);
     } catch (JsonProcessingException e) {
@@ -56,20 +48,20 @@ public class JsonUtils {
     return null;
   }
 
-  public <T> T parseToObject(String json, Class<T> clz) {
+  @Override
+  public <T> T parseToObject(String jsonString, Class<T> cls) {
     try {
-      if (json == null) {
+      if (jsonString == null) {
         return null;
       }
-      return jsonMapper.readValue(json, clz);
+      return jsonMapper.readValue(jsonString, cls);
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
     }
   }
 
-  public <T> T convertValue(Object fromValue, Class<T> clz) {
-    return jsonMapper.convertValue(fromValue, clz);
+  @Override
+  public <T> T convertValue(Object fromValue, Class<T> cls) {
+    return jsonMapper.convertValue(fromValue, cls);
   }
-
-
 }

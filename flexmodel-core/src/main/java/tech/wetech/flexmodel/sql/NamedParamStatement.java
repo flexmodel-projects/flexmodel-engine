@@ -1,7 +1,5 @@
 package tech.wetech.flexmodel.sql;
 
-import tech.wetech.flexmodel.JsonUtils;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -44,11 +42,7 @@ public class NamedParamStatement implements AutoCloseable {
     for (Map.Entry<String, Object> entry : paramMap.entrySet()) {
       String key = entry.getKey();
       Object value = entry.getValue();
-      if (value instanceof Map || value instanceof List) {
-        this.setObject(key, JsonUtils.getInstance().stringify(value));
-      } else {
-        this.setObject(key, value);
-      }
+      this.setObject(key, value);
     }
   }
 

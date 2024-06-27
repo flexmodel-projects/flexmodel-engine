@@ -2,6 +2,8 @@ package tech.wetech.flexmodel.validator;
 
 import tech.wetech.flexmodel.TypedField;
 
+import java.util.Map;
+
 /**
  * @author cjbi
  */
@@ -21,7 +23,7 @@ public class NotNullValidator extends AbstractConstraintValidator {
   @Override
   public void validate(TypedField field, Object value) throws ConstraintValidException {
     if (value == null) {
-      handleThrows(field, null);
+      handleThrows(field, null, Map.of());
     }
 
   }

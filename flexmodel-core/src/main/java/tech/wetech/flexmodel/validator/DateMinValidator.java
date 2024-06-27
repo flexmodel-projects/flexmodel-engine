@@ -3,6 +3,7 @@ package tech.wetech.flexmodel.validator;
 import tech.wetech.flexmodel.TypedField;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 /**
  * @author cjbi
@@ -23,7 +24,7 @@ public class DateMinValidator extends AbstractConstraintValidator<LocalDate> {
   @Override
   public void validate(TypedField<LocalDate, ?> field, LocalDate value) throws ConstraintValidException {
     if (value == null || value.isBefore(min)) {
-      handleThrows(field, value);
+      handleThrows(field, value, Map.of("min", min));
     }
   }
 

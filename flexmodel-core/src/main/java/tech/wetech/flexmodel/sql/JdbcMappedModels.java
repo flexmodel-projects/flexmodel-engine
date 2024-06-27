@@ -25,9 +25,11 @@ public class JdbcMappedModels implements MappedModels {
   private final DataSource dataSource;
   private final SqlDialect sqlDialect;
   private final Logger log = LoggerFactory.getLogger(JdbcMappedModels.class);
+  private final JsonObjectConverter jsonObjectConverter;
 
-  public JdbcMappedModels(DataSource dataSource) {
+  public JdbcMappedModels(DataSource dataSource, JsonObjectConverter jsonObjectConverter) {
     this.dataSource = dataSource;
+    this.jsonObjectConverter = jsonObjectConverter;
     try (Connection connection = dataSource.getConnection()) {
       sqlDialect = SqlDialectFactory.create(dataSource.getConnection().getMetaData());
       if (!existSchema(connection)) {
@@ -299,7 +301,7 @@ public class JdbcMappedModels implements MappedModels {
             field = jsonField;
             if (sqlColumn.getDefaultValue() != null) {
               try {
-                jsonField.setDefaultValue(JsonUtils.getInstance().parseToObject(sqlColumn.getDefaultValue(), Serializable.class));
+                jsonField.setDefaultValue(sqlContext.getJsonObjectConverter().parseToObject(sqlColumn.getDefaultValue(), Serializable.class));
               } catch (Exception e) {
                 log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
               }
@@ -338,6 +340,7 @@ public class JdbcMappedModels implements MappedModels {
 
   @Override
   public List<Model> lookup(String schemaName) {
+
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
       String sqlSelectString = "select " + sqlDialect.quoteIdentifier("content") +
@@ -348,10 +351,10 @@ public class JdbcMappedModels implements MappedModels {
       for (Map<String, Object> data : mapList) {
         Object content = data.get("content");
         switch (content) {
-          case String contentStr -> result.add(JsonUtils.getInstance().parseToObject(contentStr, Model.class));
+          case String contentStr -> result.add(jsonObjectConverter.parseToObject(contentStr, Model.class));
           case Blob blob ->
-            result.add(JsonUtils.getInstance().parseToObject(Arrays.toString(blob.getBinaryStream().readAllBytes()), Model.class));
-          case byte[] bytes -> result.add(JsonUtils.getInstance().parseToObject(Arrays.toString(bytes), Model.class));
+            result.add(jsonObjectConverter.parseToObject(Arrays.toString(blob.getBinaryStream().readAllBytes()), Model.class));
+          case byte[] bytes -> result.add(jsonObjectConverter.parseToObject(Arrays.toString(bytes), Model.class));
           case null, default -> {
             assert content != null;
             throw new RuntimeException("get model error, unknown data type:" + content.getClass());
@@ -391,7 +394,7 @@ public class JdbcMappedModels implements MappedModels {
   @Override
   public void persist(String schemaName, Model model) {
     try (Connection connection = dataSource.getConnection()) {
-      String content = JsonUtils.getInstance().stringify(model);
+      String content = jsonObjectConverter.toJsonString(model);
       log.trace("Persist:\n{}", content);
       connection.setAutoCommit(false);
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
@@ -425,7 +428,7 @@ public class JdbcMappedModels implements MappedModels {
                                " \nwhere " + sqlDialect.quoteIdentifier("schema_name") + "=:schemaName and " + sqlDialect.quoteIdentifier("model_name") + "=:modelName";
       String content = sqlExecutor.queryForScalar(sqlSelectString,
         Map.of("schemaName", schemaName, "modelName", modelName), String.class);
-      return JsonUtils.getInstance().parseToObject(content, Model.class);
+      return jsonObjectConverter.parseToObject(content, Model.class);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

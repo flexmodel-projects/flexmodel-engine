@@ -13,15 +13,17 @@ import java.util.Map;
  */
 public abstract class AbstractSessionContext {
 
-  private final String schemaName;
+  protected final String schemaName;
   protected final Logger log = LoggerFactory.getLogger(SqlContext.class);
-  private final MappedModels mappedModels;
+  protected final MappedModels mappedModels;
+  protected final JsonObjectConverter jsonObjectConverter;
   protected PhysicalNamingStrategy physicalNamingStrategy = new DefaultPhysicalNamingStrategy();
-  private boolean failSafe = false;
+  protected boolean failSafe = false;
 
-  protected AbstractSessionContext(String schemaName, MappedModels mappedModels) {
+  protected AbstractSessionContext(String schemaName, MappedModels mappedModels, JsonObjectConverter jsonObjectConverter) {
     this.schemaName = schemaName;
     this.mappedModels = mappedModels;
+    this.jsonObjectConverter = jsonObjectConverter;
   }
 
   public PhysicalNamingStrategy getPhysicalNamingStrategy() {
@@ -56,5 +58,9 @@ public abstract class AbstractSessionContext {
 
   public void setFailSafe(boolean failSafe) {
     this.failSafe = failSafe;
+  }
+
+  public JsonObjectConverter getJsonObjectConverter() {
+    return jsonObjectConverter;
   }
 }

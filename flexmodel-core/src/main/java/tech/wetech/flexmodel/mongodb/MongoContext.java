@@ -1,10 +1,7 @@
 package tech.wetech.flexmodel.mongodb;
 
 import com.mongodb.client.MongoDatabase;
-import tech.wetech.flexmodel.AbstractSessionContext;
-import tech.wetech.flexmodel.BasicFieldType;
-import tech.wetech.flexmodel.ExpressionCalculator;
-import tech.wetech.flexmodel.MappedModels;
+import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.mapping.*;
 
 import java.util.HashMap;
@@ -19,8 +16,8 @@ public class MongoContext extends AbstractSessionContext {
   private ExpressionCalculator<String> conditionCalculator;
   private final Map<String, TypeHandler<?>> typeHandlerMap = new HashMap<>();
 
-  public MongoContext(String schemaName, MongoDatabase mongoDatabase, MappedModels mappedModels) {
-    super(schemaName, mappedModels);
+  public MongoContext(String schemaName, MongoDatabase mongoDatabase, MappedModels mappedModels, JsonObjectConverter jsonObjectConverter) {
+    super(schemaName, mappedModels, jsonObjectConverter);
     this.mongoDatabase = mongoDatabase;
     this.conditionCalculator = new DefaultMongoExpressionCalculator();
 
@@ -32,7 +29,7 @@ public class MongoContext extends AbstractSessionContext {
     this.typeHandlerMap.put(BasicFieldType.BOOLEAN.getType(), new BooleanTypeHandler());
     this.typeHandlerMap.put(BasicFieldType.DATETIME.getType(), new DatetimeTypeHandler());
     this.typeHandlerMap.put(BasicFieldType.DATE.getType(), new DateTypeHandler());
-    this.typeHandlerMap.put(BasicFieldType.JSON.getType(), new JsonTypeHandler());
+    this.typeHandlerMap.put(BasicFieldType.JSON.getType(), new JsonTypeHandler(jsonObjectConverter));
   }
 
   public MongoDatabase getMongoDatabase() {

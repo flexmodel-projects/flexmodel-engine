@@ -11,6 +11,7 @@ import tech.wetech.flexmodel.mongodb.MongoContext;
 import tech.wetech.flexmodel.mongodb.MongoDataSourceProvider;
 import tech.wetech.flexmodel.mongodb.MongoSession;
 import tech.wetech.flexmodel.sql.*;
+import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,12 +30,14 @@ public class SessionFactory {
   private final Map<String, DataSourceProvider> dataSourceProviderMap = new HashMap<>();
   private final Cache cache;
   private final Logger log = LoggerFactory.getLogger(SessionFactory.class);
+  private final JsonObjectConverter jsonObjectConverter;
 
   SessionFactory(String defaultIdentifier, DataSourceProvider defaultDataSourceProvider, Cache cache, String importScript) {
     this.cache = cache;
+    this.jsonObjectConverter = new JacksonObjectConverter();
     addDataSourceProvider(defaultIdentifier, defaultDataSourceProvider);
     if (defaultDataSourceProvider instanceof JdbcDataSourceProvider jdbcDataSourceProvider) {
-      this.mappedModels = new CachingMappedModels(new JdbcMappedModels(jdbcDataSourceProvider.dataSource()), cache);
+      this.mappedModels = new CachingMappedModels(new JdbcMappedModels(jdbcDataSourceProvider.dataSource(), jsonObjectConverter), cache);
     } else if (defaultDataSourceProvider instanceof MongoDataSourceProvider mongoDataSourceProvider) {
       this.mappedModels = new MapMappedModels();
     }
@@ -46,12 +49,12 @@ public class SessionFactory {
     try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(scriptName)) {
       if (is != null) {
         String scriptJSON = new String(is.readAllBytes());
-        Map<?, ?> map = JsonUtils.getInstance().parseToObject(scriptJSON, Map.class);
+        Map<String, Object> map = jsonObjectConverter.parseToMap(scriptJSON);
         List<Map<String, Object>> entityList = (List<Map<String, Object>>) map.get("schema");
         try (Session session = createFailSafeSession(schemaName)) {
           for (Map<String, Object> entityMap : entityList) {
             try {
-              Entity newer = JsonUtils.getInstance().convertValue(entityMap, Entity.class);
+              Entity newer = jsonObjectConverter.convertValue(entityMap, Entity.class);
               Entity older = (Entity) session.getModel(newer.getName());
               if (older == null) {
                 session.createEntity(newer);
@@ -116,13 +119,13 @@ public class SessionFactory {
       return switch (dataSourceProviderMap.get(identifier)) {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
-          SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), mappedModels);
+          SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), mappedModels, jsonObjectConverter);
           sqlContext.setFailSafe(true);
           yield new SqlSession(sqlContext);
         }
         case MongoDataSourceProvider mongodb -> {
           MongoDatabase mongoDatabase = mongodb.mongoDatabase();
-          MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, mappedModels);
+          MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, mappedModels, jsonObjectConverter);
           mongoContext.setFailSafe(true);
           yield new MongoSession(mongoContext);
         }
@@ -139,12 +142,12 @@ public class SessionFactory {
       return switch (dataSourceProviderMap.get(identifier)) {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
-          SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), mappedModels);
+          SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), mappedModels, jsonObjectConverter);
           yield new SqlSession(sqlContext);
         }
         case MongoDataSourceProvider mongodb -> {
           MongoDatabase mongoDatabase = mongodb.mongoDatabase();
-          MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, mappedModels);
+          MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, mappedModels, jsonObjectConverter);
           yield new MongoSession(mongoContext);
         }
         case null,

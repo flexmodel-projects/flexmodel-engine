@@ -2,6 +2,8 @@ package tech.wetech.flexmodel.validator;
 
 import tech.wetech.flexmodel.TypedField;
 
+import java.util.Map;
+
 /**
  * @author cjbi
  */
@@ -22,7 +24,7 @@ public class RegexpValidator extends AbstractConstraintValidator<String> {
   @Override
   public void validate(TypedField<String, ?> field, String value) throws ConstraintValidException {
     if (value == null || !value.matches(regexp)) {
-      handleThrows(field, value);
+      handleThrows(field, value, Map.of("regexp", regexp));
     }
   }
 

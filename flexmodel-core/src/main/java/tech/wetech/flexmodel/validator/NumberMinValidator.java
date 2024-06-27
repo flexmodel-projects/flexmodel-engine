@@ -2,6 +2,8 @@ package tech.wetech.flexmodel.validator;
 
 import tech.wetech.flexmodel.TypedField;
 
+import java.util.Map;
+
 /**
  * @author cjbi
  */
@@ -22,7 +24,7 @@ public class NumberMinValidator<NUM extends Number> extends AbstractConstraintVa
   @Override
   public void validate(TypedField<NUM, ?> field, NUM number) throws ConstraintValidException {
     if (number == null || number.doubleValue() < min.doubleValue()) {
-      handleThrows(field, number);
+      handleThrows(field, number, Map.of("min", min));
     }
   }
 

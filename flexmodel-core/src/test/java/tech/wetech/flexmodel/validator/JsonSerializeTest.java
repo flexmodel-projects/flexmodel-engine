@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.generator.DatetimeNowValueGenerator;
+import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 /**
  * @author cjbi
@@ -62,8 +63,8 @@ public class JsonSerializeTest {
     email.addValidator(new EmailValidator());
     entity.addField(email);
 
-    String json = JsonUtils.getInstance().stringify(entity);
-    Entity deSerializeEntity = JsonUtils.getInstance().parseToObject(json, Entity.class);
+    String json = new JacksonObjectConverter().toJsonString(entity);
+    Entity deSerializeEntity = new JacksonObjectConverter().parseToObject(json, Entity.class);
     Assertions.assertNotNull(deSerializeEntity);
   }
 

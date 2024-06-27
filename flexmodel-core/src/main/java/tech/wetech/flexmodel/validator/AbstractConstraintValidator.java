@@ -1,6 +1,5 @@
 package tech.wetech.flexmodel.validator;
 
-import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.TypedField;
 
 import java.util.Map;
@@ -18,8 +17,9 @@ public abstract class AbstractConstraintValidator<T> implements ConstraintValida
     this.message = message;
   }
 
-  protected void handleThrows(TypedField<?, ?> field, Object value) throws ConstraintValidException {
-    throw new ConstraintValidException(field, value, simpleRenderTemplate(message, JsonUtils.getInstance().convertValue(this, Map.class)));
+  protected void handleThrows(TypedField<?, ?> field, Object value, Map<String, Object> attributes) throws ConstraintValidException {
+
+    throw new ConstraintValidException(field, value, simpleRenderTemplate(message, attributes));
   }
 
   public String simpleRenderTemplate(String template, Map<?, ?> attributes) {

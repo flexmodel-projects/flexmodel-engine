@@ -141,7 +141,7 @@ public class SqlDataOperations implements DataOperations {
                  " " +
                  " where (" + sqlDialect.quoteIdentifier(idField.getName()) + "= :id)";
     Map<String, Object> dataMap = sqlExecutor.queryForObject(sql, Map.of("id", id), getSqlResultHandler(entity, null, Map.class));
-    return JsonUtils.getInstance().convertValue(dataMap, resultType);
+    return sqlContext.getJsonObjectConverter().convertValue(dataMap, resultType);
   }
 
   @Override
@@ -150,7 +150,7 @@ public class SqlDataOperations implements DataOperations {
     Map.Entry<String, Map<String, Object>> entry = SqlHelper.toQuerySqlWithPrepared(sqlContext, modelName, query);
     List<T> list = new ArrayList<>();
     sqlExecutor.queryForList(entry.getKey(), entry.getValue(), getSqlResultHandler(model, query, Map.class)).forEach(map -> {
-      list.add(JsonUtils.getInstance().convertValue(map, resultType));
+      list.add(sqlContext.getJsonObjectConverter().convertValue(map, resultType));
     });
     return list;
   }

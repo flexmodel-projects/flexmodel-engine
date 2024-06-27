@@ -1,9 +1,6 @@
 package tech.wetech.flexmodel.sql;
 
-import tech.wetech.flexmodel.AbstractSessionContext;
-import tech.wetech.flexmodel.BasicFieldType;
-import tech.wetech.flexmodel.MappedModels;
-import tech.wetech.flexmodel.PhysicalNamingStrategy;
+import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 import tech.wetech.flexmodel.sql.type.*;
 
@@ -24,8 +21,11 @@ public class SqlContext extends AbstractSessionContext {
   protected final Map<String, SqlTypeHandler<?>> typeHandlerMap = new HashMap<>();
   private final SqlMetadata sqlMetadata;
 
-  public SqlContext(String schemaName, SqlExecutor sqlExecutor, MappedModels mappedModels) {
-    super(schemaName, mappedModels);
+  public SqlContext(String schemaName,
+                    SqlExecutor sqlExecutor,
+                    MappedModels mappedModels,
+                    JsonObjectConverter jsonObjectConverter) {
+    super(schemaName, mappedModels, jsonObjectConverter);
     this.sqlExecutor = sqlExecutor;
     DatabaseMetaData databaseMetaData;
     Connection connection = sqlExecutor.getConnection();
@@ -52,7 +52,7 @@ public class SqlContext extends AbstractSessionContext {
       this.typeHandlerMap.put(BasicFieldType.DATETIME.getType(), new LegacyDatetimeSqlTypeHandler());
       this.typeHandlerMap.put(BasicFieldType.DATE.getType(), new LegacyDateSqlTypeHandler());
     }
-    this.typeHandlerMap.put(BasicFieldType.JSON.getType(), new JsonSqlTypeHandler());
+    this.typeHandlerMap.put(BasicFieldType.JSON.getType(), new JsonSqlTypeHandler(jsonObjectConverter));
   }
 
   @Override

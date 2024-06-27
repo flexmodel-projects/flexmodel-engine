@@ -411,7 +411,7 @@ public class SqlSchemaOperations implements SchemaOperations {
         }
         case JsonField jsonField -> {
           if (field.getDefaultValue() != null) {
-            aSqlColumn.setDefaultValue(JsonUtils.getInstance().stringify(jsonField.getDefaultValue()));
+            aSqlColumn.setDefaultValue(sqlContext.getJsonObjectConverter().toJsonString(jsonField.getDefaultValue()));
           }
         }
         case BooleanField booleanField -> {
