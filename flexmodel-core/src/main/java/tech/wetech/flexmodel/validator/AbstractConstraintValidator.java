@@ -11,7 +11,6 @@ public abstract class AbstractConstraintValidator<T> implements ConstraintValida
 
   private final String message;
 
-
   protected AbstractConstraintValidator(String message) {
     assert message != null;
     this.message = message;
@@ -22,10 +21,10 @@ public abstract class AbstractConstraintValidator<T> implements ConstraintValida
     throw new ConstraintValidException(field, value, simpleRenderTemplate(message, attributes));
   }
 
-  public String simpleRenderTemplate(String template, Map<?, ?> attributes) {
+  public static String simpleRenderTemplate(String template, Map<?, ?> attributes) {
     int length = template.length();
     for (int i = 0; i < length; i++) {
-      if (template.charAt(i) == '{') {
+      if (template.charAt(i) == '$') {
         if (length > i + 1) {
           int j = i;
           char c = template.charAt(++j);
@@ -39,7 +38,7 @@ public abstract class AbstractConstraintValidator<T> implements ConstraintValida
     return template;
   }
 
-  private String simpleRenderTemplate(String template, int length, int i, Map<?, ?> attributes) {
+  private static String simpleRenderTemplate(String template, int length, int i, Map<?, ?> attributes) {
     StringBuilder valueBuilder = new StringBuilder();
     int endIndex = i - 2;
     label:
@@ -49,10 +48,7 @@ public abstract class AbstractConstraintValidator<T> implements ConstraintValida
         case ' ':
           continue;
         case '}':
-          if (length > i + 1) {
-            char c2 = template.charAt(++i);
-            if (c2 == '}') break label;
-          }
+          break label;
         default:
           valueBuilder.append(c1);
       }
@@ -82,4 +78,5 @@ public abstract class AbstractConstraintValidator<T> implements ConstraintValida
   public String getType() {
     return this.getClass().getSimpleName();
   }
+
 }

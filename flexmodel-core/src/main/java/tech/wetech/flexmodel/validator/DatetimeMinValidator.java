@@ -13,7 +13,7 @@ public class DatetimeMinValidator extends AbstractConstraintValidator<LocalDateT
   private final LocalDateTime min;
 
   public DatetimeMinValidator(LocalDateTime min) {
-    this("must be greater than or equal to {{min}}", min);
+    this("must be greater than or equal to ${min}", min);
   }
 
   public DatetimeMinValidator(String message, LocalDateTime min) {

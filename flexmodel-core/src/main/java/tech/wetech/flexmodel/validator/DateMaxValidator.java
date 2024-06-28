@@ -13,7 +13,7 @@ public class DateMaxValidator extends AbstractConstraintValidator<LocalDate> {
   private final LocalDate max;
 
   public DateMaxValidator(LocalDate max) {
-    this("must be greater than or equal to {{max}}", max);
+    this("must be greater than or equal to ${max}", max);
   }
 
   public DateMaxValidator(String message, LocalDate max) {

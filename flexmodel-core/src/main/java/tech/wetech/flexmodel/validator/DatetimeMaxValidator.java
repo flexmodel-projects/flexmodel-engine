@@ -13,7 +13,7 @@ public class DatetimeMaxValidator extends AbstractConstraintValidator<LocalDateT
   private final LocalDateTime max;
 
   public DatetimeMaxValidator(LocalDateTime max) {
-    this("must be greater than or equal to {{min}}", max);
+    this("must be greater than or equal to ${min}", max);
   }
 
   public DatetimeMaxValidator(String message, LocalDateTime max) {

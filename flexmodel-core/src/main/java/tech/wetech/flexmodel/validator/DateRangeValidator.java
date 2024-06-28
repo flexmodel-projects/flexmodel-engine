@@ -14,7 +14,7 @@ public class DateRangeValidator extends AbstractConstraintValidator<LocalDate> {
   private final LocalDate max;
 
   public DateRangeValidator(LocalDate min, LocalDate max) {
-    this("must be between {{min}} and {{max}}", min, max);
+    this("must be between ${min} and ${max}", min, max);
   }
 
   public DateRangeValidator(String message, LocalDate min, LocalDate max) {

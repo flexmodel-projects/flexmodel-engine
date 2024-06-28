@@ -12,7 +12,7 @@ public class RegexpValidator extends AbstractConstraintValidator<String> {
   private final String regexp;
 
   public RegexpValidator(String regexp) {
-    super("must match {{regexp}}");
+    super("must match ${regexp}");
     this.regexp = regexp;
   }
 

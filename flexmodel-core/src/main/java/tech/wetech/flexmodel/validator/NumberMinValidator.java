@@ -17,7 +17,7 @@ public class NumberMinValidator<NUM extends Number> extends AbstractConstraintVa
   }
 
   public NumberMinValidator(Number min) {
-    super("must be greater than or equal to {{min}}");
+    super("must be greater than or equal to ${min}");
     this.min = min;
   }
 

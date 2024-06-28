@@ -13,7 +13,7 @@ public class NumberRangeValidator<NUM extends Number> extends AbstractConstraint
   private final Number max;
 
   public NumberRangeValidator(Number min, Number max) {
-    super("must be between {{min}} and {{max}}");
+    super("must be between ${min} and ${max}");
     this.min = min;
     this.max = max;
   }

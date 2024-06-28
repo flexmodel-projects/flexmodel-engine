@@ -17,7 +17,7 @@ public class NumberMaxValidator<NUM extends Number> extends AbstractConstraintVa
   }
 
   public NumberMaxValidator(Number max) {
-    super("must be less than or equal to {{max}}");
+    super("must be less than or equal to ${max}");
     this.max = max;
   }
 

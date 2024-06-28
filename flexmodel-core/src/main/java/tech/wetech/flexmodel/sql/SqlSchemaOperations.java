@@ -177,7 +177,7 @@ public class SqlSchemaOperations implements SchemaOperations {
         modifyColumn(toSqlColumn(field));
       }
     } catch (Exception e) {
-      log.error("modify field occurred exception： {}", e.getMessage(), e);
+      log.error("Modify field occurred exception： {}", e.getMessage(), e);
     }
     return field;
   }
