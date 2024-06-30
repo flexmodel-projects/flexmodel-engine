@@ -29,7 +29,7 @@ public class DataValueGeneratorFacade {
     Map<String, Object> newData = new HashMap<>();
     // 类型转换
     data.forEach((key, value) -> {
-      TypedField field = (TypedField) entity.getField(key);
+      TypedField field = entity.getField(key);
       if (field != null && !(field instanceof RelationField)) {
         newData.put(field.getName(), convertParameter(field, value)
         );
