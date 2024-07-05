@@ -69,5 +69,19 @@ public class IDField extends TypedField<Object, IDField> {
     }
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof IDField idField)) return false;
+    if (!super.equals(o)) return false;
 
+      return getGeneratedValue() == idField.getGeneratedValue();
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (getGeneratedValue() != null ? getGeneratedValue().hashCode() : 0);
+    return result;
+  }
 }

@@ -10,6 +10,7 @@ import graphql.schema.idl.TypeDefinitionRegistry;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,8 @@ import static tech.wetech.flexmodel.RelationField.Cardinality.*;
  */
 
 public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
+
+  private final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
 
   void createClassesEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
@@ -120,7 +123,7 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
           }
         ]
       """;
-    List<Map<String, Object>> list = JsonUtils.getInstance().parseToObject(mockData, List.class);
+    List<Map<String, Object>> list = jsonObjectConverter.parseToObject(mockData, List.class);
     session.insertAll(entityName, list);
   }
 
@@ -193,7 +196,7 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
         }
       ]
       """;
-    List<Map<String, Object>> list = JsonUtils.getInstance().parseToObject(mockData, List.class);
+    List<Map<String, Object>> list = jsonObjectConverter.parseToObject(mockData, List.class);
     session.insertAll(entityName, list);
   }
 
@@ -222,7 +225,7 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
            }
         ]
       """;
-    List<Map<String, Object>> list = JsonUtils.getInstance().parseToObject(mockData, List.class);
+    List<Map<String, Object>> list = jsonObjectConverter.parseToObject(mockData, List.class);
     session.insertAll(entityName, list);
   }
 
@@ -276,7 +279,7 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
         }
       ]
       """;
-    List<Map<String, Object>> list = JsonUtils.getInstance().parseToObject(mockData, List.class);
+    List<Map<String, Object>> list = jsonObjectConverter.parseToObject(mockData, List.class);
     session.insertAll(entityName, list);
   }
 
@@ -381,7 +384,7 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
        }
       }
       """);
-    System.out.println(JsonUtils.getInstance().stringify(result.getData()));
+    System.out.println(jsonObjectConverter.toJsonString(result.getData()));
     Assertions.assertNotNull(result.getData());
   }
 

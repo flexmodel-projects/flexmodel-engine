@@ -23,4 +23,20 @@ public class StringField extends TypedField<String, StringField> {
     return this;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof StringField that)) return false;
+    if (!super.equals(o)) return false;
+
+      return getLength() != null ? getLength().equals(that.getLength()) : that.getLength() == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (getLength() != null ? getLength().hashCode() : 0);
+    return result;
+  }
+
 }

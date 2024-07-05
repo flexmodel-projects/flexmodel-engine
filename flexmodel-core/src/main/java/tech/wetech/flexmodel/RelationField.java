@@ -66,4 +66,26 @@ public class RelationField extends TypedField<Long, RelationField> {
     ONE_TO_ONE, ONE_TO_MANY, MANY_TO_MANY
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof RelationField that)) return false;
+    if (!super.equals(o)) return false;
+
+      if (isCascadeDelete() != that.isCascadeDelete()) return false;
+    if (getCardinality() != that.getCardinality()) return false;
+    if (getTargetEntity() != null ? !getTargetEntity().equals(that.getTargetEntity()) : that.getTargetEntity() != null)
+      return false;
+      return getTargetField() != null ? getTargetField().equals(that.getTargetField()) : that.getTargetField() == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (getCardinality() != null ? getCardinality().hashCode() : 0);
+    result = 31 * result + (getTargetEntity() != null ? getTargetEntity().hashCode() : 0);
+    result = 31 * result + (getTargetField() != null ? getTargetField().hashCode() : 0);
+    result = 31 * result + (isCascadeDelete() ? 1 : 0);
+    return result;
+  }
 }

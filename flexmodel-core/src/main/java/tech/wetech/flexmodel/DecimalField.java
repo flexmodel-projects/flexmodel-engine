@@ -36,4 +36,20 @@ public class DecimalField extends TypedField<Number, DecimalField> {
     return this;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof DecimalField that)) return false;
+    if (!super.equals(o)) return false;
+    if (precision != that.precision) return false;
+    return scale == that.scale;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + precision;
+    result = 31 * result + scale;
+    return result;
+  }
 }

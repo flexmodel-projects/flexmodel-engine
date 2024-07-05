@@ -64,7 +64,9 @@ public class SessionFactory {
                   if (older.getField(field.getName()) == null) {
                     session.createField(field);
                   } else {
-                    session.modifyField(field);
+                    if(!field.equals(older.getField(field.getName()))){
+                      session.modifyField(field);
+                    }
                   }
                 }
               }

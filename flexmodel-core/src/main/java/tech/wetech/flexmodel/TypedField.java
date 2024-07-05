@@ -6,6 +6,7 @@ import tech.wetech.flexmodel.validator.ConstraintValidator;
 import tech.wetech.flexmodel.validator.NotNullValidator;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -123,13 +124,34 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public boolean equals(Object obj) {
-    if (this.getName() != null && obj instanceof TypedField) {
-      return this.getName().equals(((TypedField<T, SELF>) obj).getName());
-    }
-    return false;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof TypedField<?, ?> that)) return false;
+
+    if (unique != that.unique) return false;
+    if (nullable != that.nullable) return false;
+    if (!Objects.equals(name, that.name)) return false;
+    if (!Objects.equals(type, that.type)) return false;
+    if (!Objects.equals(modelName, that.modelName)) return false;
+    if (!Objects.equals(comment, that.comment)) return false;
+    if (!Objects.equals(defaultValue, that.defaultValue)) return false;
+    if (!validators.equals(that.validators)) return false;
+    return Objects.equals(generator, that.generator);
   }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, type, modelName, comment, unique, nullable, defaultValue, validators, generator);
+  }
+
+  //  @Override
+//  @SuppressWarnings("unchecked")
+//  public boolean equals(Object obj) {
+//    if (this.getName() != null && obj instanceof TypedField) {
+//      return this.getName().equals(((TypedField<T, SELF>) obj).getName());
+//    }
+//    return false;
+//  }
 
   @SuppressWarnings("unchecked")
   private SELF self() {
