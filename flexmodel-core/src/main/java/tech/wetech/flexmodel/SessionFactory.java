@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -49,12 +50,14 @@ public class SessionFactory {
     try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(scriptName)) {
       if (is != null) {
         String scriptJSON = new String(is.readAllBytes());
-        Map<String, Object> map = jsonObjectConverter.parseToMap(scriptJSON);
-        List<Map<String, Object>> entityList = (List<Map<String, Object>>) map.get("schema");
+        ScriptDescribe describe = jsonObjectConverter.parseToObject(scriptJSON, ScriptDescribe.class);
         try (Session session = createFailSafeSession(schemaName)) {
-          for (Map<String, Object> entityMap : entityList) {
+          for (Model model : describe.getSchema()) {
+            if (!(model instanceof Entity newer)) {
+              log.warn("Not supported model: {}", model.getName());
+              continue;
+            }
             try {
-              Entity newer = jsonObjectConverter.convertValue(entityMap, Entity.class);
               Entity older = (Entity) session.getModel(newer.getName());
               if (older == null) {
                 session.createEntity(newer);
@@ -64,12 +67,23 @@ public class SessionFactory {
                   if (older.getField(field.getName()) == null) {
                     session.createField(field);
                   } else {
-                    if(!field.equals(older.getField(field.getName()))){
+                    if (!field.equals(older.getField(field.getName()))) {
                       session.modifyField(field);
                     }
                   }
                 }
               }
+            } catch (Exception e) {
+              log.debug("Import script error: {}", e.getMessage(), e);
+            }
+          }
+          Map<String, List<Map<String, Object>>> data = describe.getData();
+          Set<Map.Entry<String, List<Map<String, Object>>>> entries = data.entrySet();
+          for (Map.Entry<String, List<Map<String, Object>>> entry : entries) {
+            try {
+              String modelName = entry.getKey();
+              List<Map<String, Object>> records = entry.getValue();
+              session.insertAll(modelName, records);
             } catch (Exception e) {
               log.debug("Import script error: {}", e.getMessage(), e);
             }

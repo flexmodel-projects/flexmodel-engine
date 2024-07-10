@@ -320,5 +320,47 @@
       ],
       "indexes": []
     }
-  ]
+  ],
+  "data": {
+    "Datasource": [
+      {
+        "name": "admin3",
+        "type": "user",
+        "config": {
+          "url": "jdbc:sqlite:file::memory:?cache=shared",
+          "dbKind": "sqlite",
+          "password": "",
+          "username": ""
+        }
+      }
+    ],
+    "IdentityProvider": [
+      {
+        "name": "oidc-test",
+        "provider": {
+          "type": "oidc",
+          "issuer": "http://localhost:8080/realms/master",
+          "clientId": "simple",
+          "clientSecret": "3224354232asdfew"
+        }
+      }
+    ],
+    "ApiInfo": [
+      {
+        "name": "Fetch a paginated ApiLog records list",
+        "parentId": "01J1MBYWE7CS55HQC3XSSCAAE6",
+        "type": "REST_API",
+        "method": "GET",
+        "path": "/system_ApiLog",
+        "meta": {
+          "auth": false,
+          "type": "list",
+          "model": "ApiLog",
+          "enable": true,
+          "paging": true,
+          "datasource": "system"
+        }
+      }
+    ]
+  }
 }
