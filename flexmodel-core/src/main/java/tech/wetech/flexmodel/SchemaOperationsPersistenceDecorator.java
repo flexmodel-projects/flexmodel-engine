@@ -1,5 +1,8 @@
 package tech.wetech.flexmodel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -10,6 +13,7 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
 
   private final AbstractSessionContext sessionContext;
   private final SchemaOperations delegate;
+  private final Logger log = LoggerFactory.getLogger(SchemaOperationsPersistenceDecorator.class);
 
   public SchemaOperationsPersistenceDecorator(AbstractSessionContext sessionContext, SchemaOperations delegate) {
     this.sessionContext = sessionContext;
@@ -136,6 +140,7 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
       if (!sessionContext.isFailSafe()) {
         throw e;
       }
+      log.warn("Schema error: {}", e.getMessage());
       return orElse;
     }
   }
@@ -152,6 +157,7 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
       if (!sessionContext.isFailSafe()) {
         throw e;
       }
+      log.warn("Schema error: {}", e.getMessage());
     }
   }
 

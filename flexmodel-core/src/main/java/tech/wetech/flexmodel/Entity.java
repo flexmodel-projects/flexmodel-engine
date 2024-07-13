@@ -125,4 +125,12 @@ public class Entity implements Model {
     return this.getClass().getSimpleName() + "<" + getName() + ">";
   }
 
+  @Override
+  public Entity clone() {
+    Entity entity = new Entity(name);
+    entity.setComment(comment);
+    fields.forEach(entity::addField);
+    indexes.forEach(entity::addIndex);
+    return entity;
+  }
 }

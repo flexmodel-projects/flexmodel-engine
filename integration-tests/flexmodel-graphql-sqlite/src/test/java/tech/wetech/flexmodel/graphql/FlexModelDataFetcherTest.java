@@ -72,6 +72,7 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
                           String studentDetailEntityName, String courseEntityName, String teacherEntityName) {
     // 班级:学生
     session.createField(new RelationField("students")
+        .setModelName(classRoomEntityName)
         .setTargetEntity(studentEntityName)
         .setTargetField("classId")
         .setCardinality(ONE_TO_MANY)
@@ -79,24 +80,28 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
     );
     // 学生:课程 -> n:n
     session.createField(new RelationField("courses")
+        .setModelName(studentEntityName)
         .setTargetEntity(courseEntityName)
         .setTargetField("courseNo")
         .setCardinality(MANY_TO_MANY)
     );
     // 学生:学生明细 -> 1:1
     session.createField(new RelationField("studentDetail")
+        .setModelName(studentEntityName)
         .setTargetEntity(studentDetailEntityName)
         .setTargetField("studentId")
         .setCardinality(ONE_TO_ONE)
     );
     // 学生:教师 -> n:n
     session.createField(new RelationField("teachers")
+        .setModelName(studentEntityName)
         .setTargetEntity(teacherEntityName)
         .setTargetField("id")
         .setCardinality(MANY_TO_MANY)
     );
     // 教师:学生 -> n:n
     session.createField(new RelationField("students")
+        .setModelName(courseEntityName)
         .setTargetEntity(studentEntityName)
         .setTargetField("id")
         .setCardinality(MANY_TO_MANY)

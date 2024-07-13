@@ -16,10 +16,10 @@ import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -50,8 +50,9 @@ public class SessionFactory {
     try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(scriptName)) {
       if (is != null) {
         String scriptJSON = new String(is.readAllBytes());
-        ScriptDescribe describe = jsonObjectConverter.parseToObject(scriptJSON, ScriptDescribe.class);
+        ImportDescribe describe = jsonObjectConverter.parseToObject(scriptJSON, ImportDescribe.class);
         try (Session session = createFailSafeSession(schemaName)) {
+          List<RelationField> lazyCreateList = new ArrayList<>();
           for (Model model : describe.getSchema()) {
             if (!(model instanceof Entity newer)) {
               log.warn("Not supported model: {}", model.getName());
@@ -60,7 +61,15 @@ public class SessionFactory {
             try {
               Entity older = (Entity) session.getModel(newer.getName());
               if (older == null) {
-                session.createEntity(newer);
+                Entity newer2 = newer.clone();
+                // 跳过关联字段，解决表不存在的问题
+                for (TypedField<?, ?> field : newer2.getFields()) {
+                  if (field instanceof RelationField relationField) {
+                    newer2.removeField(field.getName());
+                    lazyCreateList.add(relationField);
+                  }
+                }
+                session.createEntity(newer2);
               } else {
                 List<TypedField<?, ?>> fields = older.getFields();
                 for (TypedField<?, ?> field : fields) {
@@ -77,12 +86,12 @@ public class SessionFactory {
               log.debug("Import script error: {}", e.getMessage(), e);
             }
           }
-          Map<String, List<Map<String, Object>>> data = describe.getData();
-          Set<Map.Entry<String, List<Map<String, Object>>>> entries = data.entrySet();
-          for (Map.Entry<String, List<Map<String, Object>>> entry : entries) {
+          lazyCreateRelationField(lazyCreateList, session);
+          List<ImportDescribe.ImportData> data = describe.getData();
+          for (ImportDescribe.ImportData item : data) {
             try {
-              String modelName = entry.getKey();
-              List<Map<String, Object>> records = entry.getValue();
+              String modelName = item.getModelName();
+              List<Map<String, Object>> records = item.getValues();
               session.insertAll(modelName, records);
             } catch (Exception e) {
               log.debug("Import script error: {}", e.getMessage(), e);
@@ -92,6 +101,12 @@ public class SessionFactory {
       }
     } catch (IOException e) {
       log.debug("Read import script error: {}", e.getMessage(), e);
+    }
+  }
+
+  private void lazyCreateRelationField(List<RelationField> relationFields, Session session) {
+    for (RelationField relationField : relationFields) {
+      session.createField(relationField);
     }
   }
 

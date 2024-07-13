@@ -55,7 +55,7 @@ public class SqlSchemaOperations implements SchemaOperations {
     createTable(sqlTable);
     for (TypedField<?, ?> typedField : entity.getFields()) {
       if (typedField instanceof RelationField relationField) {
-        createForeignKey(relationField);
+        createRelation(relationField);
       }
     }
     return entity;
@@ -100,79 +100,51 @@ public class SqlSchemaOperations implements SchemaOperations {
   @Override
   public TypedField<?, ?> createField(TypedField<?, ?> field) {
     if (field instanceof RelationField relationField) {
-      if (relationField.getCardinality() == MANY_TO_MANY) {
-
-        Entity entity = (Entity) getModel(field.getModelName());
-        Entity targetEntity = (Entity) getModel(relationField.getTargetEntity());
-        JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, relationField);
-
-        SqlTable joinTable = new SqlTable();
-        joinTable.setName(joinGraphNode.getJoinName());
-        SqlColumn joinColumn = new SqlColumn();
-        joinColumn.setTableName(joinGraphNode.getJoinName());
-        joinColumn.setName(joinGraphNode.getJoinFieldName());
-        joinColumn.setSqlTypeCode(sqlContext.getTypeHandler(joinGraphNode.getJoinFieldType()).getJdbcTypeCode());
-        joinTable.addColumn(joinColumn);
-        SqlColumn inverseJoinColumn = new SqlColumn();
-        inverseJoinColumn.setTableName(joinGraphNode.getJoinName());
-        inverseJoinColumn.setName(joinGraphNode.getInverseJoinFieldName());
-        inverseJoinColumn.setSqlTypeCode(sqlContext.getTypeHandler(joinGraphNode.getInverseJoinFieldType()).getJdbcTypeCode());
-        joinTable.addColumn(inverseJoinColumn);
-
-        SqlTable sqlTable = toSqlTable(entity);
-        SqlTable targetSqlTable = toSqlTable(targetEntity);
-
-        joinTable.createForeignKey(List.of(joinColumn), sqlTable, List.of(sqlTable.getColumn(entity.findIdField().map(IDField::getName).orElseThrow())));
-        joinTable.createForeignKey(List.of(inverseJoinColumn), targetSqlTable, List.of(targetSqlTable.getColumn(relationField.getTargetField())));
-        try {
-          createTable(joinTable);
-        } catch (Exception ignored) {
-        }
-      } else {
-        createForeignKey(relationField);
-      }
+      createRelation(relationField);
     } else {
       createColumn(toSqlColumn(field));
     }
     return field;
   }
 
+  private void createRelation(RelationField field) {
+    if (field.getCardinality() == MANY_TO_MANY) {
+      Entity entity = (Entity) getModel(field.getModelName());
+      Entity targetEntity = (Entity) getModel(field.getTargetEntity());
+      JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, field);
+
+      SqlTable joinTable = new SqlTable();
+      joinTable.setName(joinGraphNode.getJoinName());
+      SqlColumn joinColumn = new SqlColumn();
+      joinColumn.setTableName(joinGraphNode.getJoinName());
+      joinColumn.setName(joinGraphNode.getJoinFieldName());
+      joinColumn.setSqlTypeCode(sqlContext.getTypeHandler(joinGraphNode.getJoinFieldType()).getJdbcTypeCode());
+      joinTable.addColumn(joinColumn);
+      SqlColumn inverseJoinColumn = new SqlColumn();
+      inverseJoinColumn.setTableName(joinGraphNode.getJoinName());
+      inverseJoinColumn.setName(joinGraphNode.getInverseJoinFieldName());
+      inverseJoinColumn.setSqlTypeCode(sqlContext.getTypeHandler(joinGraphNode.getInverseJoinFieldType()).getJdbcTypeCode());
+      joinTable.addColumn(inverseJoinColumn);
+
+      SqlTable sqlTable = toSqlTable(entity);
+      SqlTable targetSqlTable = toSqlTable(targetEntity);
+
+      joinTable.createForeignKey(List.of(joinColumn), sqlTable, List.of(sqlTable.getColumn(entity.findIdField().map(IDField::getName).orElseThrow())));
+      joinTable.createForeignKey(List.of(inverseJoinColumn), targetSqlTable, List.of(targetSqlTable.getColumn(field.getTargetField())));
+      try {
+        createTable(joinTable);
+      } catch (Exception ignored) {
+      }
+    } else {
+      createForeignKey(field);
+    }
+  }
+
   @Override
   public TypedField<?, ?> modifyField(TypedField<?, ?> field) {
     try {
       if (field instanceof RelationField relationField) {
-        if (relationField.getCardinality() == MANY_TO_MANY) {
-          Entity entity = (Entity) getModel(field.getModelName());
-          Entity targetEntity = (Entity) getModel(relationField.getTargetEntity());
-          JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, relationField);
-
-          SqlTable joinTable = new SqlTable();
-          joinTable.setName(joinGraphNode.getJoinName());
-          SqlColumn joinColumn = new SqlColumn();
-          joinColumn.setTableName(joinGraphNode.getJoinName());
-          joinColumn.setName(joinGraphNode.getJoinFieldName());
-          joinColumn.setSqlTypeCode(sqlContext.getTypeHandler(joinGraphNode.getJoinFieldType()).getJdbcTypeCode());
-          joinTable.addColumn(joinColumn);
-          SqlColumn inverseJoinColumn = new SqlColumn();
-          inverseJoinColumn.setTableName(joinGraphNode.getJoinName());
-          inverseJoinColumn.setName(joinGraphNode.getInverseJoinFieldName());
-          inverseJoinColumn.setSqlTypeCode(sqlContext.getTypeHandler(joinGraphNode.getInverseJoinFieldType()).getJdbcTypeCode());
-          joinTable.addColumn(inverseJoinColumn);
-
-          SqlTable sqlTable = toSqlTable(entity);
-          SqlTable targetSqlTable = toSqlTable(targetEntity);
-
-          joinTable.createForeignKey(List.of(joinColumn), sqlTable, List.of(sqlTable.getColumn(entity.findIdField().map(IDField::getName).orElseThrow())));
-          joinTable.createForeignKey(List.of(inverseJoinColumn), targetSqlTable, List.of(targetSqlTable.getColumn(relationField.getTargetField())));
-          try {
-            createTable(joinTable);
-          } catch (Exception e) {
-            log.warn("modify relation field occurred exception： {}", e.getMessage());
-          }
-
-        } else {
-          createForeignKey(relationField);
-        }
+        createRelation(relationField);
       } else {
         modifyColumn(toSqlColumn(field));
       }
