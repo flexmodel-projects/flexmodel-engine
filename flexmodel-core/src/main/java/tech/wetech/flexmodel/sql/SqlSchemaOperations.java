@@ -353,6 +353,7 @@ public class SqlSchemaOperations implements SchemaOperations {
       idColumn.setTableName(toPhysicalTableString(field.getModelName()));
       idColumn.setName(field.getName());
       idColumn.setPrimaryKey(true);
+      idColumn.setUnique(true);
       idColumn.setSqlTypeCode(sqlContext.getTypeHandler(idField.getGeneratedValue().getType()).getJdbcTypeCode());
       idColumn.setAutoIncrement(idField.getGeneratedValue() == IDField.GeneratedValue.AUTO_INCREMENT);
       idColumn.setComment(field.getComment());

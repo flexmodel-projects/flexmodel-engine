@@ -16,6 +16,9 @@ public class UUIDValueGenerator extends AbstractValueGenerator<String, UUIDValue
 
   @Override
   public String generateValue(TypedField<String, ?> field, Map<String, Object> data) throws ValueGenerationException {
+    if (data.get(field.getName()) instanceof String str) {
+      return str;
+    }
     return UUID.randomUUID().toString();
   }
 
