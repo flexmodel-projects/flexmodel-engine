@@ -88,7 +88,7 @@
     <repository>
       <id>github</id>
       <name>GitHub MetaCode Apache Maven Packages</name>
-      <url>https://maven.pkg.github.com/flexmodel-project/flexmodel-maven-packages</url>
+      <url>https://maven.pkg.github.com/flexmodel-projects/flexmodel-maven-packages</url>
     </repository>
   </distributionManagement>
 </project>
