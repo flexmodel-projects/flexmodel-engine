@@ -11,6 +11,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import tech.wetech.flexmodel.JsonObjectConverter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ServiceLoader;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_BEANS;
@@ -66,8 +68,12 @@ public class JacksonObjectConverter implements JsonObjectConverter {
   }
 
   @Override
-  public <T> T convertValue(Object fromValue, UserTypeReference<T> typeReference) {
-    return jsonMapper.convertValue(fromValue, typeReference);
+  public <T> List<T> convertValueList(List<?> fromValues, Class<T> cls) {
+    List<T> list = new ArrayList<>();
+    for (Object fromValue : fromValues) {
+      list.add(convertValue(fromValue, cls));
+    }
+    return list;
   }
 
 }

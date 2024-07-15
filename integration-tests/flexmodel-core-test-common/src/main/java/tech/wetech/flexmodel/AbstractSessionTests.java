@@ -821,6 +821,7 @@ public abstract class AbstractSessionTests {
     createTeacherEntity2(entityName);
     List<TeacherDTO> list = session.find(entityName, query -> query, TeacherDTO.class);
     Assertions.assertFalse(list.isEmpty());
+    Assertions.assertNotNull(list.getFirst().getId());
   }
 
   @Test

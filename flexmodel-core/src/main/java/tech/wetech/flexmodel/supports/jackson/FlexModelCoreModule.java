@@ -1,10 +1,17 @@
 package tech.wetech.flexmodel.supports.jackson;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.generator.FixedValueGenerator;
 import tech.wetech.flexmodel.generator.ValueGenerator;
 import tech.wetech.flexmodel.validator.*;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author cjbi
@@ -50,5 +57,12 @@ public class FlexModelCoreModule extends SimpleModule {
     setMixInAnnotation(RegexpValidator.class, RegexpValidatorMixIn.class);
     setMixInAnnotation(URLValidator.class, URLValidatorMixIn.class);
 
+    addSerializer(Date.class, new JsonSerializer<>() {
+      @Override
+      public void serialize(Date date, JsonGenerator g, SerializerProvider provider) throws IOException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
+        g.writeString(sdf.format(date));
+      }
+    });
   }
 }

@@ -1,7 +1,6 @@
 package tech.wetech.flexmodel.sql;
 
 import tech.wetech.flexmodel.*;
-import tech.wetech.flexmodel.JsonObjectConverter.UserTypeReference;
 import tech.wetech.flexmodel.graph.JoinGraphNode;
 import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 import tech.wetech.flexmodel.sql.type.SqlResultHandler;
@@ -152,7 +151,7 @@ public class SqlDataOperations implements DataOperations {
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
     List<Map<String, Object>> mapList = findMapList(modelName, query);
     QueryHelper.deepQuery(mapList, this::findMapList, sqlContext.getModel(modelName), query, sqlContext, sqlContext.getDeepQueryMaxDepth());
-    return sqlContext.getJsonObjectConverter().convertValue(mapList, new UserTypeReference<>());
+    return sqlContext.getJsonObjectConverter().convertValueList(mapList, resultType);
   }
 
   private List<Map<String, Object>> findMapList(String modelName, Query query) {
