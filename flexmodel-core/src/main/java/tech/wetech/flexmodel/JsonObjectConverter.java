@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import java.util.List;
 import java.util.Map;
 
@@ -18,10 +20,15 @@ public interface JsonObjectConverter {
   }
 
   @SuppressWarnings("unchecked")
-  default List<Map<String,Object>> parseToMapList(String jsonString){
-    return parseToObject(jsonString,List.class);
+  default List<Map<String, Object>> parseToMapList(String jsonString) {
+    return parseToObject(jsonString, List.class);
   }
 
   <T> T convertValue(Object fromValue, Class<T> cls);
 
+  <T> T convertValue(Object fromValue, UserTypeReference<T> typeReference);
+
+  public static class UserTypeReference<T> extends TypeReference<T> {
+
+  }
 }

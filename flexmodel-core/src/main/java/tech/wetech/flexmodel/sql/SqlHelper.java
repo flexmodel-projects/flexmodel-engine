@@ -25,6 +25,7 @@ class SqlHelper {
   }
 
   private static Map.Entry<String, Map<String, Object>> toQuerySql(SqlContext sqlContext, String modelName, Query query, boolean prepared) {
+    QueryHelper.validate(sqlContext, modelName, query);
     String sqlString;
     Map<String, Object> params = new HashMap<>();
     SqlDialect sqlDialect = sqlContext.getSqlDialect();

@@ -15,6 +15,7 @@ import static tech.wetech.flexmodel.RelationField.Cardinality.MANY_TO_MANY;
 class MongoHelper {
 
   static List<Document> createPipeline(String modelName, MongoContext mongoContext, Query query) {
+    QueryHelper.validate(mongoContext, modelName, query);
     String schemaName = mongoContext.getSchemaName();
     Model model = mongoContext.getMappedModels().getModel(schemaName, modelName);
     PhysicalNamingStrategy physicalNamingStrategy = mongoContext.getPhysicalNamingStrategy();

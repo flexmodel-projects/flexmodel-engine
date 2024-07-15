@@ -13,7 +13,9 @@ import static tech.wetech.flexmodel.Projections.field;
  */
 public class QueryHelper {
 
-  public static void validate(String schemaName, String modelName, MappedModels mappedModels, Query query) {
+  public static void validate(AbstractSessionContext sessionContext, String modelName, Query query) {
+    String schemaName = sessionContext.getSchemaName();
+    MappedModels mappedModels = sessionContext.getMappedModels();
     Query.Projection projection = query.getProjection();
     Query.GroupBy groupBy = query.getGroupBy();
     if (groupBy != null) {

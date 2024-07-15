@@ -1,13 +1,17 @@
 package tech.wetech.flexmodel.sql;
 
 import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.JsonObjectConverter.UserTypeReference;
 import tech.wetech.flexmodel.graph.JoinGraphNode;
 import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 import tech.wetech.flexmodel.sql.type.SqlResultHandler;
 import tech.wetech.flexmodel.sql.type.SqlTypeHandler;
 import tech.wetech.flexmodel.sql.type.UnknownSqlTypeHandler;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -146,11 +150,9 @@ public class SqlDataOperations implements DataOperations {
 
   @Override
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
-    List<T> list = new ArrayList<>();
     List<Map<String, Object>> mapList = findMapList(modelName, query);
     QueryHelper.deepQuery(mapList, this::findMapList, sqlContext.getModel(modelName), query, sqlContext, sqlContext.getDeepQueryMaxDepth());
-    mapList.forEach(map -> list.add(sqlContext.getJsonObjectConverter().convertValue(map, resultType)));
-    return list;
+    return sqlContext.getJsonObjectConverter().convertValue(mapList, new UserTypeReference<>());
   }
 
   private List<Map<String, Object>> findMapList(String modelName, Query query) {

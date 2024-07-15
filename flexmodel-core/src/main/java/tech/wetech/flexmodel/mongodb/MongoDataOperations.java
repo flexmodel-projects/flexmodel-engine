@@ -6,6 +6,7 @@ import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.JsonObjectConverter.UserTypeReference;
 import tech.wetech.flexmodel.graph.JoinGraphNode;
 
 import java.util.ArrayList;
@@ -130,14 +131,13 @@ public class MongoDataOperations implements DataOperations {
   @Override
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
     List<Map<String, Object>> mapList = findMapList(modelName, query);
-    List<T> list = new ArrayList<>();
     QueryHelper.deepQuery(mapList, this::findMapList, mongoContext.getModel(modelName), query, mongoContext, mongoContext.getDeepQueryMaxDepth());
-    mapList.forEach(map -> list.add(mongoContext.getJsonObjectConverter().convertValue(map, resultType)));
-    return list;
+    return mongoContext.getJsonObjectConverter().convertValue(mapList, new UserTypeReference<>());
   }
 
   private List<Map<String, Object>> findMapList(String modelName, Query query) {
     List<Document> pipeline = MongoHelper.createPipeline(modelName, mongoContext, query);
+
     String collectionName = getCollectionName(modelName);
     List list = mongoDatabase.getCollection(collectionName, Map.class)
       .aggregate(pipeline)

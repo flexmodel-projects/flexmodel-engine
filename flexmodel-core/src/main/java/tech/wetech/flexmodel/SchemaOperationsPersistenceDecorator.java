@@ -54,7 +54,6 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   public View createView(String viewName, String viewOn, Query query) {
     String schemaName = sessionContext.getSchemaName();
     MappedModels mappedModels = sessionContext.getMappedModels();
-    QueryHelper.validate(schemaName, viewOn, mappedModels, query);
     View view = inspect(() -> delegate.createView(viewName, viewOn, query), null);
     mappedModels.persist(schemaName, view);
     return view;

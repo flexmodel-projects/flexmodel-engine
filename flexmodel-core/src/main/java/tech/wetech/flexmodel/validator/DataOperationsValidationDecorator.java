@@ -1,6 +1,9 @@
 package tech.wetech.flexmodel.validator;
 
-import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.AbstractDataOperationsDecorator;
+import tech.wetech.flexmodel.AbstractSessionContext;
+import tech.wetech.flexmodel.DataOperations;
+import tech.wetech.flexmodel.Query;
 
 import java.util.List;
 import java.util.Map;
@@ -34,13 +37,11 @@ public class DataOperationsValidationDecorator extends AbstractDataOperationsDec
 
   @Override
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
-    QueryHelper.validate(sessionContext.getSchemaName(), modelName, sessionContext.getMappedModels(), query);
     return delegate.find(modelName, query, resultType);
   }
 
   @Override
   public long count(String modelName, Query query) {
-    QueryHelper.validate(sessionContext.getSchemaName(), modelName, sessionContext.getMappedModels(), query);
     return delegate.count(modelName, query);
   }
 
