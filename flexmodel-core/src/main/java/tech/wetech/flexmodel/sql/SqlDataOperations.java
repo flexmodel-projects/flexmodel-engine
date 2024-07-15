@@ -146,12 +146,16 @@ public class SqlDataOperations implements DataOperations {
 
   @Override
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
-    Model model = mappedModels.getModel(schemaName, modelName);
-    Map.Entry<String, Map<String, Object>> entry = SqlHelper.toQuerySqlWithPrepared(sqlContext, modelName, query);
     List<T> list = new ArrayList<>();
-    sqlExecutor.queryForList(entry.getKey(), entry.getValue(), getSqlResultHandler(model, query, Map.class)).forEach(map -> {
-      list.add(sqlContext.getJsonObjectConverter().convertValue(map, resultType));
-    });
+    List<Map<String, Object>> mapList = findMapList(modelName, query);
+    QueryHelper.deepQuery(mapList, this::findMapList, sqlContext.getModel(modelName), query, sqlContext, sqlContext.getDeepQueryMaxDepth());
+    mapList.forEach(map -> list.add(sqlContext.getJsonObjectConverter().convertValue(map, resultType)));
+    return list;
+  }
+
+  private List<Map<String, Object>> findMapList(String modelName, Query query) {
+    Map.Entry<String, Map<String, Object>> entry = SqlHelper.toQuerySqlWithPrepared(sqlContext, modelName, query);
+    List list = sqlExecutor.queryForList(entry.getKey(), entry.getValue(), getSqlResultHandler(sqlContext.getModel(modelName), query, Map.class));
     return list;
   }
 

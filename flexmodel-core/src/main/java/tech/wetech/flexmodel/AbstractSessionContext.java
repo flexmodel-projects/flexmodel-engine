@@ -18,7 +18,8 @@ public abstract class AbstractSessionContext {
   protected final MappedModels mappedModels;
   protected final JsonObjectConverter jsonObjectConverter;
   protected PhysicalNamingStrategy physicalNamingStrategy = new DefaultPhysicalNamingStrategy();
-  protected boolean failSafe = false;
+  protected boolean failFast = false;
+  protected int deepQueryMaxDepth = 5;
 
   protected AbstractSessionContext(String schemaName, MappedModels mappedModels, JsonObjectConverter jsonObjectConverter) {
     this.schemaName = schemaName;
@@ -52,15 +53,23 @@ public abstract class AbstractSessionContext {
     DomainEventPublisher.instance().publish(aDomainEvent);
   }
 
-  public boolean isFailSafe() {
-    return failSafe;
+  public boolean isFailFast() {
+    return failFast;
   }
 
-  public void setFailSafe(boolean failSafe) {
-    this.failSafe = failSafe;
+  public void setFailFast(boolean failFast) {
+    this.failFast = failFast;
   }
 
   public JsonObjectConverter getJsonObjectConverter() {
     return jsonObjectConverter;
+  }
+
+  public int getDeepQueryMaxDepth() {
+    return deepQueryMaxDepth;
+  }
+
+  public void setDeepQueryMaxDepth(int deepQueryMaxDepth) {
+    this.deepQueryMaxDepth = deepQueryMaxDepth;
   }
 }

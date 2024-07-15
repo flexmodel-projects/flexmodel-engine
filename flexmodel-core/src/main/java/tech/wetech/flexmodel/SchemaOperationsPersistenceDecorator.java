@@ -137,7 +137,7 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
     try {
       return supplier.get();
     } catch (Exception e) {
-      if (!sessionContext.isFailSafe()) {
+      if (sessionContext.isFailFast()) {
         throw e;
       }
       log.warn("Schema error: {}", e.getMessage());
@@ -154,7 +154,7 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
     try {
       noArg.exec();
     } catch (Exception e) {
-      if (!sessionContext.isFailSafe()) {
+      if (sessionContext.isFailFast()) {
         throw e;
       }
       log.warn("Schema error: {}", e.getMessage());

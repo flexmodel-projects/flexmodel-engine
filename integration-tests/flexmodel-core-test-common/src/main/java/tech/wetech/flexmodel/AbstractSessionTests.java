@@ -398,6 +398,11 @@ public abstract class AbstractSessionTests {
     );
     Assertions.assertFalse(manyToMany.isEmpty());
     Assertions.assertEquals(3, manyToMany.size());
+
+    // deep query
+    List<Map<String, Object>> deepList = session.find(classesEntityName, query -> query.setDeep(true));
+    Assertions.assertFalse(deepList.isEmpty());
+    Assertions.assertNotNull(deepList.getFirst().get("students"));
   }
 
 

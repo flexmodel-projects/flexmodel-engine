@@ -3,7 +3,10 @@ package tech.wetech.flexmodel;
 import tech.wetech.flexmodel.sql.SqlExecutionException;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+
+import static tech.wetech.flexmodel.Projections.field;
 
 /**
  * @author cjbi
@@ -59,9 +62,8 @@ public class QueryHelper {
   public static Map<String, RelationField> findRelationFields(Model model, Query query) {
     Map<String, RelationField> relationFields = new HashMap<>();
     if (model instanceof Entity entity) {
-      Query.Projection projection = query.getProjection();
-      if (projection != null) {
-        for (Map.Entry<String, Query.QueryCall> entry : projection.getFields().entrySet()) {
+      if (query != null && query.getProjection() != null) {
+        for (Map.Entry<String, Query.QueryCall> entry : query.getProjection().getFields().entrySet()) {
           String key = entry.getKey();
           Query.QueryCall value = entry.getValue();
           if (value instanceof Query.QueryField queryField) {
@@ -82,5 +84,65 @@ public class QueryHelper {
     }
     return relationFields;
   }
+
+  private static List<Map<String, Object>> findRelationList(AbstractSessionContext sessionContext,
+                                                            BiFunction<String, Query,
+                                                              List<Map<String, Object>>> relationFn,
+                                                            RelationField relationField, Object id) {
+    Model model = sessionContext.getModel(relationField.getModelName());
+    if (model instanceof Entity entity) {
+      List<Map<String, Object>> mapList = relationFn.apply(entity.getName(),
+        new Query()
+          .setProjection(projection -> {
+              Entity targetEntity = (Entity) sessionContext.getModel(relationField.getTargetEntity());
+              for (TypedField<?, ?> field : targetEntity.getFields()) {
+                if (field instanceof RelationField) {
+                  continue;
+                }
+                projection.addField(field.getName(), field(field.getModelName() + "." + field.getName()));
+              }
+              return projection;
+            }
+          )
+          .setJoins(joins -> joins.addInnerJoin(join -> join.setFrom(relationField.getTargetEntity())))
+          .setFilter(String.format("""
+            {
+              "==": [{ "var": ["%s.%s"] }, %s]
+            }
+            """, entity.getName(), entity.findIdField().orElseThrow().getName(), id instanceof String ? "\"" + id + "\"" : id))
+      );
+      return mapList;
+    }
+    return List.of();
+  }
+
+  public static void deepQuery(List<Map<String, Object>> parentList,
+                               BiFunction<String, Query,
+                                 List<Map<String, Object>>> relationFn,
+                               Model model,
+                               Query query,
+                               AbstractSessionContext sessionContext,
+                               int maxDepth) {
+    if (maxDepth <= 0) {
+      return;
+    }
+    Map<String, RelationField> relationFieldMap = QueryHelper.findRelationFields(model, query);
+    for (Map<String, Object> item : parentList) {
+      for (Map.Entry<String, RelationField> entry : relationFieldMap.entrySet()) {
+        String key = entry.getKey();
+        if (model instanceof Entity entity) {
+          IDField idField = entity.findIdField().orElseThrow();
+          Object id = item.get(idField.getName());
+          RelationField relationField = entry.getValue();
+          List<Map<String, Object>> list = findRelationList(sessionContext, relationFn, relationField, id);
+          deepQuery(list, relationFn, sessionContext.getModel(relationField.getTargetEntity()), null, sessionContext, --maxDepth);
+          if (!list.isEmpty()) {
+            item.put(key, relationField.getCardinality() == RelationField.Cardinality.ONE_TO_ONE ? list.getFirst() : list);
+          }
+        }
+      }
+    }
+  }
+
 
 }

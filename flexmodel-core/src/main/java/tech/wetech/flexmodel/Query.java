@@ -16,6 +16,7 @@ public class Query implements Serializable {
   private Sort sort;
   private Integer limit;
   private Integer offset;
+  private boolean deep;
 
   public interface QueryCall extends Serializable {
   }
@@ -146,6 +147,15 @@ public class Query implements Serializable {
 
   public Query setOffset(Integer offset) {
     this.offset = offset;
+    return this;
+  }
+
+  public boolean isDeep() {
+    return deep;
+  }
+
+  public Query setDeep(boolean deep) {
+    this.deep = deep;
     return this;
   }
 

@@ -70,9 +70,7 @@ public class MongoDataOperations implements DataOperations {
     long sequenceNextVal = schemaOperations.getSequenceNextVal(sequenceName);
     Entity entity = (Entity) schemaOperations.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
-    if (idField != null) {
-      record.put(idField.getName(), sequenceNextVal);
-    }
+    record.put(idField.getName(), sequenceNextVal);
   }
 
   @Override
@@ -131,11 +129,20 @@ public class MongoDataOperations implements DataOperations {
 
   @Override
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
-    String collectionName = getCollectionName(modelName);
+    List<Map<String, Object>> mapList = findMapList(modelName, query);
+    List<T> list = new ArrayList<>();
+    QueryHelper.deepQuery(mapList, this::findMapList, mongoContext.getModel(modelName), query, mongoContext, mongoContext.getDeepQueryMaxDepth());
+    mapList.forEach(map -> list.add(mongoContext.getJsonObjectConverter().convertValue(map, resultType)));
+    return list;
+  }
+
+  private List<Map<String, Object>> findMapList(String modelName, Query query) {
     List<Document> pipeline = MongoHelper.createPipeline(modelName, mongoContext, query);
-    return mongoDatabase.getCollection(collectionName, resultType)
+    String collectionName = getCollectionName(modelName);
+    List list = mongoDatabase.getCollection(collectionName, Map.class)
       .aggregate(pipeline)
       .into(new ArrayList<>());
+    return list;
   }
 
   @Override
