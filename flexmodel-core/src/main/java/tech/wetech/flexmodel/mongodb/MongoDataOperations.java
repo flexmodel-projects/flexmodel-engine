@@ -117,6 +117,7 @@ public class MongoDataOperations implements DataOperations {
   }
 
   @Override
+  @SuppressWarnings({"rawtypes", "unchecked"})
   public <T> T findById(String modelName, Object id, Class<T> resultType, boolean deep) {
     String collectionName = getCollectionName(modelName);
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
@@ -125,7 +126,7 @@ public class MongoDataOperations implements DataOperations {
     Map dataMap = mongoDatabase.getCollection(collectionName, Map.class)
       .find(Filters.eq(idField.getName(), id))
       .first();
-    if (deep) {
+    if (deep && dataMap != null) {
       QueryHelper.deepQuery(List.of(dataMap), this::findMapList, mongoContext.getModel(modelName),
         null, mongoContext, mongoContext.getDeepQueryMaxDepth());
     }
