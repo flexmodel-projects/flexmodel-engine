@@ -38,8 +38,8 @@ public class AbstractDataOperationsDecorator implements DataOperations {
   }
 
   @Override
-  public <T> T findById(String modelName, Object id, Class<T> resultType) {
-    return delegate.findById(modelName, id, resultType);
+  public <T> T findById(String modelName, Object id, Class<T> resultType, boolean deep) {
+    return delegate.findById(modelName, id, resultType, deep);
   }
 
   @Override

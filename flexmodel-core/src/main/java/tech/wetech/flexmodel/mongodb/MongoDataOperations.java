@@ -117,14 +117,19 @@ public class MongoDataOperations implements DataOperations {
   }
 
   @Override
-  public <T> T findById(String modelName, Object id, Class<T> resultType) {
+  public <T> T findById(String modelName, Object id, Class<T> resultType, boolean deep) {
     String collectionName = getCollectionName(modelName);
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
 
-    return mongoDatabase.getCollection(collectionName, resultType)
+    Map dataMap = mongoDatabase.getCollection(collectionName, Map.class)
       .find(Filters.eq(idField.getName(), id))
       .first();
+    if (deep) {
+      QueryHelper.deepQuery(List.of(dataMap), this::findMapList, mongoContext.getModel(modelName),
+        null, mongoContext, mongoContext.getDeepQueryMaxDepth());
+    }
+    return mongoContext.getJsonObjectConverter().convertValue(dataMap, resultType);
   }
 
   @Override

@@ -129,7 +129,7 @@ public class SqlDataOperations implements DataOperations {
   }
 
   @Override
-  public <T> T findById(String modelName, Object id, Class<T> resultType) {
+  public <T> T findById(String modelName, Object id, Class<T> resultType, boolean deep) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
@@ -144,13 +144,18 @@ public class SqlDataOperations implements DataOperations {
                  " " +
                  " where (" + sqlDialect.quoteIdentifier(idField.getName()) + "= :id)";
     Map<String, Object> dataMap = sqlExecutor.queryForObject(sql, Map.of("id", id), getSqlResultHandler(entity, null, Map.class));
+    if (deep && dataMap != null) {
+      QueryHelper.deepQuery(List.of(dataMap), this::findMapList, sqlContext.getModel(modelName), null, sqlContext, sqlContext.getDeepQueryMaxDepth());
+    }
     return sqlContext.getJsonObjectConverter().convertValue(dataMap, resultType);
   }
 
   @Override
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
     List<Map<String, Object>> mapList = findMapList(modelName, query);
-    QueryHelper.deepQuery(mapList, this::findMapList, sqlContext.getModel(modelName), query, sqlContext, sqlContext.getDeepQueryMaxDepth());
+    if (query.isDeep()) {
+      QueryHelper.deepQuery(mapList, this::findMapList, sqlContext.getModel(modelName), query, sqlContext, sqlContext.getDeepQueryMaxDepth());
+    }
     return sqlContext.getJsonObjectConverter().convertValueList(mapList, resultType);
   }
 

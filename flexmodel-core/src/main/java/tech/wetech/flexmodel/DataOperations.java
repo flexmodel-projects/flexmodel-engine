@@ -33,7 +33,7 @@ public interface DataOperations {
    * @param id        编号
    * @return 记录
    */
-  <T> T findById(String modelName, Object id, Class<T> resultType);
+  <T> T findById(String modelName, Object id, Class<T> resultType, boolean deep);
 
   <T> List<T> find(String modelName, Query query, Class<T> resultType);
 
@@ -128,11 +128,36 @@ public interface DataOperations {
    *
    * @param modelName
    * @param id
+   * @param resultType
+   * @param <T>
+   * @return
+   */
+  default <T> T findById(String modelName, Object id, Class<T> resultType) {
+    return findById(modelName, id, resultType, false);
+  }
+
+  /**
+   * 根据id获取数据
+   *
+   * @param modelName
+   * @param id
    * @return
    */
   @SuppressWarnings("unchecked")
   default Map<String, Object> findById(String modelName, Object id) {
     return findById(modelName, id, Map.class);
+  }
+
+  /**
+   * 根据id获取数据
+   *
+   * @param modelName
+   * @param id
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  default Map<String, Object> findById(String modelName, Object id, boolean deep) {
+    return findById(modelName, id, Map.class, deep);
   }
 
   /**
