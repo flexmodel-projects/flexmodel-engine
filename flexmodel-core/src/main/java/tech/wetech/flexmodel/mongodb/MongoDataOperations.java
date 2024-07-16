@@ -140,6 +140,7 @@ public class MongoDataOperations implements DataOperations {
     return mongoContext.getJsonObjectConverter().convertValueList(mapList, resultType);
   }
 
+  @SuppressWarnings({"rawtypes"})
   private List<Map<String, Object>> findMapList(String modelName, Query query) {
     List<Document> pipeline = MongoHelper.createPipeline(modelName, mongoContext, query);
 
