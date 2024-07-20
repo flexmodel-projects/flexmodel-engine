@@ -921,7 +921,7 @@ public abstract class AbstractSessionTests {
     deleted.setDefaultValue(false);
     entity.addField(deleted);
     session.createField(deleted);
-    //datetime
+    // datetime
     DatetimeField createDatetime = new DatetimeField("createDatetime");
     createDatetime.setModelName(entityName);
     createDatetime.setComment("创建日期时间");

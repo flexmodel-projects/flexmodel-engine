@@ -134,6 +134,7 @@ public class SqlDataOperations implements DataOperations {
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     String columnsString = entity.getFields().stream()
+      .filter(f -> !(f instanceof RelationField))
       .map(field -> sqlDialect.quoteIdentifier(field.getName()))
       .collect(Collectors.joining(", "));
 
@@ -151,14 +152,17 @@ public class SqlDataOperations implements DataOperations {
   }
 
   @Override
+  @SuppressWarnings("all")
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
-    List<Map<String, Object>> mapList = findMapList(modelName, query);
+    Map.Entry<String, Map<String, Object>> entry = SqlHelper.toQuerySqlWithPrepared(sqlContext, modelName, query);
+    List mapList = sqlExecutor.queryForList(entry.getKey(), entry.getValue(), getSqlResultHandler(sqlContext.getModel(modelName), query, Map.class));
     if (query.isDeep()) {
       QueryHelper.deepQuery(mapList, this::findMapList, sqlContext.getModel(modelName), query, sqlContext, sqlContext.getDeepQueryMaxDepth());
     }
     return sqlContext.getJsonObjectConverter().convertValueList(mapList, resultType);
   }
 
+  @SuppressWarnings("all")
   private List<Map<String, Object>> findMapList(String modelName, Query query) {
     Map.Entry<String, Map<String, Object>> entry = SqlHelper.toQuerySqlWithPrepared(sqlContext, modelName, query);
     List list = sqlExecutor.queryForList(entry.getKey(), entry.getValue(), getSqlResultHandler(sqlContext.getModel(modelName), query, Map.class));

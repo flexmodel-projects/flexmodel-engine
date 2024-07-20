@@ -3,6 +3,10 @@ package tech.wetech.flexmodel;
 import tech.wetech.flexmodel.sql.SqlExecutionException;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -125,26 +129,40 @@ public class QueryHelper {
                                Query query,
                                AbstractSessionContext sessionContext,
                                int maxDepth) {
-    if (maxDepth <= 0) {
+    deepQuery(parentList, relationFn, model, query, sessionContext, new AtomicInteger(maxDepth));
+  }
+
+
+  public static void deepQuery(List<Map<String, Object>> parentList,
+                               BiFunction<String, Query,
+                                 List<Map<String, Object>>> relationFn,
+                               Model model,
+                               Query query,
+                               AbstractSessionContext sessionContext,
+                               AtomicInteger maxDepth) {
+    if (maxDepth.get() <= 0) {
       return;
     }
     Map<String, RelationField> relationFieldMap = QueryHelper.findRelationFields(model, query);
-    for (Map<String, Object> item : parentList) {
-      for (Map.Entry<String, RelationField> entry : relationFieldMap.entrySet()) {
-        String key = entry.getKey();
-        if (model instanceof Entity entity) {
-          IDField idField = entity.findIdField().orElseThrow();
-          Object id = item.get(idField.getName());
-          RelationField relationField = entry.getValue();
-          List<Map<String, Object>> list = findRelationList(sessionContext, relationFn, relationField, id);
-          deepQuery(list, relationFn, sessionContext.getModel(relationField.getTargetEntity()), null, sessionContext, --maxDepth);
-          if (!list.isEmpty()) {
-            item.put(key, relationField.getCardinality() == RelationField.Cardinality.ONE_TO_ONE ? list.getFirst() : list);
+    ThreadFactory factory = Thread.ofVirtual().name(sessionContext.getSchemaName() + "." + model.getName() + "-deepQuery-worker-", 1).factory();
+    ExecutorService executorService = Executors.newThreadPerTaskExecutor(factory);
+    relationFieldMap.entrySet().parallelStream().forEach(entry -> {
+      String key = entry.getKey();
+      RelationField relationField = entry.getValue();
+      executorService.submit(() -> parentList.parallelStream().forEach(item -> {
+          if (model instanceof Entity entity) {
+            IDField idField = entity.findIdField().orElseThrow();
+            Object id = item.get(idField.getName());
+            List<Map<String, Object>> list = findRelationList(sessionContext, relationFn, relationField, id);
+            deepQuery(list, relationFn, sessionContext.getModel(relationField.getTargetEntity()), null, sessionContext, maxDepth.decrementAndGet());
+            if (!list.isEmpty()) {
+              item.put(key, relationField.getCardinality() == RelationField.Cardinality.ONE_TO_ONE ? list.getFirst() : list);
+            }
           }
         }
-      }
-    }
+      ));
+    });
+    executorService.close();
   }
-
 
 }
