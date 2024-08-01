@@ -16,9 +16,9 @@ import java.util.Date;
 /**
  * @author cjbi
  */
-public class FlexModelCoreModule extends SimpleModule {
+public class FlexmodelCoreModule extends SimpleModule {
 
-  public FlexModelCoreModule() {
+  public FlexmodelCoreModule() {
     // Model
     setMixInAnnotation(Model.class, ModelMixIn.class);
     setMixInAnnotation(Entity.class, ModelMixIn.class);

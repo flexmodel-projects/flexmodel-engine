@@ -13,18 +13,21 @@ import java.util.Map;
  */
 public abstract class AbstractSessionContext {
 
-  protected final String schemaName;
   protected final Logger log = LoggerFactory.getLogger(SqlContext.class);
+
+  protected final String schemaName;
   protected final MappedModels mappedModels;
   protected final JsonObjectConverter jsonObjectConverter;
   protected PhysicalNamingStrategy physicalNamingStrategy = new DefaultPhysicalNamingStrategy();
   protected boolean failFast = false;
   protected int deepQueryMaxDepth = 5;
+  protected final SessionFactory factory;
 
-  protected AbstractSessionContext(String schemaName, MappedModels mappedModels, JsonObjectConverter jsonObjectConverter) {
+  protected AbstractSessionContext(String schemaName, MappedModels mappedModels, JsonObjectConverter jsonObjectConverter, SessionFactory factory) {
     this.schemaName = schemaName;
     this.mappedModels = mappedModels;
     this.jsonObjectConverter = jsonObjectConverter;
+      this.factory = factory;
   }
 
   public PhysicalNamingStrategy getPhysicalNamingStrategy() {
@@ -71,5 +74,9 @@ public abstract class AbstractSessionContext {
 
   public void setDeepQueryMaxDepth(int deepQueryMaxDepth) {
     this.deepQueryMaxDepth = deepQueryMaxDepth;
+  }
+
+  public SessionFactory getFactory() {
+    return factory;
   }
 }

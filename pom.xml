@@ -25,7 +25,7 @@
     <testcontainers.version>1.19.8</testcontainers.version>
     <mongodb-driver.version>5.0.1</mongodb-driver.version>
     <junit.version>5.7.0</junit.version>
-    <graphql-java.version>22.0</graphql-java.version>
+    <graphql-java.version>22.1</graphql-java.version>
     <HikariCP.version>5.1.0</HikariCP.version>
     <sqlite-jdbc.version>3.45.3.0</sqlite-jdbc.version>
   </properties>
@@ -91,4 +91,21 @@
       <url>https://maven.pkg.github.com/flexmodel-projects/flexmodel-maven-packages</url>
     </repository>
   </distributionManagement>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.2.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -1,42 +1,31 @@
 package tech.wetech.flexmodel.graphql;
 
-import graphql.ExecutionResult;
-import graphql.GraphQL;
-import graphql.schema.GraphQLSchema;
-import graphql.schema.idl.RuntimeWiring;
-import graphql.schema.idl.SchemaGenerator;
-import graphql.schema.idl.SchemaParser;
-import graphql.schema.idl.TypeDefinitionRegistry;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.util.List;
 import java.util.Map;
 
-import static graphql.schema.idl.RuntimeWiring.newRuntimeWiring;
 import static tech.wetech.flexmodel.IDField.GeneratedValue.*;
 import static tech.wetech.flexmodel.RelationField.Cardinality.*;
 
 /**
  * @author cjbi
  */
+public class Models {
 
-public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
+  private static final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
 
-  private final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
-
-  void createClassesEntity(String entityName) {
-    session.createEntity(entityName, entity -> entity
+  public static Entity createClassesEntity(Session session, String entityName) {
+    return session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("classCode"))
       .addField(new StringField("className"))
     );
   }
 
-  void createStudentEntity(String entityName) {
-    session.createEntity(entityName, entity -> entity
+  public static Entity createStudentEntity(Session session, String entityName) {
+    return session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("studentName"))
       .addField(new StringField("gender"))
@@ -45,70 +34,70 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
     );
   }
 
-  void createStudentDetailEntity(String entityName) {
-    session.createEntity(entityName, entity -> entity
+  public static Entity createStudentDetailEntity(Session session, String entityName) {
+    return session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(AUTO_INCREMENT))
       .addField(new IntField("studentId"))
       .addField(new TextField("description"))
     );
   }
 
-  void createCourseEntity(String entityName) {
-    session.createEntity(entityName, entity -> entity
+  public static Entity createCourseEntity(Session session, String entityName) {
+    return session.createEntity(entityName, entity -> entity
       .addField(new IDField("courseNo").setGeneratedValue(STRING_NOT_GENERATED))
       .addField(new StringField("courseName"))
     );
   }
 
-  void createTeacherEntity(String entityName) {
-    session.createEntity(entityName, entity -> entity
+  public static Entity createTeacherEntity(Session session, String entityName) {
+    return session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("teacherName"))
       .addField(new StringField("subject"))
     );
   }
 
-  void createAssociations(String classRoomEntityName, String studentEntityName,
-                          String studentDetailEntityName, String courseEntityName, String teacherEntityName) {
+  public static void createAssociations(Session session, String classRoomEntityName, String studentEntityName,
+                                        String studentDetailEntityName, String courseEntityName, String teacherEntityName) {
     // 班级:学生
     session.createField(new RelationField("students")
-        .setModelName(classRoomEntityName)
-        .setTargetEntity(studentEntityName)
-        .setTargetField("classId")
-        .setCardinality(ONE_TO_MANY)
-        .setCascadeDelete(true)
+      .setModelName(classRoomEntityName)
+      .setTargetEntity(studentEntityName)
+      .setTargetField("classId")
+      .setCardinality(ONE_TO_MANY)
+      .setCascadeDelete(true)
     );
     // 学生:课程 -> n:n
     session.createField(new RelationField("courses")
-        .setModelName(studentEntityName)
-        .setTargetEntity(courseEntityName)
-        .setTargetField("courseNo")
-        .setCardinality(MANY_TO_MANY)
+      .setModelName(studentEntityName)
+      .setTargetEntity(courseEntityName)
+      .setTargetField("courseNo")
+      .setCardinality(MANY_TO_MANY)
     );
     // 学生:学生明细 -> 1:1
     session.createField(new RelationField("studentDetail")
-        .setModelName(studentEntityName)
-        .setTargetEntity(studentDetailEntityName)
-        .setTargetField("studentId")
-        .setCardinality(ONE_TO_ONE)
+      .setModelName(studentEntityName)
+      .setTargetEntity(studentDetailEntityName)
+      .setTargetField("studentId")
+      .setCardinality(ONE_TO_ONE)
     );
     // 学生:教师 -> n:n
     session.createField(new RelationField("teachers")
-        .setModelName(studentEntityName)
-        .setTargetEntity(teacherEntityName)
-        .setTargetField("id")
-        .setCardinality(MANY_TO_MANY)
+      .setModelName(studentEntityName)
+      .setTargetEntity(teacherEntityName)
+      .setTargetField("id")
+      .setCardinality(MANY_TO_MANY)
     );
     // 教师:学生 -> n:n
     session.createField(new RelationField("students")
-        .setModelName(courseEntityName)
-        .setTargetEntity(studentEntityName)
-        .setTargetField("id")
-        .setCardinality(MANY_TO_MANY)
+      .setModelName(courseEntityName)
+      .setTargetEntity(studentEntityName)
+      .setTargetField("id")
+      .setCardinality(MANY_TO_MANY)
     );
   }
 
-  void createClassesData(String entityName) {
+  public static void createClassesData(Session session, String entityName) {
     String mockData = """
         [
           {
@@ -132,7 +121,7 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
     session.insertAll(entityName, list);
   }
 
-  void createStudentData(String entityName) {
+  public static void createStudentData(Session session, String entityName) {
     String mockData = """
       [
         {
@@ -205,7 +194,7 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
     session.insertAll(entityName, list);
   }
 
-  void createCourseData(String entityName) {
+  public static void createCourseData(Session session, String entityName) {
     String mockData = """
         [
            {
@@ -234,7 +223,7 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
     session.insertAll(entityName, list);
   }
 
-  void createTeacherData(String entityName) {
+  public static void createTeacherData(Session session, String entityName) {
     String mockData = """
       [
         {
@@ -286,111 +275,6 @@ public class FlexModelDataFetcherTest extends AbstractIntegrationTest {
       """;
     List<Map<String, Object>> list = jsonObjectConverter.parseToObject(mockData, List.class);
     session.insertAll(entityName, list);
-  }
-
-
-  @Test
-  void testFirst() {
-    String classesEntityName = "TestFirstClasses";
-    String studentEntityName = "TestFirstStudent";
-    String studentDetailEntityName = "TestFirstStudentDetail";
-    String courseEntityName = "TestFirstCourse";
-    String teacherEntityName = "TestFirstTeacher";
-    createClassesEntity(classesEntityName);
-    createStudentEntity(studentEntityName);
-    createStudentDetailEntity(studentDetailEntityName);
-    createCourseEntity(courseEntityName);
-    createTeacherEntity(teacherEntityName);
-    createAssociations(classesEntityName, studentEntityName, studentDetailEntityName, courseEntityName, teacherEntityName);
-    createCourseData(courseEntityName);
-    createClassesData(classesEntityName);
-    createStudentData(studentEntityName);
-    createTeacherData(teacherEntityName);
-//    createTeacherCourseEntity(teacherEntity, teacherCourseEntity);
-//    List<Model> allModels = session.getAllModels();
-//    GraphQLObjectType testFirstTeacherType = newObject()
-//      .name("testFirst_teacher")
-//      .field(
-//        newFieldDefinition()
-//
-//      )
-//      .build();
-    String schema = """
-       type Query {
-         TestFirstClasses : [TestFirstClasses]
-         TestFirstStudent : [TestFirstStudent]
-         TestFirstStudentDetail : [TestFirstStudentDetail]
-         TestFirstCourse: [TestFirstCourse]
-         TestFirstTeacher: [TestFirstTeacher]
-       }
-       type TestFirstClasses {
-         id : ID
-         classCode : String
-         className : String
-         students: [TestFirstStudent]
-       }
-       type TestFirstStudent {
-          id : ID
-          studentName: String
-          gender: String
-          age: Int
-          classId: Int
-          studentDetail: TestFirstStudentDetail
-          courses: [TestFirstCourse]
-          teachers: [TestFirstTeacher]
-       }
-       type TestFirstStudentDetail {
-         id: ID
-         studentId: Int
-         description: String
-       }
-       type TestFirstCourse {
-         courseNo: ID
-         courseName: String
-       }
-       type TestFirstTeacher {
-         id: ID
-         teacherName: String
-         subject: String
-         students: TestFirstStudent
-       }
-      """;
-    SchemaParser schemaParser = new SchemaParser();
-    TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(schema);
-    RuntimeWiring runtimeWiring = newRuntimeWiring()
-      .type("Query", builder -> builder.defaultDataFetcher(new FlexModelDataFetcher(session)))
-      .build();
-    SchemaGenerator schemaGenerator = new SchemaGenerator();
-    GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeDefinitionRegistry, runtimeWiring);
-    GraphQL graphQL = GraphQL.newGraphQL(graphQLSchema).build();
-    ExecutionResult result = graphQL.execute("""
-      query {
-       TestFirstClasses {
-         id
-         classCode
-         className
-         students {
-           id
-           studentName
-           gender
-           age
-           studentDetail {
-             description
-           }
-           courses {
-             courseNo
-             courseName
-           }
-           teachers {
-             id
-             teacherName
-           }
-         }
-       }
-      }
-      """);
-    System.out.println(jsonObjectConverter.toJsonString(result.getData()));
-    Assertions.assertNotNull(result.getData());
   }
 
 }

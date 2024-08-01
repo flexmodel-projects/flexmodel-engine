@@ -3,7 +3,7 @@ package tech.wetech.flexmodel;
 /**
  * @author cjbi
  */
-public enum BasicFieldType {
+public enum ScalarType {
   ID("id"),
   RELATION("relation"),
   STRING("string"),
@@ -17,7 +17,7 @@ public enum BasicFieldType {
   JSON("json");
   private final String type;
 
-  BasicFieldType(String type) {
+  ScalarType(String type) {
     this.type = type;
   }
 
@@ -25,8 +25,8 @@ public enum BasicFieldType {
     return type;
   }
 
-  public static BasicFieldType fromType(String type) {
-    for (BasicFieldType value : BasicFieldType.values()) {
+  public static ScalarType fromType(String type) {
+    for (ScalarType value : ScalarType.values()) {
       if (type.equals(value.type)) {
         return value;
       }

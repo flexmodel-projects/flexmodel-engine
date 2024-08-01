@@ -6,7 +6,7 @@ package tech.wetech.flexmodel;
 public class BigintField extends TypedField<Long, BigintField> {
 
   public BigintField(String name) {
-    super(name, BasicFieldType.BIGINT.getType());
+    super(name, ScalarType.BIGINT.getType());
   }
 
 }

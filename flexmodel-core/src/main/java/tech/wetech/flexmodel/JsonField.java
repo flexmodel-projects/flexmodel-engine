@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class JsonField extends TypedField<Serializable, JsonField> {
 
   public JsonField(String name) {
-    super(name, BasicFieldType.JSON.getType());
+    super(name, ScalarType.JSON.getType());
   }
 
 }

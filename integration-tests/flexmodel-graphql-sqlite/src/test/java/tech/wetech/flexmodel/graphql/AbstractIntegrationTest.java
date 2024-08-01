@@ -12,6 +12,7 @@ import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
  */
 public class AbstractIntegrationTest {
 
+  protected static final String SCHEMA_NAME = "system";
   protected static Session session;
 
   @BeforeAll
@@ -22,7 +23,7 @@ public class AbstractIntegrationTest {
     SessionFactory sessionFactory = SessionFactory.builder()
       .setDefaultDataSourceProvider("system", jdbcDataSourceProvider)
       .build();
-    session = sessionFactory.createSession("system");
+    session = sessionFactory.createSession(SCHEMA_NAME);
   }
 
   @AfterAll

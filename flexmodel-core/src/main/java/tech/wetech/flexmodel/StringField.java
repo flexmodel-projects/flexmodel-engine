@@ -11,7 +11,7 @@ public class StringField extends TypedField<String, StringField> {
   private Integer length = 255;
 
   public StringField(String name) {
-    super(name, BasicFieldType.STRING.getType());
+    super(name, ScalarType.STRING.getType());
   }
 
   public Integer getLength() {

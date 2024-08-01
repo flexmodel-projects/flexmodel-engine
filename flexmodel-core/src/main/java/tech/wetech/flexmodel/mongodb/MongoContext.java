@@ -16,20 +16,20 @@ public class MongoContext extends AbstractSessionContext {
   private ExpressionCalculator<String> conditionCalculator;
   private final Map<String, TypeHandler<?>> typeHandlerMap = new HashMap<>();
 
-  public MongoContext(String schemaName, MongoDatabase mongoDatabase, MappedModels mappedModels, JsonObjectConverter jsonObjectConverter) {
-    super(schemaName, mappedModels, jsonObjectConverter);
+  public MongoContext(String schemaName, MongoDatabase mongoDatabase, MappedModels mappedModels, JsonObjectConverter jsonObjectConverter, SessionFactory factory) {
+    super(schemaName, mappedModels, jsonObjectConverter, factory);
     this.mongoDatabase = mongoDatabase;
     this.conditionCalculator = new DefaultMongoExpressionCalculator();
 
-    this.typeHandlerMap.put(BasicFieldType.STRING.getType(), new StringTypeHandler());
-    this.typeHandlerMap.put(BasicFieldType.TEXT.getType(), new TextTypeHandler());
-    this.typeHandlerMap.put(BasicFieldType.DECIMAL.getType(), new DecimalTypeHandler());
-    this.typeHandlerMap.put(BasicFieldType.INT.getType(), new IntTypeHandler());
-    this.typeHandlerMap.put(BasicFieldType.BIGINT.getType(), new BigintTypeHandler());
-    this.typeHandlerMap.put(BasicFieldType.BOOLEAN.getType(), new BooleanTypeHandler());
-    this.typeHandlerMap.put(BasicFieldType.DATETIME.getType(), new DatetimeTypeHandler());
-    this.typeHandlerMap.put(BasicFieldType.DATE.getType(), new DateTypeHandler());
-    this.typeHandlerMap.put(BasicFieldType.JSON.getType(), new JsonTypeHandler(jsonObjectConverter));
+    this.typeHandlerMap.put(ScalarType.STRING.getType(), new StringTypeHandler());
+    this.typeHandlerMap.put(ScalarType.TEXT.getType(), new TextTypeHandler());
+    this.typeHandlerMap.put(ScalarType.DECIMAL.getType(), new DecimalTypeHandler());
+    this.typeHandlerMap.put(ScalarType.INT.getType(), new IntTypeHandler());
+    this.typeHandlerMap.put(ScalarType.BIGINT.getType(), new BigintTypeHandler());
+    this.typeHandlerMap.put(ScalarType.BOOLEAN.getType(), new BooleanTypeHandler());
+    this.typeHandlerMap.put(ScalarType.DATETIME.getType(), new DatetimeTypeHandler());
+    this.typeHandlerMap.put(ScalarType.DATE.getType(), new DateTypeHandler());
+    this.typeHandlerMap.put(ScalarType.JSON.getType(), new JsonTypeHandler(jsonObjectConverter));
   }
 
   public MongoDatabase getMongoDatabase() {

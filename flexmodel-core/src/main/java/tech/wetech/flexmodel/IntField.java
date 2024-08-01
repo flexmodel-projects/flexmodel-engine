@@ -6,7 +6,7 @@ package tech.wetech.flexmodel;
 public class IntField extends TypedField<Integer, IntField> {
 
   public IntField(String name) {
-    super(name, BasicFieldType.INT.getType());
+    super(name, ScalarType.INT.getType());
   }
 
 }

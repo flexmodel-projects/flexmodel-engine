@@ -27,4 +27,8 @@ public interface Session extends SchemaOperations, DataOperations, Closeable {
    */
   void close();
 
+  SessionFactory getFactory();
+
+  String getName();
+
 }

@@ -35,7 +35,7 @@ public class JacksonObjectConverter implements JsonObjectConverter {
     builder.disable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
     builder.disable(FAIL_ON_EMPTY_BEANS);
     builder.addModule(new JavaTimeModule());
-    builder.addModule(new FlexModelCoreModule());
+    builder.addModule(new FlexmodelCoreModule());
     ServiceLoader.load(Module.class).forEach(builder::addModule);
     this.jsonMapper = builder.build();
   }

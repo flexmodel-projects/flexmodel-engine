@@ -27,7 +27,7 @@ public class IDField extends TypedField<Object, IDField> {
   }
 
   public IDField(String name) {
-    super(name, BasicFieldType.ID.getType());
+    super(name, ScalarType.ID.getType());
   }
 
   public enum GeneratedValue {

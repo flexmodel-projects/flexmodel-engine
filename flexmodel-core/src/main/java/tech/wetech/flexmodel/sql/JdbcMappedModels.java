@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static tech.wetech.flexmodel.BasicFieldType.*;
 import static tech.wetech.flexmodel.IDField.GeneratedValue.*;
+import static tech.wetech.flexmodel.ScalarType.*;
 
 /**
  * @author cjbi
@@ -181,8 +181,8 @@ public class JdbcMappedModels implements MappedModels {
       Iterator<SqlColumn> colIte = table.getColumnIterator();
       while (colIte.hasNext()) {
         SqlColumn sqlColumn = colIte.next();
-        BasicFieldType fieldType = sqlColumn.isPrimaryKey() ? ID
-          : BasicFieldType.fromType(jdbcCodeMap.getOrDefault(sqlColumn.getSqlTypeCode(), STRING.getType()));
+        ScalarType fieldType = sqlColumn.isPrimaryKey() ? ID
+          : ScalarType.fromType(jdbcCodeMap.getOrDefault(sqlColumn.getSqlTypeCode(), STRING.getType()));
         assert fieldType != null;
         TypedField<?, ?> field;
         switch (fieldType) {
@@ -192,7 +192,7 @@ public class JdbcMappedModels implements MappedModels {
             if (sqlColumn.isAutoIncrement()) {
               idField.setGeneratedValue(AUTO_INCREMENT);
             }
-            BasicFieldType idType = BasicFieldType.fromType(jdbcCodeMap.getOrDefault(sqlColumn.getSqlTypeCode(), STRING.getType()));
+            ScalarType idType = ScalarType.fromType(jdbcCodeMap.getOrDefault(sqlColumn.getSqlTypeCode(), STRING.getType()));
             idField.setGeneratedValue(idType == BIGINT || idType == INT || idType == DECIMAL ? BIGINT_NOT_GENERATED : STRING_NOT_GENERATED);
             break;
           }

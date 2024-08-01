@@ -16,10 +16,7 @@ import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -114,6 +111,14 @@ public class SessionFactory {
     return dataSourceProviderMap;
   }
 
+  public Set<String> getSchemaNames() {
+    return dataSourceProviderMap.keySet();
+  }
+
+  public List<Model> getModels(String schemaName) {
+    return mappedModels.lookup(schemaName);
+  }
+
   public Cache getCache() {
     return cache;
   }
@@ -150,18 +155,18 @@ public class SessionFactory {
       return switch (dataSourceProviderMap.get(identifier)) {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
-          SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), mappedModels, jsonObjectConverter);
+          SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), mappedModels, jsonObjectConverter, this);
           sqlContext.setFailFast(true);
           yield new SqlSession(sqlContext);
         }
         case MongoDataSourceProvider mongodb -> {
           MongoDatabase mongoDatabase = mongodb.mongoDatabase();
-          MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, mappedModels, jsonObjectConverter);
+          MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, mappedModels, jsonObjectConverter, this);
           mongoContext.setFailFast(true);
           yield new MongoSession(mongoContext);
         }
         case null,
-          default -> throw new IllegalStateException("Unexpected identifier: " + identifier);
+             default -> throw new IllegalStateException("Unexpected identifier: " + identifier);
       };
     } catch (Exception e) {
       throw new RuntimeException(e);
@@ -173,16 +178,16 @@ public class SessionFactory {
       return switch (dataSourceProviderMap.get(identifier)) {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
-          SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), mappedModels, jsonObjectConverter);
+          SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), mappedModels, jsonObjectConverter, this);
           yield new SqlSession(sqlContext);
         }
         case MongoDataSourceProvider mongodb -> {
           MongoDatabase mongoDatabase = mongodb.mongoDatabase();
-          MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, mappedModels, jsonObjectConverter);
+          MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, mappedModels, jsonObjectConverter, this);
           yield new MongoSession(mongoContext);
         }
         case null,
-          default -> throw new IllegalStateException("Unexpected identifier: " + identifier);
+             default -> throw new IllegalStateException("Unexpected identifier: " + identifier);
       };
     } catch (Exception e) {
       throw new RuntimeException(e);
@@ -228,7 +233,6 @@ public class SessionFactory {
       }
       return new SessionFactory(defaultIdentifier, defaultDataSourceProvider, cache, importScript);
     }
-
   }
 
 }

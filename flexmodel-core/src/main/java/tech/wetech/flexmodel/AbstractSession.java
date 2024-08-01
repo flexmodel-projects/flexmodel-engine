@@ -15,11 +15,14 @@ import java.util.function.Consumer;
  */
 public abstract class AbstractSession implements Session {
 
+  private final String schemaName;
   private final DataOperations dataOperationsDelegate;
   private final SchemaOperations schemaOperationsDelegate;
+  private final SessionFactory factory;
 
   public AbstractSession(AbstractSessionContext sessionContext, DataOperations dataOperationsDelegate,
                          SchemaOperations schemaOperationsDelegate) {
+    this.schemaName = sessionContext.getSchemaName();
     this.dataOperationsDelegate =
       new DataOperationsEventDecorator(
         sessionContext,
@@ -33,6 +36,7 @@ public abstract class AbstractSession implements Session {
       new SchemaOperationsEventDecorator(
         sessionContext,
         new SchemaOperationsPersistenceDecorator(sessionContext, schemaOperationsDelegate));
+    this.factory = sessionContext.getFactory();
   }
 
   @Override
@@ -154,4 +158,15 @@ public abstract class AbstractSession implements Session {
   public void associate(JoinGraphNode joinGraphNode, Map<String, Object> data) {
     dataOperationsDelegate.associate(joinGraphNode, data);
   }
+
+  @Override
+  public SessionFactory getFactory() {
+    return factory;
+  }
+
+    @Override
+    public String getName() {
+        return schemaName;
+    }
+
 }

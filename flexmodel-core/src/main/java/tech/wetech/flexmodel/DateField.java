@@ -8,7 +8,7 @@ import java.time.LocalDate;
 public class DateField extends TypedField<LocalDate, DateField> {
 
   public DateField(String name) {
-    super(name, BasicFieldType.DATE.getType());
+    super(name, ScalarType.DATE.getType());
   }
 
 }

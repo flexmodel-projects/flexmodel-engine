@@ -23,7 +23,7 @@ public class RelationField extends TypedField<Long, RelationField> {
   private boolean cascadeDelete;
 
   public RelationField(String name) {
-    super(name, BasicFieldType.RELATION.getType());
+    super(name, ScalarType.RELATION.getType());
   }
 
   public boolean isCascadeDelete() {

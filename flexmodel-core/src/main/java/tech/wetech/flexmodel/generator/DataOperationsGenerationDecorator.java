@@ -71,7 +71,6 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
           }
         }
       }
-
     });
     return rows;
   }

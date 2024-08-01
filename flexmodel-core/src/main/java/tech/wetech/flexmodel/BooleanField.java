@@ -6,7 +6,7 @@ package tech.wetech.flexmodel;
 public class BooleanField extends TypedField<Boolean, BooleanField> {
 
   public BooleanField(String name) {
-    super(name, BasicFieldType.BOOLEAN.getType());
+    super(name, ScalarType.BOOLEAN.getType());
   }
 
 }

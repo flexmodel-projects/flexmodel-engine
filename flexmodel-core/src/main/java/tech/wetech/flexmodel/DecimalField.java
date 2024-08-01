@@ -15,7 +15,7 @@ public class DecimalField extends TypedField<Number, DecimalField> {
   private int scale = 2;
 
   public DecimalField(String name) {
-    super(name, BasicFieldType.DECIMAL.getType());
+    super(name, ScalarType.DECIMAL.getType());
   }
 
   public int getPrecision() {

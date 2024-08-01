@@ -6,7 +6,7 @@ package tech.wetech.flexmodel;
 public class TextField extends TypedField<String, TextField> {
 
   public TextField(String name) {
-    super(name, BasicFieldType.TEXT.getType());
+    super(name, ScalarType.TEXT.getType());
   }
 
 }
