@@ -8,4 +8,11 @@ record QueryRootInfo(String schemaName, String modelName, FetchType fetchType) {
     return schemaName
   }
 
+  String getModelName() {
+    return modelName
+  }
+
+  FetchType getFetchType() {
+    return fetchType
+  }
 }

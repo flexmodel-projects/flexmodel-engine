@@ -85,7 +85,7 @@ type ${key}_aggregate_fields {
   String genInputModel(String schemaName, Model model) {
     String key = "${schemaName}_${model.name}"
     return """
-"Boolean expression to filter rows from the table \\"${schemaName}.${model.name}\\". All fields are combined with a logical 'AND'."
+"Boolean expression to filter rows from the table \\"${key}\\". All fields are combined with a logical 'AND'."
 input ${key}_bool_exp {
   _and: [${key}_bool_exp!]
   _or: [${key}_bool_exp!]
@@ -94,11 +94,23 @@ ${
         .collect { field -> "${field.name}: ${comparisonMapping[field.type]}" }.join("\n")
     }
 }
-
+"Ordering options when selecting data from \\"${key}\\"."
 input ${key}_order_by {
  ${
       model.fields.findAll { field -> field.type != 'relation' }
         .collect { field -> "${field.name}: order_by" }.join("\n")
+    }
+}
+input ${key}_insert_input {
+${
+      model.fields.findAll { field -> field.type != 'relation' }
+        .collect { field -> "${field.name}: ${typeMapping[field.type]}" }.join("\n")
+    }
+}
+input ${key}_set_input {
+${
+      model.fields.findAll { field -> field.type != 'relation' }
+        .collect { field -> "${field.name}: ${typeMapping[field.type]}" }.join("\n")
     }
 }
 """
@@ -127,7 +139,7 @@ ${
             dataFetcherTypes[key] = new QueryRootInfo(schemaName, model.name, FetchType.QUERY)
 
             return """
-${key}(
+find_${key}(
   "filter the rows returned"
    where: ${key}_bool_exp
   "sort the rows by one or more columns"
@@ -139,7 +151,7 @@ ${key}(
   distinct_on: [${key}_select_column!]
 ): [${key}!]!
 
-${key}_aggregate(
+aggregate_${key}(
   "filter the rows returned"
    where: ${key}_bool_exp
   "sort the rows by one or more columns"
@@ -153,7 +165,7 @@ ${key}_aggregate(
 
 ${model?.findIdField() ?
               """
-${key}_by_pk(
+find_${key}_by_id(
   ${model?.findIdField()?.get()?.name}: ${typeMapping[model?.findIdField()?.get()?.type]}!
 ): ${key}
 """ : ""
@@ -184,7 +196,26 @@ ${
     "filter the rows which have to be deleted"
     where: ${key}_bool_exp!
   ): mutation_response
-
+${model?.findIdField() ?
+              """
+delete_${key}_by_id(
+  ${model?.findIdField()?.get()?.name}: ${typeMapping[model?.findIdField()?.get()?.type]}!
+): ${key}
+""" : ""}
+create_${key}(
+  data: ${key}_insert_input
+): ${key}
+update_${key}(
+  data: ${key}_set_input
+  where: ${key}_bool_exp
+): mutation_response
+${model?.findIdField() ?
+              """
+update_${key}_by_id(
+  data: ${key}_set_input
+  ${model?.findIdField()?.get()?.name}: ${typeMapping[model?.findIdField()?.get()?.type]}!
+): ${key}
+""" : ""}
 """
           }
         }.join("\n")
@@ -271,7 +302,6 @@ type mutation_response {
   "data from the rows affected by the mutation"
   affected_rows: Int!
 }
-
-    """
+"""
   }
 }
