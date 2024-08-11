@@ -35,12 +35,6 @@
     </dependency>
     <dependency>
       <groupId>org.apache.groovy</groupId>
-      <artifactId>groovy</artifactId>
-      <version>4.0.22</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-all</artifactId>
       <version>4.0.22</version>
       <type>pom</type>
@@ -58,11 +52,10 @@
   </dependencies>
   <build>
     <plugins>
-      <!-- 增加 gmavenplus 插件 允许集成Groovy到Maven-->
       <plugin>
         <groupId>org.codehaus.gmavenplus</groupId>
         <artifactId>gmavenplus-plugin</artifactId>
-        <version>2.0.0</version>
+        <version>3.0.2</version>
         <executions>
           <execution>
             <goals>
@@ -79,7 +72,6 @@
         </executions>
         <configuration>
           <sources>
-            <!-- 在此节点下配置源码目录,可配置多个 -->
             <source>
               <directory>${project.basedir}/src/main/groovy</directory>
               <includes>

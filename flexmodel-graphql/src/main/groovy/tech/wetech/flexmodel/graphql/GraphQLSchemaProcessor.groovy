@@ -205,8 +205,8 @@ create_${key}(
   data: ${key}_insert_input
 ): ${key}
 update_${key}(
-  data: ${key}_set_input
-  where: ${key}_bool_exp
+  _set: ${key}_set_input
+  where: ${key}_bool_exp!
 ): mutation_response
 ${model?.findIdField() ?
               """

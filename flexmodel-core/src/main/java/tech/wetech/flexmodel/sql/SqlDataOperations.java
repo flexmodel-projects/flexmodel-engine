@@ -7,10 +7,7 @@ import tech.wetech.flexmodel.sql.type.SqlResultHandler;
 import tech.wetech.flexmodel.sql.type.SqlTypeHandler;
 import tech.wetech.flexmodel.sql.type.UnknownSqlTypeHandler;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -47,19 +44,23 @@ public class SqlDataOperations implements DataOperations {
 
   @Override
   public int insert(String modelName, Map<String, Object> record, Consumer<Object> id) {
-
     String sql = getInsertSqlString(modelName, record);
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
-    IDField idField = entity.findIdField().orElseThrow();
-    if (record.containsKey(idField.getName())) {
-      id.accept(record.get(idField.getName()));
+    Optional<IDField> idFieldOptional = entity.findIdField();
+    if (idFieldOptional.isPresent()) {
+      IDField idField = idFieldOptional.get();
+      if (record.containsKey(idField.getName())) {
+        id.accept(record.get(idField.getName()));
+        return sqlExecutor.update(sql, record);
+      }
+      if (sqlDialect.useFirstGeneratedId()) {
+        return sqlExecutor.updateAndReturnFirstGeneratedKeys(sql, record, id::accept);
+      }
+      return sqlExecutor.updateAndReturnGeneratedKeys(sql, record,
+        new String[]{sqlDialect.getGeneratedKeyName(idField.getName())}, keys -> id.accept(keys.getFirst()));
+    } else {
       return sqlExecutor.update(sql, record);
     }
-    if (sqlDialect.useFirstGeneratedId()) {
-      return sqlExecutor.updateAndReturnFirstGeneratedKeys(sql, record, id::accept);
-    }
-    return sqlExecutor.updateAndReturnGeneratedKeys(sql, record,
-      new String[]{sqlDialect.getGeneratedKeyName(idField.getName())}, keys -> id.accept(keys.getFirst()));
   }
 
   private String getInsertSqlString(String modelName, Map<String, Object> record) {

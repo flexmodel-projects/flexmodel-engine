@@ -53,10 +53,49 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
       }
       """;
     ExecutionResult executionResult = graphQL.execute(query);
-    Map<String,Object> data = executionResult.getData();
+    Map<String, Object> data = executionResult.getData();
     // 打印结果
     System.out.println(executionResult);
     Assertions.assertNotNull(data);
+    Assertions.assertNotNull(data.get("course"));
+  }
+
+  @Test
+  void testMutation() {
+    String classesEntityName = "testMutationClasses";
+    String studentEntityName = "testMutationStudent";
+    String studentDetailEntityName = "testMutationStudentDetail";
+    String courseEntityName = "testMutationCourse";
+    String teacherEntityName = "testMutationTeacher";
+    createClassesEntity(session, classesEntityName);
+    createStudentEntity(session, studentEntityName);
+    createStudentDetailEntity(session, studentDetailEntityName);
+    createCourseEntity(session, courseEntityName);
+    createTeacherEntity(session, teacherEntityName);
+    createAssociations(session, classesEntityName, studentEntityName, studentDetailEntityName, courseEntityName, teacherEntityName);
+    createCourseData(session, courseEntityName);
+    createClassesData(session, classesEntityName);
+    createStudentData(session, studentEntityName);
+    createTeacherData(session, teacherEntityName);
+
+    GraphQLProvider graphQLProvider = new GraphQLProvider(session.getFactory());
+    graphQLProvider.init();
+    GraphQL graphQL = graphQLProvider.getGraphQL();
+    // 创建查询
+    String query = """
+      mutation {
+        course: create_system_testMutationCourse(data: {courseName: "测试课程", courseNo: "Test_C"}) {
+            courseName
+            courseNo
+        }
+        student: create_system_testMutationCourse(data: {courseName: "测试课程", courseNo: "Test_C"}) {
+            courseName
+            courseNo
+        }
+      }
+      """;
+    ExecutionResult executionResult = graphQL.execute(query);
+    Map<String, Object> data = executionResult.getData();
     Assertions.assertNotNull(data.get("course"));
   }
 

@@ -14,8 +14,6 @@
 
 package tech.wetech.flexmodel.event;
 
-import tech.wetech.flexmodel.event.schema.AbstractSchemaEvent;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -56,7 +54,7 @@ public class DomainEventPublisher {
         for (DomainEventSubscriber<T> subscriber : allSubscribers) {
           Class<?> subscribedToType = subscriber.subscribedToEventType();
 
-          if (eventType == subscribedToType || subscribedToType == AbstractSchemaEvent.class || subscribedToType == DomainEvent.class) {
+          if (eventType == subscribedToType || subscribedToType == DomainEvent.class) {
             subscriber.handleEvent(aDomainEvent);
           }
         }
