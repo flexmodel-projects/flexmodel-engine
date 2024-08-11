@@ -136,8 +136,11 @@ ${
         sf.getModels(schemaName).collect { model ->
           {
             String key = "${schemaName}_${model.name}"
-            dataFetcherTypes[key] = new QueryRootInfo(schemaName, model.name, FetchType.QUERY)
-
+            dataFetcherTypes["find_" + key] = new QueryRootInfo(schemaName, model.name, FetchType.FIND)
+            dataFetcherTypes["aggregate_" + key] = new QueryRootInfo(schemaName, model.name, FetchType.AGGREGATE)
+            if (model?.findIdField()) {
+              dataFetcherTypes["find_" + key + "_by_id"] = new QueryRootInfo(schemaName, model.name, FetchType.FIND_BY_ID)
+            }
             return """
 find_${key}(
   "filter the rows returned"

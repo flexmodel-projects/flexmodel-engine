@@ -31,7 +31,12 @@ public class GraphQLProvider {
     processor.execute();
     Map<String, QueryRootInfo> dataFetcherTypes = processor.getDataFetcherTypes();
     Map<String, DataFetcher<?>> dataFetchers = new HashMap<>();
-    dataFetcherTypes.forEach((key, value) -> dataFetchers.put(key, new FlexmodelDataFetcher(value.getSchemaName(), sf)));
+    dataFetcherTypes.forEach((key, value) -> {
+      switch (value.getFetchType()) {
+        case FIND -> dataFetchers.put(key, new FlexmodelFindDataFetcher(value.getSchemaName(), value.getModelName(), sf));
+      }
+
+    });
     String schemaString = processor.getGraphqlSchemaString();
     System.out.println(schemaString);
     SchemaParser schemaParser = new SchemaParser();

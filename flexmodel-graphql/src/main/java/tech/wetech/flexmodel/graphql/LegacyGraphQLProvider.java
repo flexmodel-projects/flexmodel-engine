@@ -19,6 +19,7 @@ import static tech.wetech.flexmodel.RelationField.Cardinality.ONE_TO_ONE;
 /**
  * @author cjbi
  */
+@Deprecated
 public class LegacyGraphQLProvider {
   private final SessionFactory sessionFactory;
   private GraphQL graphQL;

@@ -54,7 +54,7 @@ public class FlexmodelDataFetcherTest extends AbstractIntegrationTest {
     processor.execute();
     Map<String, QueryRootInfo> dataFetcherTypes = processor.getDataFetcherTypes();
     Map<String, DataFetcher<?>> dataFetchers = new HashMap<>();
-    dataFetcherTypes.forEach((key, value) -> dataFetchers.put(key, new FlexmodelDataFetcher(value.schemaName(), session.getFactory())));
+    dataFetcherTypes.forEach((key, value) -> dataFetchers.put(key, new FlexmodelFindDataFetcher(value.schemaName(), value.getModelName(), session.getFactory())));
     String schemaString = processor.getGraphqlSchemaString();
     System.out.println(schemaString);
     SchemaParser schemaParser = new SchemaParser();
@@ -76,7 +76,7 @@ public class FlexmodelDataFetcherTest extends AbstractIntegrationTest {
 
     ExecutionResult result = graphQL.execute("""
       query {
-       system_testTemplateClasses {
+       find_system_testTemplateClasses {
          id
          classCode
          className

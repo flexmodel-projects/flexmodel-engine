@@ -80,13 +80,13 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     // 创建查询
     String query = """
       query {
-        classes: system_testSimpleQueryClasses {
+        classes: find_system_testSimpleQueryClasses {
           id, students { name: studentName, courses { courseName } }
         }
-        students: system_testSimpleQueryStudent {
+        students: find_system_testSimpleQueryStudent {
           id, studentName, studentDetail { description }
         }
-        teachers: system_testSimpleQueryTeacher {
+        teachers: find_system_testSimpleQueryTeacher {
          id, teacherName
         }
       }
