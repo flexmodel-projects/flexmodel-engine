@@ -32,6 +32,78 @@ public class FlexmodelDataFetcherTest extends AbstractIntegrationTest {
 
   private final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
 
+
+  @Test
+  void testTemplate() {
+    String classesEntityName = "testTemplateClasses";
+    String studentEntityName = "testTemplateStudent";
+    String studentDetailEntityName = "testTemplateStudentDetail";
+    String courseEntityName = "testTemplateCourse";
+    String teacherEntityName = "testTemplateTeacher";
+    createClassesEntity(session, classesEntityName);
+    createStudentEntity(session, studentEntityName);
+    createStudentDetailEntity(session, studentDetailEntityName);
+    createCourseEntity(session, courseEntityName);
+    createTeacherEntity(session, teacherEntityName);
+    createAssociations(session, classesEntityName, studentEntityName, studentDetailEntityName, courseEntityName, teacherEntityName);
+    createCourseData(session, courseEntityName);
+    createClassesData(session, classesEntityName);
+    createStudentData(session, studentEntityName);
+    createTeacherData(session, teacherEntityName);
+    GraphQLSchemaProcessor processor = new GraphQLSchemaProcessor(session.getFactory());
+    processor.execute();
+    Map<String, QueryRootInfo> dataFetcherTypes = processor.getDataFetcherTypes();
+    Map<String, DataFetcher<?>> dataFetchers = new HashMap<>();
+    dataFetcherTypes.forEach((key, value) -> dataFetchers.put(key, new FlexmodelDataFetcher(value.schemaName(), session.getFactory())));
+    String schemaString = processor.getGraphqlSchemaString();
+    System.out.println(schemaString);
+    SchemaParser schemaParser = new SchemaParser();
+
+    TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(schemaString);
+
+    // 创建 CodeRegistry
+    GraphQLCodeRegistry codeRegistry = GraphQLCodeRegistry
+      .newCodeRegistry()
+      .dataFetchers("Query", dataFetchers)
+      .build();
+
+    RuntimeWiring runtimeWiring = newRuntimeWiring()
+      .codeRegistry(codeRegistry)
+      .build();
+    SchemaGenerator schemaGenerator = new SchemaGenerator();
+    GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeDefinitionRegistry, runtimeWiring);
+    GraphQL graphQL = GraphQL.newGraphQL(graphQLSchema).build();
+
+    ExecutionResult result = graphQL.execute("""
+      query {
+       system_testTemplateClasses {
+         id
+         classCode
+         className
+         students {
+           id
+           studentName
+           gender
+           age
+           studentDetail {
+             description
+           }
+           courses {
+             courseNo
+             courseName
+           }
+           teachers {
+             id
+             teacherName
+           }
+         }
+       }
+      }
+      """);
+    System.out.println(result);
+    System.out.println(jsonObjectConverter.toJsonString(result.getData()));
+  }
+
   @Test
   void testFirst() {
     String classesEntityName = "TestFirstClasses";

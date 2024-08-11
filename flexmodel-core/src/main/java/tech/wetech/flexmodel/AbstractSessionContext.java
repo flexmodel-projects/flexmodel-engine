@@ -7,6 +7,7 @@ import tech.wetech.flexmodel.mapping.TypeHandler;
 import tech.wetech.flexmodel.sql.SqlContext;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * @author cjbi
@@ -27,7 +28,8 @@ public abstract class AbstractSessionContext {
     this.schemaName = schemaName;
     this.mappedModels = mappedModels;
     this.jsonObjectConverter = jsonObjectConverter;
-      this.factory = factory;
+    this.factory = factory;
+    factory.getGlobalSubscribers().forEach(this::subscribeEvent);
   }
 
   public PhysicalNamingStrategy getPhysicalNamingStrategy() {
@@ -54,6 +56,10 @@ public abstract class AbstractSessionContext {
 
   public <T> void publishEvent(final T aDomainEvent) {
     DomainEventPublisher.instance().publish(aDomainEvent);
+  }
+
+  public <T> void subscribeEvent(Class<T> subscribedToEventType, Consumer<T> event) {
+    DomainEventPublisher.instance().subscribe(subscribedToEventType, event);
   }
 
   public boolean isFailFast() {

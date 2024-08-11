@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.cache.Cache;
 import tech.wetech.flexmodel.cache.CachingMappedModels;
 import tech.wetech.flexmodel.cache.ConcurrentHashMapCache;
-import tech.wetech.flexmodel.event.DomainEventPublisher;
 import tech.wetech.flexmodel.mongodb.MongoContext;
 import tech.wetech.flexmodel.mongodb.MongoDataSourceProvider;
 import tech.wetech.flexmodel.mongodb.MongoSession;
@@ -29,6 +28,8 @@ public class SessionFactory {
   private final Cache cache;
   private final Logger log = LoggerFactory.getLogger(SessionFactory.class);
   private final JsonObjectConverter jsonObjectConverter;
+
+  private final  Map<Class, Consumer> globalSubscribers = new HashMap<>();
 
   SessionFactory(String defaultIdentifier, DataSourceProvider defaultDataSourceProvider, Cache cache, String importScript) {
     this.cache = cache;
@@ -140,7 +141,11 @@ public class SessionFactory {
   }
 
   public <T> void subscribeEvent(Class<T> subscribedToEventType, Consumer<T> event) {
-    DomainEventPublisher.instance().subscribe(subscribedToEventType, event);
+    globalSubscribers.put(subscribedToEventType, event);
+  }
+
+  public Map<Class, Consumer> getGlobalSubscribers() {
+    return globalSubscribers;
   }
 
   /**
