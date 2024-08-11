@@ -1,6 +1,5 @@
 package tech.wetech.flexmodel.graphql;
 
-import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
 import tech.wetech.flexmodel.*;
@@ -15,24 +14,24 @@ import static tech.wetech.flexmodel.Projections.field;
 /**
  * @author cjbi
  */
-public class FlexmodelDataFetcher implements DataFetcher<List<Map<String, Object>>> {
+public class FlexmodelFindByIdDataFetcher extends FlexmodelAbstractDataFetcher<Map<String, Object>> {
 
   private final String schemaName;
+  private final String modelName;
   private final SessionFactory sessionFactory;
 
-  public FlexmodelDataFetcher(String schemaName, SessionFactory sessionFactory) {
+  public FlexmodelFindByIdDataFetcher(String schemaName, String modelName, SessionFactory sessionFactory) {
     this.schemaName = schemaName;
+    this.modelName = modelName;
     this.sessionFactory = sessionFactory;
   }
 
-
   @Override
-  public List<Map<String, Object>> get(DataFetchingEnvironment env) throws Exception {
-    String queryFieldName = env.getMergedField().getSingleField().getName();
-    return findRootData(env, queryFieldName.replaceFirst(schemaName + "_", ""));
+  public Map<String, Object> get(DataFetchingEnvironment env) {
+    return findRootData(env);
   }
 
-  public List<Map<String, Object>> findRootData(DataFetchingEnvironment env, String modelName) {
+  public Map<String, Object> findRootData(DataFetchingEnvironment env) {
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     try (Session session = sessionFactory.createSession(schemaName)) {
       Entity entity = (Entity) session.getModel(modelName);
@@ -69,7 +68,7 @@ public class FlexmodelDataFetcher implements DataFetcher<List<Map<String, Object
               : findAssociationDataList(session, env, null, sencondaryRelationField.getTargetEntity(), sencondaryRelationField, secondaryId));
         }
       }
-      return result;
+      return result.getFirst();
     }
 
   }
@@ -96,7 +95,7 @@ public class FlexmodelDataFetcher implements DataFetcher<List<Map<String, Object
         IDField idField = entity.findIdField().orElseThrow();
         projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
         for (SelectedField selectedField : selectedFields) {
-          TypedField<?, ?> flexModelField = (TypedField<?, ?>) targetEntity.getField(selectedField.getName());
+          TypedField<?, ?> flexModelField = targetEntity.getField(selectedField.getName());
           if (flexModelField == null) {
             continue;
           }

@@ -29,14 +29,18 @@ public class GraphQLProvider {
   public void init() {
     GraphQLSchemaProcessor processor = new GraphQLSchemaProcessor(sf);
     processor.execute();
-    Map<String, QueryRootInfo> dataFetcherTypes = processor.getDataFetcherTypes();
-    Map<String, DataFetcher<?>> dataFetchers = new HashMap<>();
-    dataFetcherTypes.forEach((key, value) -> {
+    Map<String, DataFetcher<?>> queryDataFetchers = new HashMap<>();
+    processor.getDataFetcherTypes().forEach((key, value) -> {
       switch (value.getFetchType()) {
-        case FIND -> dataFetchers.put(key, new FlexmodelFindDataFetcher(value.getSchemaName(), value.getModelName(), sf));
+        case FIND ->
+          queryDataFetchers.put(key, new FlexmodelFindDataFetcher(value.getSchemaName(), value.getModelName(), sf));
+        case FIND_BY_ID ->
+          queryDataFetchers.put(key, new FlexmodelFindByIdDataFetcher(value.getSchemaName(), value.getModelName(), sf));
+        case AGGREGATE ->
+          queryDataFetchers.put(key, new FlexmodelAggregateDataFetcher(value.getSchemaName(), value.getModelName(), sf));
       }
-
     });
+
     String schemaString = processor.getGraphqlSchemaString();
     System.out.println(schemaString);
     SchemaParser schemaParser = new SchemaParser();
@@ -46,7 +50,7 @@ public class GraphQLProvider {
     // 创建 CodeRegistry
     GraphQLCodeRegistry codeRegistry = GraphQLCodeRegistry
       .newCodeRegistry()
-      .dataFetchers("Query", dataFetchers)
+      .dataFetchers("Query", queryDataFetchers)
       .build();
 
     RuntimeWiring runtimeWiring = newRuntimeWiring()
