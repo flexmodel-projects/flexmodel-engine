@@ -17,6 +17,16 @@ import static tech.wetech.flexmodel.Projections.field;
  */
 public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> {
 
+  protected final String schemaName;
+  protected final String modelName;
+  protected final SessionFactory sessionFactory;
+
+  public FlexmodelAbstractDataFetcher(String schemaName, String modelName, SessionFactory sessionFactory) {
+    this.schemaName = schemaName;
+    this.modelName = modelName;
+    this.sessionFactory = sessionFactory;
+  }
+
   protected List<Map<String, Object>> findAssociationDataList(Session session, DataFetchingEnvironment env, String path, String modelName, RelationField relationField, Object id) {
     Entity entity = (Entity) session.getModel(relationField.getModelName());
     Entity targetEntity = (Entity) session.getModel(relationField.getTargetEntity());

@@ -16,14 +16,8 @@ import static tech.wetech.flexmodel.Projections.field;
  */
 public class FlexmodelAggregateDataFetcher extends FlexmodelAbstractDataFetcher<List<Map<String, Object>>> {
 
-  private final String schemaName;
-  private final String modelName;
-  private final SessionFactory sessionFactory;
-
-  public FlexmodelAggregateDataFetcher(String schemaName, String modelName, SessionFactory sessionFactory) {
-    this.schemaName = schemaName;
-    this.modelName = modelName;
-    this.sessionFactory = sessionFactory;
+  public FlexmodelAggregateDataFetcher(String schemaName, String modelName, SessionFactory sf) {
+    super(schemaName, modelName, sf);
   }
 
   @Override

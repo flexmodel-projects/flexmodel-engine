@@ -16,14 +16,8 @@ import static tech.wetech.flexmodel.Projections.field;
  */
 public class FlexmodelFindByIdDataFetcher extends FlexmodelAbstractDataFetcher<Map<String, Object>> {
 
-  private final String schemaName;
-  private final String modelName;
-  private final SessionFactory sessionFactory;
-
   public FlexmodelFindByIdDataFetcher(String schemaName, String modelName, SessionFactory sessionFactory) {
-    this.schemaName = schemaName;
-    this.modelName = modelName;
-    this.sessionFactory = sessionFactory;
+    super(schemaName, modelName, sessionFactory);
   }
 
   @Override

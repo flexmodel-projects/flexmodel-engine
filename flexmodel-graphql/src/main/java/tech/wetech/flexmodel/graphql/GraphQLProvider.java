@@ -28,8 +28,8 @@ public class GraphQLProvider {
 
   public void init() {
     GraphQLSchemaProcessor processor = new GraphQLSchemaProcessor(sf);
-    processor.execute();
     Map<String, DataFetcher<?>> queryDataFetchers = new HashMap<>();
+    Map<String, DataFetcher<?>> mutationDataFetchers = new HashMap<>();
     processor.getDataFetcherTypes().forEach((key, value) -> {
       switch (value.getFetchType()) {
         case FIND ->
@@ -38,11 +38,20 @@ public class GraphQLProvider {
           queryDataFetchers.put(key, new FlexmodelFindByIdDataFetcher(value.getSchemaName(), value.getModelName(), sf));
         case AGGREGATE ->
           queryDataFetchers.put(key, new FlexmodelAggregateDataFetcher(value.getSchemaName(), value.getModelName(), sf));
+        case MUTATION_DELETE ->
+          mutationDataFetchers.put(key, new FlexmodelMutationDeleteDataFetcher(value.getSchemaName(), value.getModelName(), sf));
+        case MUTATION_DELETE_BY_ID ->
+          mutationDataFetchers.put(key, new FlexmodelMutationDeleteByIdDataFetcher(value.getSchemaName(), value.getModelName(), sf));
+        case MUTATION_CREATE ->
+          mutationDataFetchers.put(key, new FlexmodelMutationCreateDataFetcher(value.getSchemaName(), value.getModelName(), sf));
+        case MUTATION_UPDATE ->
+          mutationDataFetchers.put(key, new FlexmodelMutationUpdateDataFetcher(value.getSchemaName(), value.getModelName(), sf));
+        case MUTATION_UPDATE_BY_ID ->
+          mutationDataFetchers.put(key, new FlexmodelMutationUpdateByIdDataFetcher(value.getSchemaName(), value.getModelName(), sf));
       }
     });
-
     String schemaString = processor.getGraphqlSchemaString();
-    System.out.println(schemaString);
+
     SchemaParser schemaParser = new SchemaParser();
 
     TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(schemaString);
@@ -51,6 +60,7 @@ public class GraphQLProvider {
     GraphQLCodeRegistry codeRegistry = GraphQLCodeRegistry
       .newCodeRegistry()
       .dataFetchers("Query", queryDataFetchers)
+      .dataFetchers("Mutation", mutationDataFetchers)
       .build();
 
     RuntimeWiring runtimeWiring = newRuntimeWiring()

@@ -11,8 +11,10 @@ class GraphQLSchemaProcessor {
 
   GraphQLSchemaProcessor(SessionFactory sf) {
     this.sf = sf
+    initSchemaString()
+    initDataFetcherTypes()
+    log.debug("generate graphql schema:\n", graphqlSchemaString)
   }
-
   private final Logger log = LoggerFactory.getLogger(GraphQLSchemaProcessor.class)
 
   private final SessionFactory sf
@@ -45,11 +47,6 @@ class GraphQLSchemaProcessor {
     "json"    : "String_comparison_exp",
     "relation": "String_comparison_exp",
   ]
-
-  void execute() {
-    graphqlSchemaString = genSchemaString()
-    log.debug("generate graphql schema:\n", graphqlSchemaString);
-  }
 
   String genSelectionField(String schemaName, Field field) {
     if (field instanceof RelationField) {
@@ -128,19 +125,18 @@ ${
 """
   }
 
-  String genSchemaString() {
-    return """
+  /**
+   * 生成Graphql Schema
+   * @return
+   */
+  private void initSchemaString() {
+    this.graphqlSchemaString = """
 type Query {
 ${
       sf.getSchemaNames().collect { schemaName ->
         sf.getModels(schemaName).collect { model ->
           {
             String key = "${schemaName}_${model.name}"
-            dataFetcherTypes["find_" + key] = new QueryRootInfo(schemaName, model.name, FetchType.FIND)
-            dataFetcherTypes["aggregate_" + key] = new QueryRootInfo(schemaName, model.name, FetchType.AGGREGATE)
-            if (model?.findIdField()) {
-              dataFetcherTypes["find_" + key + "_by_id"] = new QueryRootInfo(schemaName, model.name, FetchType.FIND_BY_ID)
-            }
             return """
 find_${key}(
   "filter the rows returned"
@@ -306,5 +302,24 @@ type mutation_response {
   affected_rows: Int!
 }
 """
+  }
+
+  private void initDataFetcherTypes() {
+    sf.getSchemaNames().forEach { schemaName ->
+      sf.getModels(schemaName).forEach { model ->
+        String key = "${schemaName}_${model.name}"
+        dataFetcherTypes["find_" + key] = new QueryRootInfo(schemaName, model.name, FetchType.FIND)
+        dataFetcherTypes["aggregate_" + key] = new QueryRootInfo(schemaName, model.name, FetchType.AGGREGATE)
+        dataFetcherTypes["delete_" + key] = new QueryRootInfo(schemaName, model.name, FetchType.MUTATION_DELETE)
+        dataFetcherTypes["create_" + key] = new QueryRootInfo(schemaName, model.name, FetchType.MUTATION_CREATE)
+        dataFetcherTypes["update_" + key] = new QueryRootInfo(schemaName, model.name, FetchType.MUTATION_UPDATE)
+        if (model?.findIdField()) {
+          dataFetcherTypes["find_" + key + "_by_id"] = new QueryRootInfo(schemaName, model.name, FetchType.FIND_BY_ID)
+          dataFetcherTypes["delete_" + key + "_by_id"] = new QueryRootInfo(schemaName, model.name, FetchType.MUTATION_DELETE_BY_ID)
+          dataFetcherTypes["update_" + key + "_by_id"] = new QueryRootInfo(schemaName, model.name, FetchType.MUTATION_UPDATE_BY_ID)
+        }
+      }
+    }
+
   }
 }

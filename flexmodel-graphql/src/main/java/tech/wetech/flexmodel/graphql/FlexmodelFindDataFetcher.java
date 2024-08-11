@@ -16,14 +16,8 @@ import static tech.wetech.flexmodel.Projections.field;
  */
 public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<Map<String, Object>>> {
 
-  private final String schemaName;
-  private final String modelName;
-  private final SessionFactory sessionFactory;
-
   public FlexmodelFindDataFetcher(String schemaName, String modelName, SessionFactory sessionFactory) {
-    this.schemaName = schemaName;
-    this.modelName = modelName;
-    this.sessionFactory = sessionFactory;
+    super(schemaName, modelName, sessionFactory);
   }
 
   @Override
@@ -32,27 +26,38 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
   }
 
   public List<Map<String, Object>> findRootData(DataFetchingEnvironment env) {
+    Integer offset = env.getArgument("offset");
+    Integer limit = env.getArgument("limit");
+
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     try (Session session = sessionFactory.createSession(schemaName)) {
       Entity entity = (Entity) session.getModel(modelName);
       List<RelationField> relationFields = new ArrayList<>();
-      List<Map<String, Object>> list = session.find(entity.getName(), query -> query
-        .setProjection(projection -> {
-          IDField idField = entity.findIdField().orElseThrow();
-          projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
-          for (SelectedField selectedField : selectedFields) {
-            TypedField<?, ?> flexModelField = (TypedField<?, ?>) entity.getField(selectedField.getName());
-            if (flexModelField == null) {
-              continue;
+      List<Map<String, Object>> list = session.find(entity.getName(), query -> {
+          query.setProjection(projection -> {
+            IDField idField = entity.findIdField().orElseThrow();
+            projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
+            for (SelectedField selectedField : selectedFields) {
+              TypedField<?, ?> flexModelField = entity.getField(selectedField.getName());
+              if (flexModelField == null) {
+                continue;
+              }
+              if (flexModelField instanceof RelationField secondaryRelationField) {
+                relationFields.add(secondaryRelationField);
+                continue;
+              }
+              projection.addField(selectedField.getName(), field(flexModelField.getModelName() + "." + flexModelField.getName()));
             }
-            if (flexModelField instanceof RelationField secondaryRelationField) {
-              relationFields.add(secondaryRelationField);
-              continue;
+            return projection;
+          });
+          if (limit != null) {
+            query.setLimit(limit);
+            if (offset != null) {
+              query.setOffset(offset);
             }
-            projection.addField(selectedField.getName(), field(flexModelField.getModelName() + "." + flexModelField.getName()));
           }
-          return projection;
-        })
+          return query;
+        }
       );
       List<Map<String, Object>> result = new ArrayList<>();
       for (Map<String, Object> map : list) {
