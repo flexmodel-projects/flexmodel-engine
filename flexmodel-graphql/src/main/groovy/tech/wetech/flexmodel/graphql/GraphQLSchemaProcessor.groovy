@@ -53,14 +53,31 @@ class GraphQLSchemaProcessor {
 
   String genSelectionField(String schemaName, Field field) {
     if (field instanceof RelationField) {
-      return "${field.name}  : ${field.cardinality == RelationField.Cardinality.ONE_TO_ONE ? "${schemaName}_${field.targetEntity}" : "[${schemaName}_${field.targetEntity}]"}"
+      return "${field.name} : ${field.cardinality == RelationField.Cardinality.ONE_TO_ONE ? "${schemaName}_${field.targetEntity}" : "[${schemaName}_${field.targetEntity}]"}"
     }
-    return "${field.name} : ${typeMapping[field.type]}"
+    return "${field.name}: ${typeMapping[field.type]}"
   }
 
   String genTypeModel(String schemaName, Model model) {
-    return """type ${schemaName}_${model.name} {
-${model.fields.collect { field -> "  " + genSelectionField(schemaName, field) }.join("\n")}
+    String key = "${schemaName}_${model.name}"
+    return """
+type ${key} {
+  ${model.fields.collect { field -> genSelectionField(schemaName, field) }.join("\n")}
+}
+
+"aggregated selection of \\"${key}\\""
+type ${key}_aggregate {
+  aggregate: ${key}_aggregate_fields
+  nodes: [${key}!]!
+}
+
+"aggregate fields of \\"${key}\\""
+type ${key}_aggregate_fields {
+  count: ${key}
+  max: ${key}
+  min: ${key}
+  sum: ${key}
+  avg: ${key}
 }
 """
   }
@@ -68,20 +85,20 @@ ${model.fields.collect { field -> "  " + genSelectionField(schemaName, field) }.
   String genInputModel(String schemaName, Model model) {
     String key = "${schemaName}_${model.name}"
     return """
-"Boolean expression to filter rows from the table ${schemaName}.${model.name}. All fields are combined with a logical 'AND'."
+"Boolean expression to filter rows from the table \\"${schemaName}.${model.name}\\". All fields are combined with a logical 'AND'."
 input ${key}_bool_exp {
   _and: [${key}_bool_exp!]
   _or: [${key}_bool_exp!]
 ${
       model.fields.findAll { field -> field.type != 'relation' }
-        .collect { field -> "${field.name} : ${comparisonMapping[field.type]}" }.join("\n")
+        .collect { field -> "${field.name}: ${comparisonMapping[field.type]}" }.join("\n")
     }
 }
 
 input ${key}_order_by {
  ${
       model.fields.findAll { field -> field.type != 'relation' }
-        .collect { field -> "${field.name} : order_by" }.join("\n")
+        .collect { field -> "${field.name}: order_by" }.join("\n")
     }
 }
 """
@@ -93,7 +110,7 @@ input ${key}_order_by {
 enum ${key}_select_column {
 ${
       model.fields.findAll { field -> field.type != 'relation' }
-        .collect { field -> field.name }.join("\n")
+        .collect { field -> "  " + field.name }.join("\n")
     }
 }
 """
@@ -120,14 +137,27 @@ ${key}(
   "skip the first n rows"
   offset: Int
   distinct_on: [${key}_select_column!]
-) : [${key}!]!
-${model?.findIdField()?
-"""
+): [${key}!]!
+
+${key}_aggregate(
+  "filter the rows returned"
+   where: ${key}_bool_exp
+  "sort the rows by one or more columns"
+  order_by: [${key}_order_by!]
+  "limit the number of rows returned"
+  limit: Int
+  "skip the first n rows"
+  offset: Int
+  distinct_on: [${key}_select_column!]
+): ${key}_aggregate!
+
+${model?.findIdField() ?
+              """
 ${key}_by_pk(
-  ${model?.findIdField()?.get()?.name} : ${typeMapping[model?.findIdField()?.get()?.type]}
-) : ${key}
+  ${model?.findIdField()?.get()?.name}: ${typeMapping[model?.findIdField()?.get()?.type]}!
+): ${key}
 """ : ""
- }
+            }
 """
           }
         }.join("\n")
@@ -153,7 +183,7 @@ ${
   delete_${key}(
     "filter the rows which have to be deleted"
     where: ${key}_bool_exp!
-  ) : mutation_response
+  ): mutation_response
 
 """
           }
@@ -168,7 +198,6 @@ ${
           genInputModel(schemaName, model) }.join("\n")
       }.join("\n")
     }
-
 ${
       sf.getSchemaNames().collect { schemaName ->
         sf.getModels(schemaName).collect { model ->
