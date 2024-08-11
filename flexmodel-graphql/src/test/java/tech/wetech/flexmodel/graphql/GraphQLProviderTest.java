@@ -2,7 +2,10 @@ package tech.wetech.flexmodel.graphql;
 
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static tech.wetech.flexmodel.graphql.Models.*;
 
@@ -12,7 +15,7 @@ import static tech.wetech.flexmodel.graphql.Models.*;
 public class GraphQLProviderTest extends AbstractIntegrationTest {
 
   @Test
-  void testFind() throws Exception {
+  void testFind() {
     String classesEntityName = "testSimpleQueryClasses";
     String studentEntityName = "testSimpleQueryStudent";
     String studentDetailEntityName = "testSimpleQueryStudentDetail";
@@ -44,11 +47,17 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
         teachers: find_system_testSimpleQueryTeacher {
          id, teacherName
         }
+        course: find_system_testSimpleQueryCourse_by_id(courseNo: "Math") {
+           courseNo, courseName
+        }
       }
       """;
     ExecutionResult executionResult = graphQL.execute(query);
+    Map<String,Object> data = executionResult.getData();
     // 打印结果
     System.out.println(executionResult);
+    Assertions.assertNotNull(data);
+    Assertions.assertNotNull(data.get("course"));
   }
 
 }
