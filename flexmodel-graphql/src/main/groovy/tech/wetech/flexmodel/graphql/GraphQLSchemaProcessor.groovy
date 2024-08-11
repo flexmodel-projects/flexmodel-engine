@@ -211,7 +211,7 @@ update_${key}(
 ${model?.findIdField() ?
               """
 update_${key}_by_id(
-  data: ${key}_set_input
+   _set: ${key}_set_input
   ${model?.findIdField()?.get()?.name}: ${typeMapping[model?.findIdField()?.get()?.type]}!
 ): ${key}
 """ : ""}
