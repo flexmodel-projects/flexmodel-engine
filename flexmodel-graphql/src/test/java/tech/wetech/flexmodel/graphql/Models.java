@@ -40,7 +40,6 @@ public class Models {
     return session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(AUTO_INCREMENT))
       .addField(new IntField("studentId"))
-      .addField(new TextField("description"))
     );
   }
 
