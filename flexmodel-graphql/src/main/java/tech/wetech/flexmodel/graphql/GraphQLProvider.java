@@ -67,9 +67,10 @@ public class GraphQLProvider {
     RuntimeWiring runtimeWiring = newRuntimeWiring()
       .codeRegistry(codeRegistry)
       .scalar(FlexmodelScalars.Text)
+      .scalar(ExtendedScalars.GraphQLLong)
       .scalar(ExtendedScalars.Json)
-      .scalar(ExtendedScalars.Date)
       .scalar(ExtendedScalars.DateTime)
+      .scalar(ExtendedScalars.Date)
       .build();
     SchemaGenerator schemaGenerator = new SchemaGenerator();
     GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeDefinitionRegistry, runtimeWiring);

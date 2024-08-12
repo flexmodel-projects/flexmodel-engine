@@ -25,12 +25,13 @@ class GraphQLSchemaProcessor {
   def typeMapping = [
     "id"      : "ID",
     "string"  : "String",
-    "text"    : "String",
+    "text"    : "Text",
     "decimal" : "Float",
     "int"     : "Int",
-    "bigint"  : "Int",
+    "bigint"  : "Long",
     "boolean" : "Boolean",
-    "datetime": "String",
+    "datetime": "DateTime",
+    "date": "Date",
     "json"    : "JSON",
   ]
 
@@ -238,6 +239,7 @@ scalar JSON
 scalar Date
 scalar DateTime
 scalar Text
+scalar Long
 
 "Boolean expression to compare columns of type \\"Int\\". All fields are combined with logical 'AND'."
 input Int_comparison_exp {
