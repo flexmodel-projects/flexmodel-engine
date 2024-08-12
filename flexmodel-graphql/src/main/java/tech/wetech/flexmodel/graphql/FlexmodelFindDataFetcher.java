@@ -28,7 +28,8 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
   public List<Map<String, Object>> findRootData(DataFetchingEnvironment env) {
     Integer offset = env.getArgument("offset");
     Integer limit = env.getArgument("limit");
-
+    Map<String, String> orderBy = env.getArgument("order_by");
+    List<String> distinctOn = env.getArgument("distinct_on");
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     try (Session session = sessionFactory.createSession(schemaName)) {
       Entity entity = (Entity) session.getModel(modelName);

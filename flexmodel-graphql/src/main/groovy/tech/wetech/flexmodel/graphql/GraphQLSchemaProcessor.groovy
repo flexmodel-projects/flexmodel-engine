@@ -142,7 +142,7 @@ find_${key}(
   "filter the rows returned"
    where: ${key}_bool_exp
   "sort the rows by one or more columns"
-  order_by: [${key}_order_by!]
+  order_by: ${key}_order_by
   "limit the number of rows returned"
   limit: Int
   "skip the first n rows"
@@ -154,7 +154,7 @@ aggregate_${key}(
   "filter the rows returned"
    where: ${key}_bool_exp
   "sort the rows by one or more columns"
-  order_by: [${key}_order_by!]
+  order_by: ${key}_order_by
   "limit the number of rows returned"
   limit: Int
   "skip the first n rows"

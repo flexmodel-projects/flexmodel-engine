@@ -42,13 +42,18 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
         classes: find_system_testSimpleQueryClasses(offset: 0, limit:1) {
           id, students { name: studentName, courses { courseName } }
         }
-        students: find_system_testSimpleQueryStudent {
-          id, studentName, studentDetail { description }
+        students: find_system_testSimpleQueryStudent(
+          limit: 3
+          offset: 0
+          order_by: {classId: asc, id: desc}
+          distinct_on: age
+        ) {
+          id, studentName
         }
         teachers: find_system_testSimpleQueryTeacher {
          id, teacherName
         }
-        course: find_system_testSimpleQueryCourse_by_id(courseNo: "Math") {
+        course: find_system_testSimpleQueryCourse_by_id(id: "Math") {
            courseNo, courseName
         }
       }

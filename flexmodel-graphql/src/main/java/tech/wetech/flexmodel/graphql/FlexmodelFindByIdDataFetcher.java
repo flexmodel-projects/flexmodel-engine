@@ -27,17 +27,18 @@ public class FlexmodelFindByIdDataFetcher extends FlexmodelAbstractDataFetcher<M
 
   private Map<String, Object> findRootData(DataFetchingEnvironment env) {
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
+    String idValue = env.getArgument("id");
     try (Session session = sessionFactory.createSession(schemaName)) {
       Entity entity = (Entity) session.getModel(modelName);
       IDField idField = entity.findIdField().orElseThrow();
-      Object idValue = env.getArgument(idField.getName());
+
       List<RelationField> relationFields = new ArrayList<>();
       List<Map<String, Object>> list = session.find(entity.getName(), query -> query
         .setFilter(String.format("""
           {
              "==": [{ "var": ["%s"] }, %s]
           }
-          """, idField.getName(), idValue instanceof String ? "\"" + idValue + "\"" : idValue))
+          """, idField.getName(), idField.getGeneratedValue().getType().equals("string") ? "\"" + idValue + "\"" : idValue))
         .setProjection(projection -> {
           projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
           for (SelectedField selectedField : selectedFields) {
