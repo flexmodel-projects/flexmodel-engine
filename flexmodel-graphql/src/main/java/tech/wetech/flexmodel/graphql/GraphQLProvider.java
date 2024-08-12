@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.graphql;
 
 import graphql.GraphQL;
+import graphql.scalars.ExtendedScalars;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLCodeRegistry;
 import graphql.schema.GraphQLSchema;
@@ -65,6 +66,10 @@ public class GraphQLProvider {
 
     RuntimeWiring runtimeWiring = newRuntimeWiring()
       .codeRegistry(codeRegistry)
+      .scalar(FlexmodelScalars.Text)
+      .scalar(ExtendedScalars.Json)
+      .scalar(ExtendedScalars.Date)
+      .scalar(ExtendedScalars.DateTime)
       .build();
     SchemaGenerator schemaGenerator = new SchemaGenerator();
     GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeDefinitionRegistry, runtimeWiring);

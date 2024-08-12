@@ -25,7 +25,7 @@ public class FlexmodelFindByIdDataFetcher extends FlexmodelAbstractDataFetcher<M
     return findRootData(env);
   }
 
-  public Map<String, Object> findRootData(DataFetchingEnvironment env) {
+  private Map<String, Object> findRootData(DataFetchingEnvironment env) {
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     try (Session session = sessionFactory.createSession(schemaName)) {
       Entity entity = (Entity) session.getModel(modelName);

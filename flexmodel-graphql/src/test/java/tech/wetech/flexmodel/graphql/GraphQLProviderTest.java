@@ -84,17 +84,21 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     // 创建查询
     String query = """
       mutation {
-        course: create_system_testMutationCourse(data: {courseName: "测试课程", courseNo: "Test_C"}) {
+        class: create_system_testMutationClasses(data:{className: "测试班级", classCode: "TestC"}) {
+          classCode
+        }
+        course: create_system_testMutationCourse(data: {courseName: "测试课程", courseNo: "Test_CC"}) {
             courseName
             courseNo
         }
-        student: create_system_testMutationCourse(data: {courseName: "测试课程", courseNo: "Test_C"}) {
-            courseName
-            courseNo
+        student: create_system_testMutationStudent(data: {studentName: "张三丰", gender: "男", age: 200, classId: 1, remark: {test:"aa"}}) {
+            id
+            remark
         }
       }
       """;
     ExecutionResult executionResult = graphQL.execute(query);
+    log.info("result: {}", executionResult);
     Map<String, Object> data = executionResult.getData();
     Assertions.assertNotNull(data.get("course"));
   }

@@ -3,6 +3,8 @@ package tech.wetech.flexmodel.graphql;
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.Session;
 import tech.wetech.flexmodel.SessionFactory;
 import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
@@ -12,6 +14,7 @@ import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
  */
 public class AbstractIntegrationTest {
 
+  protected static final Logger log = LoggerFactory.getLogger(GraphQLProviderTest.class);
   protected static final String SCHEMA_NAME = "system";
   protected static Session session;
 

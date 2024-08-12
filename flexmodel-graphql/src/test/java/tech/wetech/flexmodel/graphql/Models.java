@@ -21,6 +21,7 @@ public class Models {
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("classCode"))
       .addField(new StringField("className"))
+      .addField(new JsonField("description"))
     );
   }
 
@@ -31,6 +32,7 @@ public class Models {
       .addField(new StringField("gender"))
       .addField(new IntField("age"))
       .addField(new IntField("classId"))
+      .addField(new JsonField("remark"))
     );
   }
 
@@ -130,6 +132,9 @@ public class Models {
           "gender": "男",
           "age": 10,
           "classId": 1,
+          "remark": {
+              "foo": "bar"
+          },
           "studentDetail": {
             "description": "张三的描述"
           },
@@ -154,6 +159,9 @@ public class Models {
           "gender": "女",
           "age": 10,
           "classId": 1,
+          "remark": {
+              "leader": "John Doe"
+          },
           "studentDetail": {
             "description": "李四的描述"
           },
@@ -174,6 +182,7 @@ public class Models {
           "gender": "男",
           "age": 11,
           "classId": 2,
+          "remark": null,
           "studentDetail": {
             "description": "王五的描述"
           },

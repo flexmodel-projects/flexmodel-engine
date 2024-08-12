@@ -13,7 +13,6 @@ class GraphQLSchemaProcessor {
     this.sf = sf
     initSchemaString()
     initDataFetcherTypes()
-    log.debug("generate graphql schema:\n", graphqlSchemaString)
   }
   private final Logger log = LoggerFactory.getLogger(GraphQLSchemaProcessor.class)
 
@@ -32,7 +31,7 @@ class GraphQLSchemaProcessor {
     "bigint"  : "Int",
     "boolean" : "Boolean",
     "datetime": "String",
-    "json"    : "String",
+    "json"    : "JSON",
   ]
 
   def comparisonMapping = [
@@ -235,6 +234,11 @@ ${
       }.join("\n")
     }
 
+scalar JSON
+scalar Date
+scalar DateTime
+scalar Text
+
 "Boolean expression to compare columns of type \\"Int\\". All fields are combined with logical 'AND'."
 input Int_comparison_exp {
   _eq: Int
@@ -302,6 +306,7 @@ type mutation_response {
   affected_rows: Int!
 }
 """
+    log.debug("generate graphql schema: {}\n", graphqlSchemaString)
   }
 
   private void initDataFetcherTypes() {
