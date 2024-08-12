@@ -164,7 +164,7 @@ aggregate_${key}(
 ${model?.findIdField() ?
               """
 find_${key}_by_id(
-  ${model?.findIdField()?.get()?.name}: ${typeMapping[model?.findIdField()?.get()?.type]}!
+  id: ${typeMapping[model?.findIdField()?.get()?.type]}!
 ): ${key}
 """ : ""
             }
@@ -197,7 +197,7 @@ ${
 ${model?.findIdField() ?
               """
 delete_${key}_by_id(
-  ${model?.findIdField()?.get()?.name}: ${typeMapping[model?.findIdField()?.get()?.type]}!
+  id: ${typeMapping[model?.findIdField()?.get()?.type]}!
 ): ${key}
 """ : ""}
 create_${key}(
@@ -211,7 +211,7 @@ ${model?.findIdField() ?
               """
 update_${key}_by_id(
    _set: ${key}_set_input
-  ${model?.findIdField()?.get()?.name}: ${typeMapping[model?.findIdField()?.get()?.type]}!
+   id: ${typeMapping[model?.findIdField()?.get()?.type]}!
 ): ${key}
 """ : ""}
 """

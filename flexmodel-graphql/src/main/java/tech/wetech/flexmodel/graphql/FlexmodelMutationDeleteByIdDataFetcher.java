@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.graphql;
 
 import graphql.schema.DataFetchingEnvironment;
+import tech.wetech.flexmodel.Session;
 import tech.wetech.flexmodel.SessionFactory;
 
 import java.util.Map;
@@ -16,7 +17,12 @@ public class FlexmodelMutationDeleteByIdDataFetcher extends FlexmodelAbstractDat
 
   @Override
   public Map<String, Object> get(DataFetchingEnvironment environment) throws Exception {
-    return Map.of();
+    Object id = environment.getArgument("id");
+    try (Session session = sessionFactory.createSession(schemaName)) {
+      Map<String, Object> data = session.findById(modelName, id);
+      session.deleteById(modelName, id);
+      return data;
+    }
   }
 
 }

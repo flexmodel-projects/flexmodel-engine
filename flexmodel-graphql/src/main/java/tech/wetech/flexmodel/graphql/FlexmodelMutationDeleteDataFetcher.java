@@ -16,7 +16,7 @@ public class FlexmodelMutationDeleteDataFetcher extends FlexmodelAbstractDataFet
 
   @Override
   public Map<String, Object> get(DataFetchingEnvironment environment) throws Exception {
-    return Map.of();
+    return environment.getArgument("");
   }
 
 }

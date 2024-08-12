@@ -5,6 +5,7 @@ import graphql.GraphQL;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static tech.wetech.flexmodel.graphql.Models.*;
@@ -98,9 +99,30 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
       }
       """;
     ExecutionResult executionResult = graphQL.execute(query);
-    log.info("result: {}", executionResult);
+    log.info("query result: {}", executionResult);
     Map<String, Object> data = executionResult.getData();
+    Assertions.assertNotNull(data.get("class"));
     Assertions.assertNotNull(data.get("course"));
+    Assertions.assertNotNull(data.get("student"));
+    String query2 = """
+      mutation MyMutation($studentId: ID!, $courseNo: ID!) {
+        class: delete_system_testMutationCourse_by_id(id: $courseNo) {
+          courseNo
+        }
+        student: update_system_testMutationStudent_by_id(_set: {age: 199, remark: {test: "bb"}}, id: $studentId) {
+          id
+        }
+      }
+      """;
+    Map<String, Object> variables = new HashMap<>();
+    if (data.get("student") instanceof Map<?, ?> map) {
+      variables.put("studentId", map.get("id"));
+    }
+    variables.put("courseNo", "Test_CC");
+    ExecutionResult executionResult2 = graphQL.execute(i -> i.query(query2).variables(variables));
+    log.info("query result: {}", executionResult2);
+    Map<String, Object> data2 = executionResult2.getData();
+    Assertions.assertNotNull(data2.get("class"));
   }
 
 }
