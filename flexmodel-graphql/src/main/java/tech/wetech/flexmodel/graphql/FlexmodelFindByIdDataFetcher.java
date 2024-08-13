@@ -34,15 +34,11 @@ public class FlexmodelFindByIdDataFetcher extends FlexmodelAbstractDataFetcher<M
 
       List<RelationField> relationFields = new ArrayList<>();
       List<Map<String, Object>> list = session.find(entity.getName(), query -> query
-        .setFilter(String.format("""
-          {
-             "==": [{ "var": ["%s"] }, %s]
-          }
-          """, idField.getName(), idField.getGeneratedValue().getType().equals("string") ? "\"" + idValue + "\"" : idValue))
+        .setFilter(f -> f.equalTo(idField.getName(), idField.getGeneratedValue().getType().equals("string") ? "\"" + idValue + "\"" : idValue))
         .setProjection(projection -> {
           projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
           for (SelectedField selectedField : selectedFields) {
-            TypedField<?, ?> flexModelField = (TypedField<?, ?>) entity.getField(selectedField.getName());
+            TypedField<?, ?> flexModelField = entity.getField(selectedField.getName());
             if (flexModelField == null) {
               continue;
             }

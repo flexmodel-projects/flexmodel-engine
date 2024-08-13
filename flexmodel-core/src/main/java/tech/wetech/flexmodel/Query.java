@@ -1,5 +1,8 @@
 package tech.wetech.flexmodel;
 
+import tech.wetech.flexmodel.criterion.Example;
+import tech.wetech.flexmodel.criterion.Example.Criteria;
+
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.UnaryOperator;
@@ -16,6 +19,7 @@ public class Query implements Serializable {
   private Sort sort;
   private Integer limit;
   private Integer offset;
+  private DistinctOn distinctOn;
   private boolean deep;
 
   public interface QueryCall extends Serializable {
@@ -80,6 +84,21 @@ public class Query implements Serializable {
     }
   }
 
+  public static class DistinctOn implements Serializable {
+
+    private final Set<String> fields = new HashSet<>();
+
+    public DistinctOn addField(String field) {
+      fields.add(field);
+      return this;
+    }
+
+    public Set<String> getFields() {
+      return fields;
+    }
+
+  }
+
   public Query setProjection(UnaryOperator<Projection> projectUnaryOperator) {
     Projection projection = new Projection();
     projectUnaryOperator.apply(projection);
@@ -114,6 +133,13 @@ public class Query implements Serializable {
     return this;
   }
 
+  public Query setFilter(UnaryOperator<Criteria> unaryOperator) {
+    Example example = new Example();
+    unaryOperator.apply(example.createCriteria());
+    this.filter = example.toFilterString();
+    return this;
+  }
+
   public Projection getProjection() {
     return projection;
   }
@@ -126,9 +152,9 @@ public class Query implements Serializable {
     return sort;
   }
 
-  public Query setSort(UnaryOperator<Sort> UnaryOperator) {
+  public Query setSort(UnaryOperator<Sort> unaryOperator) {
     this.sort = new Sort();
-    UnaryOperator.apply(this.sort);
+    unaryOperator.apply(this.sort);
     return this;
   }
 
@@ -147,6 +173,16 @@ public class Query implements Serializable {
 
   public Query setOffset(Integer offset) {
     this.offset = offset;
+    return this;
+  }
+
+  public DistinctOn getDistinctOn() {
+    return distinctOn;
+  }
+
+  public Query setDistinctOn(UnaryOperator<DistinctOn> unaryOperator) {
+    this.distinctOn = new DistinctOn();
+    unaryOperator.apply(this.distinctOn);
     return this;
   }
 

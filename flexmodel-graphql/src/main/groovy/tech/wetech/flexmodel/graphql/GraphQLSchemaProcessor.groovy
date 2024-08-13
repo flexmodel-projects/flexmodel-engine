@@ -131,6 +131,11 @@ ${
    */
   private void initSchemaString() {
     this.graphqlSchemaString = """
+schema {
+  query: Query
+  mutation: Mutation
+}
+
 type Query {
 ${
       sf.getSchemaNames().collect { schemaName ->

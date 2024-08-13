@@ -72,17 +72,6 @@ public class FlexmodelAggregateDataFetcher extends FlexmodelAbstractDataFetcher<
     Entity targetEntity = (Entity) session.getModel(relationField.getTargetEntity());
     path = path == null ? relationField.getName() : path + "/" + relationField.getName();
     List<SelectedField> selectedFields = env.getSelectionSet().getFields(path + "/*");
-    String filter = String.format("""
-        {
-          "==": [
-            {"var": ["%s"]},
-            %s
-          ]
-        }
-        """,
-      entity.getName() + "." + entity.findIdField().map(IDField::getName).orElseThrow(),
-      id instanceof Number ? id : "\"" + id + "\""
-    );
     List<RelationField> relationFields = new ArrayList<>();
     List<Map<String, Object>> list = session.find(entity.getName(), query -> query
       .setProjection(projection -> {
@@ -102,7 +91,8 @@ public class FlexmodelAggregateDataFetcher extends FlexmodelAbstractDataFetcher<
         return projection;
       })
       .setJoins(joins -> joins.addLeftJoin(join -> join.setFrom(targetEntity.getName())))
-      .setFilter(filter)
+      .setFilter(f -> f.equalTo(entity.getName() + "." + entity.findIdField().map(IDField::getName).orElseThrow(),
+        id instanceof Number ? id : "\"" + id + "\""))
     );
     List<Map<String, Object>> result = new ArrayList<>();
     for (Map<String, Object> map : list) {

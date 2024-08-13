@@ -57,6 +57,19 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
               query.setOffset(offset);
             }
           }
+          if (orderBy != null) {
+            query.setSort(sort -> {
+                orderBy.forEach((k, v) -> sort.addOrder(k, Direction.valueOf(v.toUpperCase())));
+                return sort;
+              }
+            );
+          }
+          if (distinctOn != null) {
+            query.setDistinctOn(d -> {
+              distinctOn.forEach(d::addField);
+              return d;
+            });
+          }
           return query;
         }
       );

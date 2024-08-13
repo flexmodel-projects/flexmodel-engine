@@ -336,16 +336,7 @@ public abstract class AbstractSessionTests {
       .setJoins(joins -> joins
         .addLeftJoin(join -> join.setFrom(studentDetailEntityName))
       )
-      .setFilter(
-        String.format("""
-          {
-            "==": [
-              {"var": ["%s"]},
-              %s
-            ]
-          }
-          """, studentEntityName + ".id", 1)
-      )
+      .setFilter(f -> f.equalTo(studentEntityName + ".id", 1))
     ).getFirst();
     Assertions.assertEquals("张三", oneToOne.get("studentName"));
     Assertions.assertEquals("张三的描述", oneToOne.get("description"));
@@ -361,16 +352,7 @@ public abstract class AbstractSessionTests {
           .setFrom(studentEntityName)
         )
       )
-      .setFilter(
-        String.format("""
-          {
-            "==": [
-              {"var": ["%s"]},
-              %s
-            ]
-          }
-          """, classesEntityName + ".id", 1)
-      )
+      .setFilter(f -> f.equalTo(classesEntityName + ".id", 1))
     );
     Assertions.assertFalse(oneToMany.isEmpty());
     Assertions.assertEquals("一年级1班", oneToMany.getFirst().get("className"));
@@ -385,16 +367,7 @@ public abstract class AbstractSessionTests {
       .setJoins(joins -> joins.addLeftJoin(join -> join
         .setFrom(teacherEntityName)
       ))
-      .setFilter(
-        String.format("""
-          {
-            "==": [
-              {"var": ["%s"]},
-              %s
-            ]
-          }
-          """, studentEntityName + ".id", 1)
-      )
+      .setFilter(f -> f.equalTo(studentEntityName + ".id", 1))
     );
     Assertions.assertFalse(manyToMany.isEmpty());
     Assertions.assertEquals(3, manyToMany.size());
@@ -546,11 +519,7 @@ public abstract class AbstractSessionTests {
           .setFrom(teacherCourseEntityName)
         )
       )
-      .setFilter(String.format("""
-        {
-          ">=": [{ "var": ["%s.id"] }, 1]
-        }
-        """, teacherEntityName))
+      .setFilter(f -> f.greaterThanOrEqualTo(teacherEntityName + ".id", 1))
       .setGroupBy(groupBy -> groupBy
         .addField(teacherEntityName + ".id")
         .addField("teacher_name")
@@ -641,18 +610,7 @@ public abstract class AbstractSessionTests {
           .addField("teacher_id", field("id"))
           .addField("teacher_name", field("name"))
         )
-        .setFilter("""
-          {
-            "or": [
-              {
-                "==": [{ "var": ["name"] }, "张三"]
-              },
-              {
-                "==": [{ "var": ["name"] }, "李四"]
-              }
-            ]
-          }
-          """));
+        .setFilter(f -> f.or(f.equalTo("name", "张三").equalTo("name", "李四"))));
     Assertions.assertFalse(list.isEmpty());
     Assertions.assertEquals(2, list.size());
   }
@@ -665,11 +623,8 @@ public abstract class AbstractSessionTests {
     createTeacherEntity2(entityName);
     createTeacherCourseEntity(entityName, courseEntityName);
     createTeacherCourseReportView(teacherCourseReportViewName, entityName, courseEntityName);
-    List<Map<String, Object>> list = session.find(teacherCourseReportViewName, query -> query.setFilter("""
-      {
-        "==": [{ "var": ["teacher_id"] }, 2]
-      }
-      """));
+    List<Map<String, Object>> list = session.find(teacherCourseReportViewName, query ->
+      query.setFilter(f -> f.equalTo("teacher_id", 2)));
     Assertions.assertFalse(list.isEmpty());
     Map<String, Object> item = list.getFirst();
     Assertions.assertEquals(2L, ((Number) item.get("teacher_id")).intValue());
@@ -704,11 +659,7 @@ public abstract class AbstractSessionTests {
       .setGroupBy(groupBy -> groupBy
         .addField("teacher_name")
       )
-      .setFilter("""
-        {
-          "==": [{ "var": ["name"] }, "李四"]
-        }
-        """)
+      .setFilter(f -> f.equalTo("name", "李四"))
     );
     Assertions.assertFalse(groupList.isEmpty());
     Map<String, Object> groupFirst = groupList.getFirst();
@@ -773,21 +724,25 @@ public abstract class AbstractSessionTests {
   }
 
   @Test
+  void testDistinctOn() {
+    String entityName = "testDistinctOn_teacher";
+    createTeacherEntity2(entityName);
+    List<Map<String, Object>> list = session.find(entityName, query ->
+      query
+        .setDistinctOn(distinctOn -> distinctOn.addField("id").addField("name"))
+        .setProjection(project -> project
+          .addField("teacher_id", field("id"))
+          .addField("teacher_name", field("name"))
+        ));
+    Assertions.assertFalse(list.isEmpty());
+  }
+
+  @Test
   void testCountByCondition() {
     String entityName = "testCountByCondition_teacher";
     createTeacherEntity2(entityName);
-    long total = session.count(entityName, query -> query.setFilter("""
-      {
-        "or": [
-          {
-            "==": [{ "var": ["name"] }, "张三"]
-          },
-          {
-            "==": [{ "var": ["name"] }, "李四"]
-          }
-        ]
-      }
-      """));
+    long total = session.count(entityName, query -> query
+      .setFilter(f -> f.or(f.equalTo("name", "张三").equalTo("name", "李四"))));
     Assertions.assertEquals(2, total);
   }
 
