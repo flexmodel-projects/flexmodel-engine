@@ -66,11 +66,11 @@ public class Example {
   public static class Criteria {
 
     private boolean isAnd = true;
-    private final Example example;
+    private final Example that;
     private final List<Criterion> criteria;
 
-    public Criteria(Example example) {
-      this.example = example;
+    public Criteria(Example that) {
+      this.that = that;
       this.criteria = new ArrayList<>();
     }
 
@@ -83,20 +83,20 @@ public class Example {
     }
 
     public Criteria and() {
-      return example.and();
+      return that.and();
     }
 
     public Criteria and(Criteria criteria) {
-      example.and(criteria);
+      that.and(criteria);
       return this;
     }
 
     public Criteria or() {
-      return example.or();
+      return that.or();
     }
 
     public Criteria or(Criteria criteria) {
-      example.or(criteria);
+      that.or(criteria);
       return this;
     }
 
@@ -252,25 +252,31 @@ public class Example {
   }
 
   public String toFilterString() {
-    Map<String, Object> filterMap = new HashMap<>();
-    List<Map<String, Object>> resList = new ArrayList<>();
-    filterMap.put("and", resList);
+    Map<String, Object> root = new HashMap<>();
+    List<Map<String, Object>> andList = new ArrayList<>();
+    root.put("and", andList);
     for (Criteria criteria : this.oredCriteria) {
+      Map<String, Object> filterMap = new HashMap<>();
       List<Object> logicValues = new ArrayList<>();
       filterMap.put(criteria.isAnd ? "and" : "or", logicValues);
       for (Criteria.Criterion criterion : criteria.getAllCriteria()) {
-        List<Object> item = new ArrayList<>();
-        logicValues.add(Map.of("and",
-          List.of(Map.of(criterion.getOperator(), item))));
-        item.add(Map.of("var", List.of(criterion.getField())));
-        item.add(criterion.getValue());
-        if (criterion.isBetweenValue()) {
-          item.add(criterion.getSecondValue());
-        }
+        Map<String, Object> condition = getCondition(criterion);
+        logicValues.add(condition);
       }
+      andList.add(filterMap);
     }
     JacksonObjectConverter converter = new JacksonObjectConverter();
-    return converter.toJsonString(filterMap);
+    return converter.toJsonString(root);
+  }
+
+  private Map<String, Object> getCondition(Criteria.Criterion criterion) {
+    List<Object> item = new ArrayList<>();
+    item.add(Map.of("var", List.of(criterion.getField())));
+    item.add(criterion.getValue());
+    if (criterion.isBetweenValue()) {
+      item.add(criterion.getSecondValue());
+    }
+    return Map.of(criterion.getOperator(), item);
   }
 
 }

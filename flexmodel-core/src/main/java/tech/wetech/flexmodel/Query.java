@@ -133,9 +133,9 @@ public class Query implements Serializable {
     return this;
   }
 
-  public Query setFilter(UnaryOperator<Criteria> unaryOperator) {
+  public Query setFilter(UnaryOperator<Criteria> filter) {
     Example example = new Example();
-    unaryOperator.apply(example.createCriteria());
+    filter.apply(example.createCriteria());
     this.filter = example.toFilterString();
     return this;
   }

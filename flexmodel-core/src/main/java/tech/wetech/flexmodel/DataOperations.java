@@ -1,9 +1,11 @@
 package tech.wetech.flexmodel;
 
+import tech.wetech.flexmodel.criterion.Example;
 import tech.wetech.flexmodel.graph.JoinGraphNode;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
@@ -205,6 +207,33 @@ public interface DataOperations {
    */
   default boolean exists(String modelName, UnaryOperator<Query> queryUnaryOperator) {
     return count(modelName, queryUnaryOperator) > 0;
+  }
+
+  /**
+   * 根据条件更新记录
+   *
+   * @param modelName
+   * @param record
+   * @param unaryOperator
+   * @return 影响行数
+   */
+  default int update(String modelName, Map<String, Object> record, UnaryOperator<Example.Criteria> unaryOperator) {
+    Example example = new Example();
+    unaryOperator.apply(example.createCriteria());
+    return update(modelName, record, example.toFilterString());
+  }
+
+  /**
+   * 根据条件删除
+   *
+   * @param modelName     模型名称
+   * @param unaryOperator 条件
+   * @return 影响行数
+   */
+  default int delete(String modelName, UnaryOperator<Example.Criteria> unaryOperator) {
+    Example example = new Example();
+    unaryOperator.apply(example.createCriteria());
+    return update(modelName, new TreeMap<>(), example.toFilterString());
   }
 
 }
