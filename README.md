@@ -263,11 +263,7 @@ session.createView("teacher_course_report", "teacher", query -> query
           .setFrom(teacherCourseEntityName)
         )
       )
-      .setFilter("""
-        {
-          ">=": [{ "var": ["id"] }, 1]
-        }
-        """)
+      .setFilter(f -> f.greaterThanOrEqualTo("id", 1))
       .setGroupBy(groupBy -> groupBy
         .addField("id")
         .addField("teacher_name")
@@ -283,9 +279,7 @@ session.createView("teacher_course_report", "teacher", query -> query
 
 ```java
 List<Map<String, Object>> list = session.find("teacher_course_report", query -> query
-  .setFilter("""
-    {"==": [{ "var": ["teacher_id"] }, 2]}
-  """)
+  .setFilter(f -> f.equalTo("teacher_id", 2))
 );
 ```
 
@@ -368,11 +362,7 @@ List<Map<String, Object>> groupList = session.find(entityName, query -> query
       .setFrom(courseEntityName)
       .setLocalField("id") // 主键字段，存在关联关系时可不指定
       .setForeignField("teacher_id") // 外键字段，存在关联关系时可不指定
-      .setFilter("""
-        {
-          "!=": [{ "var": ["teacher_id"] }, 999]
-        }
-        """)
+      .setFilter(f -> f.notEqualTo("teacher_id", 999))
     )
   )
   // 设置分组
@@ -380,11 +370,7 @@ List<Map<String, Object>> groupList = session.find(entityName, query -> query
     .addField("teacher_name")
   )
   // 设置过滤条件
-  .setFilter("""
-    {
-      "==": [{ "var": ["name"] }, "李四"]
-    }
-    """)
+  .setFilter(f -> f.notEqualTo("name", "李四"))
   // 设置排序
   .setSort(sort -> sort.addOrder("id", Direction.DESC))
   // 设置分页查询
