@@ -108,8 +108,7 @@ public class QueryHelper {
             }
           )
           .setJoins(joins -> joins.addInnerJoin(join -> join.setFrom(relationField.getTargetEntity())))
-          .setFilter(f -> f.equalTo(entity.getName() + "." + entity.findIdField().orElseThrow().getName(),
-            id instanceof String ? "\"" + id + "\"" : id))
+          .setFilter(f -> f.equalTo(entity.getName() + "." + entity.findIdField().orElseThrow().getName(), id))
       );
       return mapList;
     }

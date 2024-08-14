@@ -91,8 +91,7 @@ public class FlexmodelAggregateDataFetcher extends FlexmodelAbstractDataFetcher<
         return projection;
       })
       .setJoins(joins -> joins.addLeftJoin(join -> join.setFrom(targetEntity.getName())))
-      .setFilter(f -> f.equalTo(entity.getName() + "." + entity.findIdField().map(IDField::getName).orElseThrow(),
-        id instanceof Number ? id : "\"" + id + "\""))
+      .setFilter(f -> f.equalTo(entity.getName() + "." + entity.findIdField().map(IDField::getName).orElseThrow(), id))
     );
     List<Map<String, Object>> result = new ArrayList<>();
     for (Map<String, Object> map : list) {
