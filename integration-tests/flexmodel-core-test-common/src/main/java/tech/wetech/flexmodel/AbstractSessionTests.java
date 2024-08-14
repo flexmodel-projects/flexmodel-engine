@@ -610,7 +610,7 @@ public abstract class AbstractSessionTests {
           .addField("teacher_id", field("id"))
           .addField("teacher_name", field("name"))
         )
-        .setFilter(f -> f.or(f.equalTo("name", "张三").equalTo("name", "李四"))));
+        .setFilter(f -> f.or(or -> or.equalTo("name", "张三").equalTo("name", "李四"))));
     Assertions.assertFalse(list.isEmpty());
     Assertions.assertEquals(2, list.size());
   }
@@ -742,7 +742,7 @@ public abstract class AbstractSessionTests {
     String entityName = "testCountByCondition_teacher";
     createTeacherEntity2(entityName);
     long total = session.count(entityName, query -> query
-      .setFilter(f -> f.or(f.equalTo("name", "张三").equalTo("name", "李四"))));
+      .setFilter(f -> f.or(or -> or.equalTo("name", "张三").equalTo("name", "李四"))));
     Assertions.assertEquals(2, total);
   }
 

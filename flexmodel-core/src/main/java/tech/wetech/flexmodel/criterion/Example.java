@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 /**
  * @author cjbi
@@ -37,10 +38,8 @@ public class Example {
     return criteria;
   }
 
-  public Criteria and(Criteria criteria) {
-    criteria.isAnd = true;
-    oredCriteria.add(criteria);
-    return criteria;
+  public Criteria and(UnaryOperator<Criteria> and) {
+    return and.apply(and());
   }
 
   public Criteria or() {
@@ -50,10 +49,8 @@ public class Example {
     return criteria;
   }
 
-  public Criteria or(Criteria criteria) {
-    criteria.isAnd = false;
-    oredCriteria.add(criteria);
-    return criteria;
+  public Criteria or(UnaryOperator<Criteria> or) {
+    return or.apply(or());
   }
 
   protected Criteria createCriteriaInternal() {
@@ -86,8 +83,8 @@ public class Example {
       return that.and();
     }
 
-    public Criteria and(Criteria criteria) {
-      that.and(criteria);
+    public Criteria and(UnaryOperator<Criteria> and) {
+      that.and(and);
       return this;
     }
 
@@ -95,8 +92,8 @@ public class Example {
       return that.or();
     }
 
-    public Criteria or(Criteria criteria) {
-      that.or(criteria);
+    public Criteria or(UnaryOperator<Criteria> or) {
+      that.or(or);
       return this;
     }
 
@@ -258,6 +255,9 @@ public class Example {
     for (Criteria criteria : this.oredCriteria) {
       Map<String, Object> filterMap = new HashMap<>();
       List<Object> logicValues = new ArrayList<>();
+      if (criteria.getAllCriteria().isEmpty()) {
+        continue;
+      }
       filterMap.put(criteria.isAnd ? "and" : "or", logicValues);
       for (Criteria.Criterion criterion : criteria.getAllCriteria()) {
         Map<String, Object> condition = getCondition(criterion);

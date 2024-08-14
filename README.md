@@ -370,7 +370,18 @@ List<Map<String, Object>> groupList = session.find(entityName, query -> query
     .addField("teacher_name")
   )
   // 设置过滤条件
-  .setFilter(f -> f.notEqualTo("name", "李四"))
+  .setFilter(f -> f.equalTo("username", "john_doe")
+    .or()
+    .equalTo("remark", "aa")
+    .equalTo("locked", false)
+    .notEqualTo("email", "jane_doe@example.com")
+    .greaterThan("age", 18)
+    .and()
+    .greaterThanOrEqualTo("registrationDate", "2020-01-01")
+    .lessThan("age", 65)
+    .lessThanOrEqualTo("lastLogin", "2023-01-01")
+    .or(or -> or.notIn("role", List.of("banned")).in("status", List.of("active", "pending")))
+    .between("createdAt", "2022-01-01", "2022-12-31"))
   // 设置排序
   .setSort(sort -> sort.addOrder("id", Direction.DESC))
   // 设置分页查询
