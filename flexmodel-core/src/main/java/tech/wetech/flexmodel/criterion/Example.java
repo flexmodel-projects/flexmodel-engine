@@ -172,78 +172,78 @@ public class Example {
       criteria.add(new Criterion(field, operator));
     }
 
-    public static class Criterion {
-      private final String operator;
-      private final String field;
-      private Object value;
-      private Object secondValue;
-      private boolean noValue;
-      private boolean singleValue;
-      private boolean betweenValue;
-      private boolean listValue;
-
-      public Criterion(String field, String operator) {
-        this.field = field;
-        this.operator = operator;
-        this.noValue = true;
-      }
-
-      public Criterion(String field, Object value, String operator) {
-        this.field = field;
-        this.value = value;
-        this.operator = operator;
-
-        if (value instanceof Iterable) {
-          this.listValue = true;
-        } else {
-          this.singleValue = true;
-        }
-      }
-
-      public Criterion(String field, Object value1, Object value2, String operator) {
-        this.field = field;
-        this.value = value1;
-        this.secondValue = value2;
-        this.operator = operator;
-        this.betweenValue = true;
-      }
-
-      public String getField() {
-        return field;
-      }
-
-      public Object getValue() {
-        return value;
-      }
-
-      public Object getSecondValue() {
-        return secondValue;
-      }
-
-      public String getOperator() {
-        return operator;
-      }
-
-      public boolean isNoValue() {
-        return noValue;
-      }
-
-      public boolean isSingleValue() {
-        return singleValue;
-      }
-
-      public boolean isBetweenValue() {
-        return betweenValue;
-      }
-
-      public boolean isListValue() {
-        return listValue;
-      }
-
-    }
-
     public void clear() {
       criteria.clear();
+    }
+
+  }
+
+  public static class Criterion {
+    private final String operator;
+    private final String field;
+    private Object value;
+    private Object secondValue;
+    private boolean noValue;
+    private boolean singleValue;
+    private boolean betweenValue;
+    private boolean listValue;
+
+    public Criterion(String field, String operator) {
+      this.field = field;
+      this.operator = operator;
+      this.noValue = true;
+    }
+
+    public Criterion(String field, Object value, String operator) {
+      this.field = field;
+      this.value = value;
+      this.operator = operator;
+
+      if (value instanceof Iterable) {
+        this.listValue = true;
+      } else {
+        this.singleValue = true;
+      }
+    }
+
+    public Criterion(String field, Object value1, Object value2, String operator) {
+      this.field = field;
+      this.value = value1;
+      this.secondValue = value2;
+      this.operator = operator;
+      this.betweenValue = true;
+    }
+
+    public String getField() {
+      return field;
+    }
+
+    public Object getValue() {
+      return value;
+    }
+
+    public Object getSecondValue() {
+      return secondValue;
+    }
+
+    public String getOperator() {
+      return operator;
+    }
+
+    public boolean isNoValue() {
+      return noValue;
+    }
+
+    public boolean isSingleValue() {
+      return singleValue;
+    }
+
+    public boolean isBetweenValue() {
+      return betweenValue;
+    }
+
+    public boolean isListValue() {
+      return listValue;
     }
 
   }
@@ -259,7 +259,7 @@ public class Example {
         continue;
       }
       filterMap.put(criteria.isAnd ? "and" : "or", logicValues);
-      for (Criteria.Criterion criterion : criteria.getAllCriteria()) {
+      for (Criterion criterion : criteria.getAllCriteria()) {
         Map<String, Object> condition = getCondition(criterion);
         logicValues.add(condition);
       }
@@ -269,7 +269,7 @@ public class Example {
     return converter.toJsonString(root);
   }
 
-  private Map<String, Object> getCondition(Criteria.Criterion criterion) {
+  private Map<String, Object> getCondition(Criterion criterion) {
     List<Object> item = new ArrayList<>();
     item.add(Map.of("var", List.of(criterion.getField())));
     item.add(criterion.getValue());
