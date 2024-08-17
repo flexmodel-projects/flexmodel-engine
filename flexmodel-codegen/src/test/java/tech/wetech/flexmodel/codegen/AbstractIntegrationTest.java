@@ -1,4 +1,4 @@
-package tech.wetech.flexmodel.graphql;
+package tech.wetech.flexmodel.codegen;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.AfterAll;

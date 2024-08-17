@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 /**
- * 数据操作
+ * Data Operations
  *
  * @author cjbi
  */
@@ -19,76 +19,78 @@ public interface DataOperations {
   void associate(JoinGraphNode joinGraphNode, Map<String, Object> data);
 
   /**
-   * 插入记录
+   * Insert a record
    *
-   * @param modelName 模型名称
-   * @param record    记录
-   * @param id        auto increment name
-   * @return affected rows
+   * @param modelName Model name
+   * @param record    Record
+   * @param id        Auto increment name
+   * @return Number of affected rows
    */
   int insert(String modelName, Map<String, Object> record, Consumer<Object> id);
 
   /**
-   * 根据id获取记录
+   * Find a record by ID
    *
-   * @param modelName 模型名称
-   * @param id        编号
-   * @return 记录
+   * @param modelName Model name
+   * @param id        ID
+   * @return Record
    */
   <T> T findById(String modelName, Object id, Class<T> resultType, boolean deep);
 
   <T> List<T> find(String modelName, Query query, Class<T> resultType);
 
   /**
-   * 根据条件统计
+   * Count records based on conditions
    *
-   * @param modelName
-   * @param query
-   * @return 记录数
+   * @param modelName Model name
+   * @param query     Query
+   * @return Number of records
    */
   long count(String modelName, Query query);
 
   /**
-   * 根据id更新记录
+   * Update a record by ID
    *
-   * @param modelName 模型名称
-   * @param record    记录
-   * @return affected rows
+   * @param modelName Model name
+   * @param record    Record
+   * @param id        ID
+   * @return Number of affected rows
    */
   int updateById(String modelName, Map<String, Object> record, Object id);
 
   /**
-   * 根据条件更新记录
+   * Update records based on conditions
    *
-   * @param modelName
-   * @param record
-   * @param filter
-   * @return 影响行数
+   * @param modelName Model name
+   * @param record    Record
+   * @param filter    Filter
+   * @return Number of affected rows
    */
   int update(String modelName, Map<String, Object> record, String filter);
 
   /**
-   * 根据id删除
+   * Delete a record by ID
    *
-   * @param modelName 模型名称
-   * @return affected rows
+   * @param modelName Model name
+   * @param id        ID
+   * @return Number of affected rows
    */
   int deleteById(String modelName, Object id);
 
   /**
-   * 根据条件删除
+   * Delete records based on conditions
    *
-   * @param modelName 模型名称
-   * @param filter    条件
-   * @return 影响行数
+   * @param modelName Model name
+   * @param filter    Filter
+   * @return Number of affected rows
    */
   int delete(String modelName, String filter);
 
   /**
-   * 删除所有
+   * Delete all records
    *
-   * @param modelName
-   * @return
+   * @param modelName Model name
+   * @return Number of affected rows
    */
   int deleteAll(String modelName);
 
@@ -98,11 +100,11 @@ public interface DataOperations {
   }
 
   /**
-   * 插入多条记录
+   * Insert multiple records
    *
-   * @param modelName
-   * @param records
-   * @return
+   * @param modelName Model name
+   * @param records   Records
+   * @return Number of affected rows
    */
   default int insertAll(String modelName, List<Map<String, Object>> records) {
     int rows = -1;
@@ -113,11 +115,11 @@ public interface DataOperations {
   }
 
   /**
-   * 根据条件查询
+   * Find records based on conditions
    *
-   * @param modelName
-   * @param queryUnaryOperator
-   * @return
+   * @param modelName          Model name
+   * @param queryUnaryOperator Query unary operator
+   * @return List of records
    */
   default <T> List<T> find(String modelName, UnaryOperator<Query> queryUnaryOperator, Class<T> resultType) {
     Query query = new Query();
@@ -126,24 +128,24 @@ public interface DataOperations {
   }
 
   /**
-   * 根据id获取数据
+   * Find a record by ID
    *
-   * @param modelName
-   * @param id
-   * @param resultType
-   * @param <T>
-   * @return
+   * @param modelName  Model name
+   * @param id         ID
+   * @param resultType Result type
+   * @param <T>        Type parameter
+   * @return Record
    */
   default <T> T findById(String modelName, Object id, Class<T> resultType) {
     return findById(modelName, id, resultType, false);
   }
 
   /**
-   * 根据id获取数据
+   * Find a record by ID
    *
-   * @param modelName
-   * @param id
-   * @return
+   * @param modelName Model name
+   * @param id        ID
+   * @return Record
    */
   @SuppressWarnings("unchecked")
   default Map<String, Object> findById(String modelName, Object id) {
@@ -151,11 +153,12 @@ public interface DataOperations {
   }
 
   /**
-   * 根据id获取数据
+   * Find a record by ID
    *
-   * @param modelName
-   * @param id
-   * @return
+   * @param modelName Model name
+   * @param id        ID
+   * @param deep      Whether to perform a deep fetch
+   * @return Record
    */
   @SuppressWarnings("unchecked")
   default Map<String, Object> findById(String modelName, Object id, boolean deep) {
@@ -163,11 +166,11 @@ public interface DataOperations {
   }
 
   /**
-   * 根据条件查询
+   * Find records based on conditions
    *
-   * @param modelName
-   * @param queryUnaryOperator
-   * @return
+   * @param modelName          Model name
+   * @param queryUnaryOperator Query unary operator
+   * @return List of records
    */
   @SuppressWarnings("all")
   default List<Map<String, Object>> find(String modelName, UnaryOperator<Query> queryUnaryOperator) {
@@ -188,34 +191,34 @@ public interface DataOperations {
   }
 
   /**
-   * 根据id查询是否存在
+   * Check if a record exists by ID
    *
-   * @param modelName
-   * @param id
-   * @return
+   * @param modelName Model name
+   * @param id        ID
+   * @return True if exists, false otherwise
    */
   default boolean existsById(String modelName, Object id) {
     return findById(modelName, id) != null;
   }
 
   /**
-   * 查询是否存在
+   * Check if records exist based on conditions
    *
-   * @param modelName
-   * @param queryUnaryOperator
-   * @return
+   * @param modelName          Model name
+   * @param queryUnaryOperator Query unary operator
+   * @return True if exists, false otherwise
    */
   default boolean exists(String modelName, UnaryOperator<Query> queryUnaryOperator) {
     return count(modelName, queryUnaryOperator) > 0;
   }
 
   /**
-   * 根据条件更新记录
+   * Update records based on conditions
    *
-   * @param modelName
-   * @param record
-   * @param unaryOperator
-   * @return 影响行数
+   * @param modelName     Model name
+   * @param record        Record
+   * @param unaryOperator Unary operator for criteria
+   * @return Number of affected rows
    */
   default int update(String modelName, Map<String, Object> record, UnaryOperator<Example.Criteria> unaryOperator) {
     Example example = new Example();
@@ -224,11 +227,11 @@ public interface DataOperations {
   }
 
   /**
-   * 根据条件删除
+   * Delete records based on conditions
    *
-   * @param modelName     模型名称
-   * @param unaryOperator 条件
-   * @return 影响行数
+   * @param modelName     Model name
+   * @param unaryOperator Unary operator for criteria
+   * @return Number of affected rows
    */
   default int delete(String modelName, UnaryOperator<Example.Criteria> unaryOperator) {
     Example example = new Example();

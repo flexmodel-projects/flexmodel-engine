@@ -240,4 +240,7 @@ public class SessionFactory {
     }
   }
 
+  public JsonObjectConverter getJsonObjectConverter() {
+    return jsonObjectConverter;
+  }
 }
