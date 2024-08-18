@@ -18,7 +18,7 @@ class PojoGenerator extends AbstractGenerator {
   @Override
   void generate(GenerationContext context) {
     def modelClass = context.modelClass
-    System.out.println "Generating: ${modelClass.fullClassName}"
+    System.out.println "Generating: ${modelClass.fullClassName}.java"
 
     def filePath = new File(context.targetDirectory + File.separator + "entity", "${File.separator}${modelClass.shortClassName}.java")
     filePath.withPrintWriter { out ->

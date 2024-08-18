@@ -7,7 +7,7 @@
     <artifactId>flexmodel-integration-tests</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>flexmodel-code-sqlite-it</artifactId>
+  <artifactId>flexmodel-core-sqlite-it</artifactId>
   <dependencies>
     <dependency>
       <groupId>tech.wetech.flexmodel</groupId>

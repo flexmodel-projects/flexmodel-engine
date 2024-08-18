@@ -35,6 +35,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>tech.wetech.flexmodel</groupId>
+      <artifactId>flexmodel-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-arc</artifactId>
     </dependency>
@@ -56,6 +61,45 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>tech.wetech.flexmodel</groupId>
+        <artifactId>flexmodel-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>${sqlite-jdbc.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <generator>
+            <schema>
+              <name>system</name>
+              <includes>1</includes>
+              <excludes>2</excludes>
+              <connect>
+                <db-kind>sqlite</db-kind>
+                <url>jdbc:sqlite:file:sqlite.db</url>
+                <username/>
+                <password/>
+              </connect>
+            </schema>
+            <target>
+              <packageName>tech.wetech.flexmodel</packageName>
+              <directory>src/main/test222</directory>
+            </target>
+          </generator>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>${quarkus.platform.group-id}</groupId>
         <artifactId>quarkus-maven-plugin</artifactId>

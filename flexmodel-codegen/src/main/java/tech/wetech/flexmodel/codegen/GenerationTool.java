@@ -47,27 +47,27 @@ public class GenerationTool {
   }
 
   public static void run(Configuration configuration) {
-    Configuration.SchemaConfig schema = configuration.getSchema();
-    Configuration.DSConfig dsConfig = schema.getDsConfig();
+    Configuration.Schema schema = configuration.getSchema();
+    Configuration.Connect dsConfig = schema.getConnect();
     ConnectionWrapper connectionWrapper = new ConnectionWrapper(dsConfig.getUrl(), dsConfig.getUsername(), dsConfig.getPassword());
     if ("mongodb".equals(dsConfig.getDbKind())) {
       throw new UnsupportedOperationException("Not supported yet.");
     }
     JdbcMappedModels mappedModels = new JdbcMappedModels(connectionWrapper, new JacksonObjectConverter());
-    List<Model> models = mappedModels.lookup(schema.getSchemaName());
+    List<Model> models = mappedModels.lookup(schema.getName());
     PojoGenerator pojoGenerator = new PojoGenerator();
     pojoGenerator.setConfiguration(configuration);
     DaoGenerator daoGenerator = new DaoGenerator();
     daoGenerator.setConfiguration(configuration);
     String packageName = configuration.getTarget().getPackageName();
-    String targetDirectory = configuration.getTarget().getDirector() + File.separator +
+    String targetDirectory = configuration.getTarget().getDirectory() + File.separator +
                              packageName.replace(".", File.separator);
     createDirectoriesIfNotExists(targetDirectory + File.separator + "dao");
     createDirectoriesIfNotExists(targetDirectory + File.separator + "entity");
     // generate single model file
     for (Model model : models) {
       GenerationContext context = new GenerationContext();
-      context.setSchemaName(schema.getSchemaName());
+      context.setSchemaName(schema.getName());
       context.setModelClass(buildModelClass(packageName, (Entity) model));
       context.setPackageName(packageName);
       context.setTargetDirectory(targetDirectory);
@@ -76,7 +76,7 @@ public class GenerationTool {
     }
     // generate multiple model file
     MultipleModelGenerationContext multipleModelGenerationContext = new MultipleModelGenerationContext();
-    multipleModelGenerationContext.setSchemaName(schema.getSchemaName());
+    multipleModelGenerationContext.setSchemaName(schema.getName());
     multipleModelGenerationContext.setTargetDirectory(targetDirectory);
     multipleModelGenerationContext.setPackageName(packageName);
     MultipleModelClass multipleModelClass = new MultipleModelClass();

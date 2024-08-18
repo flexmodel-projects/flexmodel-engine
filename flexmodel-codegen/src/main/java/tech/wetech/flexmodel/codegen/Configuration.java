@@ -1,20 +1,22 @@
 package tech.wetech.flexmodel.codegen;
 
+import java.io.Serializable;
+
 /**
  * 配置类，用于存储和处理代码生成的各种设置，包括数据库连接信息和生成策略。
  *
  * @author cjbi
  */
-public class Configuration {
+public class Configuration implements Serializable {
 
-  private SchemaConfig schema;
+  private Schema schema;
   private Target target;
 
-  public SchemaConfig getSchema() {
+  public Schema getSchema() {
     return schema;
   }
 
-  public void setSchema(SchemaConfig schema) {
+  public void setSchema(Schema schema) {
     this.schema = schema;
   }
 
@@ -26,19 +28,19 @@ public class Configuration {
     this.target = target;
   }
 
-  public static class SchemaConfig {
-    private String schemaName;
+  public static class Schema implements Serializable {
+    private String name;
     private String importScript;
     private String includes;
     private String excludes;
-    private DSConfig dsConfig;
+    private Connect connect;
 
-    public String getSchemaName() {
-      return schemaName;
+    public String getName() {
+      return name;
     }
 
-    public void setSchemaName(String schemaName) {
-      this.schemaName = schemaName;
+    public void setName(String name) {
+      this.name = name;
     }
 
     public String getImportScript() {
@@ -65,19 +67,19 @@ public class Configuration {
       this.excludes = excludes;
     }
 
-    public DSConfig getDsConfig() {
-      return dsConfig;
+    public Connect getConnect() {
+      return connect;
     }
 
-    public void setDsConfig(DSConfig dsConfig) {
-      this.dsConfig = dsConfig;
+    public void setConnect(Connect connect) {
+      this.connect = connect;
     }
   }
 
   /**
    * 数据库配置
    */
-  public static class DSConfig {
+  public static class Connect {
 
     private String dbKind;
     private String url;
@@ -117,10 +119,10 @@ public class Configuration {
     }
   }
 
-  public static class Target {
+  public static class Target implements Serializable {
 
-    private String packageName = "";
-    private String director = "scr/main/java";
+    private String packageName = "com.example";
+    private String directory =  null;
 
     public String getPackageName() {
       return packageName;
@@ -130,12 +132,12 @@ public class Configuration {
       this.packageName = packageName;
     }
 
-    public String getDirector() {
-      return director;
+    public String getDirectory() {
+      return directory;
     }
 
-    public void setDirector(String director) {
-      this.director = director;
+    public void setDirectory(String directory) {
+      this.directory = directory;
     }
   }
 

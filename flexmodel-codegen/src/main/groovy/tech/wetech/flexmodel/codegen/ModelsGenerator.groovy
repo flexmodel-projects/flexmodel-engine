@@ -11,8 +11,7 @@ class ModelsGenerator implements MultipleModelGenerator {
 
   @Override
   void generate(MultipleModelGenerationContext context) {
-    def className = "Models"
-    System.out.println "Generating: ${className}"
+    System.out.println "Generating: ${context.packageName}.Models.java"
     new File(context.targetDirectory, "Models.java").withPrintWriter { out ->
       generate(out as GroovyPrintWriter, context)
     }
