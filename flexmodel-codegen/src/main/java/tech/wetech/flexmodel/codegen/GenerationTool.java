@@ -70,6 +70,7 @@ public class GenerationTool {
       context.setSchemaName(schema.getName());
       context.setModelClass(buildModelClass(packageName, (Entity) model));
       context.setPackageName(packageName);
+      context.setBaseDir(configuration.getTarget().getBaseDir());
       context.setTargetDirectory(targetDirectory);
       pojoGenerator.generate(context);
       daoGenerator.generate(context);
@@ -78,6 +79,7 @@ public class GenerationTool {
     MultipleModelGenerationContext multipleModelGenerationContext = new MultipleModelGenerationContext();
     multipleModelGenerationContext.setSchemaName(schema.getName());
     multipleModelGenerationContext.setTargetDirectory(targetDirectory);
+    multipleModelGenerationContext.setBaseDir(configuration.getTarget().getBaseDir());
     multipleModelGenerationContext.setPackageName(packageName);
     MultipleModelClass multipleModelClass = new MultipleModelClass();
     multipleModelClass.setPackageName(packageName);
@@ -89,47 +91,64 @@ public class GenerationTool {
     }
     ModelsGenerator modelsGenerator = new ModelsGenerator();
     modelsGenerator.generate(multipleModelGenerationContext);
+
+    SchemaBuildItemGenerator schemaBuildItemGenerator = new SchemaBuildItemGenerator();
+    schemaBuildItemGenerator.generate(multipleModelGenerationContext);
+
+    createDirectoriesIfNotExists(multipleModelGenerationContext.getBaseDir() + "/META-INF/services");
+    BuildItemSPIFileGenerator buildItemSPIFileGenerator = new BuildItemSPIFileGenerator();
+    buildItemSPIFileGenerator.generate(multipleModelGenerationContext);
   }
 
   private static ModelClass buildModelClass(String packageName, Entity entity) {
-    ModelClass modelClass = new ModelClass();
-    modelClass.setComment(entity.getComment());
-    modelClass.setVariableName(uncapitalize(entity.getName()));
-    modelClass.setLowerCaseName(uncapitalize(entity.getName()));
-    modelClass.setShortClassName(capitalize(entity.getName()));
-    modelClass.setPackageName(packageName + ".entity");
-    modelClass.setFullClassName(modelClass.getPackageName() + "." + modelClass.getShortClassName());
-    modelClass.setOriginalModel(entity);
+
+    ModelClass modelClass = new ModelClass()
+      .setComment(entity.getComment())
+      .setVariableName(uncapitalize(entity.getName()))
+      .setLowerCaseName(uncapitalize(entity.getName()))
+      .setShortClassName(capitalize(entity.getName()))
+      .setPackageName(packageName + ".entity")
+      .setFullClassName(packageName + ".entity" + "." + capitalize(entity.getName()))
+      .setOriginalModel(entity);
+
     for (TypedField<?, ?> field : entity.getFields()) {
-      ModelField modelField = new ModelField();
-      modelField.setModelClass(modelClass);
-      modelField.setFieldName(field.getName());
-      modelField.setOriginalField(field);
-      modelField.setComment(field.getComment());
+
+      ModelField modelField = new ModelField()
+        .setModelClass(modelClass)
+        .setFieldName(field.getName())
+        .setOriginalField(field)
+        .setComment(field.getComment());
+
       if (field instanceof IDField idField) {
         TypeInfo typeInfo = TYPE_MAPPING.get(idField.getGeneratedValue().getType());
-        modelField.setTypePackage(typeInfo.typePackage());
-        modelField.setShortTypeName(typeInfo.shortTypeName());
-        modelField.setFullTypeName(typeInfo.fullTypeName());
-        modelField.setIdentity(true);
+
+        modelField.setTypePackage(typeInfo.typePackage())
+          .setShortTypeName(typeInfo.shortTypeName())
+          .setFullTypeName(typeInfo.fullTypeName())
+          .setIdentity(true);
+
         modelClass.setIdField(modelField);
+
       } else if (field instanceof RelationField relationField) {
         if (relationField.getCardinality() == ONE_TO_ONE) {
-          modelField.setTypePackage(null);
-          modelField.setFullTypeName(modelField.getTypePackage() + "." + relationField.getTargetEntity());
-          modelField.setShortTypeName(relationField.getTargetEntity());
+          modelField.setTypePackage(null)
+            .setFullTypeName(modelField.getTypePackage() + "." + relationField.getTargetEntity())
+            .setShortTypeName(relationField.getTargetEntity());
         } else {
-          modelField.setTypePackage("java.util");
-          modelField.setFullTypeName("java.util.List");
-          modelField.setShortTypeName("List<" + relationField.getTargetEntity() + ">");
+
+          modelField.setTypePackage("java.util")
+            .setFullTypeName("java.util.List")
+            .setShortTypeName("List<" + relationField.getTargetEntity() + ">");
         }
+
       } else {
+
         TypeInfo typeInfo = TYPE_MAPPING.get(field.getType());
-        modelField.setTypePackage(typeInfo.typePackage());
-        modelField.setShortTypeName(typeInfo.shortTypeName());
-        modelField.setFullTypeName(typeInfo.fullTypeName());
+        modelField.setTypePackage(typeInfo.typePackage())
+          .setShortTypeName(typeInfo.shortTypeName())
+          .setFullTypeName(typeInfo.fullTypeName());
       }
-      modelField.setNullable(field.isNullable());
+
       if (modelField.getTypePackage() != null) {
         modelClass.getImports().add(modelField.getFullTypeName());
       }

@@ -32,6 +32,10 @@ class ModelsGenerator implements MultipleModelGenerator {
     out.println "import tech.wetech.flexmodel.JsonObjectConverter;"
     out.println "import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;"
     out.println "import tech.wetech.flexmodel.Entity;"
+    out.println "import tech.wetech.flexmodel.Model;"
+    out.println ""
+    out.println "import java.util.ArrayList;"
+    out.println "import java.util.List;"
     out.println ""
     modelsClass.imports.each(importStatement ->
       out.println "import ${importStatement};"
@@ -64,6 +68,14 @@ class ModelsGenerator implements MultipleModelGenerator {
       out.println "    \"\"\", Entity.class);"
     }
     out.println ""
+    out.println "  }"
+    out.println ""
+    out.println "  public static List<Model> getAllModels() {"
+    out.println "    List<Model> list = new ArrayList<>();"
+    modelsClass.models.each { model ->
+      out.println "    list.add(${model.variableName});"
+    }
+    out.println "    return list;"
     out.println "  }"
     out.println ""
     out.println "}"

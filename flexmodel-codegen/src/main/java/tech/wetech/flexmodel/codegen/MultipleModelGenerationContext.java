@@ -8,6 +8,7 @@ public class MultipleModelGenerationContext {
   private String schemaName;
   private String packageName;
   private MultipleModelClass modelsClass;
+  private String baseDir;
   private String targetDirectory;
 
   public String getSchemaName() {
@@ -24,6 +25,14 @@ public class MultipleModelGenerationContext {
 
   public void setModelsClass(MultipleModelClass modelsClass) {
     this.modelsClass = modelsClass;
+  }
+
+  public String getBaseDir() {
+    return baseDir;
+  }
+
+  public void setBaseDir(String baseDir) {
+    this.baseDir = baseDir;
   }
 
   public String getTargetDirectory() {

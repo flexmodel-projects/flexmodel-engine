@@ -14,78 +14,77 @@ public class ModelField {
   private String shortTypeName;
   private String fullTypeName;
   private boolean identity;
-  private boolean nullable;
   private Field originalField;
 
   public ModelClass getModelClass() {
     return modelClass;
   }
 
-  public void setModelClass(ModelClass modelClass) {
+  public ModelField setModelClass(ModelClass modelClass) {
     this.modelClass = modelClass;
+    return this;
   }
 
   public String getFieldName() {
     return fieldName;
   }
 
-  public void setFieldName(String fieldName) {
+  public ModelField setFieldName(String fieldName) {
     this.fieldName = fieldName;
+    return this;
   }
 
   public String getComment() {
     return comment;
   }
 
-  public void setComment(String comment) {
+  public ModelField setComment(String comment) {
     this.comment = comment;
+    return this;
   }
 
   public String getTypePackage() {
     return typePackage;
   }
 
-  public void setTypePackage(String typePackage) {
+  public ModelField setTypePackage(String typePackage) {
     this.typePackage = typePackage;
+    return this;
   }
 
   public String getShortTypeName() {
     return shortTypeName;
   }
 
-  public void setShortTypeName(String shortTypeName) {
+  public ModelField setShortTypeName(String shortTypeName) {
     this.shortTypeName = shortTypeName;
+    return this;
   }
 
   public String getFullTypeName() {
     return fullTypeName;
   }
 
-  public void setFullTypeName(String fullTypeName) {
+  public ModelField setFullTypeName(String fullTypeName) {
     this.fullTypeName = fullTypeName;
+    return this;
   }
 
   public boolean isIdentity() {
     return identity;
   }
 
-  public void setIdentity(boolean identity) {
+  public ModelField setIdentity(boolean identity) {
     this.identity = identity;
-  }
-
-  public boolean isNullable() {
-    return nullable;
-  }
-
-  public void setNullable(boolean nullable) {
-    this.nullable = nullable;
+    return this;
   }
 
   public Field getOriginalField() {
     return originalField;
   }
 
-  public void setOriginalField(Field originalField) {
+  public ModelField setOriginalField(Field originalField) {
     this.originalField = originalField;
+    return this;
   }
 }

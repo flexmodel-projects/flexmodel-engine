@@ -53,4 +53,7 @@ public class CachingMappedModels implements MappedModels {
     return (Model) cache.retrieve(schemaName + ":" + modelName, () -> delegate.getModel(schemaName, modelName));
   }
 
+  public Cache getCache() {
+    return cache;
+  }
 }

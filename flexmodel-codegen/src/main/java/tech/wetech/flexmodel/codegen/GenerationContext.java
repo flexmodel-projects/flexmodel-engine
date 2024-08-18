@@ -8,6 +8,7 @@ public class GenerationContext {
   private String schemaName;
   private String packageName;
   private ModelClass modelClass;
+  private String baseDir;
   private String targetDirectory;
 
   public String getSchemaName() {
@@ -24,6 +25,14 @@ public class GenerationContext {
 
   public void setModelClass(ModelClass modelClass) {
     this.modelClass = modelClass;
+  }
+
+  public String getBaseDir() {
+    return baseDir;
+  }
+
+  public void setBaseDir(String baseDir) {
+    this.baseDir = baseDir;
   }
 
   public String getTargetDirectory() {

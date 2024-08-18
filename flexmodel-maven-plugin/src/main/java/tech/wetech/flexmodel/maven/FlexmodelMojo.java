@@ -58,16 +58,13 @@ public class FlexmodelMojo extends AbstractMojo {
   public void execute() throws MojoExecutionException, MojoFailureException {
     getLog().info("Executing Flexmodel Maven Plugin");
 
-    ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
-    URLClassLoader pluginClassLoader = getClassLoader();
-
     try {
 
-      Thread.currentThread().setContextClassLoader(pluginClassLoader);
       // Ensure the output directory is added as a compile source root
       getLog().info("Compile source root: " + outputDirectory);
       // Configure the generator to output to the specified directory
       if (generator != null) {
+        generator.getTarget().setBaseDir(project.getBuild().getDirectory());
         generator.getTarget().setDirectory(outputDirectory);
         GenerationTool.run(generator);
 
@@ -76,18 +73,7 @@ public class FlexmodelMojo extends AbstractMojo {
       }
     } finally {
       project.addCompileSourceRoot(outputDirectory);
-      Thread.currentThread().setContextClassLoader(oldCL);
-
-      try {
-        pluginClassLoader.close();
-      }
-
-      // Catch all possible errors to avoid suppressing the original exception
-      catch (Throwable e) {
-        getLog().error("Couldn't close the classloader.", e);
-      }
     }
-
   }
 
   private URLClassLoader getClassLoader() throws MojoExecutionException {

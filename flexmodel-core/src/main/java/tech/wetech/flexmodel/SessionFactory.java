@@ -29,7 +29,7 @@ public class SessionFactory {
   private final Logger log = LoggerFactory.getLogger(SessionFactory.class);
   private final JsonObjectConverter jsonObjectConverter;
 
-  private final  Map<Class, Consumer> globalSubscribers = new HashMap<>();
+  private final Map<Class, Consumer> globalSubscribers = new HashMap<>();
 
   SessionFactory(String defaultIdentifier, DataSourceProvider defaultDataSourceProvider, Cache cache, String importScript) {
     this.cache = cache;
@@ -40,7 +40,24 @@ public class SessionFactory {
     } else if (defaultDataSourceProvider instanceof MongoDataSourceProvider mongoDataSourceProvider) {
       this.mappedModels = new MapMappedModels();
     }
+    processBuildItem();
     loadScript(defaultIdentifier, importScript);
+  }
+
+  /**
+   * 处理构建步骤的项目
+   */
+  void processBuildItem() {
+    // 处理编译器处理的过的模型
+    Iterator<BuildItem> iterator = ServiceLoader.load(BuildItem.class).iterator();
+    if (iterator.hasNext()) {
+      iterator.forEachRemaining(buildStep -> {
+        List<Model> allModels = buildStep.getModels();
+        for (Model model : allModels) {
+          cache.put(buildStep.getSchemaName() + ":" + model.getName(), model);
+        }
+      });
+    }
   }
 
   @SuppressWarnings("unchecked")

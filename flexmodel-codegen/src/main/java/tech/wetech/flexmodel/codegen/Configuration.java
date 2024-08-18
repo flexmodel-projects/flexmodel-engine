@@ -123,6 +123,7 @@ public class Configuration implements Serializable {
 
     private String packageName = "com.example";
     private String directory =  null;
+    private String baseDir = null;
 
     public String getPackageName() {
       return packageName;
@@ -138,6 +139,14 @@ public class Configuration implements Serializable {
 
     public void setDirectory(String directory) {
       this.directory = directory;
+    }
+
+    public String getBaseDir() {
+      return baseDir;
+    }
+
+    public void setBaseDir(String baseDir) {
+      this.baseDir = baseDir;
     }
   }
 
