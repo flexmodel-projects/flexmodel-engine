@@ -14,7 +14,7 @@
   <dependencies>
     <dependency>
       <groupId>tech.wetech.flexmodel</groupId>
-      <artifactId>flexmodel-integration-tests-flexmodel-core-test-common</artifactId>
+      <artifactId>flexmodel-common-it</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
