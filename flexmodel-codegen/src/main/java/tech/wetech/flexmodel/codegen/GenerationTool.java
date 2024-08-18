@@ -89,13 +89,10 @@ public class GenerationTool {
       multipleModelClass.getModels().add(modelClass);
       multipleModelClass.getImports().add(modelClass.getFullClassName());
     }
-    ModelsGenerator modelsGenerator = new ModelsGenerator();
+    SchemaGenerator modelsGenerator = new SchemaGenerator();
     modelsGenerator.generate(multipleModelGenerationContext);
 
-    SchemaBuildItemGenerator schemaBuildItemGenerator = new SchemaBuildItemGenerator();
-    schemaBuildItemGenerator.generate(multipleModelGenerationContext);
-
-    createDirectoriesIfNotExists(multipleModelGenerationContext.getBaseDir() + "/META-INF/services");
+    createDirectoriesIfNotExists(multipleModelGenerationContext.getBaseDir() + "/classes/META-INF/services");
     BuildItemSPIFileGenerator buildItemSPIFileGenerator = new BuildItemSPIFileGenerator();
     buildItemSPIFileGenerator.generate(multipleModelGenerationContext);
   }

@@ -75,7 +75,7 @@ public class SessionFactory {
             }
             try {
               Entity older = (Entity) session.getModel(newer.getName());
-              if (older == null) {
+              try {
                 Entity newer2 = newer.clone();
                 // 跳过关联字段，解决表不存在的问题
                 for (TypedField<?, ?> field : newer2.getFields()) {
@@ -85,7 +85,7 @@ public class SessionFactory {
                   }
                 }
                 session.createEntity(newer2);
-              } else {
+              } catch (Exception e) {
                 List<TypedField<?, ?>> fields = older.getFields();
                 for (TypedField<?, ?> field : fields) {
                   if (older.getField(field.getName()) == null) {
@@ -98,7 +98,7 @@ public class SessionFactory {
                 }
               }
             } catch (Exception e) {
-              log.debug("Import script error: {}", e.getMessage(), e);
+              log.warn("Import script error: {}", e.getMessage());
             }
           }
           lazyCreateRelationField(lazyCreateList, session);
@@ -109,7 +109,7 @@ public class SessionFactory {
               List<Map<String, Object>> records = item.getValues();
               session.insertAll(modelName, records);
             } catch (Exception e) {
-              log.debug("Import script error: {}", e.getMessage(), e);
+              log.warn("Import script error: {}", e.getMessage());
             }
           }
         }
