@@ -7,6 +7,4 @@ public interface Generator {
 
   void generate(GenerationContext context);
 
-  Configuration getConfiguration();
-
 }

@@ -43,7 +43,7 @@ public class JacksonObjectConverter implements JsonObjectConverter {
   @Override
   public String toJsonString(Object obj) {
     try {
-      return jsonMapper.writeValueAsString(obj);
+      return jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
     } catch (JsonProcessingException e) {
       e.printStackTrace();
     }

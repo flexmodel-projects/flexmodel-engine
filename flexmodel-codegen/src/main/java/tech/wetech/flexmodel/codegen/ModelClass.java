@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel.codegen;
 
+import tech.wetech.flexmodel.Model;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,6 +22,7 @@ public class ModelClass implements Serializable {
   private String comment;
   private ModelField idField;
   private final List<ModelField> allFields = new ArrayList<>();
+  private Model originalModel;
 
   public String getVariableName() {
     return variableName;
@@ -83,5 +86,13 @@ public class ModelClass implements Serializable {
 
   public Set<String> getImports() {
     return imports;
+  }
+
+  public Model getOriginalModel() {
+    return originalModel;
+  }
+
+  public void setOriginalModel(Model originalModel) {
+    this.originalModel = originalModel;
   }
 }

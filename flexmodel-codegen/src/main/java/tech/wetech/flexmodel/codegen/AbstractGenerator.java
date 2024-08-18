@@ -7,7 +7,6 @@ public abstract class AbstractGenerator implements Generator {
 
   protected Configuration configuration;
 
-  @Override
   public Configuration getConfiguration() {
     return configuration;
   }

@@ -64,6 +64,7 @@ public class GenerationTool {
                              packageName.replace(".", File.separator);
     createDirectoriesIfNotExists(targetDirectory + File.separator + "dao");
     createDirectoriesIfNotExists(targetDirectory + File.separator + "entity");
+    // generate single model file
     for (Model model : models) {
       GenerationContext context = new GenerationContext();
       context.setSchemaName(schema.getSchemaName());
@@ -73,19 +74,37 @@ public class GenerationTool {
       pojoGenerator.generate(context);
       daoGenerator.generate(context);
     }
+    // generate multiple model file
+    MultipleModelGenerationContext multipleModelGenerationContext = new MultipleModelGenerationContext();
+    multipleModelGenerationContext.setSchemaName(schema.getSchemaName());
+    multipleModelGenerationContext.setTargetDirectory(targetDirectory);
+    multipleModelGenerationContext.setPackageName(packageName);
+    MultipleModelClass multipleModelClass = new MultipleModelClass();
+    multipleModelClass.setPackageName(packageName);
+    multipleModelGenerationContext.setModelsClass(multipleModelClass);
+    for (Model model : models) {
+      ModelClass modelClass = buildModelClass(packageName, (Entity) model);
+      multipleModelClass.getModels().add(modelClass);
+      multipleModelClass.getImports().add(modelClass.getFullClassName());
+    }
+    ModelsGenerator modelsGenerator = new ModelsGenerator();
+    modelsGenerator.generate(multipleModelGenerationContext);
   }
 
   private static ModelClass buildModelClass(String packageName, Entity entity) {
     ModelClass modelClass = new ModelClass();
+    modelClass.setComment(entity.getComment());
     modelClass.setVariableName(uncapitalize(entity.getName()));
     modelClass.setLowerCaseName(uncapitalize(entity.getName()));
     modelClass.setShortClassName(capitalize(entity.getName()));
     modelClass.setPackageName(packageName + ".entity");
     modelClass.setFullClassName(modelClass.getPackageName() + "." + modelClass.getShortClassName());
+    modelClass.setOriginalModel(entity);
     for (TypedField<?, ?> field : entity.getFields()) {
       ModelField modelField = new ModelField();
       modelField.setModelClass(modelClass);
       modelField.setFieldName(field.getName());
+      modelField.setOriginalField(field);
       modelField.setComment(field.getComment());
       if (field instanceof IDField idField) {
         TypeInfo typeInfo = TYPE_MAPPING.get(idField.getGeneratedValue().getType());

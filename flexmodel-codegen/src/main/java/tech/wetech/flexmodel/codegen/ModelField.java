@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel.codegen;
 
+import tech.wetech.flexmodel.Field;
+
 /**
  * @author cjbi
  */
@@ -13,6 +15,7 @@ public class ModelField {
   private String fullTypeName;
   private boolean identity;
   private boolean nullable;
+  private Field originalField;
 
   public ModelClass getModelClass() {
     return modelClass;
@@ -78,4 +81,11 @@ public class ModelField {
     this.nullable = nullable;
   }
 
+  public Field getOriginalField() {
+    return originalField;
+  }
+
+  public void setOriginalField(Field originalField) {
+    this.originalField = originalField;
+  }
 }

@@ -18,7 +18,7 @@ class GenerationToolTest extends AbstractIntegrationTest {
     schemaConfig.setDsConfig(dsConfig);
     configuration.setSchema(schemaConfig);
     Configuration.Target target = new Configuration.Target();
-    target.setDirector("src/main/java");
+    target.setDirector("src/test/java");
     target.setPackageName("com.example");
     configuration.setTarget(target);
     GenerationTool.run(configuration);
