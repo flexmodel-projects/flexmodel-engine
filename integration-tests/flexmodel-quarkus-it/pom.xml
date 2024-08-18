@@ -86,9 +86,10 @@
               <name>system</name>
               <includes>1</includes>
               <excludes>2</excludes>
+              <import-script>import.json</import-script>
               <connect>
                 <db-kind>sqlite</db-kind>
-                <url>jdbc:sqlite:file:sqlite.db</url>
+                <url>jdbc:sqlite:file::memory:?cache=shared</url>
                 <username/>
                 <password/>
               </connect>

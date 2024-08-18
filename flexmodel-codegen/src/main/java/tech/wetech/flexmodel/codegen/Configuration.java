@@ -30,7 +30,7 @@ public class Configuration implements Serializable {
 
   public static class Schema implements Serializable {
     private String name;
-    private String importScript;
+    private String importScript = "import.json";
     private String includes;
     private String excludes;
     private Connect connect;
@@ -47,8 +47,9 @@ public class Configuration implements Serializable {
       return importScript;
     }
 
-    public void setImportScript(String importScript) {
+    public Schema setImportScript(String importScript) {
       this.importScript = importScript;
+      return this;
     }
 
     public String getIncludes() {

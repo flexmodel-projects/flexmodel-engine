@@ -10,8 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static tech.wetech.flexmodel.RelationField.Cardinality.ONE_TO_ONE;
 
@@ -53,8 +54,24 @@ public class GenerationTool {
     if ("mongodb".equals(dsConfig.getDbKind())) {
       throw new UnsupportedOperationException("Not supported yet.");
     }
+    JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
     JdbcMappedModels mappedModels = new JdbcMappedModels(connectionWrapper, new JacksonObjectConverter());
-    List<Model> models = mappedModels.lookup(schema.getName());
+    Set<Model> models = new HashSet<>(mappedModels.lookup(schema.getName()));
+
+    // read from script
+    String importScript = configuration.getSchema().getImportScript();
+    File scriptFile = new File(configuration.getTarget().getBaseDir() +"/src/main/resources/" + importScript);
+    if (scriptFile.exists()) {
+      System.out.println("Import Script File: " + scriptFile);
+      try {
+        String content = Files.readString(scriptFile.toPath());
+        ImportDescribe describe = jsonObjectConverter.parseToObject(content, ImportDescribe.class);
+        models.addAll(describe.getSchema());
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
     PojoGenerator pojoGenerator = new PojoGenerator();
     pojoGenerator.setConfiguration(configuration);
     DaoGenerator daoGenerator = new DaoGenerator();
@@ -89,10 +106,11 @@ public class GenerationTool {
       multipleModelClass.getModels().add(modelClass);
       multipleModelClass.getImports().add(modelClass.getFullClassName());
     }
+
     SchemaGenerator modelsGenerator = new SchemaGenerator();
     modelsGenerator.generate(multipleModelGenerationContext);
 
-    createDirectoriesIfNotExists(multipleModelGenerationContext.getBaseDir() + "/classes/META-INF/services");
+    createDirectoriesIfNotExists(multipleModelGenerationContext.getBaseDir() + "/target/classes/META-INF/services");
     BuildItemSPIFileGenerator buildItemSPIFileGenerator = new BuildItemSPIFileGenerator();
     buildItemSPIFileGenerator.generate(multipleModelGenerationContext);
   }
