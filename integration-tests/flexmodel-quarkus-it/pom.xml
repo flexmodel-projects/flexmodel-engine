@@ -35,6 +35,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>tech.wetech.flexmodel</groupId>
       <artifactId>flexmodel-core</artifactId>
       <version>${project.version}</version>
