@@ -30,7 +30,7 @@ public class ConnectionWrapper implements DataSource {
 
   @Override
   public Connection getConnection(String username, String password) throws SQLException {
-    throw new UnsupportedOperationException("Not supported yet.");
+    return DriverManager.getConnection(url, username, password);
   }
 
   @Override

@@ -105,6 +105,7 @@ public class JdbcMappedModels implements MappedModels {
     for (String sql : sqlList) {
       Statement statement = connection.createStatement();
       statement.executeUpdate(sql);
+      statement.close();
     }
   }
 
