@@ -42,14 +42,37 @@ public class JdbcMappedModels implements MappedModels {
   }
 
   private boolean existSchema(Connection connection) {
+    Statement statement = null;
+    ResultSet resultSet = null;
     try {
-      Statement statement = connection.createStatement();
-      ResultSet resultSet = statement.executeQuery("select count(0) from " + sqlDialect.quoteIdentifier(STORED_TABLES));
-      resultSet.close();
-      statement.close();
+      statement = connection.createStatement();
+      resultSet = statement.executeQuery("select count(0) from " + sqlDialect.quoteIdentifier(STORED_TABLES));
       return true;
     } catch (Exception e) {
       return false;
+    } finally {
+      closeStatement(statement);
+      closeResultSet(resultSet);
+    }
+  }
+
+  private void closeResultSet(ResultSet resultSet) {
+    if (resultSet != null) {
+      try {
+        resultSet.close();
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
+  private void closeStatement(Statement statement) {
+    if (statement != null) {
+      try {
+        statement.close();
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
+      }
     }
   }
 
@@ -103,9 +126,9 @@ public class JdbcMappedModels implements MappedModels {
     sqlList.addAll(List.of(sqlDialect.getIndexExporter().getSqlCreateString(idxSchemaModel)));
     log.debug("Execute Create Sql: {}", sqlList);
     for (String sql : sqlList) {
-      Statement statement = connection.createStatement();
-      statement.executeUpdate(sql);
-      statement.close();
+      try (Statement statement = connection.createStatement()) {
+        statement.executeUpdate(sql);
+      }
     }
   }
 
@@ -399,16 +422,28 @@ public class JdbcMappedModels implements MappedModels {
       log.trace("Persist:\n{}", content);
       connection.setAutoCommit(false);
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
-      String sqlDeleteString = getDeleteString();
-      sqlExecutor.update(sqlDeleteString, Map.of("schemaName", schemaName, "modelName", model.getName()));
-      String sqlInsertString = "insert into " + sqlDialect.quoteIdentifier("flex_models") +
-                               " values (:schemaName, :modelName, :modelType, :content)\n";
-      sqlExecutor.update(sqlInsertString,
-        Map.of("schemaName", schemaName,
-          "modelName", model.getName(),
-          "modelType", model.getType(),
-          "content", content
-        ));
+      Model older;
+      if ((older = this.getModel(schemaName, model.getName())) != null) {
+        String oldContent = jsonObjectConverter.toJsonString(older);
+        if (!oldContent.equals(content)) {
+          String updateString = "update " + sqlDialect.quoteIdentifier(STORED_TABLES) + "set content=:content" +
+                                " \nwhere " + sqlDialect.quoteIdentifier("schema_name") + "=:schemaName and " + sqlDialect.quoteIdentifier("model_name") + "=:modelName";
+          sqlExecutor.update(
+            updateString,
+            Map.of("schemaName", schemaName,
+              "modelName", model.getName(),
+              "content", content));
+        }
+      } else {
+        String sqlInsertString = "insert into " + sqlDialect.quoteIdentifier("flex_models") +
+                                 " values (:schemaName, :modelName, :modelType, :content)\n";
+        sqlExecutor.update(sqlInsertString,
+          Map.of("schemaName", schemaName,
+            "modelName", model.getName(),
+            "modelType", model.getType(),
+            "content", content
+          ));
+      }
       connection.commit();
     } catch (Exception e) {
       throw new RuntimeException(e);

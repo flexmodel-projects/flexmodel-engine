@@ -39,7 +39,7 @@ public class Models {
   public static Entity createStudentDetailEntity(Session session, String entityName) {
     return session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(AUTO_INCREMENT))
-      .addField(new IntField("studentId"))
+      .addField(new BigintField("studentId"))
     );
   }
 

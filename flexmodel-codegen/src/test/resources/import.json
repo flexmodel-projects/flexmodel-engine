@@ -489,7 +489,7 @@
         },
         {
           "name": "studentId",
-          "type": "int",
+          "type": "bigint",
           "modelName": "StudentDetail",
           "unique": false,
           "nullable": true,

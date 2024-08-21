@@ -150,7 +150,6 @@ public class GenerationTool {
             .setFullTypeName(modelField.getTypePackage() + "." + relationField.getTargetEntity())
             .setShortTypeName(relationField.getTargetEntity());
         } else {
-
           modelField.setTypePackage("java.util")
             .setFullTypeName("java.util.List")
             .setShortTypeName("List<" + relationField.getTargetEntity() + ">");
