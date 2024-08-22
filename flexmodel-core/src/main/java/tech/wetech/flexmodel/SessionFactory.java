@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 public class SessionFactory {
 
   private MappedModels mappedModels;
-  private final Map<String, DataSourceProvider> dataSourceProviderMap = new HashMap<>();
+  private final Map<String, DataSourceProvider> dataSourceProviders = new HashMap<>();
   private final Cache cache;
   private final Logger log = LoggerFactory.getLogger(SessionFactory.class);
   private final JsonObjectConverter jsonObjectConverter;
@@ -35,13 +35,19 @@ public class SessionFactory {
     this.cache = cache;
     this.jsonObjectConverter = new JacksonObjectConverter();
     addDataSourceProvider(defaultIdentifier, defaultDataSourceProvider);
-    if (defaultDataSourceProvider instanceof JdbcDataSourceProvider jdbcDataSourceProvider) {
-      this.mappedModels = new CachingMappedModels(new JdbcMappedModels(jdbcDataSourceProvider.dataSource(), jsonObjectConverter), cache);
-    } else if (defaultDataSourceProvider instanceof MongoDataSourceProvider mongoDataSourceProvider) {
-      this.mappedModels = new MapMappedModels();
-    }
+    this.mappedModels = initializeMappedModels(defaultDataSourceProvider);
     processBuildItem();
     loadScript(defaultIdentifier, importScript);
+  }
+
+  private MappedModels initializeMappedModels(DataSourceProvider dataSourceProvider) {
+    if (dataSourceProvider instanceof JdbcDataSourceProvider jdbcDataSourceProvider) {
+      return new CachingMappedModels(new JdbcMappedModels(jdbcDataSourceProvider.dataSource(), jsonObjectConverter), cache);
+    } else if (dataSourceProvider instanceof MongoDataSourceProvider) {
+      return new MapMappedModels();
+    } else {
+      throw new IllegalArgumentException("Unsupported DataSourceProvider");
+    }
   }
 
   /**
@@ -49,88 +55,99 @@ public class SessionFactory {
    */
   void processBuildItem() {
     // 处理编译器处理的过的模型
-    Iterator<BuildItem> iterator = ServiceLoader.load(BuildItem.class).iterator();
-    if (iterator.hasNext()) {
-      iterator.forEachRemaining(buildStep -> {
-        List<Model> allModels = buildStep.getModels();
-        for (Model model : allModels) {
-          cache.put(buildStep.getSchemaName() + ":" + model.getName(), model);
-        }
-      });
-    }
+    ServiceLoader.load(BuildItem.class).forEach(this::processBuildItem);
   }
 
-  @SuppressWarnings("unchecked")
+  private void processBuildItem(BuildItem buildItem) {
+    List<Model> allModels = buildItem.getModels();
+    allModels.forEach(model -> cache.put(buildItem.getSchemaName() + ":" + model.getName(), model));
+  }
+
   public void loadScript(String schemaName, String scriptName) {
     try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(scriptName)) {
-      if (is != null) {
-        String scriptJSON = new String(is.readAllBytes());
-        ImportDescribe describe = jsonObjectConverter.parseToObject(scriptJSON, ImportDescribe.class);
-        try (Session session = createFailSafeSession(schemaName)) {
-          List<RelationField> lazyCreateList = new ArrayList<>();
-          for (Model model : describe.getSchema()) {
-            if (!(model instanceof Entity newer)) {
-              log.warn("Not supported model: {}", model.getName());
-              continue;
-            }
-            try {
-              Entity older = (Entity) session.getModel(newer.getName());
-              try {
-                Entity newer2 = newer.clone();
-                // 跳过关联字段，解决表不存在的问题
-                for (TypedField<?, ?> field : newer2.getFields()) {
-                  if (field instanceof RelationField relationField) {
-                    newer2.removeField(field.getName());
-                    lazyCreateList.add(relationField);
-                  }
-                }
-                session.createEntity(newer2);
-              } catch (Exception e) {
-                List<TypedField<?, ?>> fields = older.getFields();
-                for (TypedField<?, ?> field : fields) {
-                  if (older.getField(field.getName()) == null) {
-                    session.createField(field);
-                  } else {
-                    if (!field.equals(older.getField(field.getName()))) {
-                      session.modifyField(field);
-                    }
-                  }
-                }
-              }
-            } catch (Exception e) {
-              log.warn("Import script error: {}", e.getMessage());
-            }
-          }
-          lazyCreateRelationField(lazyCreateList, session);
-          List<ImportDescribe.ImportData> data = describe.getData();
-          for (ImportDescribe.ImportData item : data) {
-            try {
-              String modelName = item.getModelName();
-              List<Map<String, Object>> records = item.getValues();
-              session.insertAll(modelName, records);
-            } catch (Exception e) {
-              log.warn("Import script error: {}", e.getMessage());
-            }
-          }
-        }
+      if (is == null) {
+        log.warn("Script file not found: {}", scriptName);
+        return;
+      }
+      String scriptJSON = new String(is.readAllBytes());
+      ImportDescribe describe = jsonObjectConverter.parseToObject(scriptJSON, ImportDescribe.class);
+
+      try (Session session = createFailSafeSession(schemaName)) {
+        List<RelationField> lazyCreateList = processModels(describe.getSchema(), session);
+        lazyCreateRelationFields(lazyCreateList, session);
+        processImportData(describe.getData(), session);
       }
     } catch (IOException e) {
-      log.debug("Read import script error: {}", e.getMessage(), e);
+      log.error("Failed to read import script: {}", e.getMessage(), e);
     }
   }
 
-  private void lazyCreateRelationField(List<RelationField> relationFields, Session session) {
+  private List<RelationField> processModels(List<Model> models, Session session) {
+    List<RelationField> lazyCreateList = new ArrayList<>();
+    for (Model model : models) {
+      if (!(model instanceof Entity newer)) {
+        log.warn("Unsupported model type: {}", model.getName());
+        continue;
+      }
+
+      try {
+        Entity older = (Entity) session.getModel(newer.getName());
+        updateEntity(session, newer, older, lazyCreateList);
+      } catch (Exception e) {
+        log.warn("Error processing model: {}", e.getMessage(), e);
+      }
+    }
+    return lazyCreateList;
+  }
+
+  private void updateEntity(Session session, Entity newer, Entity older, List<RelationField> lazyCreateList) throws Exception {
+    Entity clonedNewer = newer.clone();
+    clonedNewer.getFields().stream()
+      .filter(field -> field instanceof RelationField)
+      .forEach(field -> {
+        clonedNewer.removeField(field.getName());
+        lazyCreateList.add((RelationField) field);
+      });
+
+    try {
+      session.createEntity(clonedNewer);
+    } catch (Exception e) {
+      updateEntityFields(session, older);
+    }
+  }
+
+  private void updateEntityFields(Session session, Entity older) {
+    older.getFields().forEach(field -> {
+      try {
+        if (older.getField(field.getName()) == null) {
+          session.createField(field);
+        } else if (!field.equals(older.getField(field.getName()))) {
+          session.modifyField(field);
+        }
+      } catch (Exception e) {
+        log.warn("Error updating field: {}", e.getMessage(), e);
+      }
+    });
+  }
+
+  private void lazyCreateRelationFields(List<RelationField> relationFields, Session session) {
     for (RelationField relationField : relationFields) {
       session.createField(relationField);
     }
   }
 
-  public Map<String, DataSourceProvider> getDataSourceProviderMap() {
-    return dataSourceProviderMap;
+  private void processImportData(List<ImportDescribe.ImportData> data, Session session) {
+    data.forEach(item -> {
+      try {
+        session.insertAll(item.getModelName(), item.getValues());
+      } catch (Exception e) {
+        log.warn("Error importing data: {}", e.getMessage(), e);
+      }
+    });
   }
 
   public Set<String> getSchemaNames() {
-    return dataSourceProviderMap.keySet();
+    return dataSourceProviders.keySet();
   }
 
   public List<Model> getModels(String schemaName) {
@@ -146,15 +163,15 @@ public class SessionFactory {
   }
 
   public void addDataSourceProvider(String identifier, DataSourceProvider dataSource) {
-    dataSourceProviderMap.put(identifier, dataSource);
+    dataSourceProviders.put(identifier, dataSource);
   }
 
   public DataSourceProvider getDataSourceProvider(String identifier) {
-    return dataSourceProviderMap.get(identifier);
+    return dataSourceProviders.get(identifier);
   }
 
   public void removeDataSourceProvider(String identifier) {
-    dataSourceProviderMap.remove(identifier);
+    dataSourceProviders.remove(identifier);
   }
 
   public <T> void subscribeEvent(Class<T> subscribedToEventType, Consumer<T> event) {
@@ -174,7 +191,7 @@ public class SessionFactory {
    */
   private Session createFailSafeSession(String identifier) {
     try {
-      return switch (dataSourceProviderMap.get(identifier)) {
+      return switch (dataSourceProviders.get(identifier)) {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
           SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), mappedModels, jsonObjectConverter, this);
@@ -197,7 +214,7 @@ public class SessionFactory {
 
   public Session createSession(String identifier) {
     try {
-      return switch (dataSourceProviderMap.get(identifier)) {
+      return switch (dataSourceProviders.get(identifier)) {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
           SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), mappedModels, jsonObjectConverter, this);

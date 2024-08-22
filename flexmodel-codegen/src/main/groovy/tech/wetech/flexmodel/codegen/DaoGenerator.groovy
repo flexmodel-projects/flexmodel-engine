@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.codegen
 
 import groovy.io.GroovyPrintWriter
+import groovy.util.logging.Log
 
 /**
  * PojoGenerator Class
@@ -8,13 +9,14 @@ import groovy.io.GroovyPrintWriter
  *
  * Author: cjbi
  */
+@Log
 class DaoGenerator extends AbstractGenerator {
 
   @Override
   void generate(GenerationContext context) {
     def modelClass = context.modelClass
     def className = "${modelClass.shortClassName}DAO"
-    System.out.println "Generating: ${modelClass.fullClassName}.java"
+    log.info "Generating: ${modelClass.fullClassName}DAO.java"
     new File(context.targetDirectory + File.separator + "dao", "${className}.java").withPrintWriter { out ->
       generate(out as GroovyPrintWriter, className, context)
     }

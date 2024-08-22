@@ -60,7 +60,7 @@ public class GenerationTool {
 
     // read from script
     String importScript = configuration.getSchema().getImportScript();
-    File scriptFile = new File(configuration.getTarget().getBaseDir() +"/src/main/resources/" + importScript);
+    File scriptFile = new File(configuration.getTarget().getBaseDir() + "/src/main/resources/" + importScript);
     if (scriptFile.exists()) {
       System.out.println("Import Script File: " + scriptFile);
       try {
@@ -81,11 +81,17 @@ public class GenerationTool {
                              packageName.replace(".", File.separator);
     createDirectoriesIfNotExists(targetDirectory + File.separator + "dao");
     createDirectoriesIfNotExists(targetDirectory + File.separator + "entity");
+
+    Map<String, ModelClass> modelClassMap = new HashMap<>();
+    for (Model model : models) {
+      modelClassMap.put(model.getName(), buildModelClass(packageName, (Entity) model));
+    }
+
     // generate single model file
     for (Model model : models) {
       GenerationContext context = new GenerationContext();
       context.setSchemaName(schema.getName());
-      context.setModelClass(buildModelClass(packageName, (Entity) model));
+      context.setModelClass(modelClassMap.get(model.getName()));
       context.setPackageName(packageName);
       context.setBaseDir(configuration.getTarget().getBaseDir());
       context.setTargetDirectory(targetDirectory);
@@ -102,7 +108,7 @@ public class GenerationTool {
     multipleModelClass.setPackageName(packageName);
     multipleModelGenerationContext.setModelsClass(multipleModelClass);
     for (Model model : models) {
-      ModelClass modelClass = buildModelClass(packageName, (Entity) model);
+      ModelClass modelClass = modelClassMap.get(model.getName());
       multipleModelClass.getModels().add(modelClass);
       multipleModelClass.getImports().add(modelClass.getFullClassName());
     }

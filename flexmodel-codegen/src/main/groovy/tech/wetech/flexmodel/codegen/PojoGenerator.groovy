@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.codegen
 
 import groovy.io.GroovyPrintWriter
+import groovy.util.logging.Log
 
 /**
  * PojoGenerator Class
@@ -8,6 +9,7 @@ import groovy.io.GroovyPrintWriter
  *
  * Author: cjbi
  */
+@Log
 class PojoGenerator extends AbstractGenerator {
 
   /**
@@ -18,7 +20,7 @@ class PojoGenerator extends AbstractGenerator {
   @Override
   void generate(GenerationContext context) {
     def modelClass = context.modelClass
-    System.out.println "Generating: ${modelClass.fullClassName}.java"
+    log.info "Generating: ${modelClass.fullClassName}.java"
 
     def filePath = new File(context.targetDirectory + File.separator + "entity", "${File.separator}${modelClass.shortClassName}.java")
     filePath.withPrintWriter { out ->

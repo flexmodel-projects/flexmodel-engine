@@ -1,18 +1,20 @@
 package tech.wetech.flexmodel.codegen
 
 import groovy.io.GroovyPrintWriter
+import groovy.util.logging.Log
 import tech.wetech.flexmodel.JsonObjectConverter
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter
 
 /**
  * @author cjbi
  */
+@Log
 class SchemaGenerator implements MultipleModelGenerator {
 
   @Override
   void generate(MultipleModelGenerationContext context) {
     def className = context.schemaName.capitalize()
-    System.out.println "Generating: ${context.packageName}.${className}.java"
+    log.info "Generating: ${context.packageName}.${className}.java"
     new File(context.targetDirectory, "${className}.java").withPrintWriter { out ->
       generate(out as GroovyPrintWriter, className, context)
     }
@@ -66,7 +68,7 @@ class SchemaGenerator implements MultipleModelGenerator {
     out.println "    JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();"
     modelsClass.models.each { model ->
       out.println "    ${model.variableName} = jsonObjectConverter.parseToObject(\"\"\""
-      out.println "${jsonObjectConverter.toJsonString(model.originalModel)}"
+      out.println "    ${jsonObjectConverter.toJsonString(model.originalModel)}"
       out.println "    \"\"\", Entity.class);"
     }
     out.println ""
