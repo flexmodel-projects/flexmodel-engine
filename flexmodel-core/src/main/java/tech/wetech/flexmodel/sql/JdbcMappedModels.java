@@ -426,7 +426,7 @@ public class JdbcMappedModels implements MappedModels {
       if ((older = this.getModel(schemaName, model.getName())) != null) {
         String oldContent = jsonObjectConverter.toJsonString(older);
         if (!oldContent.equals(content)) {
-          String updateString = "update " + sqlDialect.quoteIdentifier(STORED_TABLES) + "set content=:content" +
+          String updateString = "update " + sqlDialect.quoteIdentifier(STORED_TABLES) + "set " + sqlDialect.quoteIdentifier("content") + "=:content" +
                                 " \nwhere " + sqlDialect.quoteIdentifier("schema_name") + "=:schemaName and " + sqlDialect.quoteIdentifier("model_name") + "=:modelName";
           sqlExecutor.update(
             updateString,
