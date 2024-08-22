@@ -23,7 +23,7 @@ import java.util.function.Consumer;
  */
 public class SessionFactory {
 
-  private MappedModels mappedModels;
+  private final MappedModels mappedModels;
   private final Map<String, DataSourceProvider> dataSourceProviders = new HashMap<>();
   private final Cache cache;
   private final Logger log = LoggerFactory.getLogger(SessionFactory.class);
