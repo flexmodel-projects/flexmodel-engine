@@ -1,6 +1,5 @@
 package tech.wetech.flexmodel.codegen
 
-import groovy.io.GroovyPrintWriter
 import groovy.util.logging.Log
 
 /**
@@ -13,17 +12,9 @@ import groovy.util.logging.Log
 class DaoGenerator extends AbstractGenerator {
 
   @Override
-  void generate(GenerationContext context) {
+  def generate(PrintWriter out, GenerationContext context) {
     def modelClass = context.modelClass
     def className = "${modelClass.shortClassName}DAO"
-    log.info "Generating: ${modelClass.fullClassName}DAO.java"
-    new File(context.targetDirectory + File.separator + "dao", "${className}.java").withPrintWriter { out ->
-      generate(out as GroovyPrintWriter, className, context)
-    }
-  }
-
-  def generate(GroovyPrintWriter out, className, GenerationContext context) {
-    def modelClass = context.modelClass
     out.println "package ${context.packageName}.dao;"
     out.println ""
     out.println "import jakarta.inject.Inject;"

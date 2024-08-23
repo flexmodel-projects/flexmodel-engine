@@ -73,9 +73,7 @@ public class GenerationTool {
     }
 
     PojoGenerator pojoGenerator = new PojoGenerator();
-    pojoGenerator.setConfiguration(configuration);
     DaoGenerator daoGenerator = new DaoGenerator();
-    daoGenerator.setConfiguration(configuration);
     String packageName = configuration.getTarget().getPackageName();
     String targetDirectory = configuration.getTarget().getDirectory() + File.separator +
                              packageName.replace(".", File.separator);
@@ -93,35 +91,35 @@ public class GenerationTool {
       context.setSchemaName(schema.getName());
       context.setModelClass(modelClassMap.get(model.getName()));
       context.setPackageName(packageName);
-      context.setBaseDir(configuration.getTarget().getBaseDir());
-      context.setTargetDirectory(targetDirectory);
-      pojoGenerator.generate(context);
-      daoGenerator.generate(context);
+      pojoGenerator.generate(context, Path.of(targetDirectory, "entity", model.getName() + ".java").toString());
+      daoGenerator.generate(context, Path.of(targetDirectory, "dao", model.getName() + "DAO.java").toString());
     }
     // generate multiple model file
-    MultipleModelGenerationContext multipleModelGenerationContext = new MultipleModelGenerationContext();
+    ModelListGenerationContext multipleModelGenerationContext = new ModelListGenerationContext();
     multipleModelGenerationContext.setSchemaName(schema.getName());
-    multipleModelGenerationContext.setTargetDirectory(targetDirectory);
-    multipleModelGenerationContext.setBaseDir(configuration.getTarget().getBaseDir());
     multipleModelGenerationContext.setPackageName(packageName);
-    MultipleModelClass multipleModelClass = new MultipleModelClass();
+    ModelListClass multipleModelClass = new ModelListClass();
     multipleModelClass.setPackageName(packageName);
     multipleModelGenerationContext.setModelsClass(multipleModelClass);
     for (Model model : models) {
       ModelClass modelClass = modelClassMap.get(model.getName());
-      multipleModelClass.getModels().add(modelClass);
+      multipleModelClass.getModelList().add(modelClass);
       multipleModelClass.getImports().add(modelClass.getFullClassName());
     }
 
-    SchemaGenerator modelsGenerator = new SchemaGenerator();
-    modelsGenerator.generate(multipleModelGenerationContext);
+    SchemaGenerator schemaClassGenerator = new SchemaGenerator();
+    schemaClassGenerator.generate(multipleModelGenerationContext, Path.of(targetDirectory, capitalize(schema.getName()) + ".java").toString());
 
-    createDirectoriesIfNotExists(multipleModelGenerationContext.getBaseDir() + "/target/classes/META-INF/services");
+    createDirectoriesIfNotExists(configuration.getTarget().getBaseDir() + "/target/classes/META-INF/services");
     BuildItemSPIFileGenerator buildItemSPIFileGenerator = new BuildItemSPIFileGenerator();
-    buildItemSPIFileGenerator.generate(multipleModelGenerationContext);
+    buildItemSPIFileGenerator.generate(multipleModelGenerationContext, Path.of(
+      configuration.getTarget().getBaseDir(),
+      "/target/classes/META-INF/services",
+      packageName + "." + schema.getName()
+    ).toString());
   }
 
-  private static ModelClass buildModelClass(String packageName, Entity entity) {
+  public static ModelClass buildModelClass(String packageName, Entity entity) {
 
     ModelClass modelClass = new ModelClass()
       .setComment(entity.getComment())

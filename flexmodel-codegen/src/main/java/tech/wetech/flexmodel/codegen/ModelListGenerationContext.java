@@ -3,11 +3,11 @@ package tech.wetech.flexmodel.codegen;
 /**
  * @author cjbi
  */
-public class GenerationContext {
+public class ModelListGenerationContext {
 
   private String schemaName;
   private String packageName;
-  private ModelClass modelClass;
+  private ModelListClass modelListClass;
 
   public String getSchemaName() {
     return schemaName;
@@ -17,12 +17,12 @@ public class GenerationContext {
     this.schemaName = schemaName;
   }
 
-  public ModelClass getModelClass() {
-    return modelClass;
+  public ModelListClass getModelListClass() {
+    return modelListClass;
   }
 
-  public void setModelClass(ModelClass modelClass) {
-    this.modelClass = modelClass;
+  public void setModelsClass(ModelListClass modelsClass) {
+    this.modelListClass = modelsClass;
   }
 
   public String getPackageName() {

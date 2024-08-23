@@ -8,11 +8,11 @@ import java.util.Set;
 /**
  * @author cjbi
  */
-public class MultipleModelClass {
+public class ModelListClass {
 
   private String packageName;
   private final Set<String> imports = new HashSet<>();
-  private final List<ModelClass> models = new ArrayList<>();
+  private final List<ModelClass> modelList = new ArrayList<>();
 
   public String getPackageName() {
     return packageName;
@@ -26,8 +26,8 @@ public class MultipleModelClass {
     return imports;
   }
 
-  public List<ModelClass> getModels() {
-    return models;
+  public List<ModelClass> getModelList() {
+    return modelList;
   }
 
 }

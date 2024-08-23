@@ -1,32 +1,11 @@
 package tech.wetech.flexmodel.codegen
-
-import groovy.io.GroovyPrintWriter
-import groovy.util.logging.Log
-
 /**
  * PojoGenerator Class
  * Generates Java POJOs based on the provided model definitions.
  *
  * Author: cjbi
  */
-@Log
 class PojoGenerator extends AbstractGenerator {
-
-  /**
-   * Generates a POJO class file.
-   *
-   * @param context Generation context containing model and target directory information.
-   */
-  @Override
-  void generate(GenerationContext context) {
-    def modelClass = context.modelClass
-    log.info "Generating: ${modelClass.fullClassName}.java"
-
-    def filePath = new File(context.targetDirectory + File.separator + "entity", "${File.separator}${modelClass.shortClassName}.java")
-    filePath.withPrintWriter { out ->
-      generate(out as GroovyPrintWriter, modelClass.shortClassName, context)
-    }
-  }
 
   /**
    * Writes the Java class content to the GroovyPrintWriter.
@@ -35,8 +14,9 @@ class PojoGenerator extends AbstractGenerator {
    * @param className The name of the class.
    * @param context The generation context with model details.
    */
-  def generate(GroovyPrintWriter out, String className, GenerationContext context) {
+  def generate(PrintWriter out, GenerationContext context) {
     def modelClass = context.modelClass
+    def className = modelClass.shortClassName
     def fields = modelClass.allFields
 
     // Write package statement
@@ -89,7 +69,7 @@ class PojoGenerator extends AbstractGenerator {
    * @param out Print writer to output the getter method.
    * @param field Field details for which the getter is generated.
    */
-  def generateGetter(GroovyPrintWriter out, field) {
+  def generateGetter(PrintWriter out, field) {
     out.println ""
     out.println "  public ${field.shortTypeName} get${field.fieldName.capitalize()}() {"
     out.println "    return ${field.fieldName};"
@@ -102,7 +82,7 @@ class PojoGenerator extends AbstractGenerator {
    * @param out Print writer to output the setter method.
    * @param field Field details for which the setter is generated.
    */
-  def generateSetter(GroovyPrintWriter out, field) {
+  def generateSetter(PrintWriter out, field) {
     out.println ""
     out.println "  public void set${field.fieldName.capitalize()}(${field.shortTypeName} ${field.fieldName}) {"
     out.println "    this.${field.fieldName} = ${field.fieldName};"

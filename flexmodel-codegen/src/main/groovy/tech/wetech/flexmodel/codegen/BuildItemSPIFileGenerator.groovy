@@ -6,17 +6,10 @@ import groovy.util.logging.Log
  * @author cjbi
  */
 @Log
-class BuildItemSPIFileGenerator implements MultipleModelGenerator {
+class BuildItemSPIFileGenerator extends AbstractModelListGenerator {
 
   @Override
-  void generate(MultipleModelGenerationContext context) {
-    def fileName = "tech.wetech.flexmodel.BuildItem"
-    log.info "Generating: $fileName"
-    def parent = context.baseDir + "/target/classes/META-INF/services"
-
-    new File(parent, fileName).withPrintWriter { out ->
-      out.println "${context.packageName}.${context.schemaName.capitalize()}"
-    }
+  def generate(PrintWriter out, ModelListGenerationContext context) {
+    out.println "${context.packageName}.${context.schemaName.capitalize()}"
   }
-
 }

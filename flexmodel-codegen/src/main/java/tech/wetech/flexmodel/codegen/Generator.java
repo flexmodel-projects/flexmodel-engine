@@ -1,10 +1,14 @@
 package tech.wetech.flexmodel.codegen;
 
+import java.io.File;
+
 /**
  * @author cjbi
  */
 public interface Generator {
 
-  void generate(GenerationContext context);
+  File generate(GenerationContext context, String targetFile);
+
+  String generate(GenerationContext context);
 
 }
