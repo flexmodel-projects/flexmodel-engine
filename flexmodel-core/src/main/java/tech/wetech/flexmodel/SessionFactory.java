@@ -132,7 +132,11 @@ public class SessionFactory {
 
   private void lazyCreateRelationFields(List<RelationField> relationFields, Session session) {
     for (RelationField relationField : relationFields) {
-      session.createField(relationField);
+      try {
+        session.createField(relationField);
+      } catch (Exception e) {
+        log.warn("Error lazy create relation field: {}, message: {}", relationField.getName(), e.getMessage());
+      }
     }
   }
 
