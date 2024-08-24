@@ -87,12 +87,11 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "    offset: Int"
       out.println "    distinct_on: [${key}_select_column!]"
       out.println "  ): ${key}_aggregate!"
-      if (it.idField) {
-        out.println ""
-        out.println "  ${DataFetchers.FIND_BY_ID.keyFunc.apply(it.schemaName, it.modelName)}("
-        out.println "    id: ID!"
-        out.println "  ): ${key}"
-      }
+      out.println ""
+      out.println "  ${DataFetchers.FIND_ONE.keyFunc.apply(it.schemaName, it.modelName)}("
+      out.println "    \"filter the rows returned\""
+      out.println "    where: ${key}_bool_exp"
+      out.println "  ): ${key}"
     }
     out.println "}"
     // gen mutation

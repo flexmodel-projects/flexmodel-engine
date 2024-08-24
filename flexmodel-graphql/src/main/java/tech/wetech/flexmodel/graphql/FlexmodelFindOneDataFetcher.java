@@ -14,9 +14,9 @@ import static tech.wetech.flexmodel.Projections.field;
 /**
  * @author cjbi
  */
-public class FlexmodelFindByIdDataFetcher extends FlexmodelAbstractDataFetcher<Map<String, Object>> {
+public class FlexmodelFindOneDataFetcher extends FlexmodelAbstractDataFetcher<Map<String, Object>> {
 
-  public FlexmodelFindByIdDataFetcher(String schemaName, String modelName, SessionFactory sessionFactory) {
+  public FlexmodelFindOneDataFetcher(String schemaName, String modelName, SessionFactory sessionFactory) {
     super(schemaName, modelName, sessionFactory);
   }
 
@@ -27,14 +27,13 @@ public class FlexmodelFindByIdDataFetcher extends FlexmodelAbstractDataFetcher<M
 
   private Map<String, Object> findRootData(DataFetchingEnvironment env) {
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
-    String idValue = env.getArgument("id");
     try (Session session = sessionFactory.createSession(schemaName)) {
       Entity entity = (Entity) session.getModel(modelName);
       IDField idField = entity.findIdField().orElseThrow();
 
       List<RelationField> relationFields = new ArrayList<>();
       List<Map<String, Object>> list = session.find(entity.getName(), query -> query
-        .setFilter(f -> f.equalTo(idField.getName(), idValue))
+//        .setFilter(f -> f)
         .setProjection(projection -> {
           projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
           for (SelectedField selectedField : selectedFields) {
