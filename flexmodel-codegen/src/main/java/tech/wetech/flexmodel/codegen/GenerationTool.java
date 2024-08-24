@@ -110,7 +110,7 @@ public class GenerationTool {
     buildItemSPIFileGenerator.generate(multipleModelGenerationContext, Path.of(
       configuration.getTarget().getBaseDir(),
       "/target/classes/META-INF/services",
-      packageName + "." + schema.getName()
+      "tech.wetech.flexmodel.BuildItem"
     ).toString());
   }
 

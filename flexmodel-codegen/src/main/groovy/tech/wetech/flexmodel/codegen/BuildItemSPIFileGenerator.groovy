@@ -10,8 +10,8 @@ class BuildItemSPIFileGenerator extends AbstractModelListGenerator {
 
   @Override
   def generate(PrintWriter out, ModelListGenerationContext context) {
-    context.modelListClass.modelList.each {
-      out.println "${it.packageName}.${context.schemaName.capitalize()}"
+    context.modelListClass.each {
+      out.println "${context.packageName}.${context.schemaName.capitalize()}"
     }
   }
 }

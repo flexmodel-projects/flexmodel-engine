@@ -18,7 +18,7 @@ public enum DataFetchers {
   MUTATION_DELETE_BY_ID((schema, model) -> snakeToCamel("delete_" + schema + "_" + model + "_by_id"), FlexmodelMutationDeleteByIdDataFetcher::new, false),
   MUTATION_CREATE((schema, model) -> snakeToCamel("create_" + schema + "_" + model), FlexmodelMutationCreateDataFetcher::new, false),
   MUTATION_UPDATE((schema, model) -> snakeToCamel("update_" + schema + "_" + model), FlexmodelMutationUpdateDataFetcher::new, false),
-  MUTATION_UPDATE_BY_ID((schema, model) -> snakeToCamel("update_" + schema + "_" + model + "_by_id"), FlexmodelMutationUpdateDataFetcher::new, false);
+  MUTATION_UPDATE_BY_ID((schema, model) -> snakeToCamel("update_" + schema + "_" + model + "_by_id"), FlexmodelMutationUpdateByIdDataFetcher::new, false);
 
   private final BiFunction<String, String, String> keyFunc;
   private final DataFetcherFunc dataFetcherFunc;
