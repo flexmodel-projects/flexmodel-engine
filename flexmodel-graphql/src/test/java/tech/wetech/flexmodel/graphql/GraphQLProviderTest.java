@@ -39,10 +39,10 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     // 创建查询
     String query = """
       query {
-        classes: findSystemTestSimpleQueryClasses(offset: 0, limit:1) {
+        classes: systemTestSimpleQueryClassesList(offset: 0, limit:1) {
           id, students { name: studentName, courses { courseName } }
         }
-        students: findSystemTestSimpleQueryStudent(
+        students: systemTestSimpleQueryStudentList(
           limit: 3
           offset: 0
           order_by: {classId: asc, id: desc}
@@ -50,10 +50,10 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
         ) {
           id, studentName
         }
-        teachers: findSystemTestSimpleQueryTeacher {
+        teachers: systemTestSimpleQueryTeacherList {
          id, teacherName
         }
-        course: findSystemTestSimpleQueryCourseById(id: "Math") {
+        course: systemTestSimpleQueryCourse {
            courseNo, courseName
         }
       }
