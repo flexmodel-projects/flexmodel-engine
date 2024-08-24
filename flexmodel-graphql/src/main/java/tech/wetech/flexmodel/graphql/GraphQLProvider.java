@@ -9,9 +9,15 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import tech.wetech.flexmodel.Entity;
+import tech.wetech.flexmodel.Model;
 import tech.wetech.flexmodel.SessionFactory;
+import tech.wetech.flexmodel.codegen.GenerationTool;
+import tech.wetech.flexmodel.codegen.ModelListClass;
+import tech.wetech.flexmodel.codegen.ModelListGenerationContext;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static graphql.schema.idl.RuntimeWiring.newRuntimeWiring;
@@ -28,33 +34,43 @@ public class GraphQLProvider {
   }
 
   public void init() {
-    GraphQLSchemaProcessor processor = new GraphQLSchemaProcessor(sf);
+    GraphQLSchemaGenerator generator = new GraphQLSchemaGenerator();
+    ModelListGenerationContext context = new ModelListGenerationContext();
+    ModelListClass modelListClass = new ModelListClass();
+    context.setModelListClass(modelListClass);
     Map<String, DataFetcher<?>> queryDataFetchers = new HashMap<>();
     Map<String, DataFetcher<?>> mutationDataFetchers = new HashMap<>();
-    processor.getDataFetcherTypes().forEach((key, value) -> {
-      switch (value.getFetchType()) {
-        case FIND ->
-          queryDataFetchers.put(key, new FlexmodelFindDataFetcher(value.getSchemaName(), value.getModelName(), sf));
-        case FIND_BY_ID ->
-          queryDataFetchers.put(key, new FlexmodelFindByIdDataFetcher(value.getSchemaName(), value.getModelName(), sf));
-        case AGGREGATE ->
-          queryDataFetchers.put(key, new FlexmodelAggregateDataFetcher(value.getSchemaName(), value.getModelName(), sf));
-        case MUTATION_DELETE ->
-          mutationDataFetchers.put(key, new FlexmodelMutationDeleteDataFetcher(value.getSchemaName(), value.getModelName(), sf));
-        case MUTATION_DELETE_BY_ID ->
-          mutationDataFetchers.put(key, new FlexmodelMutationDeleteByIdDataFetcher(value.getSchemaName(), value.getModelName(), sf));
-        case MUTATION_CREATE ->
-          mutationDataFetchers.put(key, new FlexmodelMutationCreateDataFetcher(value.getSchemaName(), value.getModelName(), sf));
-        case MUTATION_UPDATE ->
-          mutationDataFetchers.put(key, new FlexmodelMutationUpdateDataFetcher(value.getSchemaName(), value.getModelName(), sf));
-        case MUTATION_UPDATE_BY_ID ->
-          mutationDataFetchers.put(key, new FlexmodelMutationUpdateByIdDataFetcher(value.getSchemaName(), value.getModelName(), sf));
+    for (String schemaName : sf.getSchemaNames()) {
+      List<Model> models = sf.getModels(schemaName);
+      for (Model model : models) {
+        if (model instanceof Entity entity) {
+          modelListClass.getModelList().add(GenerationTool.buildModelClass("", schemaName, entity));
+        } else {
+          // todo 支持非实体类型
+        }
       }
-    });
-    String schemaString = processor.getGraphqlSchemaString();
+    }
+
+    for (String schemaName : sf.getSchemaNames()) {
+      List<Model> models = sf.getModels(schemaName);
+      for (Model model : models) {
+        String key = schemaName + "_" + model.getName();
+        queryDataFetchers.put("find_" + key, new FlexmodelFindDataFetcher(schemaName, model.getName(), sf));
+        queryDataFetchers.put("aggregate_" + key, new FlexmodelAggregateDataFetcher(schemaName, model.getName(), sf));
+        queryDataFetchers.put("delete_" + key, new FlexmodelMutationDeleteDataFetcher(schemaName, model.getName(), sf));
+        queryDataFetchers.put("create_" + key, new FlexmodelMutationCreateDataFetcher(schemaName, model.getName(), sf));
+        queryDataFetchers.put("update_" + key, new FlexmodelMutationUpdateDataFetcher(schemaName, model.getName(), sf));
+        if (model instanceof Entity entity) {
+          queryDataFetchers.put("find_" + key + "_by_id", new FlexmodelFindByIdDataFetcher(schemaName, model.getName(), sf));
+          queryDataFetchers.put("delete_" + key + "_by_id", new FlexmodelMutationDeleteByIdDataFetcher(schemaName, model.getName(), sf));
+          queryDataFetchers.put("update_" + key + "_by_id", new FlexmodelMutationUpdateByIdDataFetcher(schemaName, model.getName(), sf));
+        }
+      }
+    }
+
+    String schemaString = generator.generate(context);
 
     SchemaParser schemaParser = new SchemaParser();
-
     TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(schemaString);
 
     // 创建 CodeRegistry

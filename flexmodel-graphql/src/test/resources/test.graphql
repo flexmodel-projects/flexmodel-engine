@@ -1,0 +1,345 @@
+schema  { query: query_root mutation: mutation_root subscription: subscription_root }
+
+type __Directive { args: __InputValue
+  description: String!
+  isRepeatable: String!
+  locations: String!
+  name: String!
+}
+
+type __EnumValue { deprecationReason: String!
+  description: String!
+  isDeprecated: String!
+  name: String!
+}
+
+type __Field { args: __InputValue
+  deprecationReason: String!
+  description: String!
+  isDeprecated: String!
+  name: String!
+  type: __Type
+}
+
+type __InputValue { defaultValue: String!
+  description: String!
+  name: String!
+  type: __Type
+}
+
+type __Schema { description: String!
+  directives: __Directive
+  mutationType: __Type
+  queryType: __Type
+  subscriptionType: __Type
+  types: __Type
+}
+
+type __Type { description: String!
+  enumValues(includeDeprecated: Boolean = false): __EnumValue
+  fields(includeDeprecated: Boolean = false): __Field
+  inputFields: __InputValue
+  interfaces: __Type
+  kind: __TypeKind!
+  name: String!
+  ofType: __Type
+  possibleTypes: __Type
+}
+
+type query_root { "fetch aggregated fields from the table: \"t_user\""
+t_user_aggregate("filter the rows returned"
+where: t_user_bool_exp, "sort the rows by one or more columns"
+order_by: [t_user_order_by!], "limit the number of rows returned"
+limit: Int, "skip the first n rows. Use only with order_by"
+offset: Int, "distinct select on columns"
+distinct_on: [t_user_select_column!]
+): t_user_aggregate!
+  "fetch data from the table: \"t_user\""
+  t_user("filter the rows returned"
+  where: t_user_bool_exp, "sort the rows by one or more columns"
+  order_by: [t_user_order_by!], "limit the number of rows returned"
+  limit: Int, "skip the first n rows. Use only with order_by"
+  offset: Int, "distinct select on columns"
+  distinct_on: [t_user_select_column!]
+  ): [t_user!]!
+  "fetch data from the table: \"t_user\" using primary key columns"
+  t_user_by_pk(id: Int!): t_user
+}
+
+type subscription_root { "fetch aggregated fields from the table: \"t_user\""
+t_user_aggregate("filter the rows returned"
+where: t_user_bool_exp, "sort the rows by one or more columns"
+order_by: [t_user_order_by!], "limit the number of rows returned"
+limit: Int, "skip the first n rows. Use only with order_by"
+offset: Int, "distinct select on columns"
+distinct_on: [t_user_select_column!]): t_user_aggregate!
+  "fetch data from the table in a streaming manner: \"t_user\""
+  t_user_stream("filter the rows returned"
+  where: t_user_bool_exp, "cursor to stream the results returned by the query"
+  cursor: [t_user_stream_cursor_input]!, "maximum number of rows returned in a single batch"
+  batch_size: Int!): [t_user!]!
+  "fetch data from the table: \"t_user\""
+  t_user("filter the rows returned"
+  where: t_user_bool_exp, "sort the rows by one or more columns"
+  order_by: [t_user_order_by!], "limit the number of rows returned"
+  limit: Int, "skip the first n rows. Use only with order_by"
+  offset: Int, "distinct select on columns"
+  distinct_on: [t_user_select_column!]): [t_user!]!
+  "fetch data from the table: \"t_user\" using primary key columns"
+  t_user_by_pk(id: Int!): t_user
+}
+
+"aggregate avg on columns"
+type t_user_avg_fields { id: Float
+}
+
+"aggregate fields of \"t_user\""
+type t_user_aggregate_fields { avg: t_user_avg_fields
+  count(distinct: Boolean, columns: [t_user_select_column!]): Int!
+  max: t_user_max_fields
+  min: t_user_min_fields
+  stddev: t_user_stddev_fields
+  stddev_pop: t_user_stddev_pop_fields
+  stddev_samp: t_user_stddev_samp_fields
+  sum: t_user_sum_fields
+  var_pop: t_user_var_pop_fields
+  var_samp: t_user_var_samp_fields
+  variance: t_user_variance_fields
+}
+
+"aggregate max on columns"
+type t_user_max_fields { id: Int
+  name: String
+}
+
+"aggregate min on columns"
+type t_user_min_fields { id: Int
+  name: String
+}
+
+"aggregate stddev on columns"
+type t_user_stddev_fields { id: Float
+}
+
+"aggregate stddev_pop on columns"
+type t_user_stddev_pop_fields { id: Float
+}
+
+"aggregate stddev_samp on columns"
+type t_user_stddev_samp_fields { id: Float
+}
+
+"aggregate sum on columns"
+type t_user_sum_fields { id: Int
+}
+
+"aggregate var_pop on columns"
+type t_user_var_pop_fields { id: Float
+}
+
+"aggregate var_samp on columns"
+type t_user_var_samp_fields { id: Float
+}
+
+"aggregate variance on columns"
+type t_user_variance_fields { id: Float
+}
+
+"aggregated selection of \"t_user\""
+type t_user_aggregate { aggregate: t_user_aggregate_fields
+  nodes: [t_user!]!
+}
+
+"columns and relationships of \"t_user\""
+type t_user { id: Int!
+  name: String!
+}
+
+"mutation root"
+type mutation_root { "delete data from the table: \"t_user\""
+delete_t_user("filter the rows which have to be deleted"
+where: t_user_bool_exp!): t_user_mutation_response
+  "delete single row from the table: \"t_user\""
+  delete_t_user_by_pk(id: Int!): t_user
+  "insert a single row into the table: \"t_user\""
+  insert_t_user_one("upsert condition"
+  on_conflict: t_user_on_conflict, "the row to be inserted"
+  object: t_user_insert_input!): t_user
+  "insert data into the table: \"t_user\""
+  insert_t_user("upsert condition"
+  on_conflict: t_user_on_conflict, "the rows to be inserted"
+  objects: [t_user_insert_input!]!): t_user_mutation_response
+  "update data of the table: \"t_user\""
+  update_t_user("sets the columns of the filtered rows to the given values"
+  _set: t_user_set_input, "increments the numeric columns with given value of the filtered values"
+  _inc: t_user_inc_input, "filter the rows which have to be updated"
+  where: t_user_bool_exp!): t_user_mutation_response
+  "update multiples rows of table: \"t_user\""
+  update_t_user_many("updates to execute, in order"
+  updates: [t_user_updates!]!): [t_user_mutation_response]
+  "update single row of the table: \"t_user\""
+  update_t_user_by_pk("sets the columns of the filtered rows to the given values"
+  _set: t_user_set_input, "increments the numeric columns with given value of the filtered values"
+  _inc: t_user_inc_input, pk_columns: t_user_pk_columns_input!): t_user
+}
+
+"response of any mutation on the table \"t_user\""
+type t_user_mutation_response { "data from the rows affected by the mutation"
+returning: [t_user!]!
+  "number of rows affected by the mutation"
+  affected_rows: Int!
+}
+
+enum __TypeKind {ENUM
+  INPUT_OBJECT
+  INTERFACE
+  LIST
+  NON_NULL
+  OBJECT
+  SCALAR
+  UNION
+}
+
+"column ordering options"
+enum order_by {"in ascending order, nulls first"
+asc_nulls_first
+  "in ascending order, nulls last"
+  asc
+  "in ascending order, nulls last"
+  asc_nulls_last
+  "in descending order, nulls first"
+  desc
+  "in descending order, nulls first"
+  desc_nulls_first
+  "in descending order, nulls last"
+  desc_nulls_last
+}
+
+"ordering argument of a cursor"
+enum cursor_ordering {"ascending ordering of the cursor"
+ASC
+  "descending ordering of the cursor"
+  DESC
+}
+
+"select columns of table \"t_user\""
+enum t_user_select_column {"column name"
+id
+  "column name"
+  name
+}
+
+"unique or primary key constraints on table \"t_user\""
+enum t_user_constraint {"unique or primary key constraint on columns \"id\""
+t_user_pkey
+  "unique or primary key constraint on columns \"name\""
+  t_user_name_key
+}
+
+"update columns of table \"t_user\""
+enum t_user_update_column {"column name"
+id
+  "column name"
+  name
+}
+
+input t_user_updates {"filter the rows which have to be updated"
+  where: t_user_bool_exp!
+  "increments the numeric columns with given value of the filtered values"
+  _inc: t_user_inc_input
+  "sets the columns of the filtered rows to the given values"
+  _set: t_user_set_input
+}
+
+"Boolean expression to compare columns of type \"Int\". All fields are combined with logical 'AND'."
+input Int_comparison_exp {_eq: Int
+  _gt: Int
+  _gte: Int
+  _in: [Int!]
+  _is_null: Boolean
+  _lt: Int
+  _lte: Int
+  _neq: Int
+  _nin: [Int!]
+}
+
+"Boolean expression to compare columns of type \"String\". All fields are combined with logical 'AND'."
+input String_comparison_exp {_eq: String
+  _gt: String
+  _gte: String
+  _in: [String!]
+  _is_null: Boolean
+  _lt: String
+  _lte: String
+  _neq: String
+  _nin: [String!]
+  "does the column NOT match the given POSIX regular expression, case insensitive"
+  _niregex: String
+  "does the column NOT match the given POSIX regular expression, case sensitive"
+  _nregex: String
+  "does the column NOT match the given SQL regular expression"
+  _nsimilar: String
+  "does the column NOT match the given case-insensitive pattern"
+  _nilike: String
+  "does the column NOT match the given pattern"
+  _nlike: String
+  "does the column match the given POSIX regular expression, case insensitive"
+  _iregex: String
+  "does the column match the given POSIX regular expression, case sensitive"
+  _regex: String
+  "does the column match the given SQL regular expression"
+  _similar: String
+  "does the column match the given case-insensitive pattern"
+  _ilike: String
+  "does the column match the given pattern"
+  _like: String
+}
+
+"Boolean expression to filter rows from the table \"t_user\". All fields are combined with a logical 'AND'."
+input t_user_bool_exp {_and: [t_user_bool_exp!]
+  _not: t_user_bool_exp
+  _or: [t_user_bool_exp!]
+  id: Int_comparison_exp
+  name: String_comparison_exp
+}
+
+"Initial value of the column from where the streaming should start"
+input t_user_stream_cursor_value_input {id: Int
+  name: String
+}
+
+"Ordering options when selecting data from \"t_user\"."
+input t_user_order_by {id: order_by
+  name: order_by
+}
+
+"Streaming cursor of the table \"t_user\""
+input t_user_stream_cursor_input {"Stream column input with initial value"
+initial_value: t_user_stream_cursor_value_input!
+  "cursor ordering"
+  ordering: cursor_ordering
+}
+
+"input type for incrementing numeric columns in table \"t_user\""
+input t_user_inc_input {id: Int
+}
+
+"input type for inserting data into table \"t_user\""
+input t_user_insert_input {id: Int
+  name: String
+}
+
+"input type for updating data in table \"t_user\""
+input t_user_set_input {id: Int
+  name: String
+}
+
+"on_conflict condition type for table \"t_user\""
+input t_user_on_conflict {constraint: t_user_constraint!
+  update_columns: [t_user_update_column!]! = []
+  where: t_user_bool_exp
+}
+
+"primary key columns input for table: t_user"
+input t_user_pk_columns_input {id: Int!
+}

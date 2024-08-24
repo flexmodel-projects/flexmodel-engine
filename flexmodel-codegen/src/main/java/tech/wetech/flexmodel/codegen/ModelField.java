@@ -14,6 +14,7 @@ public class ModelField {
   private String shortTypeName;
   private String fullTypeName;
   private boolean identity;
+  private boolean relationField;
   private Field originalField;
 
   public ModelClass getModelClass() {
@@ -76,6 +77,15 @@ public class ModelField {
 
   public ModelField setIdentity(boolean identity) {
     this.identity = identity;
+    return this;
+  }
+
+  public boolean isRelationField() {
+    return relationField;
+  }
+
+  public ModelField setRelationField(boolean relationField) {
+    this.relationField = relationField;
     return this;
   }
 

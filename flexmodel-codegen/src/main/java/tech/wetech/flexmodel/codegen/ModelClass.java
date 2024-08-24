@@ -14,6 +14,8 @@ import java.util.Set;
 public class ModelClass implements Serializable {
 
   private String packageName;
+  private String schemaName;
+  private String modelName;
   private final Set<String> imports = new HashSet<>();
   private String variableName;
   private String lowerCaseName;
@@ -21,6 +23,7 @@ public class ModelClass implements Serializable {
   private String fullClassName;
   private String comment;
   private ModelField idField;
+  private final List<ModelField> relationFields = new ArrayList<>();
   private final List<ModelField> allFields = new ArrayList<>();
   private Model originalModel;
 
@@ -31,6 +34,24 @@ public class ModelClass implements Serializable {
 
   public ModelClass setPackageName(String packageName) {
     this.packageName = packageName;
+    return this;
+  }
+
+  public String getSchemaName() {
+    return schemaName;
+  }
+
+  public ModelClass setSchemaName(String schemaName) {
+    this.schemaName = schemaName;
+    return this;
+  }
+
+  public String getModelName() {
+    return modelName;
+  }
+
+  public ModelClass setModelName(String modelName) {
+    this.modelName = modelName;
     return this;
   }
 
@@ -90,6 +111,10 @@ public class ModelClass implements Serializable {
   public ModelClass setIdField(ModelField idField) {
     this.idField = idField;
     return this;
+  }
+
+  public List<ModelField> getRelationFields() {
+    return relationFields;
   }
 
   public List<ModelField> getAllFields() {

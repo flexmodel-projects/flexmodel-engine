@@ -21,7 +21,7 @@ public class ModelListGenerationContext {
     return modelListClass;
   }
 
-  public void setModelsClass(ModelListClass modelsClass) {
+  public void setModelListClass(ModelListClass modelsClass) {
     this.modelListClass = modelsClass;
   }
 

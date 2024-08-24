@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -22,10 +21,6 @@ import static tech.wetech.flexmodel.RelationField.Cardinality.ONE_TO_ONE;
  * @author cjbi
  */
 public class GenerationTool {
-
-  public static void main(String[] args) {
-    run(null);
-  }
 
   private static final Map<String, TypeInfo> TYPE_MAPPING;
 
@@ -77,12 +72,12 @@ public class GenerationTool {
     String packageName = configuration.getTarget().getPackageName();
     String targetDirectory = configuration.getTarget().getDirectory() + File.separator +
                              packageName.replace(".", File.separator);
-    createDirectoriesIfNotExists(targetDirectory + File.separator + "dao");
-    createDirectoriesIfNotExists(targetDirectory + File.separator + "entity");
+    StringUtils.createDirectoriesIfNotExists(targetDirectory + File.separator + "dao");
+    StringUtils.createDirectoriesIfNotExists(targetDirectory + File.separator + "entity");
 
     Map<String, ModelClass> modelClassMap = new HashMap<>();
     for (Model model : models) {
-      modelClassMap.put(model.getName(), buildModelClass(packageName, (Entity) model));
+      modelClassMap.put(model.getName(), buildModelClass(packageName, schema.getName(), (Entity) model));
     }
 
     // generate single model file
@@ -100,7 +95,7 @@ public class GenerationTool {
     multipleModelGenerationContext.setPackageName(packageName);
     ModelListClass multipleModelClass = new ModelListClass();
     multipleModelClass.setPackageName(packageName);
-    multipleModelGenerationContext.setModelsClass(multipleModelClass);
+    multipleModelGenerationContext.setModelListClass(multipleModelClass);
     for (Model model : models) {
       ModelClass modelClass = modelClassMap.get(model.getName());
       multipleModelClass.getModelList().add(modelClass);
@@ -108,9 +103,9 @@ public class GenerationTool {
     }
 
     SchemaGenerator schemaClassGenerator = new SchemaGenerator();
-    schemaClassGenerator.generate(multipleModelGenerationContext, Path.of(targetDirectory, capitalize(schema.getName()) + ".java").toString());
+    schemaClassGenerator.generate(multipleModelGenerationContext, Path.of(targetDirectory, StringUtils.capitalize(schema.getName()) + ".java").toString());
 
-    createDirectoriesIfNotExists(configuration.getTarget().getBaseDir() + "/target/classes/META-INF/services");
+    StringUtils.createDirectoriesIfNotExists(configuration.getTarget().getBaseDir() + "/target/classes/META-INF/services");
     BuildItemSPIFileGenerator buildItemSPIFileGenerator = new BuildItemSPIFileGenerator();
     buildItemSPIFileGenerator.generate(multipleModelGenerationContext, Path.of(
       configuration.getTarget().getBaseDir(),
@@ -119,15 +114,17 @@ public class GenerationTool {
     ).toString());
   }
 
-  public static ModelClass buildModelClass(String packageName, Entity entity) {
+  public static ModelClass buildModelClass(String packageName, String schemaName, Entity entity) {
 
     ModelClass modelClass = new ModelClass()
       .setComment(entity.getComment())
-      .setVariableName(uncapitalize(entity.getName()))
-      .setLowerCaseName(uncapitalize(entity.getName()))
-      .setShortClassName(capitalize(entity.getName()))
+      .setVariableName(StringUtils.uncapitalize(entity.getName()))
+      .setLowerCaseName(StringUtils.uncapitalize(entity.getName()))
+      .setShortClassName(StringUtils.capitalize(entity.getName()))
       .setPackageName(packageName + ".entity")
-      .setFullClassName(packageName + ".entity" + "." + capitalize(entity.getName()))
+      .setSchemaName(schemaName)
+      .setModelName(entity.getName())
+      .setFullClassName(packageName + ".entity" + "." + StringUtils.capitalize(entity.getName()))
       .setOriginalModel(entity);
 
     for (TypedField<?, ?> field : entity.getFields()) {
@@ -152,11 +149,14 @@ public class GenerationTool {
         if (relationField.getCardinality() == ONE_TO_ONE) {
           modelField.setTypePackage(null)
             .setFullTypeName(modelField.getTypePackage() + "." + relationField.getTargetEntity())
-            .setShortTypeName(relationField.getTargetEntity());
+            .setShortTypeName(relationField.getTargetEntity())
+            .setRelationField(true);
+          modelClass.getRelationFields().add(modelField);
         } else {
           modelField.setTypePackage("java.util")
             .setFullTypeName("java.util.List")
-            .setShortTypeName("List<" + relationField.getTargetEntity() + ">");
+            .setShortTypeName("List<" + relationField.getTargetEntity() + ">")
+            .setRelationField(true);
         }
 
       } else {
@@ -175,37 +175,4 @@ public class GenerationTool {
     return modelClass;
   }
 
-  public static String capitalize(final CharSequence self) {
-    if (self.length() == 0) return "";
-    return "" + Character.toUpperCase(self.charAt(0)) + self.subSequence(1, self.length());
-  }
-
-  /**
-   * Convenience method to uncapitalize the first letter of a CharSequence
-   * (typically the first letter of a word). Example usage:
-   * <pre class="groovyTestCase">
-   * assert 'H'.uncapitalize() == 'h'
-   * assert 'Hello'.uncapitalize() == 'hello'
-   * assert 'Hello world'.uncapitalize() == 'hello world'
-   * assert 'Hello World'.uncapitalize() == 'hello World'
-   * assert 'hello world' == 'Hello World'.split(' ').collect{ it.uncapitalize() }.join(' ')
-   * </pre>
-   *
-   * @param self The CharSequence to uncapitalize
-   * @return A String containing the uncapitalized toString() of the CharSequence
-   * @since 2.4.8
-   */
-  public static String uncapitalize(final CharSequence self) {
-    if (self.length() == 0) return "";
-    return "" + Character.toLowerCase(self.charAt(0)) + self.subSequence(1, self.length());
-  }
-
-  private static void createDirectoriesIfNotExists(String targetDirectory) {
-    try {
-      Path path = Paths.get(targetDirectory);
-      Files.createDirectories(path);
-    } catch (IOException e) {
-      System.err.println("Error creating directories: " + e.getMessage());
-    }
-  }
 }

@@ -26,7 +26,7 @@ class GeneratorTest {
     GenerationContext generationContext = new GenerationContext();
     generationContext.setSchemaName(schemaName);
     generationContext.setPackageName(packageName);
-    generationContext.setModelClass(GenerationTool.buildModelClass(packageName, (Entity) describe.getSchema().getFirst()));
+    generationContext.setModelClass(GenerationTool.buildModelClass(packageName, schemaName, (Entity) describe.getSchema().getFirst()));
     String str = daoGenerator.generate(generationContext);
     Assertions.assertNotNull(str);
   }

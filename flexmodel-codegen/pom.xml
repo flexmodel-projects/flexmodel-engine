@@ -12,7 +12,7 @@
     <dependency>
       <groupId>tech.wetech.flexmodel</groupId>
       <artifactId>flexmodel-core</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.groovy</groupId>
