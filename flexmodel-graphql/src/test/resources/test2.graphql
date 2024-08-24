@@ -1,0 +1,1624 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Query {
+
+  findSystemApiInfo(
+    "filter the rows returned"
+    where: system_ApiInfo_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_ApiInfo_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_ApiInfo_select_column!]
+  ): [system_ApiInfo!]!
+
+  aggregateSystemApiInfo(
+    "filter the rows returned"
+    where: system_ApiInfo_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_ApiInfo_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_ApiInfo_select_column!]
+  ): system_ApiInfo_aggregate!
+
+  findSystemApiInfoById(
+    id: ID!
+  ): system_ApiInfo
+
+  findSystemApiLog(
+    "filter the rows returned"
+    where: system_ApiLog_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_ApiLog_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_ApiLog_select_column!]
+  ): [system_ApiLog!]!
+
+  aggregateSystemApiLog(
+    "filter the rows returned"
+    where: system_ApiLog_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_ApiLog_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_ApiLog_select_column!]
+  ): system_ApiLog_aggregate!
+
+  findSystemApiLogById(
+    id: ID!
+  ): system_ApiLog
+
+  findSystemClasses(
+    "filter the rows returned"
+    where: system_Classes_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_Classes_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_Classes_select_column!]
+  ): [system_Classes!]!
+
+  aggregateSystemClasses(
+    "filter the rows returned"
+    where: system_Classes_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_Classes_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_Classes_select_column!]
+  ): system_Classes_aggregate!
+
+  findSystemClassesById(
+    id: ID!
+  ): system_Classes
+
+  findSystemCourse(
+    "filter the rows returned"
+    where: system_Course_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_Course_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_Course_select_column!]
+  ): [system_Course!]!
+
+  aggregateSystemCourse(
+    "filter the rows returned"
+    where: system_Course_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_Course_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_Course_select_column!]
+  ): system_Course_aggregate!
+
+  findSystemCourseById(
+    id: ID!
+  ): system_Course
+
+  findSystemDatasource(
+    "filter the rows returned"
+    where: system_Datasource_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_Datasource_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_Datasource_select_column!]
+  ): [system_Datasource!]!
+
+  aggregateSystemDatasource(
+    "filter the rows returned"
+    where: system_Datasource_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_Datasource_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_Datasource_select_column!]
+  ): system_Datasource_aggregate!
+
+  findSystemDatasourceById(
+    id: ID!
+  ): system_Datasource
+
+  findSystemIdentityProvider(
+    "filter the rows returned"
+    where: system_IdentityProvider_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_IdentityProvider_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_IdentityProvider_select_column!]
+  ): [system_IdentityProvider!]!
+
+  aggregateSystemIdentityProvider(
+    "filter the rows returned"
+    where: system_IdentityProvider_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_IdentityProvider_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_IdentityProvider_select_column!]
+  ): system_IdentityProvider_aggregate!
+
+  findSystemIdentityProviderById(
+    id: ID!
+  ): system_IdentityProvider
+
+  findSystemStudent(
+    "filter the rows returned"
+    where: system_Student_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_Student_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_Student_select_column!]
+  ): [system_Student!]!
+
+  aggregateSystemStudent(
+    "filter the rows returned"
+    where: system_Student_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_Student_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_Student_select_column!]
+  ): system_Student_aggregate!
+
+  findSystemStudentById(
+    id: ID!
+  ): system_Student
+
+  findSystemStudentDetail(
+    "filter the rows returned"
+    where: system_StudentDetail_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_StudentDetail_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_StudentDetail_select_column!]
+  ): [system_StudentDetail!]!
+
+  aggregateSystemStudentDetail(
+    "filter the rows returned"
+    where: system_StudentDetail_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_StudentDetail_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_StudentDetail_select_column!]
+  ): system_StudentDetail_aggregate!
+
+  findSystemStudentDetailById(
+    id: ID!
+  ): system_StudentDetail
+
+  findSystemTeacher(
+    "filter the rows returned"
+    where: system_Teacher_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_Teacher_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_Teacher_select_column!]
+  ): [system_Teacher!]!
+
+  aggregateSystemTeacher(
+    "filter the rows returned"
+    where: system_Teacher_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_Teacher_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_Teacher_select_column!]
+  ): system_Teacher_aggregate!
+
+  findSystemTeacherById(
+    id: ID!
+  ): system_Teacher
+
+  findSystemTestMutationClasses(
+    "filter the rows returned"
+    where: system_testMutationClasses_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_testMutationClasses_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_testMutationClasses_select_column!]
+  ): [system_testMutationClasses!]!
+
+  aggregateSystemTestMutationClasses(
+    "filter the rows returned"
+    where: system_testMutationClasses_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_testMutationClasses_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_testMutationClasses_select_column!]
+  ): system_testMutationClasses_aggregate!
+
+  findSystemTestMutationClassesById(
+    id: ID!
+  ): system_testMutationClasses
+
+  findSystemTestMutationCourse(
+    "filter the rows returned"
+    where: system_testMutationCourse_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_testMutationCourse_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_testMutationCourse_select_column!]
+  ): [system_testMutationCourse!]!
+
+  aggregateSystemTestMutationCourse(
+    "filter the rows returned"
+    where: system_testMutationCourse_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_testMutationCourse_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_testMutationCourse_select_column!]
+  ): system_testMutationCourse_aggregate!
+
+  findSystemTestMutationCourseById(
+    id: ID!
+  ): system_testMutationCourse
+
+  findSystemTestMutationStudent(
+    "filter the rows returned"
+    where: system_testMutationStudent_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_testMutationStudent_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_testMutationStudent_select_column!]
+  ): [system_testMutationStudent!]!
+
+  aggregateSystemTestMutationStudent(
+    "filter the rows returned"
+    where: system_testMutationStudent_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_testMutationStudent_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_testMutationStudent_select_column!]
+  ): system_testMutationStudent_aggregate!
+
+  findSystemTestMutationStudentById(
+    id: ID!
+  ): system_testMutationStudent
+
+  findSystemTestMutationStudentDetail(
+    "filter the rows returned"
+    where: system_testMutationStudentDetail_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_testMutationStudentDetail_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_testMutationStudentDetail_select_column!]
+  ): [system_testMutationStudentDetail!]!
+
+  aggregateSystemTestMutationStudentDetail(
+    "filter the rows returned"
+    where: system_testMutationStudentDetail_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_testMutationStudentDetail_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_testMutationStudentDetail_select_column!]
+  ): system_testMutationStudentDetail_aggregate!
+
+  findSystemTestMutationStudentDetailById(
+    id: ID!
+  ): system_testMutationStudentDetail
+
+  findSystemTestMutationTeacher(
+    "filter the rows returned"
+    where: system_testMutationTeacher_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_testMutationTeacher_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_testMutationTeacher_select_column!]
+  ): [system_testMutationTeacher!]!
+
+  aggregateSystemTestMutationTeacher(
+    "filter the rows returned"
+    where: system_testMutationTeacher_bool_exp
+    "sort the rows by one or more columns"
+    order_by: system_testMutationTeacher_order_by
+    "limit the number of rows returned"
+    limit: Int
+    "skip the first n rows"
+    offset: Int
+    distinct_on: [system_testMutationTeacher_select_column!]
+  ): system_testMutationTeacher_aggregate!
+
+  findSystemTestMutationTeacherById(
+    id: ID!
+  ): system_testMutationTeacher
+}
+type Mutation {
+
+  "delete data from the table: system_ApiInfo"
+  deleteSystemApiInfo(
+    "filter the rows which have to be deleted"
+    where: system_ApiInfo_bool_exp!
+  ): mutation_response
+
+  deleteSystemApiInfoById(
+    id: ID!
+  ): system_ApiInfo
+
+  updateSystemApiInfoById(
+    _set: system_ApiInfo_set_input
+    id: ID!
+  ): system_ApiInfo
+
+  createSystemApiInfo(
+    data: system_ApiInfo_insert_input
+  ): system_ApiInfo
+
+  updateSystemApiInfo(
+    _set: system_ApiInfo_set_input
+    where: system_ApiInfo_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_ApiLog"
+  deleteSystemApiLog(
+    "filter the rows which have to be deleted"
+    where: system_ApiLog_bool_exp!
+  ): mutation_response
+
+  deleteSystemApiLogById(
+    id: ID!
+  ): system_ApiLog
+
+  updateSystemApiLogById(
+    _set: system_ApiLog_set_input
+    id: ID!
+  ): system_ApiLog
+
+  createSystemApiLog(
+    data: system_ApiLog_insert_input
+  ): system_ApiLog
+
+  updateSystemApiLog(
+    _set: system_ApiLog_set_input
+    where: system_ApiLog_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_Classes"
+  deleteSystemClasses(
+    "filter the rows which have to be deleted"
+    where: system_Classes_bool_exp!
+  ): mutation_response
+
+  deleteSystemClassesById(
+    id: ID!
+  ): system_Classes
+
+  updateSystemClassesById(
+    _set: system_Classes_set_input
+    id: ID!
+  ): system_Classes
+
+  createSystemClasses(
+    data: system_Classes_insert_input
+  ): system_Classes
+
+  updateSystemClasses(
+    _set: system_Classes_set_input
+    where: system_Classes_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_Course"
+  deleteSystemCourse(
+    "filter the rows which have to be deleted"
+    where: system_Course_bool_exp!
+  ): mutation_response
+
+  deleteSystemCourseById(
+    id: ID!
+  ): system_Course
+
+  updateSystemCourseById(
+    _set: system_Course_set_input
+    id: ID!
+  ): system_Course
+
+  createSystemCourse(
+    data: system_Course_insert_input
+  ): system_Course
+
+  updateSystemCourse(
+    _set: system_Course_set_input
+    where: system_Course_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_Datasource"
+  deleteSystemDatasource(
+    "filter the rows which have to be deleted"
+    where: system_Datasource_bool_exp!
+  ): mutation_response
+
+  deleteSystemDatasourceById(
+    id: ID!
+  ): system_Datasource
+
+  updateSystemDatasourceById(
+    _set: system_Datasource_set_input
+    id: ID!
+  ): system_Datasource
+
+  createSystemDatasource(
+    data: system_Datasource_insert_input
+  ): system_Datasource
+
+  updateSystemDatasource(
+    _set: system_Datasource_set_input
+    where: system_Datasource_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_IdentityProvider"
+  deleteSystemIdentityProvider(
+    "filter the rows which have to be deleted"
+    where: system_IdentityProvider_bool_exp!
+  ): mutation_response
+
+  deleteSystemIdentityProviderById(
+    id: ID!
+  ): system_IdentityProvider
+
+  updateSystemIdentityProviderById(
+    _set: system_IdentityProvider_set_input
+    id: ID!
+  ): system_IdentityProvider
+
+  createSystemIdentityProvider(
+    data: system_IdentityProvider_insert_input
+  ): system_IdentityProvider
+
+  updateSystemIdentityProvider(
+    _set: system_IdentityProvider_set_input
+    where: system_IdentityProvider_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_Student"
+  deleteSystemStudent(
+    "filter the rows which have to be deleted"
+    where: system_Student_bool_exp!
+  ): mutation_response
+
+  deleteSystemStudentById(
+    id: ID!
+  ): system_Student
+
+  updateSystemStudentById(
+    _set: system_Student_set_input
+    id: ID!
+  ): system_Student
+
+  createSystemStudent(
+    data: system_Student_insert_input
+  ): system_Student
+
+  updateSystemStudent(
+    _set: system_Student_set_input
+    where: system_Student_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_StudentDetail"
+  deleteSystemStudentDetail(
+    "filter the rows which have to be deleted"
+    where: system_StudentDetail_bool_exp!
+  ): mutation_response
+
+  deleteSystemStudentDetailById(
+    id: ID!
+  ): system_StudentDetail
+
+  updateSystemStudentDetailById(
+    _set: system_StudentDetail_set_input
+    id: ID!
+  ): system_StudentDetail
+
+  createSystemStudentDetail(
+    data: system_StudentDetail_insert_input
+  ): system_StudentDetail
+
+  updateSystemStudentDetail(
+    _set: system_StudentDetail_set_input
+    where: system_StudentDetail_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_Teacher"
+  deleteSystemTeacher(
+    "filter the rows which have to be deleted"
+    where: system_Teacher_bool_exp!
+  ): mutation_response
+
+  deleteSystemTeacherById(
+    id: ID!
+  ): system_Teacher
+
+  updateSystemTeacherById(
+    _set: system_Teacher_set_input
+    id: ID!
+  ): system_Teacher
+
+  createSystemTeacher(
+    data: system_Teacher_insert_input
+  ): system_Teacher
+
+  updateSystemTeacher(
+    _set: system_Teacher_set_input
+    where: system_Teacher_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_testMutationClasses"
+  deleteSystemTestMutationClasses(
+    "filter the rows which have to be deleted"
+    where: system_testMutationClasses_bool_exp!
+  ): mutation_response
+
+  deleteSystemTestMutationClassesById(
+    id: ID!
+  ): system_testMutationClasses
+
+  updateSystemTestMutationClassesById(
+    _set: system_testMutationClasses_set_input
+    id: ID!
+  ): system_testMutationClasses
+
+  createSystemTestMutationClasses(
+    data: system_testMutationClasses_insert_input
+  ): system_testMutationClasses
+
+  updateSystemTestMutationClasses(
+    _set: system_testMutationClasses_set_input
+    where: system_testMutationClasses_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_testMutationCourse"
+  deleteSystemTestMutationCourse(
+    "filter the rows which have to be deleted"
+    where: system_testMutationCourse_bool_exp!
+  ): mutation_response
+
+  deleteSystemTestMutationCourseById(
+    id: ID!
+  ): system_testMutationCourse
+
+  updateSystemTestMutationCourseById(
+    _set: system_testMutationCourse_set_input
+    id: ID!
+  ): system_testMutationCourse
+
+  createSystemTestMutationCourse(
+    data: system_testMutationCourse_insert_input
+  ): system_testMutationCourse
+
+  updateSystemTestMutationCourse(
+    _set: system_testMutationCourse_set_input
+    where: system_testMutationCourse_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_testMutationStudent"
+  deleteSystemTestMutationStudent(
+    "filter the rows which have to be deleted"
+    where: system_testMutationStudent_bool_exp!
+  ): mutation_response
+
+  deleteSystemTestMutationStudentById(
+    id: ID!
+  ): system_testMutationStudent
+
+  updateSystemTestMutationStudentById(
+    _set: system_testMutationStudent_set_input
+    id: ID!
+  ): system_testMutationStudent
+
+  createSystemTestMutationStudent(
+    data: system_testMutationStudent_insert_input
+  ): system_testMutationStudent
+
+  updateSystemTestMutationStudent(
+    _set: system_testMutationStudent_set_input
+    where: system_testMutationStudent_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_testMutationStudentDetail"
+  deleteSystemTestMutationStudentDetail(
+    "filter the rows which have to be deleted"
+    where: system_testMutationStudentDetail_bool_exp!
+  ): mutation_response
+
+  deleteSystemTestMutationStudentDetailById(
+    id: ID!
+  ): system_testMutationStudentDetail
+
+  updateSystemTestMutationStudentDetailById(
+    _set: system_testMutationStudentDetail_set_input
+    id: ID!
+  ): system_testMutationStudentDetail
+
+  createSystemTestMutationStudentDetail(
+    data: system_testMutationStudentDetail_insert_input
+  ): system_testMutationStudentDetail
+
+  updateSystemTestMutationStudentDetail(
+    _set: system_testMutationStudentDetail_set_input
+    where: system_testMutationStudentDetail_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_testMutationTeacher"
+  deleteSystemTestMutationTeacher(
+    "filter the rows which have to be deleted"
+    where: system_testMutationTeacher_bool_exp!
+  ): mutation_response
+
+  deleteSystemTestMutationTeacherById(
+    id: ID!
+  ): system_testMutationTeacher
+
+  updateSystemTestMutationTeacherById(
+    _set: system_testMutationTeacher_set_input
+    id: ID!
+  ): system_testMutationTeacher
+
+  createSystemTestMutationTeacher(
+    data: system_testMutationTeacher_insert_input
+  ): system_testMutationTeacher
+
+  updateSystemTestMutationTeacher(
+    _set: system_testMutationTeacher_set_input
+    where: system_testMutationTeacher_bool_exp!
+  ): mutation_response
+}
+
+type system_ApiInfo {
+  id : ID
+  parentId : String
+  createdAt : DateTime
+  meta : JSON
+  type : String
+  path : String
+  name : String
+  method : String
+  updatedAt : DateTime
+}
+
+type system_ApiInfo_aggregate {
+  aggregate: system_ApiInfo_aggregate_fields
+  nodes: [system_ApiInfo!]!
+}
+
+"aggregate fields of \"system_ApiInfo\""
+type system_ApiInfo_aggregate_fields {
+  count: system_ApiInfo_select_column
+  max: system_ApiInfo_select_column
+  min: system_ApiInfo_select_column
+  sum: system_ApiInfo_select_column
+  avg: system_ApiInfo_select_column
+}
+type system_ApiLog {
+  level : String
+  uri : Text
+  createdAt : DateTime
+  data : JSON
+  id : ID
+}
+
+type system_ApiLog_aggregate {
+  aggregate: system_ApiLog_aggregate_fields
+  nodes: [system_ApiLog!]!
+}
+
+"aggregate fields of \"system_ApiLog\""
+type system_ApiLog_aggregate_fields {
+  count: system_ApiLog_select_column
+  max: system_ApiLog_select_column
+  min: system_ApiLog_select_column
+  sum: system_ApiLog_select_column
+  avg: system_ApiLog_select_column
+}
+type system_Classes {
+  classCode : String
+  className : String
+  students : [system_Student]
+  id : ID
+}
+
+type system_Classes_aggregate {
+  aggregate: system_Classes_aggregate_fields
+  nodes: [system_Classes!]!
+}
+
+"aggregate fields of \"system_Classes\""
+type system_Classes_aggregate_fields {
+  count: system_Classes_select_column
+  max: system_Classes_select_column
+  min: system_Classes_select_column
+  sum: system_Classes_select_column
+  avg: system_Classes_select_column
+}
+type system_Course {
+  students : [system_Student]
+  courseNo : ID
+  courseName : String
+}
+
+type system_Course_aggregate {
+  aggregate: system_Course_aggregate_fields
+  nodes: [system_Course!]!
+}
+
+"aggregate fields of \"system_Course\""
+type system_Course_aggregate_fields {
+  count: system_Course_select_column
+  max: system_Course_select_column
+  min: system_Course_select_column
+  sum: system_Course_select_column
+  avg: system_Course_select_column
+}
+type system_Datasource {
+  config : JSON
+  updatedAt : DateTime
+  name : ID
+  type : String
+  enabled : Boolean
+  createdAt : DateTime
+}
+
+type system_Datasource_aggregate {
+  aggregate: system_Datasource_aggregate_fields
+  nodes: [system_Datasource!]!
+}
+
+"aggregate fields of \"system_Datasource\""
+type system_Datasource_aggregate_fields {
+  count: system_Datasource_select_column
+  max: system_Datasource_select_column
+  min: system_Datasource_select_column
+  sum: system_Datasource_select_column
+  avg: system_Datasource_select_column
+}
+type system_IdentityProvider {
+  provider : JSON
+  updatedAt : DateTime
+  createdAt : DateTime
+  name : ID
+}
+
+type system_IdentityProvider_aggregate {
+  aggregate: system_IdentityProvider_aggregate_fields
+  nodes: [system_IdentityProvider!]!
+}
+
+"aggregate fields of \"system_IdentityProvider\""
+type system_IdentityProvider_aggregate_fields {
+  count: system_IdentityProvider_select_column
+  max: system_IdentityProvider_select_column
+  min: system_IdentityProvider_select_column
+  sum: system_IdentityProvider_select_column
+  avg: system_IdentityProvider_select_column
+}
+type system_Student {
+  teachers : [system_Teacher]
+  courses : [system_Course]
+  age : Int
+  studentName : String
+  studentDetail : system_StudentDetail
+  gender : String
+  classId : Int
+  id : ID
+}
+
+type system_Student_aggregate {
+  aggregate: system_Student_aggregate_fields
+  nodes: [system_Student!]!
+}
+
+"aggregate fields of \"system_Student\""
+type system_Student_aggregate_fields {
+  count: system_Student_select_column
+  max: system_Student_select_column
+  min: system_Student_select_column
+  sum: system_Student_select_column
+  avg: system_Student_select_column
+}
+type system_StudentDetail {
+  studentId : Long
+  description : Text
+  id : ID
+}
+
+type system_StudentDetail_aggregate {
+  aggregate: system_StudentDetail_aggregate_fields
+  nodes: [system_StudentDetail!]!
+}
+
+"aggregate fields of \"system_StudentDetail\""
+type system_StudentDetail_aggregate_fields {
+  count: system_StudentDetail_select_column
+  max: system_StudentDetail_select_column
+  min: system_StudentDetail_select_column
+  sum: system_StudentDetail_select_column
+  avg: system_StudentDetail_select_column
+}
+type system_Teacher {
+  id : ID
+  subject : String
+  teacherName : String
+}
+
+type system_Teacher_aggregate {
+  aggregate: system_Teacher_aggregate_fields
+  nodes: [system_Teacher!]!
+}
+
+"aggregate fields of \"system_Teacher\""
+type system_Teacher_aggregate_fields {
+  count: system_Teacher_select_column
+  max: system_Teacher_select_column
+  min: system_Teacher_select_column
+  sum: system_Teacher_select_column
+  avg: system_Teacher_select_column
+}
+type system_testMutationClasses {
+  classCode : String
+  id : ID
+  className : String
+  description : JSON
+  students : [system_testMutationStudent]
+}
+
+type system_testMutationClasses_aggregate {
+  aggregate: system_testMutationClasses_aggregate_fields
+  nodes: [system_testMutationClasses!]!
+}
+
+"aggregate fields of \"system_testMutationClasses\""
+type system_testMutationClasses_aggregate_fields {
+  count: system_testMutationClasses_select_column
+  max: system_testMutationClasses_select_column
+  min: system_testMutationClasses_select_column
+  sum: system_testMutationClasses_select_column
+  avg: system_testMutationClasses_select_column
+}
+type system_testMutationCourse {
+  courseNo : ID
+  students : [system_testMutationStudent]
+  courseName : String
+}
+
+type system_testMutationCourse_aggregate {
+  aggregate: system_testMutationCourse_aggregate_fields
+  nodes: [system_testMutationCourse!]!
+}
+
+"aggregate fields of \"system_testMutationCourse\""
+type system_testMutationCourse_aggregate_fields {
+  count: system_testMutationCourse_select_column
+  max: system_testMutationCourse_select_column
+  min: system_testMutationCourse_select_column
+  sum: system_testMutationCourse_select_column
+  avg: system_testMutationCourse_select_column
+}
+type system_testMutationStudent {
+  gender : String
+  classId : Int
+  teachers : [system_testMutationTeacher]
+  id : ID
+  studentDetail : system_testMutationStudentDetail
+  studentName : String
+  remark : JSON
+  courses : [system_testMutationCourse]
+  age : Int
+}
+
+type system_testMutationStudent_aggregate {
+  aggregate: system_testMutationStudent_aggregate_fields
+  nodes: [system_testMutationStudent!]!
+}
+
+"aggregate fields of \"system_testMutationStudent\""
+type system_testMutationStudent_aggregate_fields {
+  count: system_testMutationStudent_select_column
+  max: system_testMutationStudent_select_column
+  min: system_testMutationStudent_select_column
+  sum: system_testMutationStudent_select_column
+  avg: system_testMutationStudent_select_column
+}
+type system_testMutationStudentDetail {
+  id : ID
+  studentId : Long
+}
+
+type system_testMutationStudentDetail_aggregate {
+  aggregate: system_testMutationStudentDetail_aggregate_fields
+  nodes: [system_testMutationStudentDetail!]!
+}
+
+"aggregate fields of \"system_testMutationStudentDetail\""
+type system_testMutationStudentDetail_aggregate_fields {
+  count: system_testMutationStudentDetail_select_column
+  max: system_testMutationStudentDetail_select_column
+  min: system_testMutationStudentDetail_select_column
+  sum: system_testMutationStudentDetail_select_column
+  avg: system_testMutationStudentDetail_select_column
+}
+type system_testMutationTeacher {
+  id : ID
+  teacherName : String
+  subject : String
+}
+
+type system_testMutationTeacher_aggregate {
+  aggregate: system_testMutationTeacher_aggregate_fields
+  nodes: [system_testMutationTeacher!]!
+}
+
+"aggregate fields of \"system_testMutationTeacher\""
+type system_testMutationTeacher_aggregate_fields {
+  count: system_testMutationTeacher_select_column
+  max: system_testMutationTeacher_select_column
+  min: system_testMutationTeacher_select_column
+  sum: system_testMutationTeacher_select_column
+  avg: system_testMutationTeacher_select_column
+}
+
+"Boolean expression to filter rows from the table \"system_ApiInfo\". All fields are combined with a logical 'AND'."
+input system_ApiInfo_bool_exp {
+  _and: [system_ApiInfo_bool_exp!]
+  _or: [system_ApiInfo_bool_exp!]
+  id: Int_comparison_exp
+  parentId: String_comparison_exp
+  createdAt: String_comparison_exp
+  meta: String_comparison_exp
+  type: String_comparison_exp
+  path: String_comparison_exp
+  name: String_comparison_exp
+  method: String_comparison_exp
+  updatedAt: String_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_ApiInfo\"."
+
+input system_ApiInfo_order_by {
+  id: order_by
+  parentId: order_by
+  createdAt: order_by
+  meta: order_by
+  type: order_by
+  path: order_by
+  name: order_by
+  method: order_by
+  updatedAt: order_by
+}
+
+input system_ApiInfo_insert_input {
+  id: ID
+}
+
+input system_ApiInfo_set_input {
+  id: ID
+  parentId: String
+  createdAt: DateTime
+  meta: JSON
+  type: String
+  path: String
+  name: String
+  method: String
+  updatedAt: DateTime
+}
+
+"Boolean expression to filter rows from the table \"system_ApiLog\". All fields are combined with a logical 'AND'."
+input system_ApiLog_bool_exp {
+  _and: [system_ApiLog_bool_exp!]
+  _or: [system_ApiLog_bool_exp!]
+  level: String_comparison_exp
+  uri: String_comparison_exp
+  createdAt: String_comparison_exp
+  data: String_comparison_exp
+  id: Int_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_ApiLog\"."
+
+input system_ApiLog_order_by {
+  level: order_by
+  uri: order_by
+  createdAt: order_by
+  data: order_by
+  id: order_by
+}
+
+input system_ApiLog_insert_input {
+  level: String
+}
+
+input system_ApiLog_set_input {
+  level: String
+  uri: Text
+  createdAt: DateTime
+  data: JSON
+  id: ID
+}
+
+"Boolean expression to filter rows from the table \"system_Classes\". All fields are combined with a logical 'AND'."
+input system_Classes_bool_exp {
+  _and: [system_Classes_bool_exp!]
+  _or: [system_Classes_bool_exp!]
+  classCode: String_comparison_exp
+  className: String_comparison_exp
+  id: Int_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_Classes\"."
+
+input system_Classes_order_by {
+  classCode: order_by
+  className: order_by
+  id: order_by
+}
+
+input system_Classes_insert_input {
+  classCode: String
+}
+
+input system_Classes_set_input {
+  classCode: String
+  className: String
+  id: ID
+}
+
+"Boolean expression to filter rows from the table \"system_Course\". All fields are combined with a logical 'AND'."
+input system_Course_bool_exp {
+  _and: [system_Course_bool_exp!]
+  _or: [system_Course_bool_exp!]
+  courseNo: Int_comparison_exp
+  courseName: String_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_Course\"."
+
+input system_Course_order_by {
+  courseNo: order_by
+  courseName: order_by
+}
+
+input system_Course_insert_input {
+  courseNo: ID
+}
+
+input system_Course_set_input {
+  courseNo: ID
+  courseName: String
+}
+
+"Boolean expression to filter rows from the table \"system_Datasource\". All fields are combined with a logical 'AND'."
+input system_Datasource_bool_exp {
+  _and: [system_Datasource_bool_exp!]
+  _or: [system_Datasource_bool_exp!]
+  config: String_comparison_exp
+  updatedAt: String_comparison_exp
+  name: Int_comparison_exp
+  type: String_comparison_exp
+  enabled: String_comparison_exp
+  createdAt: String_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_Datasource\"."
+
+input system_Datasource_order_by {
+  config: order_by
+  updatedAt: order_by
+  name: order_by
+  type: order_by
+  enabled: order_by
+  createdAt: order_by
+}
+
+input system_Datasource_insert_input {
+  config: JSON
+}
+
+input system_Datasource_set_input {
+  config: JSON
+  updatedAt: DateTime
+  name: ID
+  type: String
+  enabled: Boolean
+  createdAt: DateTime
+}
+
+"Boolean expression to filter rows from the table \"system_IdentityProvider\". All fields are combined with a logical 'AND'."
+input system_IdentityProvider_bool_exp {
+  _and: [system_IdentityProvider_bool_exp!]
+  _or: [system_IdentityProvider_bool_exp!]
+  provider: String_comparison_exp
+  updatedAt: String_comparison_exp
+  createdAt: String_comparison_exp
+  name: Int_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_IdentityProvider\"."
+
+input system_IdentityProvider_order_by {
+  provider: order_by
+  updatedAt: order_by
+  createdAt: order_by
+  name: order_by
+}
+
+input system_IdentityProvider_insert_input {
+  provider: JSON
+}
+
+input system_IdentityProvider_set_input {
+  provider: JSON
+  updatedAt: DateTime
+  createdAt: DateTime
+  name: ID
+}
+
+"Boolean expression to filter rows from the table \"system_Student\". All fields are combined with a logical 'AND'."
+input system_Student_bool_exp {
+  _and: [system_Student_bool_exp!]
+  _or: [system_Student_bool_exp!]
+  age: Int_comparison_exp
+  studentName: String_comparison_exp
+  gender: String_comparison_exp
+  classId: Int_comparison_exp
+  id: Int_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_Student\"."
+
+input system_Student_order_by {
+  age: order_by
+  studentName: order_by
+  gender: order_by
+  classId: order_by
+  id: order_by
+}
+
+input system_Student_insert_input {
+  age: Int
+}
+
+input system_Student_set_input {
+  age: Int
+  studentName: String
+  gender: String
+  classId: Int
+  id: ID
+}
+
+"Boolean expression to filter rows from the table \"system_StudentDetail\". All fields are combined with a logical 'AND'."
+input system_StudentDetail_bool_exp {
+  _and: [system_StudentDetail_bool_exp!]
+  _or: [system_StudentDetail_bool_exp!]
+  studentId: Int_comparison_exp
+  description: String_comparison_exp
+  id: Int_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_StudentDetail\"."
+
+input system_StudentDetail_order_by {
+  studentId: order_by
+  description: order_by
+  id: order_by
+}
+
+input system_StudentDetail_insert_input {
+  studentId: Long
+}
+
+input system_StudentDetail_set_input {
+  studentId: Long
+  description: Text
+  id: ID
+}
+
+"Boolean expression to filter rows from the table \"system_Teacher\". All fields are combined with a logical 'AND'."
+input system_Teacher_bool_exp {
+  _and: [system_Teacher_bool_exp!]
+  _or: [system_Teacher_bool_exp!]
+  id: Int_comparison_exp
+  subject: String_comparison_exp
+  teacherName: String_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_Teacher\"."
+
+input system_Teacher_order_by {
+  id: order_by
+  subject: order_by
+  teacherName: order_by
+}
+
+input system_Teacher_insert_input {
+  id: ID
+}
+
+input system_Teacher_set_input {
+  id: ID
+  subject: String
+  teacherName: String
+}
+
+"Boolean expression to filter rows from the table \"system_testMutationClasses\". All fields are combined with a logical 'AND'."
+input system_testMutationClasses_bool_exp {
+  _and: [system_testMutationClasses_bool_exp!]
+  _or: [system_testMutationClasses_bool_exp!]
+  classCode: String_comparison_exp
+  id: Int_comparison_exp
+  className: String_comparison_exp
+  description: String_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_testMutationClasses\"."
+
+input system_testMutationClasses_order_by {
+  classCode: order_by
+  id: order_by
+  className: order_by
+  description: order_by
+}
+
+input system_testMutationClasses_insert_input {
+  classCode: String
+}
+
+input system_testMutationClasses_set_input {
+  classCode: String
+  id: ID
+  className: String
+  description: JSON
+}
+
+"Boolean expression to filter rows from the table \"system_testMutationCourse\". All fields are combined with a logical 'AND'."
+input system_testMutationCourse_bool_exp {
+  _and: [system_testMutationCourse_bool_exp!]
+  _or: [system_testMutationCourse_bool_exp!]
+  courseNo: Int_comparison_exp
+  courseName: String_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_testMutationCourse\"."
+
+input system_testMutationCourse_order_by {
+  courseNo: order_by
+  courseName: order_by
+}
+
+input system_testMutationCourse_insert_input {
+  courseNo: ID
+}
+
+input system_testMutationCourse_set_input {
+  courseNo: ID
+  courseName: String
+}
+
+"Boolean expression to filter rows from the table \"system_testMutationStudent\". All fields are combined with a logical 'AND'."
+input system_testMutationStudent_bool_exp {
+  _and: [system_testMutationStudent_bool_exp!]
+  _or: [system_testMutationStudent_bool_exp!]
+  gender: String_comparison_exp
+  classId: Int_comparison_exp
+  id: Int_comparison_exp
+  studentName: String_comparison_exp
+  remark: String_comparison_exp
+  age: Int_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_testMutationStudent\"."
+
+input system_testMutationStudent_order_by {
+  gender: order_by
+  classId: order_by
+  id: order_by
+  studentName: order_by
+  remark: order_by
+  age: order_by
+}
+
+input system_testMutationStudent_insert_input {
+  gender: String
+}
+
+input system_testMutationStudent_set_input {
+  gender: String
+  classId: Int
+  id: ID
+  studentName: String
+  remark: JSON
+  age: Int
+}
+
+"Boolean expression to filter rows from the table \"system_testMutationStudentDetail\". All fields are combined with a logical 'AND'."
+input system_testMutationStudentDetail_bool_exp {
+  _and: [system_testMutationStudentDetail_bool_exp!]
+  _or: [system_testMutationStudentDetail_bool_exp!]
+  id: Int_comparison_exp
+  studentId: Int_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_testMutationStudentDetail\"."
+
+input system_testMutationStudentDetail_order_by {
+  id: order_by
+  studentId: order_by
+}
+
+input system_testMutationStudentDetail_insert_input {
+  id: ID
+}
+
+input system_testMutationStudentDetail_set_input {
+  id: ID
+  studentId: Long
+}
+
+"Boolean expression to filter rows from the table \"system_testMutationTeacher\". All fields are combined with a logical 'AND'."
+input system_testMutationTeacher_bool_exp {
+  _and: [system_testMutationTeacher_bool_exp!]
+  _or: [system_testMutationTeacher_bool_exp!]
+  id: Int_comparison_exp
+  teacherName: String_comparison_exp
+  subject: String_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_testMutationTeacher\"."
+
+input system_testMutationTeacher_order_by {
+  id: order_by
+  teacherName: order_by
+  subject: order_by
+}
+
+input system_testMutationTeacher_insert_input {
+  id: ID
+}
+
+input system_testMutationTeacher_set_input {
+  id: ID
+  teacherName: String
+  subject: String
+}
+
+enum system_ApiInfo_select_column {
+  id
+  parentId
+  createdAt
+  meta
+  type
+  path
+  name
+  method
+  updatedAt
+}
+
+enum system_ApiLog_select_column {
+  level
+  uri
+  createdAt
+  data
+  id
+}
+
+enum system_Classes_select_column {
+  classCode
+  className
+  id
+}
+
+enum system_Course_select_column {
+  courseNo
+  courseName
+}
+
+enum system_Datasource_select_column {
+  config
+  updatedAt
+  name
+  type
+  enabled
+  createdAt
+}
+
+enum system_IdentityProvider_select_column {
+  provider
+  updatedAt
+  createdAt
+  name
+}
+
+enum system_Student_select_column {
+  age
+  studentName
+  gender
+  classId
+  id
+}
+
+enum system_StudentDetail_select_column {
+  studentId
+  description
+  id
+}
+
+enum system_Teacher_select_column {
+  id
+  subject
+  teacherName
+}
+
+enum system_testMutationClasses_select_column {
+  classCode
+  id
+  className
+  description
+}
+
+enum system_testMutationCourse_select_column {
+  courseNo
+  courseName
+}
+
+enum system_testMutationStudent_select_column {
+  gender
+  classId
+  id
+  studentName
+  remark
+  age
+}
+
+enum system_testMutationStudentDetail_select_column {
+  id
+  studentId
+}
+
+enum system_testMutationTeacher_select_column {
+  id
+  teacherName
+  subject
+}
+
+scalar JSON
+scalar Date
+scalar DateTime
+scalar Text
+scalar Long
+
+"Boolean expression to compare columns of type \"Int\". All fields are combined with logical 'AND.'"
+input Int_comparison_exp {
+  _eq: Int
+  _gt: Int
+  _gte: Int
+  _in: [Int!]
+  _is_null: Boolean
+  _lt: Int
+  _lte: Int
+  _neq: Int
+  _nin: [Int!]
+}
+
+"Boolean expression to compare columns of type \"String\". All fields are combined with logical 'AND.'"
+input String_comparison_exp {
+  _eq: String
+  _gt: String
+  _gte: String
+  _in: [String!]
+  _is_null: Boolean
+  _lt: String
+  _lte: String
+  _neq: String
+  _nin: [String!]
+  "does the column NOT match the given POSIX regular expression, case insensitive"
+  _niregex: String
+  "does the column NOT match the given POSIX regular expression, case sensitive"
+  _nregex: String
+  "does the column NOT match the given SQL regular expression"
+  _nsimilar: String
+  "does the column NOT match the given case-insensitive pattern"
+  _nilike: String
+  "does the column NOT match the given pattern"
+  _nlike: String
+  "does the column match the given POSIX regular expression, case insensitive"
+  _iregex: String
+  "does the column match the given POSIX regular expression, case sensitive"
+  _regex: String
+  "does the column match the given SQL regular expression"
+  _similar: String
+  "does the column match the given case-insensitive pattern"
+  _ilike: String
+  "does the column match the given pattern"
+  _like: String
+}
+
+"column ordering options"
+enum order_by {
+  "in ascending order, nulls last"
+  asc
+  "in descending order, nulls first"
+  desc
+}
+
+"ordering argument of a cursor"
+enum cursor_ordering {
+  "ascending ordering of the cursor"
+  ASC
+  "descending ordering of the cursor"
+  DESC
+}
+
+type mutation_response {
+  "data from the rows affected by the mutation"
+  affected_rows: Int!
+}

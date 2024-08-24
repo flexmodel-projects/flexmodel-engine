@@ -39,10 +39,10 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     // 创建查询
     String query = """
       query {
-        classes: find_system_testSimpleQueryClasses(offset: 0, limit:1) {
+        classes: findSystemTestSimpleQueryClasses(offset: 0, limit:1) {
           id, students { name: studentName, courses { courseName } }
         }
-        students: find_system_testSimpleQueryStudent(
+        students: findSystemTestSimpleQueryStudent(
           limit: 3
           offset: 0
           order_by: {classId: asc, id: desc}
@@ -50,10 +50,10 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
         ) {
           id, studentName
         }
-        teachers: find_system_testSimpleQueryTeacher {
+        teachers: findSystemTestSimpleQueryTeacher {
          id, teacherName
         }
-        course: find_system_testSimpleQueryCourse_by_id(id: "Math") {
+        course: findSystemTestSimpleQueryCourseById(id: "Math") {
            courseNo, courseName
         }
       }
@@ -90,14 +90,14 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     // 创建查询
     String query = """
       mutation {
-        class: create_system_testMutationClasses(data:{className: "测试班级", classCode: "TestC"}) {
+        class: createSystemTestMutationClasses(data:{className: "测试班级", classCode: "TestC"}) {
           classCode
         }
-        course: create_system_testMutationCourse(data: {courseName: "测试课程", courseNo: "Test_CC"}) {
+        course: createSystemTestMutationCourse(data: {courseName: "测试课程", courseNo: "Test_CC"}) {
             courseName
             courseNo
         }
-        student: create_system_testMutationStudent(data: {studentName: "张三丰", gender: "男", age: 200, classId: 1, remark: {test:"aa"}}) {
+        student: createSystemTestMutationStudent(data: {studentName: "张三丰", gender: "男", age: 200, classId: 1, remark: {test:"aa"}}) {
             id
             remark
         }
@@ -111,10 +111,10 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     Assertions.assertNotNull(data.get("student"));
     String query2 = """
       mutation MyMutation($studentId: ID!, $courseNo: ID!) {
-        class: delete_system_testMutationCourse_by_id(id: $courseNo) {
+        class: deleteSystemTestMutationCourseById(id: $courseNo) {
           courseNo
         }
-        student: update_system_testMutationStudent_by_id(_set: {age: 199, remark: {test: "bb"}}, id: $studentId) {
+        student: updateSystemTestMutationStudentById(_set: {age: 199, remark: {test: "bb"}}, id: $studentId) {
           id
         }
       }

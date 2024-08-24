@@ -54,16 +54,19 @@ public class GraphQLProvider {
     for (String schemaName : sf.getSchemaNames()) {
       List<Model> models = sf.getModels(schemaName);
       for (Model model : models) {
-        String key = schemaName + "_" + model.getName();
-        queryDataFetchers.put("find_" + key, new FlexmodelFindDataFetcher(schemaName, model.getName(), sf));
-        queryDataFetchers.put("aggregate_" + key, new FlexmodelAggregateDataFetcher(schemaName, model.getName(), sf));
-        queryDataFetchers.put("delete_" + key, new FlexmodelMutationDeleteDataFetcher(schemaName, model.getName(), sf));
-        queryDataFetchers.put("create_" + key, new FlexmodelMutationCreateDataFetcher(schemaName, model.getName(), sf));
-        queryDataFetchers.put("update_" + key, new FlexmodelMutationUpdateDataFetcher(schemaName, model.getName(), sf));
         if (model instanceof Entity entity) {
-          queryDataFetchers.put("find_" + key + "_by_id", new FlexmodelFindByIdDataFetcher(schemaName, model.getName(), sf));
-          queryDataFetchers.put("delete_" + key + "_by_id", new FlexmodelMutationDeleteByIdDataFetcher(schemaName, model.getName(), sf));
-          queryDataFetchers.put("update_" + key + "_by_id", new FlexmodelMutationUpdateByIdDataFetcher(schemaName, model.getName(), sf));
+          for (DataFetchers fetchType : DataFetchers.values()) {
+            if(fetchType.isQuery()) {
+              queryDataFetchers.put(
+                fetchType.getKeyFunc().apply(schemaName, model.getName()),
+                fetchType.getDataFetcherFunc().apply(schemaName, model.getName(), sf));
+            }
+            if(fetchType.isMutation()) {
+              mutationDataFetchers.put(
+                fetchType.getKeyFunc().apply(schemaName, model.getName()),
+                fetchType.getDataFetcherFunc().apply(schemaName, model.getName(), sf));
+            }
+          }
         }
       }
     }

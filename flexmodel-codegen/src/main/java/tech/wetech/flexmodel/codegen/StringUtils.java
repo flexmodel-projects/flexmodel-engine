@@ -43,4 +43,32 @@ public class StringUtils {
       System.err.println("Error creating directories: " + e.getMessage());
     }
   }
+
+  /**
+   * 将下划线命名转换为驼峰命名
+   * @param s 下划线命名字符串
+   * @return 转换后的驼峰命名字符串
+   */
+  public static String snakeToCamel(String s) {
+    if (s == null || !s.contains("_")){
+      return s;
+    }
+    StringBuffer sb = new StringBuffer();
+    //用来判断大写的标志
+    boolean nextUpperCase = false;
+    for (int i = 0; i < s.length(); i++) {
+      if ("_".equals(String.valueOf(s.charAt(i)))) {
+        nextUpperCase = true;
+      } else {
+        if (nextUpperCase) {
+          sb = sb.append(String.valueOf(s.charAt(i)).toUpperCase());
+          nextUpperCase = false;
+        }else {
+          sb = sb.append(s.charAt(i));
+        }
+      }
+    }
+    return sb.toString();
+  }
+
 }

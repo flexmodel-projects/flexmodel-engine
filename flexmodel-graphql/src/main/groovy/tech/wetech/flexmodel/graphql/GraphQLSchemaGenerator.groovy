@@ -64,7 +64,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     context.modelListClass.modelList.each {
       def key = "${it.schemaName}_${it.modelName}"
       out.println ""
-      out.println "  find_${key}("
+      out.println "  ${DataFetchers.FIND.keyFunc.apply(it.schemaName, it.modelName)}("
       out.println "    \"filter the rows returned\""
       out.println "    where: ${key}_bool_exp"
       out.println "    \"sort the rows by one or more columns\""
@@ -76,7 +76,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "    distinct_on: [${key}_select_column!]"
       out.println "  ): [${key}!]!"
       out.println ""
-      out.println "  aggregate_${key}("
+      out.println "  ${DataFetchers.AGGREGATE.keyFunc.apply(it.schemaName, it.modelName)}("
       out.println "    \"filter the rows returned\""
       out.println "    where: ${key}_bool_exp"
       out.println "    \"sort the rows by one or more columns\""
@@ -89,7 +89,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "  ): ${key}_aggregate!"
       if (it.idField) {
         out.println ""
-        out.println "  find_${key}_by_id("
+        out.println "  ${DataFetchers.FIND_BY_ID.keyFunc.apply(it.schemaName, it.modelName)}("
         out.println "    id: ID!"
         out.println "  ): ${key}"
       }
@@ -101,27 +101,27 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       def key = "${it.schemaName}_${it.modelName}"
       out.println ""
       out.println "  \"delete data from the table: ${key}\""
-      out.println "  delete_${key}("
+      out.println "  ${DataFetchers.MUTATION_DELETE.keyFunc.apply(it.schemaName, it.modelName)}("
       out.println "    \"filter the rows which have to be deleted\""
       out.println "    where: ${key}_bool_exp!"
       out.println "  ): mutation_response"
       if (it.idField) {
         out.println ""
-        out.println "  delete_${key}_by_id("
+        out.println "  ${DataFetchers.MUTATION_DELETE_BY_ID.keyFunc.apply(it.schemaName, it.modelName)}("
         out.println "    id: ID!"
         out.println "  ): ${key}"
         out.println ""
-        out.println "  update_${key}_by_id("
+        out.println "  ${DataFetchers.MUTATION_UPDATE_BY_ID.keyFunc.apply(it.schemaName, it.modelName)}("
         out.println "   _set: ${key}_set_input"
         out.println "   id: ID!"
         out.println "  ): ${key}"
       }
       out.println ""
-      out.println "  create_${key}("
+      out.println "  ${DataFetchers.MUTATION_CREATE.keyFunc.apply(it.schemaName, it.modelName)}("
       out.println "    data: ${key}_insert_input"
       out.println "  ): ${key}"
       out.println ""
-      out.println "  update_${key}("
+      out.println "  ${DataFetchers.MUTATION_UPDATE.keyFunc.apply(it.schemaName, it.modelName)}("
       out.println "    _set: ${key}_set_input"
       out.println "    where: ${key}_bool_exp!"
       out.println "  ): mutation_response"
@@ -177,8 +177,10 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "}"
       out.println ""
       out.println "input ${key}_insert_input {"
-      it.allFields.find {!it.isRelationField()}.each {
-        out.println "  ${it.fieldName}: ${toGraphQLType(it)}"
+      it.allFields.each {
+        if (!it.isRelationField()) {
+          out.println "  ${it.fieldName}: ${toGraphQLType(it)}"
+        }
       }
       out.println "}"
       out.println ""
