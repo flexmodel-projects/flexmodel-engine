@@ -381,22 +381,14 @@ public class NamedParameterSqlExecutor implements SqlExecutor {
   }
 
   private boolean isEmpty(Object object) {
-    if (object == null) {
-      return true;
-    }
-    if (object instanceof String) {
-      return ((String) object).isEmpty();
-    }
-    if (object instanceof Collection) {
-      return ((Collection<?>) object).isEmpty();
-    }
-    if (object instanceof Map) {
-      return ((Map<?, ?>) object).isEmpty();
-    }
-    if (object instanceof Object[]) {
-      return ((Object[]) object).length == 0;
-    }
-    return false;
+    return switch (object) {
+      case null -> true;
+      case String s -> s.isEmpty();
+      case Collection<?> collection -> collection.isEmpty();
+      case Map<?, ?> map -> map.isEmpty();
+      case Object[] objects -> objects.length == 0;
+      default -> false;
+    };
   }
 
 }
