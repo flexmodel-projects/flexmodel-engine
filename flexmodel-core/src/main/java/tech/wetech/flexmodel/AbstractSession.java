@@ -164,9 +164,9 @@ public abstract class AbstractSession implements Session {
     return factory;
   }
 
-    @Override
-    public String getName() {
-        return schemaName;
-    }
+  @Override
+  public String getName() {
+    return schemaName;
+  }
 
 }

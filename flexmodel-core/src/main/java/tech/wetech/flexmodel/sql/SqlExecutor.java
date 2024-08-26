@@ -43,6 +43,8 @@ public interface SqlExecutor {
 
   int update(String sql, Map<String, Object> paramMap);
 
+  int batchUpdate(String sql, List<Map<String, Object>> params);
+
   int updateAndReturnGeneratedKeys(String sql, String[] generatedKeyColumns, Consumer<List<?>> keyConsumer);
 
   int updateAndReturnFirstGeneratedKeys(String sql, Map<String, Object> paramMap, Consumer<Long> keyConsumer);

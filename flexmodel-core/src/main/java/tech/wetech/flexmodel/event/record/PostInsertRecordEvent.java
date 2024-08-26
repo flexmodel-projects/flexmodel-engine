@@ -15,7 +15,7 @@ public class PostInsertRecordEvent extends AbstractRecordEvent {
   public PostInsertRecordEvent() {
   }
 
-  public PostInsertRecordEvent(String modelName, String schemaName, Map<String, Object> record, Object id, int affectedRows) {
+  public PostInsertRecordEvent(String schemaName, String modelName, Map<String, Object> record, Object id, int affectedRows) {
     this.modelName = modelName;
     this.schemaName = schemaName;
     this.record = record;

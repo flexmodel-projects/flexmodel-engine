@@ -33,46 +33,60 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
     Object id = atomicId.get();
     idConsumer.accept(id);
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
+    insertRelationRecord(modelName, record, id);
+    return rows;
+  }
+
+  @SuppressWarnings({"rawtypes","unchecked"})
+  private void insertRelationRecord(String modelName, Map<String, Object> record, Object id) {
+    String schemaName = sessionContext.getSchemaName();
+    MappedModels mappedModels = sessionContext.getMappedModels();
+    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     record.forEach((key, value) -> {
       if (value != null) {
         if (entity.getField(key) instanceof RelationField relationField) {
           Entity targetEntity = (Entity) mappedModels.getModel(schemaName, relationField.getTargetEntity());
-          if (relationField.getCardinality() == ONE_TO_ONE && value instanceof Map data) {
-            Map<String, Object> associationRecord = new HashMap<>(data);
-            associationRecord.put(relationField.getTargetField(), id);
-            insert(relationField.getTargetEntity(), associationRecord);
-          } else if (relationField.getCardinality() == ONE_TO_MANY && value instanceof Collection<?> collection) {
-            for (Object obj : collection) {
-              if (obj instanceof Map data) {
-                Map<String, Object> associationRecord = new HashMap<>(data);
-                associationRecord.put(relationField.getTargetField(), id);
-                insert(relationField.getTargetEntity(), associationRecord);
+          switch (value) {
+            case Map data when relationField.getCardinality() == ONE_TO_ONE -> {
+              Map<String, Object> associationRecord = new HashMap<>(data);
+              associationRecord.put(relationField.getTargetField(), id);
+              insert(relationField.getTargetEntity(), associationRecord);
+            }
+            case Collection<?> collection when relationField.getCardinality() == ONE_TO_MANY -> {
+              for (Object obj : collection) {
+                if (obj instanceof Map data) {
+                  Map<String, Object> associationRecord = new HashMap<>(data);
+                  associationRecord.put(relationField.getTargetField(), id);
+                  insert(relationField.getTargetEntity(), associationRecord);
+                }
               }
             }
-          } else if (relationField.getCardinality() == MANY_TO_MANY && value instanceof Collection<?> collection) {
-            for (Object obj : collection) {
-              if (obj instanceof Map data) {
-                Map<String, Object> associationRecord = new HashMap<>(data);
-                AtomicReference<Object> inveseAtomicId = new AtomicReference<>();
-                try {
-                  insert(relationField.getTargetEntity(), associationRecord, inveseAtomicId::set);
-                } catch (Exception e) {
-                  if (data.containsKey(targetEntity.findIdField().map(IDField::getName).orElseThrow())) {
-                    inveseAtomicId.set(data.get(targetEntity.findIdField().map(IDField::getName).orElseThrow()));
+            case Collection<?> collection when relationField.getCardinality() == MANY_TO_MANY -> {
+              for (Object obj : collection) {
+                if (obj instanceof Map data) {
+                  Map<String, Object> associationRecord = new HashMap<>(data);
+                  AtomicReference<Object> inverseAtomicId = new AtomicReference<>();
+                  try {
+                    insert(relationField.getTargetEntity(), associationRecord, inverseAtomicId::set);
+                  } catch (Exception e) {
+                    if (data.containsKey(targetEntity.findIdField().map(IDField::getName).orElseThrow())) {
+                      inverseAtomicId.set(data.get(targetEntity.findIdField().map(IDField::getName).orElseThrow()));
+                    }
                   }
+                  JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, relationField);
+                  associate(joinGraphNode, Map.of(
+                    joinGraphNode.getJoinFieldName(), id,
+                    joinGraphNode.getInverseJoinFieldName(), inverseAtomicId.get()
+                  ));
                 }
-                JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, relationField);
-                associate(joinGraphNode, Map.of(
-                  joinGraphNode.getJoinFieldName(), atomicId.get(),
-                  joinGraphNode.getInverseJoinFieldName(), inveseAtomicId.get()
-                ));
               }
+            }
+            default -> {
             }
           }
         }
       }
     });
-    return rows;
   }
 
 

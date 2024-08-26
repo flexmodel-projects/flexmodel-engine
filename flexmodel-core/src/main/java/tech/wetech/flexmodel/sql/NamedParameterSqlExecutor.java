@@ -227,6 +227,30 @@ public class NamedParameterSqlExecutor implements SqlExecutor {
   }
 
   @Override
+  public int batchUpdate(String sql, List<Map<String, Object>> params) {
+    return metrics(() -> {
+      NamedParamStatement stmt = null;
+      try {
+        stmt = new NamedParamStatement(connection, sql);
+        for (Map<String, Object> paramMap : params) {
+          setParameters(stmt, paramMap);
+          stmt.addBatch();
+        }
+        int[] batchRows = stmt.executeBatch();
+        int rows = 0;
+        for (int i : batchRows) {
+          rows += i;
+        }
+        return rows;
+      } catch (SQLException e) {
+        throw new SqlExecutionException("Could not execute JDBC Statement: " + sql + ", Reason: " + e.getMessage(), e);
+      } finally {
+        closeStatement(stmt);
+      }
+    }, sql, params);
+  }
+
+  @Override
   public int updateAndReturnGeneratedKeys(String sql, String[] generatedKeyColumns, Consumer<List<?>> keys) {
     return updateAndReturnGeneratedKeys(sql, Collections.emptyMap(), generatedKeyColumns, keys);
   }
@@ -311,44 +335,68 @@ public class NamedParameterSqlExecutor implements SqlExecutor {
     }
   }
 
-  public <T> T metrics(Supplier<T> supplier, String sql, Map<String, Object> namedParams, Object... params) {
+  public <T> T metrics(Supplier<T> supplier, String sql, Object params) {
     if (!log.isDebugEnabled()) {
       return supplier.get();
     }
     log.debug(" ==> Executing SQL      : {} ", sql);
-    log.debug(" ==> SQL Parameters     : {}", namedParams != null ? formatValueLog(namedParams) : params);
+    if (!isEmpty(params)) {
+      log.debug(" ==> SQL Parameters     : {}", formatValueLog(params));
+    }
     long startTime = System.currentTimeMillis();
     T t = supplier.get();
-
-    if (t instanceof Collection<?> collection) {
-      log.debug(" ==> SQL result         :");
-      for (Object o : collection) {
-        if (o instanceof Map<?, ?> map) {
-          log.debug(" ==> {}", formatValueLog(map));
-        } else {
-          log.debug(" ==> {}", o);
-        }
-      }
-    } else {
-      log.debug(" ==> SQL result         : {}", t);
+    if (!isEmpty(t)) {
+      log.debug(" ==> SQL Result         :");
+      log.debug(" ==> {}", formatValueLog(t));
     }
     log.debug(" ==> SQL Execution time : {} ms", System.currentTimeMillis() - startTime);
     return t;
   }
 
-  private String formatValueLog(Map<?, ?> map) {
+  private String formatValueLog(Object params) {
     StringBuilder sb = new StringBuilder();
-    map.forEach((key, value) -> {
-      sb.append(key).append("=").append(value);
-      if (value != null) {
-        sb.append("(").append(value.getClass().getSimpleName()).append(")");
+    if (params instanceof Map<?, ?> map) {
+      map.forEach((key, value) -> {
+        sb.append(key).append("=").append(value);
+        if (value != null) {
+          sb.append("(").append(value.getClass().getSimpleName()).append(")");
+        }
+        sb.append(", ");
+      });
+      if (!map.isEmpty()) {
+        sb.deleteCharAt(sb.length() - 2);
       }
-      sb.append(", ");
-    });
-    if (!map.isEmpty()) {
-      sb.deleteCharAt(sb.length() - 2);
+      return sb.toString();
+    } else if (params instanceof Collection<?> collection) {
+      StringJoiner joiner = new StringJoiner(",\n");
+      for (Object o : collection) {
+        String string = o.toString();
+        joiner.add(string);
+      }
+      sb.append(joiner);
+    } else {
+      sb.append(params);
     }
     return sb.toString();
+  }
+
+  private boolean isEmpty(Object object) {
+    if (object == null) {
+      return true;
+    }
+    if (object instanceof String) {
+      return ((String) object).isEmpty();
+    }
+    if (object instanceof Collection) {
+      return ((Collection<?>) object).isEmpty();
+    }
+    if (object instanceof Map) {
+      return ((Map<?, ?>) object).isEmpty();
+    }
+    if (object instanceof Object[]) {
+      return ((Object[]) object).length == 0;
+    }
+    return false;
   }
 
 }

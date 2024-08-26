@@ -38,6 +38,14 @@ public class NamedParamStatement implements AutoCloseable {
     this(conn, statementWithNames, new String[]{});
   }
 
+  public void addBatch() throws SQLException {
+    prepStmt.addBatch();
+  }
+
+  public int[] executeBatch() throws SQLException {
+    return prepStmt.executeBatch();
+  }
+
   public void setParameters(Map<String, Object> paramMap) throws SQLException {
     for (Map.Entry<String, Object> entry : paramMap.entrySet()) {
       String key = entry.getKey();
@@ -85,7 +93,7 @@ public class NamedParamStatement implements AutoCloseable {
   }
 
   public ParsedSql parseSqlStatement(String sql) {
-      sql += ' ';
+    sql += ' ';
     ParsedSql parsedSql = new ParsedSql(sql);
     char[] statement = sql.toCharArray();
     int i = 0;

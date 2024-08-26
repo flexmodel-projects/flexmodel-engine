@@ -33,7 +33,7 @@ public class AbstractDataOperationsDecorator implements DataOperations {
     int rows = delegate.insert(modelName, record, atomicId::set);
     Object id = atomicId.get();
     idConsumer.accept(id);
-    sessionContext.publishEvent(new PostInsertRecordEvent(sessionContext.getSchemaName(), modelName, record, id, rows));
+    sessionContext.publishEvent(new PostInsertRecordEvent(modelName, sessionContext.getSchemaName(), record, id, rows));
     return rows;
   }
 
