@@ -29,7 +29,6 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
     Integer offset = env.getArgument("offset");
     Integer limit = env.getArgument("limit");
     Map<String, String> orderBy = env.getArgument("order_by");
-    List<String> distinctOn = env.getArgument("distinct_on");
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     try (Session session = sessionFactory.createSession(schemaName)) {
       Entity entity = (Entity) session.getModel(modelName);
@@ -63,9 +62,6 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
                 return sort;
               }
             );
-          }
-          if (distinctOn != null) {
-            distinctOn.forEach(query::distinctOn);
           }
           return query;
         }

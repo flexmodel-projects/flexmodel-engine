@@ -83,21 +83,6 @@ public class Query implements Serializable {
     }
   }
 
-  public static class DistinctOn implements Serializable {
-
-    private final Set<String> fields = new HashSet<>();
-
-    public DistinctOn addField(String field) {
-      fields.add(field);
-      return this;
-    }
-
-    public Set<String> getFields() {
-      return fields;
-    }
-
-  }
-
   public Query setProjection(UnaryOperator<Projection> projectUnaryOperator) {
     Projection projection = new Projection();
     projectUnaryOperator.apply(projection);

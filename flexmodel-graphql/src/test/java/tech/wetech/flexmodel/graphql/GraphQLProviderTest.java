@@ -46,7 +46,6 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
           limit: 3
           offset: 0
           order_by: {classId: asc, id: desc}
-          distinct_on: age
         ) {
           id, studentName
         }
