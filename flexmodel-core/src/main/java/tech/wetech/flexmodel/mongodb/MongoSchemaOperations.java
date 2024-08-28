@@ -17,16 +17,15 @@ import static tech.wetech.flexmodel.RelationField.Cardinality.ONE_TO_ONE;
 /**
  * @author cjbi
  */
-public class MongoSchemaOperations implements SchemaOperations {
+public class MongoSchemaOperations extends BaseMongoStatement implements SchemaOperations {
 
-  private final MongoContext mongoContext;
   private final String schemaName;
   private final MongoDatabase mongoDatabase;
   private final MappedModels mappedModels;
   private final PhysicalNamingStrategy physicalNamingStrategy;
 
   public MongoSchemaOperations(MongoContext mongoContext) {
-    this.mongoContext = mongoContext;
+    super(mongoContext);
     this.schemaName = mongoContext.getSchemaName();
     this.mongoDatabase = mongoContext.getMongoDatabase();
     this.mappedModels = mongoContext.getMappedModels();
@@ -61,7 +60,7 @@ public class MongoSchemaOperations implements SchemaOperations {
     for (Index index : entity.getIndexes()) {
       createIndex(index);
     }
-    entity.findIdField().ifPresent(idField ->{
+    entity.findIdField().ifPresent(idField -> {
       Index index = new Index(idField.getModelName());
       index.setUnique(true);
       index.addField(idField.getName());
@@ -72,7 +71,7 @@ public class MongoSchemaOperations implements SchemaOperations {
 
   @Override
   public View createView(String viewName, String viewOn, Query query) {
-    mongoDatabase.createView(viewName, viewOn, MongoHelper.createPipeline(viewOn, mongoContext, query));
+    mongoDatabase.createView(viewName, viewOn, createPipeline(viewOn, query));
     View view = new View(viewName);
     view.setViewOn(viewOn);
     view.setQuery(query);

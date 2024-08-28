@@ -14,14 +14,12 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static tech.wetech.flexmodel.IDField.GeneratedValue.AUTO_INCREMENT;
-import static tech.wetech.flexmodel.mongodb.MongoHelper.getMongoCondition;
 
 /**
  * @author cjbi
  */
-public class MongoDataOperations implements DataOperations {
+public class MongoDataOperations extends BaseMongoStatement implements DataOperations {
 
-  private final MongoContext mongoContext;
   private final String schemaName;
   private final MappedModels mappedModels;
   private final MongoDatabase mongoDatabase;
@@ -29,7 +27,7 @@ public class MongoDataOperations implements DataOperations {
   private final SchemaOperations schemaOperations;
 
   public MongoDataOperations(MongoContext mongoContext) {
-    this.mongoContext = mongoContext;
+    super(mongoContext);
     this.schemaName = mongoContext.getSchemaName();
     this.mongoDatabase = mongoContext.getMongoDatabase();
     this.physicalNamingStrategy = mongoContext.getPhysicalNamingStrategy();
@@ -85,7 +83,7 @@ public class MongoDataOperations implements DataOperations {
   @Override
   public int update(String modelName, Map<String, Object> record, String filter) {
     String collectionName = getCollectionName(modelName);
-    String mongoCondition = MongoHelper.getMongoCondition(mongoContext, filter);
+    String mongoCondition = getMongoCondition(filter);
     Document mongoFilter = Document.parse(mongoCondition);
     UpdateResult result = mongoDatabase.getCollection(collectionName).updateMany(mongoFilter, new Document("$set", new Document(record)));
     return (int) result.getModifiedCount();
@@ -103,7 +101,7 @@ public class MongoDataOperations implements DataOperations {
   @Override
   public int delete(String modelName, String filter) {
     String collectionName = getCollectionName(modelName);
-    String mongoCondition = getMongoCondition(mongoContext, filter);
+    String mongoCondition = getMongoCondition(filter);
     return (int) mongoDatabase.getCollection(collectionName)
       .deleteMany(Document.parse(mongoCondition)).getDeletedCount();
   }
@@ -142,7 +140,7 @@ public class MongoDataOperations implements DataOperations {
 
   @SuppressWarnings({"rawtypes"})
   private List<Map<String, Object>> findMapList(String modelName, Query query) {
-    List<Document> pipeline = MongoHelper.createPipeline(modelName, mongoContext, query);
+    List<Document> pipeline = createPipeline(modelName, query);
 
     String collectionName = getCollectionName(modelName);
     List list = mongoDatabase.getCollection(collectionName, Map.class)
@@ -154,7 +152,7 @@ public class MongoDataOperations implements DataOperations {
   @Override
   public long count(String modelName, Query query) {
     String collectionName = getCollectionName(modelName);
-    List<Document> pipeline = MongoHelper.createPipeline(modelName, mongoContext, query);
+    List<Document> pipeline = createPipeline(modelName, query);
     ArrayList<Document> count = new ArrayList<>(pipeline);
     count.add(new Document("$count", "total"));
     Number total = mongoDatabase.getCollection(collectionName)

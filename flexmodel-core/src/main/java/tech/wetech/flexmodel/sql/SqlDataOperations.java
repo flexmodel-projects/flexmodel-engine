@@ -14,9 +14,8 @@ import java.util.stream.Collectors;
 /**
  * @author cjbi
  */
-public class SqlDataOperations implements DataOperations {
+public class SqlDataOperations extends BaseSqlStatement implements DataOperations {
 
-  private final SqlContext sqlContext;
   private final String schemaName;
   private final SqlExecutor sqlExecutor;
   private final MappedModels mappedModels;
@@ -26,7 +25,7 @@ public class SqlDataOperations implements DataOperations {
   private final Map<String, SqlTypeHandler<?>> typeHandlerMap;
 
   public SqlDataOperations(SqlContext sqlContext) {
-    this.sqlContext = sqlContext;
+    super(sqlContext);
     this.schemaName = sqlContext.getSchemaName();
     this.sqlExecutor = sqlContext.getJdbcOperations();
     this.mappedModels = sqlContext.getMappedModels();
@@ -155,8 +154,8 @@ public class SqlDataOperations implements DataOperations {
   @Override
   @SuppressWarnings("all")
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
-    Map.Entry<String, Map<String, Object>> entry = SqlHelper.toQuerySqlWithPrepared(sqlContext, modelName, query);
-    List mapList = sqlExecutor.queryForList(entry.getKey(), entry.getValue(), getSqlResultHandler(sqlContext.getModel(modelName), query, Map.class));
+    Pair<String, Map<String, Object>> pair = toQuerySqlWithPrepared(modelName, query);
+    List mapList = sqlExecutor.queryForList(pair.first(), pair.second(), getSqlResultHandler(sqlContext.getModel(modelName), query, Map.class));
     if (query.isDeep()) {
       QueryHelper.deepQuery(mapList, this::findMapList, sqlContext.getModel(modelName), query, sqlContext, sqlContext.getDeepQueryMaxDepth());
     }
@@ -165,16 +164,16 @@ public class SqlDataOperations implements DataOperations {
 
   @SuppressWarnings("all")
   private List<Map<String, Object>> findMapList(String modelName, Query query) {
-    Map.Entry<String, Map<String, Object>> entry = SqlHelper.toQuerySqlWithPrepared(sqlContext, modelName, query);
-    List list = sqlExecutor.queryForList(entry.getKey(), entry.getValue(), getSqlResultHandler(sqlContext.getModel(modelName), query, Map.class));
+    Pair<String, Map<String, Object>> pair = toQuerySqlWithPrepared(modelName, query);
+    List list = sqlExecutor.queryForList(pair.first(), pair.second(), getSqlResultHandler(sqlContext.getModel(modelName), query, Map.class));
     return list;
   }
 
   @Override
   public long count(String modelName, Query query) {
-    Map.Entry<String, Map<String, Object>> entry = SqlHelper.toQuerySqlWithPrepared(sqlContext, modelName, query);
-    String sql = "select count(*) from(" + entry.getKey() + ") tmp_count";
-    return sqlExecutor.queryForScalar(sql, entry.getValue(), Long.class);
+    Pair<String, Map<String, Object>> pair = toQuerySqlWithPrepared(modelName, query);
+    String sql = "select count(*) from(" + pair.first() + ") tmp_count";
+    return sqlExecutor.queryForScalar(sql, pair.second(), Long.class);
   }
 
   @Override

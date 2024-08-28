@@ -728,12 +728,10 @@ public abstract class AbstractSessionTests {
     String entityName = "testDistinctOn_teacher";
     createTeacherEntity2(entityName);
     List<Map<String, Object>> list = session.find(entityName, query ->
-      query
-        .setDistinctOn(distinctOn -> distinctOn.addField("id").addField("name"))
-        .setProjection(project -> project
-          .addField("teacher_id", field("id"))
-          .addField("teacher_name", field("name"))
-        ));
+      query.setProjection(project -> project
+        .addField("teacher_id", field("id"))
+        .addField("teacher_name", field("name"))
+      ).distinctOn("id", "name"));
     Assertions.assertFalse(list.isEmpty());
   }
 

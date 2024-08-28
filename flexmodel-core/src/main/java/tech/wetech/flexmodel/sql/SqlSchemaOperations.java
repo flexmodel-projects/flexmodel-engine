@@ -14,14 +14,12 @@ import static tech.wetech.flexmodel.RelationField.Cardinality.ONE_TO_ONE;
 /**
  * @author cjbi
  */
-public class SqlSchemaOperations implements SchemaOperations {
-
-  private final SqlContext sqlContext;
+public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOperations {
 
   private final Logger log = LoggerFactory.getLogger(SqlSchemaOperations.class);
 
   public SqlSchemaOperations(SqlContext sqlContext) {
-    this.sqlContext = sqlContext;
+    super(sqlContext);
   }
 
   @Override
@@ -332,7 +330,7 @@ public class SqlSchemaOperations implements SchemaOperations {
         .map(Field::getName)
         .toList()
     );
-    sqlView.setQuery(SqlHelper.toQuerySql(sqlContext, view.getViewOn(), query));
+    sqlView.setQuery(buildQuerySql(view.getViewOn(), query));
     return sqlView;
   }
 

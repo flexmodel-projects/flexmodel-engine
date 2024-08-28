@@ -19,7 +19,7 @@ public class Query implements Serializable {
   private Sort sort;
   private Integer limit;
   private Integer offset;
-  private DistinctOn distinctOn;
+  private final List<String> distinctOn = new ArrayList<>();
   private boolean deep;
 
   public interface QueryCall extends Serializable {
@@ -176,13 +176,12 @@ public class Query implements Serializable {
     return this;
   }
 
-  public DistinctOn getDistinctOn() {
+  public List<String> getDistinctOn() {
     return distinctOn;
   }
 
-  public Query setDistinctOn(UnaryOperator<DistinctOn> unaryOperator) {
-    this.distinctOn = new DistinctOn();
-    unaryOperator.apply(this.distinctOn);
+  public Query distinctOn(String... fields) {
+    Collections.addAll(distinctOn, fields);
     return this;
   }
 

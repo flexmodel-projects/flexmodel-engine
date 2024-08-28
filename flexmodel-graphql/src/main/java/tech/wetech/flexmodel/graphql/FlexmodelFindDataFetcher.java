@@ -65,10 +65,7 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
             );
           }
           if (distinctOn != null) {
-            query.setDistinctOn(d -> {
-              distinctOn.forEach(d::addField);
-              return d;
-            });
+            distinctOn.forEach(query::distinctOn);
           }
           return query;
         }
