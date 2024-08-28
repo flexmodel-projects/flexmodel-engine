@@ -222,13 +222,11 @@ abstract class BaseMongoStatement {
     Model model = mongoContext.getMappedModels().getModel(schemaName, modelName);
     PhysicalNamingStrategy physicalNamingStrategy = mongoContext.getPhysicalNamingStrategy();
     List<Document> pipeline = new ArrayList<>();
-
     addMatchStage(pipeline, query);
     addSortStage(pipeline, query);
     addPaginationStages(pipeline, query);
     addJoins(pipeline, model, physicalNamingStrategy, query);
     addProjectionStage(pipeline, model, query);
-
     return pipeline;
   }
 

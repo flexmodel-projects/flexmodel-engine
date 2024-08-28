@@ -19,7 +19,6 @@ public class Query implements Serializable {
   private Sort sort;
   private Integer limit;
   private Integer offset;
-  private final List<String> distinctOn = new ArrayList<>();
   private boolean deep;
 
   public interface QueryCall extends Serializable {
@@ -173,15 +172,6 @@ public class Query implements Serializable {
 
   public Query setOffset(Integer offset) {
     this.offset = offset;
-    return this;
-  }
-
-  public List<String> getDistinctOn() {
-    return distinctOn;
-  }
-
-  public Query distinctOn(String... fields) {
-    Collections.addAll(distinctOn, fields);
     return this;
   }
 

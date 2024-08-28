@@ -34,12 +34,12 @@ public abstract class BaseSqlStatement {
     Map<String, Object> params = new HashMap<>();
     Model model = sqlContext.getMappedModels().getModel(sqlContext.getSchemaName(), modelName);
     StringBuilder sqlBuilder = new StringBuilder("\nselect ");
-    Map<String, String> aliasColumnMap = new HashMap<>();
-    appendProjection(modelName, query, model, aliasColumnMap, sqlBuilder);
+    Map<String, String> projectionMap = new HashMap<>();
+    appendProjection(modelName, query, model, projectionMap, sqlBuilder);
     appendFromClause(modelName, sqlBuilder);
     appendJoins(modelName, query, model, sqlBuilder, params, prepared);
     appendWhereClause(query, sqlBuilder, params, prepared);
-    appendGroupByClause(query, aliasColumnMap, sqlBuilder);
+    appendGroupByClause(query, projectionMap, sqlBuilder);
     appendOrderByClause(query, sqlBuilder);
     appendLimitClause(query, sqlBuilder);
     return Pair.of(sqlBuilder.toString(), params);
@@ -66,13 +66,13 @@ public abstract class BaseSqlStatement {
     }
   }
 
-  private void appendGroupByClause(Query query, Map<String, String> aliasColumnMap, StringBuilder sqlBuilder) {
+  private void appendGroupByClause(Query query, Map<String, String> projectionMap, StringBuilder sqlBuilder) {
     if (query.getGroupBy() != null) {
       SqlDialect sqlDialect = sqlContext.getSqlDialect();
       sqlBuilder.append("\ngroup by ");
       StringJoiner groupByColumns = new StringJoiner(", ");
       for (Query.QueryField field : query.getGroupBy().getFields()) {
-        groupByColumns.add(sqlDialect.supportsGroupByColumnAlias() ? toFullColumnQuoteString(field.getModelName(), field.getFieldName()) : aliasColumnMap.getOrDefault(field.getFieldName(), toFullColumnQuoteString(field.getModelName(), field.getFieldName())));
+        groupByColumns.add(sqlDialect.supportsGroupByColumnAlias() ? toFullColumnQuoteString(field.getModelName(), field.getFieldName()) : projectionMap.getOrDefault(field.getFieldName(), toFullColumnQuoteString(field.getModelName(), field.getFieldName())));
       }
       sqlBuilder.append(groupByColumns);
     }
@@ -146,7 +146,7 @@ public abstract class BaseSqlStatement {
     sqlBuilder.append("\nfrom ").append(physicalFromTableName);
   }
 
-  private void appendProjection(String modelName, Query query, Model model, Map<String, String> aliasColumnMap, StringBuilder sqlBuilder) {
+  private void appendProjection(String modelName, Query query, Model model, Map<String, String> projectionMap, StringBuilder sqlBuilder) {
     SqlDialect sqlDialect = sqlContext.getSqlDialect();
     Query.Projection projection = query.getProjection();
     Map<String, RelationField> relationFields = QueryHelper.findRelationFields(model, query);
@@ -155,7 +155,7 @@ public abstract class BaseSqlStatement {
       projection.getFields().forEach((key, value) -> {
         if (!relationFields.containsKey(key)) {
           String sqlCall = toSqlCall(value);
-          aliasColumnMap.put(key, sqlCall);
+          projectionMap.put(key, sqlCall);
           columns.add("\n " + sqlCall + " " + sqlDialect.quoteIdentifier(key));
         }
       });
@@ -163,6 +163,7 @@ public abstract class BaseSqlStatement {
       model.getFields().forEach(field -> {
         if (!relationFields.containsKey(field.getName())) {
           columns.add("\n " + toFullColumnQuoteString(modelName, field.getName()) + " " + sqlDialect.quoteIdentifier(field.getName()));
+          projectionMap.put(field.getName(), field.getName());
         }
       });
     }

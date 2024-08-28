@@ -30,7 +30,7 @@ public class JoinGraphNode {
     this.joinFieldType = entity.findIdField().orElseThrow().getGeneratedValue().getType();
     this.inverseJoinFieldName = relationField.getTargetEntity() + "_" + relationField.getTargetField();
 
-    TypedField<?, ?> targetField = (TypedField<?, ?>) targetEntity.getField(relationField.getTargetField());
+    TypedField<?, ?> targetField = targetEntity.getField(relationField.getTargetField());
     this.inverseJoinFieldType = targetField instanceof IDField idField
       ? idField.getGeneratedValue().getType()
       : targetField.getType();
