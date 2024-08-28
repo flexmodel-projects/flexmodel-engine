@@ -20,9 +20,9 @@ abstract class BaseMongoStatement {
     this.mongoContext = mongoContext;
   }
 
-  private void addMatchStage(List<Document> pipeline, MongoContext mongoContext, Query query) {
+  private void addMatchStage(List<Document> pipeline, Query query) {
     if (query.getFilter() != null) {
-      String bsonCondition = getMongoCondition(mongoContext, query.getFilter());
+      String bsonCondition = getMongoCondition(query.getFilter());
       pipeline.add(Document.parse(String.format("{ $match: %s }", bsonCondition)));
     }
   }
@@ -89,7 +89,7 @@ abstract class BaseMongoStatement {
     }
 
     if (join.getFilter() != null) {
-      lookup.append("pipeline", List.of(Document.parse(String.format("{ $match: %s }", getMongoCondition(mongoContext, join.getFilter())))));
+      lookup.append("pipeline", List.of(Document.parse(String.format("{ $match: %s }", getMongoCondition(join.getFilter())))));
     }
     return lookup;
   }
@@ -216,15 +216,6 @@ abstract class BaseMongoStatement {
     return new Document(mongoOperator, "$" + fieldName);
   }
 
-  String getMongoCondition(MongoContext mongoContext, String condition) {
-    try {
-      ExpressionCalculator<String> expressionCalculator = mongoContext.getConditionCalculator();
-      return expressionCalculator.calculate(condition, null);
-    } catch (ExpressionCalculatorException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   protected List<Document> createPipeline(String modelName, Query query) {
     QueryHelper.validate(mongoContext, modelName, query);
     String schemaName = mongoContext.getSchemaName();
@@ -232,7 +223,7 @@ abstract class BaseMongoStatement {
     PhysicalNamingStrategy physicalNamingStrategy = mongoContext.getPhysicalNamingStrategy();
     List<Document> pipeline = new ArrayList<>();
 
-    addMatchStage(pipeline, mongoContext, query);
+    addMatchStage(pipeline, query);
     addSortStage(pipeline, query);
     addPaginationStages(pipeline, query);
     addJoins(pipeline, model, physicalNamingStrategy, query);
