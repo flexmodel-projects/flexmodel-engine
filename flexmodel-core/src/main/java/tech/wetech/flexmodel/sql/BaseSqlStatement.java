@@ -47,8 +47,12 @@ public abstract class BaseSqlStatement {
 
   private void appendLimitClause(Query query, StringBuilder sqlBuilder) {
     SqlDialect sqlDialect = sqlContext.getSqlDialect();
-    if (query.getLimit() != null) {
-      String limitString = sqlDialect.getLimitString(sqlBuilder.toString(), Objects.toString(query.getOffset(), null), query.getLimit().toString());
+    if (query.getPage() != null) {
+      String limitString = sqlDialect.getLimitString(
+        sqlBuilder.toString(),
+        Objects.toString(query.getPage().getOffset()),
+        Objects.toString(query.getPage().getPageSize())
+      );
       sqlBuilder.setLength(0);
       sqlBuilder.append(limitString);
     }

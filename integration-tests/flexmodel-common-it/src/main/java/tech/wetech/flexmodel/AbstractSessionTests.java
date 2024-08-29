@@ -525,8 +525,7 @@ public abstract class AbstractSessionTests {
         .addField("teacher_name")
       )
       .setSort(sort -> sort.addOrder(teacherEntityName + ".id", Direction.DESC))
-      .setLimit(100)
-      .setOffset(0)
+      .setPage(1,100)
     );
   }
 
@@ -1028,8 +1027,7 @@ public abstract class AbstractSessionTests {
         .setSort(sort -> sort
           .addOrder("id", DESC)
         )
-        .setLimit(100)
-        .setOffset(10)
+        .setPage(1,100)
     );
   }
 

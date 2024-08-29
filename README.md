@@ -269,8 +269,7 @@ session.createView("teacher_course_report", "teacher", query -> query
         .addField("teacher_name")
       )
       .setSort(sort -> sort.addOrder("id", Direction.DESC))
-      .setLimit(100)
-      .setOffset(0)
+      .setPage(1, 1000)
   );
 
 ```
@@ -387,8 +386,7 @@ List<Map<String, Object>> groupList = session.find(entityName, query -> query
   // 设置排序
   .setSort(sort -> sort.addOrder("id", Direction.DESC))
   // 设置分页查询
-  .setLimit(100)
-  .setOffset(0)
+  .setPage(1, 1000)
 );
 
 ```

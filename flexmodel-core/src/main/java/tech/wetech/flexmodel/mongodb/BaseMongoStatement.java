@@ -38,11 +38,9 @@ abstract class BaseMongoStatement {
   }
 
   private void addPaginationStages(List<Document> pipeline, Query query) {
-    if (query.getOffset() != null) {
-      pipeline.add(new Document("$skip", query.getOffset()));
-    }
-    if (query.getLimit() != null) {
-      pipeline.add(new Document("$limit", query.getLimit()));
+    if (query.getPage() != null) {
+      pipeline.add(new Document("$skip", query.getPage().getOffset()));
+      pipeline.add(new Document("$limit", query.getPage().getPageSize()));
     }
   }
 

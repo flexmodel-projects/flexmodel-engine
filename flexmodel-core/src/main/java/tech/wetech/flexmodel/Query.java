@@ -17,8 +17,7 @@ public class Query implements Serializable {
   private Joins joins;
   private GroupBy groupBy;
   private Sort sort;
-  private Integer limit;
-  private Integer offset;
+  private Page page;
   private boolean deep;
 
   public interface QueryCall extends Serializable {
@@ -46,6 +45,7 @@ public class Query implements Serializable {
   }
 
   public static class Joins implements Serializable {
+
     private final Map<String, Join> joinMap = new HashMap<>();
 
     public List<Join> getJoins() {
@@ -55,22 +55,21 @@ public class Query implements Serializable {
     public Joins addInnerJoin(UnaryOperator<Join> joinUnaryOperator) {
       Join join = new Join();
       join.setJoinType(Join.JoinType.INNER_JOIN);
-      joinUnaryOperator.apply(join);
-      this.joinMap.put(join.getFrom(), join);
+      this.joinMap.put(join.getFrom(), joinUnaryOperator.apply(join));
       return this;
     }
 
     public Joins addLeftJoin(UnaryOperator<Join> joinUnaryOperator) {
       Join join = new Join();
       join.setJoinType(Join.JoinType.LEFT_JOIN);
-      joinUnaryOperator.apply(join);
-      this.joinMap.put(join.getFrom(), join);
+      this.joinMap.put(join.getFrom(), joinUnaryOperator.apply(join));
       return this;
     }
 
   }
 
   public static class GroupBy implements Serializable {
+
     private final List<QueryField> fields = new ArrayList<>();
 
     public GroupBy addField(String field) {
@@ -92,8 +91,7 @@ public class Query implements Serializable {
 
   public Query setJoins(UnaryOperator<Joins> joinersUnaryOperator) {
     Joins joins = new Joins();
-    joinersUnaryOperator.apply(joins);
-    this.joins = joins;
+    this.joins = joinersUnaryOperator.apply(joins);
     return this;
   }
 
@@ -103,8 +101,7 @@ public class Query implements Serializable {
 
   public Query setGroupBy(UnaryOperator<GroupBy> groupByUnaryOperator) {
     GroupBy groupBy = new GroupBy();
-    groupByUnaryOperator.apply(groupBy);
-    this.groupBy = groupBy;
+    this.groupBy = groupByUnaryOperator.apply(groupBy);
     return this;
   }
 
@@ -136,28 +133,35 @@ public class Query implements Serializable {
     return sort;
   }
 
+  public Query setSort(Sort sort) {
+    this.sort = sort;
+    return this;
+  }
+
   public Query setSort(UnaryOperator<Sort> unaryOperator) {
-    this.sort = new Sort();
-    unaryOperator.apply(this.sort);
+    this.sort = unaryOperator.apply(new Sort());
     return this;
   }
 
-  public Integer getLimit() {
-    return limit;
-  }
-
-  public Query setLimit(Integer limit) {
-    this.limit = limit;
+  public Query setPage(Page page) {
+    this.page = page;
     return this;
   }
 
-  public Integer getOffset() {
-    return offset;
+  public Query setPage(int pageNumber, int pageSize) {
+    this.page = new Page();
+    page.setPageNumber(pageNumber);
+    page.setPageSize(pageSize);
+    return this;
   }
 
-  public Query setOffset(Integer offset) {
-    this.offset = offset;
+  public Query setPage(UnaryOperator<Page> unaryOperator) {
+    this.page = unaryOperator.apply(new Page());
     return this;
+  }
+
+  public Page getPage() {
+    return page;
   }
 
   public boolean isDeep() {
@@ -167,6 +171,38 @@ public class Query implements Serializable {
   public Query setDeep(boolean deep) {
     this.deep = deep;
     return this;
+  }
+
+  public static class Page implements Serializable {
+
+    public static final int DEFAULT_PAGE_NUMBER = 1;
+    public static final int DEFAULT_PAGE_SIZE = 20;
+
+    private int pageSize = DEFAULT_PAGE_SIZE;
+    private int pageNumber = DEFAULT_PAGE_NUMBER;
+
+    public int getPageSize() {
+      return pageSize;
+    }
+
+    public Page setPageSize(int pageSize) {
+      this.pageSize = pageSize;
+      return this;
+    }
+
+    public int getPageNumber() {
+      return pageNumber;
+    }
+
+    public Page setPageNumber(int pageNumber) {
+      this.pageNumber = pageNumber;
+      return this;
+    }
+
+    public int getOffset() {
+      return (pageNumber - 1) * pageSize;
+    }
+
   }
 
   public static class Join implements QueryCall {

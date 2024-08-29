@@ -26,8 +26,8 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
   }
 
   public List<Map<String, Object>> findRootData(DataFetchingEnvironment env) {
-    Integer offset = env.getArgument("offset");
-    Integer limit = env.getArgument("limit");
+    Integer pageNumber = env.getArgument("page_number");
+    Integer pageSize = env.getArgument("page_size");
     Map<String, String> orderBy = env.getArgument("order_by");
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     try (Session session = sessionFactory.createSession(schemaName)) {
@@ -50,15 +50,12 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
             }
             return projection;
           });
-          if (limit != null) {
-            query.setLimit(limit);
-            if (offset != null) {
-              query.setOffset(offset);
-            }
+          if (pageSize != null && pageNumber != null) {
+            query.setPage(pageNumber, pageSize);
           }
           if (orderBy != null) {
             query.setSort(sort -> {
-                orderBy.forEach((k, v) -> sort.addOrder(k, Direction.valueOf(v.toUpperCase())));
+                orderBy.forEach((k, v) -> sort.by(k, Direction.valueOf(v.toUpperCase())));
                 return sort;
               }
             );
