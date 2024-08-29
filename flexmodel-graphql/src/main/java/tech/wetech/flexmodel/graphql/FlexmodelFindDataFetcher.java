@@ -55,7 +55,7 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
           }
           if (orderBy != null) {
             query.setSort(sort -> {
-                orderBy.forEach((k, v) -> sort.by(k, Direction.valueOf(v.toUpperCase())));
+                orderBy.forEach((k, v) -> sort.addOrder(k, Direction.valueOf(v.toUpperCase())));
                 return sort;
               }
             );
