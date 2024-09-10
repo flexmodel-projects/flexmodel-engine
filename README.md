@@ -380,7 +380,8 @@ List<Map<String, Object>> groupList = session.find(entityName, query -> query
     .lessThan("age", 65)
     .lessThanOrEqualTo("lastLogin", "2023-01-01")
     .or(or -> or.notIn("role", List.of("banned")).in("status", List.of("active", "pending")))
-    .between("createdAt", "2022-01-01", "2022-12-31"))
+    .between("createdAt", "2022-01-01", "2022-12-31")
+  )
   // 设置去重的字段
   .setDistintOn("teacher_id", "teacher_name")
   // 设置排序

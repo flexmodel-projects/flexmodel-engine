@@ -10,8 +10,32 @@ import java.nio.file.Paths;
  */
 public class StringUtils {
 
+  public static boolean isEmpty(Object str) {
+    return str == null || "".equals(str);
+  }
+
+  public static boolean isBlank(String str) {
+    int strLen;
+    if (str != null && (strLen = str.length()) != 0) {
+      for (int i = 0; i < strLen; ++i) {
+        // 判断字符是否为空格、制表符、tab
+        if (!Character.isWhitespace(str.charAt(i))) {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      return true;
+    }
+  }
+
+  public static String sanitize(final String name) {
+    return name.replaceAll("^[0-9]", "_$0") // e.g. 12object => _12object
+      .replaceAll("[^A-Za-z0-9]", "_");
+  }
+
   public static String capitalize(final CharSequence self) {
-    if (self.length() == 0) return "";
+    if (self.isEmpty()) return "";
     return "" + Character.toUpperCase(self.charAt(0)) + self.subSequence(1, self.length());
   }
 
@@ -31,7 +55,7 @@ public class StringUtils {
    * @since 2.4.8
    */
   public static String uncapitalize(final CharSequence self) {
-    if (self.length() == 0) return "";
+    if (self.isEmpty()) return "";
     return "" + Character.toLowerCase(self.charAt(0)) + self.subSequence(1, self.length());
   }
 
@@ -53,7 +77,7 @@ public class StringUtils {
     if (s == null || !s.contains("_")){
       return s;
     }
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     //用来判断大写的标志
     boolean nextUpperCase = false;
     for (int i = 0; i < s.length(); i++) {
@@ -61,10 +85,10 @@ public class StringUtils {
         nextUpperCase = true;
       } else {
         if (nextUpperCase) {
-          sb = sb.append(String.valueOf(s.charAt(i)).toUpperCase());
+          sb.append(String.valueOf(s.charAt(i)).toUpperCase());
           nextUpperCase = false;
         }else {
-          sb = sb.append(s.charAt(i));
+          sb.append(s.charAt(i));
         }
       }
     }
