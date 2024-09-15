@@ -63,7 +63,11 @@ public class JacksonObjectConverter implements JsonObjectConverter {
   }
 
   @Override
+  @SuppressWarnings("all")
   public <T> T convertValue(Object fromValue, Class<T> cls) {
+    if (fromValue != null && cls.isAssignableFrom(fromValue.getClass())) {
+      return (T) fromValue;
+    }
     return jsonMapper.convertValue(fromValue, cls);
   }
 

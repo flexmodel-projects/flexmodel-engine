@@ -33,6 +33,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     "int"     : "Int_comparison_exp",
     "bigint"  : "Int_comparison_exp",
     "boolean" : "String_comparison_exp",
+    "date": "String_comparison_exp",
     "datetime": "String_comparison_exp",
     "json"    : "String_comparison_exp",
     "relation": "String_comparison_exp",

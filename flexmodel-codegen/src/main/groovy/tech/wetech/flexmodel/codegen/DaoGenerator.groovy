@@ -135,7 +135,7 @@ class DaoGenerator extends AbstractGenerator {
     out.println "   * @return The number of rows affected by the update operation."
     out.println "   */"
     out.println "  public <S extends ${modelClass.shortClassName}> S save(S record) {"
-    out.println "    if (record.get${modelClass.idField.fieldName.capitalize()}() != null && findById(record.getName()) != null) {"
+    out.println "    if (record.get${modelClass.idField.fieldName.capitalize()}() != null && findById(record.get${modelClass.idField.fieldName.capitalize()}()) != null) {"
     out.println "      updateById(record, record.get${modelClass.idField.fieldName.capitalize()}());"
     out.println "    } else {"
     out.println "      create(record, id -> record.set${modelClass.idField.fieldName.capitalize()}(id));"
