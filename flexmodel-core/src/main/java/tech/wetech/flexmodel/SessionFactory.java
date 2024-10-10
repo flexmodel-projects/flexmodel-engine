@@ -199,13 +199,13 @@ public class SessionFactory {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
           SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), mappedModels, jsonObjectConverter, this);
-          sqlContext.setFailFast(true);
+          sqlContext.setFailFast(false);
           yield new SqlSession(sqlContext);
         }
         case MongoDataSourceProvider mongodb -> {
           MongoDatabase mongoDatabase = mongodb.mongoDatabase();
           MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, mappedModels, jsonObjectConverter, this);
-          mongoContext.setFailFast(true);
+          mongoContext.setFailFast(false);
           yield new MongoSession(mongoContext);
         }
         case null,

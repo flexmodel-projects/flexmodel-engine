@@ -1,6 +1,5 @@
 package tech.wetech.flexmodel.supports.jackson;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -26,10 +25,10 @@ public class JacksonObjectConverter implements JsonObjectConverter {
 
   public JacksonObjectConverter() {
     JsonMapper.Builder builder = new JsonMapper().rebuild();
-    builder.serializationInclusion(JsonInclude.Include.NON_NULL);
+    //
 //        JSON.configure(SerializationFeature.INDENT_OUTPUT, false);
     //不显示为null的字段
-    builder.serializationInclusion(JsonInclude.Include.NON_NULL);
+//    builder.serializationInclusion(JsonInclude.Include.NON_NULL);
     builder.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     builder.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     builder.disable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);

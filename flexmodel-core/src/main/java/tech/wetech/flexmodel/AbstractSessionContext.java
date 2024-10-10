@@ -20,7 +20,7 @@ public abstract class AbstractSessionContext {
   protected final MappedModels mappedModels;
   protected final JsonObjectConverter jsonObjectConverter;
   protected PhysicalNamingStrategy physicalNamingStrategy = new DefaultPhysicalNamingStrategy();
-  protected boolean failFast = false;
+  protected boolean failFast = true;
   protected int deepQueryMaxDepth = 5;
   protected final SessionFactory factory;
 
