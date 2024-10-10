@@ -39,20 +39,20 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     // 创建查询
     String query = """
       query {
-        classes: systemTestSimpleQueryClassesList(offset: 0, limit:1) {
+        classes: system_testSimpleQueryClasses_list(page: 1, size:1) {
           id, students { name: studentName, courses { courseName } }
         }
-        students: systemTestSimpleQueryStudentList(
-          limit: 3
-          offset: 0
+        students: system_testSimpleQueryStudent_list(
+          size: 3
+          page: 1
           order_by: {classId: asc, id: desc}
         ) {
           id, studentName
         }
-        teachers: systemTestSimpleQueryTeacherList {
+        teachers: system_testSimpleQueryTeacher_list {
          id, teacherName
         }
-        course: systemTestSimpleQueryCourse {
+        course: system_testSimpleQueryCourse {
            courseNo, courseName
         }
       }
@@ -89,14 +89,14 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     // 创建查询
     String query = """
       mutation {
-        class: createSystemTestMutationClasses(data:{className: "测试班级", classCode: "TestC"}) {
+        class: create_system_testMutationClasses(data:{className: "测试班级", classCode: "TestC"}) {
           classCode
         }
-        course: createSystemTestMutationCourse(data: {courseName: "测试课程", courseNo: "Test_CC"}) {
+        course: create_system_testMutationCourse(data: {courseName: "测试课程", courseNo: "Test_CC"}) {
             courseName
             courseNo
         }
-        student: createSystemTestMutationStudent(data: {studentName: "张三丰", gender: "男", age: 200, classId: 1, remark: {test:"aa"}}) {
+        student: create_system_testMutationStudent(data: {studentName: "张三丰", gender: "男", age: 200, classId: 1, remark: {test:"aa"}}) {
             id
             remark
         }
@@ -110,10 +110,10 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     Assertions.assertNotNull(data.get("student"));
     String query2 = """
       mutation MyMutation($studentId: ID!, $courseNo: ID!) {
-        class: deleteSystemTestMutationCourseById(id: $courseNo) {
+        class: delete_system_testMutationCourse_by_id(id: $courseNo) {
           courseNo
         }
-        student: updateSystemTestMutationStudentById(_set: {age: 199, remark: {test: "bb"}}, id: $studentId) {
+        student: update_system_testMutationStudent_by_id(_set: {age: 199, remark: {test: "bb"}}, id: $studentId) {
           id
         }
       }
