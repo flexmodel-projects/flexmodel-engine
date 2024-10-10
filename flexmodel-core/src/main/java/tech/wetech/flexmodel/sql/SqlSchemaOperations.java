@@ -192,7 +192,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
     sqlContext.getJdbcOperations().update(sqlAlterModifyColumnString);
     SqlTable sqlTable = new SqlTable();
     sqlTable.setName(sqlColumn.getTableName());
-    if (sqlColumn.isUnique()) {
+    if (sqlColumn.isUnique() && !sqlColumn.isPrimaryKey()) {
       sqlTable.createUniqueKey(List.of(sqlColumn));
       createUniqueKeys(sqlTable);
     }

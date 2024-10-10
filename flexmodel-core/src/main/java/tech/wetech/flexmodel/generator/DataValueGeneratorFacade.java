@@ -39,6 +39,11 @@ public class DataValueGeneratorFacade {
       if (field instanceof RelationField) {
         continue;
       }
+      if (field.getGenerator() == null && field.getDefaultValue() != null) {
+        FixedValueGenerator fixedValueGenerator = new FixedValueGenerator<>(field.getDefaultValue());
+        fixedValueGenerator.setGenerationTime(GenerationTime.INSERT);
+        field.setGenerator(fixedValueGenerator);
+      }
       if (field.getGenerator() != null) {
         ValueGenerator generator = field.getGenerator();
         Runnable runnable = () -> newData.put(field.getName(), convertParameter(field, generator.generateValue(field, data)));

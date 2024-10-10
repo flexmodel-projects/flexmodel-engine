@@ -66,9 +66,6 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
 
   public SELF setDefaultValue(T defaultValue) {
     this.defaultValue = defaultValue;
-    if (defaultValue != null) {
-      this.generator = new FixedValueGenerator<>(defaultValue);
-    }
     return self();
   }
 

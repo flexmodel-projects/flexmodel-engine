@@ -61,7 +61,7 @@ public class StandardTableExporter implements Exporter<SqlTable> {
         }
       }
 
-      if (col.isUnique()) {
+      if (col.isUnique() && !col.isPrimaryKey()) {
         String keyName = SqlConstraint.generateName("UK_", sqlTable, col);
         SqlUniqueKey uk = sqlTable.getOrCreateUniqueKey(keyName);
         uk.addColumn(col);
