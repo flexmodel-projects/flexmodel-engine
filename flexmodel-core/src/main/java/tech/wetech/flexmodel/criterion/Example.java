@@ -107,6 +107,16 @@ public class Example {
       return this;
     }
 
+    public Criteria contains(String field, String value) {
+      addCriterion(field, value, "contains");
+      return this;
+    }
+
+    public Criteria notContains(String field, String value) {
+      addCriterion(field, value, "not_contains");
+      return this;
+    }
+
     public Criteria greaterThan(String field, Object value) {
       addCriterion(field, value, ">");
       return this;
@@ -264,6 +274,10 @@ public class Example {
         logicValues.add(condition);
       }
       andList.add(filterMap);
+    }
+    // 没有任何条件
+    if (andList.isEmpty()) {
+      return null;
     }
     JacksonObjectConverter converter = new JacksonObjectConverter();
     return converter.toJsonString(root);
