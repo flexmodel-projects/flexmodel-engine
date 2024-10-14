@@ -26,8 +26,8 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
   }
 
   public List<Map<String, Object>> findRootData(DataFetchingEnvironment env) {
-    Integer pageNumber = env.getArgument("page_number");
-    Integer pageSize = env.getArgument("page_size");
+    Integer pageNumber = env.getArgument("page");
+    Integer pageSize = env.getArgument("size");
     Map<String, String> orderBy = env.getArgument("order_by");
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     try (Session session = sessionFactory.createSession(schemaName)) {

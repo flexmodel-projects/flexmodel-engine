@@ -117,6 +117,16 @@ public class Example {
       return this;
     }
 
+    public Criteria startsWith(String field, String value) {
+      addCriterion(field, value, "starts_with");
+      return this;
+    }
+
+    public Criteria endsWith(String field, String value) {
+      addCriterion(field, value, "ends_with");
+      return this;
+    }
+
     public Criteria greaterThan(String field, Object value) {
       addCriterion(field, value, ">");
       return this;
