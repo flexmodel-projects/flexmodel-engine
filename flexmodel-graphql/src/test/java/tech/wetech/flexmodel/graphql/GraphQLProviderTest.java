@@ -89,14 +89,14 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     // 创建查询
     String query = """
       mutation {
-        class: create_system_testMutationClasses(data:{className: "测试班级", classCode: "TestC"}) {
+        class: system_create_testMutationClasses(data:{className: "测试班级", classCode: "TestC"}) {
           classCode
         }
-        course: create_system_testMutationCourse(data: {courseName: "测试课程", courseNo: "Test_CC"}) {
+        course: system_create_testMutationCourse(data: {courseName: "测试课程", courseNo: "Test_CC"}) {
             courseName
             courseNo
         }
-        student: create_system_testMutationStudent(data: {studentName: "张三丰", gender: "男", age: 200, classId: 1, remark: {test:"aa"}}) {
+        student: system_create_testMutationStudent(data: {studentName: "张三丰", gender: "男", age: 200, classId: 1, remark: {test:"aa"}}) {
             id
             remark
         }
@@ -110,10 +110,10 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     Assertions.assertNotNull(data.get("student"));
     String query2 = """
       mutation MyMutation($studentId: ID!, $courseNo: ID!) {
-        class: delete_system_testMutationCourse_by_id(id: $courseNo) {
+        class: system_delete_testMutationCourse_by_id(id: $courseNo) {
           courseNo
         }
-        student: update_system_testMutationStudent_by_id(_set: {age: 199, remark: {test: "bb"}}, id: $studentId) {
+        student: system_update_testMutationStudent_by_id(_set: {age: 199, remark: {test: "bb"}}, id: $studentId) {
           id
         }
       }
