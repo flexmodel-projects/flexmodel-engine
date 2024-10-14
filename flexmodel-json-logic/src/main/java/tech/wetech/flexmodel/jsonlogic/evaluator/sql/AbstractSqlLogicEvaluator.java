@@ -46,6 +46,8 @@ public abstract class AbstractSqlLogicEvaluator implements JsonLogicEvaluator {
 
     addOperation(ContainsSqlExpression.CONTAINS);
     addOperation(ContainsSqlExpression.NOT_CONTAINS);
+    addOperation(StartsWithSqlExpression.INSTANCE);
+    addOperation(EndsWithSqlExpression.INSTANCE);
     addOperation(BetweenSqlExpression.INSTANCE);
 
     addOperation(TableFieldSqlExpression.INSTANCE);
