@@ -29,6 +29,13 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
     Integer pageNumber = env.getArgument("page");
     Integer pageSize = env.getArgument("size");
     Map<String, String> orderBy = env.getArgument("order_by");
+    Map<String, Object> where = env.getArgument("where");
+    String filter;
+    if (where != null && !where.isEmpty()) {
+      filter = jsonObjectConverter.toJsonString(FlexmodelInputWhereTransformer.transform(where));
+    } else {
+      filter = null;
+    }
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     try (Session session = sessionFactory.createSession(schemaName)) {
       Entity entity = (Entity) session.getModel(modelName);
@@ -59,6 +66,9 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
                 return sort;
               }
             );
+          }
+          if (filter != null) {
+            query.setFilter(filter);
           }
           return query;
         }

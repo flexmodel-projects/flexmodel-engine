@@ -4,6 +4,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
 import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
   protected final String schemaName;
   protected final String modelName;
   protected final SessionFactory sessionFactory;
+  protected final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
 
   public FlexmodelAbstractDataFetcher(String schemaName, String modelName, SessionFactory sessionFactory) {
     this.schemaName = schemaName;

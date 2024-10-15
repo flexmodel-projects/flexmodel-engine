@@ -39,8 +39,12 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     // 创建查询
     String query = """
       query {
-        classes: system_testSimpleQueryClasses_list(page: 1, size:1) {
-          id, students { name: studentName, courses { courseName } }
+        classes: system_testSimpleQueryClasses_list(
+         page: 1,
+         size:1,
+         where: {classCode: {_eq: "C_001"}, _and: [{className: {_eq: "一年级1班"}}, {_or: [{classCode: { _eq: "C_002"}}]}]}
+        ) {
+          id, classCode, className, students { name: studentName, courses { courseName } }
         }
         students: system_testSimpleQueryStudent_list(
           size: 3
