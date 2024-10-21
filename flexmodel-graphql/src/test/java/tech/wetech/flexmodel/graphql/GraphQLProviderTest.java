@@ -59,6 +59,24 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
         course: system_testSimpleQueryCourse {
            courseNo, courseName
         }
+        aggregate: system_testSimpleQueryStudent_aggregate {
+           _count
+        }
+        aggregate2: system_testSimpleQueryStudent_aggregate {
+           total: _count(distinct: true, field: id)
+           _max {
+             id, age
+           }
+           _min {
+             id, age
+           }
+           _sum {
+             age
+           }
+           _avg {
+             age
+           }
+        }
       }
       """;
     ExecutionResult executionResult = graphQL.execute(query);

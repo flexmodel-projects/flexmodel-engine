@@ -30,6 +30,12 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
   protected static final String WHERE = "where";
   protected static final String ID = "id";
   protected static final String AFFECTED_ROWS = "affected_rows";
+  protected static final String AGG_COUNT = "_count";
+  protected static final String AGG_MAX = "_max";
+  protected static final String AGG_MIN = "_min";
+  protected static final String AGG_SUM = "_sum";
+  protected static final String AGG_AVG = "_avg";
+  protected static final String[] AGG_FIELDS = new String[]{AGG_COUNT, AGG_MAX, AGG_MIN, AGG_SUM, AGG_AVG};
 
 
   public FlexmodelAbstractDataFetcher(String schemaName, String modelName, SessionFactory sessionFactory) {
