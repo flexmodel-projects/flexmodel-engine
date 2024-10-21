@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.graphql;
 
 import graphql.schema.DataFetchingEnvironment;
+import tech.wetech.flexmodel.Session;
 import tech.wetech.flexmodel.SessionFactory;
 
 import java.util.Map;
@@ -16,7 +17,14 @@ public class FlexmodelMutationUpdateDataFetcher extends FlexmodelAbstractDataFet
 
   @Override
   public Map<String, Object> get(DataFetchingEnvironment environment) throws Exception {
-    return Map.of();
+    Map<String, Object> where = environment.getArgument(WHERE);
+    String filter = getFilterString(where);
+    Map<String, Object> setValue = environment.getArgument("_set");
+    assert setValue != null;
+    try (Session session = sessionFactory.createSession(schemaName)) {
+      int rows = session.update(modelName, setValue, filter);
+      return Map.of(AFFECTED_ROWS, rows);
+    }
   }
 
 }

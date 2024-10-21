@@ -26,16 +26,11 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
   }
 
   public List<Map<String, Object>> findRootData(DataFetchingEnvironment env) {
-    Integer pageNumber = env.getArgument("page");
-    Integer pageSize = env.getArgument("size");
-    Map<String, String> orderBy = env.getArgument("order_by");
-    Map<String, Object> where = env.getArgument("where");
-    String filter;
-    if (where != null && !where.isEmpty()) {
-      filter = jsonObjectConverter.toJsonString(FlexmodelInputWhereTransformer.transform(where));
-    } else {
-      filter = null;
-    }
+    Integer pageNumber = env.getArgument(PAGE_NUMBER);
+    Integer pageSize = env.getArgument(PAGE_SIZE);
+    Map<String, String> orderBy = env.getArgument(ORDER_BY);
+    Map<String, Object> where = env.getArgument(WHERE);
+    String filter = getFilterString(where);
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     try (Session session = sessionFactory.createSession(schemaName)) {
       Entity entity = (Entity) session.getModel(modelName);
@@ -90,5 +85,7 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
       return result;
     }
   }
+
+
 
 }

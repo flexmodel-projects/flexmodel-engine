@@ -17,7 +17,7 @@ public class FlexmodelMutationUpdateByIdDataFetcher extends FlexmodelAbstractDat
 
   @Override
   public Map<String, Object> get(DataFetchingEnvironment environment) throws Exception {
-    Object id = environment.getArgument("id");
+    Object id = environment.getArgument(ID);
     Map<String, Object> setValue = environment.getArgument("_set");
     assert setValue != null;
     try (Session session = sessionFactory.createSession(schemaName)) {
