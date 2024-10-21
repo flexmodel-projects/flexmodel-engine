@@ -2,19 +2,16 @@ package tech.wetech.flexmodel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.wetech.flexmodel.event.DomainEventPublisher;
 import tech.wetech.flexmodel.mapping.TypeHandler;
-import tech.wetech.flexmodel.sql.SqlContext;
 
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * @author cjbi
  */
 public abstract class AbstractSessionContext {
 
-  protected final Logger log = LoggerFactory.getLogger(SqlContext.class);
+  protected final Logger log = LoggerFactory.getLogger(AbstractSessionContext.class);
 
   protected final String schemaName;
   protected final MappedModels mappedModels;
@@ -29,7 +26,6 @@ public abstract class AbstractSessionContext {
     this.mappedModels = mappedModels;
     this.jsonObjectConverter = jsonObjectConverter;
     this.factory = factory;
-    factory.getGlobalSubscribers().forEach(this::subscribeEvent);
   }
 
   public PhysicalNamingStrategy getPhysicalNamingStrategy() {
@@ -53,14 +49,6 @@ public abstract class AbstractSessionContext {
   }
 
   public abstract Map<String, ? extends TypeHandler<?>> getTypeHandlerMap();
-
-  public <T> void publishEvent(final T aDomainEvent) {
-    DomainEventPublisher.instance().publish(aDomainEvent);
-  }
-
-  public <T> void subscribeEvent(Class<T> subscribedToEventType, Consumer<T> event) {
-    DomainEventPublisher.instance().subscribe(subscribedToEventType, event);
-  }
 
   public boolean isFailFast() {
     return failFast;

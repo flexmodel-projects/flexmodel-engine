@@ -85,7 +85,6 @@ public class GraphQLProvider {
 
     RuntimeWiring runtimeWiring = newRuntimeWiring()
       .codeRegistry(codeRegistry)
-      .scalar(FlexmodelScalars.Text)
       .scalar(ExtendedScalars.GraphQLLong)
       .scalar(ExtendedScalars.Json)
       .scalar(ExtendedScalars.DateTime)

@@ -3,9 +3,7 @@ package tech.wetech.flexmodel.validator;
 import tech.wetech.flexmodel.AbstractDataOperationsDecorator;
 import tech.wetech.flexmodel.AbstractSessionContext;
 import tech.wetech.flexmodel.DataOperations;
-import tech.wetech.flexmodel.Query;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -34,16 +32,5 @@ public class DataOperationsValidationDecorator extends AbstractDataOperationsDec
     validatorFacade.validate(modelName, record);
     return delegate.update(modelName, record, filter);
   }
-
-  @Override
-  public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
-    return delegate.find(modelName, query, resultType);
-  }
-
-  @Override
-  public long count(String modelName, Query query) {
-    return delegate.count(modelName, query);
-  }
-
 
 }

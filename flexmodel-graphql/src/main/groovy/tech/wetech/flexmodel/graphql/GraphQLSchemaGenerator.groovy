@@ -15,7 +15,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
   def typeMapping = [
     "id"      : "ID",
     "string"  : "String",
-    "text"    : "Text",
+    "text"    : "String",
     "decimal" : "Float",
     "int"     : "Int",
     "bigint"  : "Long",
@@ -28,7 +28,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
   def comparisonMapping = [
     "id"      : "Int_comparison_exp",
     "string"  : "String_comparison_exp",
-    "text"    : "Text_comparison_exp",
+    "text"    : "String_comparison_exp",
     "decimal" : "Float_comparison_exp",
     "int"     : "Int_comparison_exp",
     "bigint"  : "Long_comparison_exp",
@@ -36,7 +36,6 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     "date"    : "Date_comparison_exp",
     "datetime": "DateTime_comparison_exp",
     "json"    : "JSON_comparison_exp",
-    "relation": "String_comparison_exp",
   ]
 
   def toGraphQLType(ModelField itt) {
@@ -206,7 +205,6 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "scalar JSON"
     out.println "scalar Date"
     out.println "scalar DateTime"
-    out.println "scalar Text"
     out.println "scalar Long"
     out.println ""
     out.println "\"Boolean expression to compare columns of type \\\"ID\\\". All fields are combined with logical 'AND.'\""
@@ -259,18 +257,6 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println ""
     out.println "\"Boolean expression to compare columns of type \\\"String\\\". All fields are combined with logical 'AND.'\""
     out.println "input String_comparison_exp {"
-    out.println "  _eq: String"
-    out.println "  _ne: String"
-    out.println "  _in: [String!]"
-    out.println "  _nin: [String!]"
-    out.println "  _contains: String"
-    out.println "  _not_contains: String"
-    out.println "  _starts_with: String"
-    out.println "  _ends_with: String"
-    out.println "}"
-    out.println ""
-    out.println "\"Boolean expression to compare columns of type \\\"Text\\\". All fields are combined with logical 'AND.'\""
-    out.println "input Text_comparison_exp {"
     out.println "  _eq: String"
     out.println "  _ne: String"
     out.println "  _in: [String!]"
