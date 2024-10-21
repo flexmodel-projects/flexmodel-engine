@@ -205,6 +205,8 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     }
 
     out.println ""
+    out.println ""
+    out.println ""
     out.println "scalar JSON"
     out.println "scalar Date"
     out.println "scalar DateTime"

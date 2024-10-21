@@ -39,30 +39,30 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     // 创建查询
     String query = """
       query {
-        classes: system_testSimpleQueryClasses_list(
+        classes: system_list_testSimpleQueryClasses(
          page: 1,
          size:1,
          where: {classCode: {_eq: "C_001"}, _and: [{className: {_eq: "一年级1班"}}, {_or: [{classCode: { _eq: "C_002"}}]}]}
         ) {
           id, classCode, className, students { name: studentName, courses { courseName } }
         }
-        students: system_testSimpleQueryStudent_list(
+        students: system_list_testSimpleQueryStudent(
           size: 3
           page: 1
           order_by: {classId: asc, id: desc}
         ) {
           id, studentName
         }
-        teachers: system_testSimpleQueryTeacher_list {
+        teachers: system_list_testSimpleQueryTeacher {
          id, teacherName
         }
-        course: system_testSimpleQueryCourse {
+        course: system_find_one_testSimpleQueryCourse {
            courseNo, courseName
         }
-        aggregate: system_testSimpleQueryStudent_aggregate {
+        aggregate: system_aggregate_testSimpleQueryStudent {
            _count
         }
-        aggregate2: system_testSimpleQueryStudent_aggregate {
+        aggregate2: system_aggregate_testSimpleQueryStudent {
            total: _count(distinct: true, field: id)
            _max {
              id, age
