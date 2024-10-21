@@ -14,9 +14,9 @@ import static tech.wetech.flexmodel.Projections.field;
 /**
  * @author cjbi
  */
-public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<Map<String, Object>>> {
+public class FlexmodelListDataFetcher extends FlexmodelAbstractDataFetcher<List<Map<String, Object>>> {
 
-  public FlexmodelFindDataFetcher(String schemaName, String modelName, SessionFactory sessionFactory) {
+  public FlexmodelListDataFetcher(String schemaName, String modelName, SessionFactory sessionFactory) {
     super(schemaName, modelName, sessionFactory);
   }
 
@@ -52,20 +52,7 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
             }
             return projection;
           });
-          if (pageSize != null && pageNumber != null) {
-            query.setPage(pageNumber, pageSize);
-          }
-          if (orderBy != null) {
-            query.setSort(sort -> {
-                orderBy.forEach((k, v) -> sort.addOrder(k, Direction.valueOf(v.toUpperCase())));
-                return sort;
-              }
-            );
-          }
-          if (filter != null) {
-            query.setFilter(filter);
-          }
-          return query;
+          return getQuery(pageNumber, pageSize, orderBy, filter, query);
         }
       );
       List<Map<String, Object>> result = new ArrayList<>();

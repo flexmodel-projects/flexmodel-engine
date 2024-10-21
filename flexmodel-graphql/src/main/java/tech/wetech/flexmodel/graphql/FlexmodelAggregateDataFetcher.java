@@ -33,58 +33,59 @@ public class FlexmodelAggregateDataFetcher extends FlexmodelAbstractDataFetcher<
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     try (Session session = sessionFactory.createSession(schemaName)) {
       Entity entity = (Entity) session.getModel(modelName);
-      List<Map<String, Object>> list = session.find(entity.getName(), query -> query
-        .setProjection(projection -> {
-          IDField idField = entity.findIdField().orElseThrow();
-          projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
-          for (SelectedField selectedField : selectedFields) {
-            if (selectedField.getName().equals(AGG_COUNT)) {
-              Map<String, Object> args = selectedField.getArguments();
-              Boolean distinct = (Boolean) args.get("distinct");
-              String field = (String) args.get("field");
-              if (field == null) {
-                field = entity.getName() + "." + entity.findIdField().orElseThrow().getName();
+      List<Map<String, Object>> list = session.find(entity.getName(), query -> {
+        query.setProjection(projection -> {
+            IDField idField = entity.findIdField().orElseThrow();
+            projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
+            for (SelectedField selectedField : selectedFields) {
+              if (selectedField.getName().equals(AGG_COUNT)) {
+                Map<String, Object> args = selectedField.getArguments();
+                Boolean distinct = (Boolean) args.get("distinct");
+                String field = (String) args.get("field");
+                if (field == null) {
+                  field = entity.getName() + "." + entity.findIdField().orElseThrow().getName();
+                }
+                projection.addField(selectedField.getName(), count(field(field)));
+                continue;
               }
-              projection.addField(selectedField.getName(), count(field(field)));
-              continue;
-            }
-            if (selectedField.getName().equals(AGG_MAX)) {
-              List<SelectedField> aggFields = selectedField.getSelectionSet().getImmediateFields();
-              for (SelectedField aggField : aggFields) {
-                projection.addField(AGG_MAX + "_" + aggField.getName(), max(field(aggField.getName())));
+              if (selectedField.getName().equals(AGG_MAX)) {
+                List<SelectedField> aggFields = selectedField.getSelectionSet().getImmediateFields();
+                for (SelectedField aggField : aggFields) {
+                  projection.addField(AGG_MAX + "_" + aggField.getName(), max(field(aggField.getName())));
+                }
+                continue;
               }
-              continue;
-            }
-            if (selectedField.getName().equals(AGG_MIN)) {
-              List<SelectedField> aggFields = selectedField.getSelectionSet().getImmediateFields();
-              for (SelectedField aggField : aggFields) {
-                projection.addField(AGG_MIN + "_"  + aggField.getName(), min(field(aggField.getName())));
+              if (selectedField.getName().equals(AGG_MIN)) {
+                List<SelectedField> aggFields = selectedField.getSelectionSet().getImmediateFields();
+                for (SelectedField aggField : aggFields) {
+                  projection.addField(AGG_MIN + "_" + aggField.getName(), min(field(aggField.getName())));
+                }
+                continue;
               }
-              continue;
-            }
-            if (selectedField.getName().equals(AGG_SUM)) {
-              List<SelectedField> aggFields = selectedField.getSelectionSet().getImmediateFields();
-              for (SelectedField aggField : aggFields) {
-                projection.addField(AGG_SUM + "_"  + aggField.getName(), sum(field(aggField.getName())));
+              if (selectedField.getName().equals(AGG_SUM)) {
+                List<SelectedField> aggFields = selectedField.getSelectionSet().getImmediateFields();
+                for (SelectedField aggField : aggFields) {
+                  projection.addField(AGG_SUM + "_" + aggField.getName(), sum(field(aggField.getName())));
+                }
+                continue;
               }
-              continue;
-            }
-            if (selectedField.getName().equals(AGG_AVG)) {
-              List<SelectedField> aggFields = selectedField.getSelectionSet().getImmediateFields();
-              for (SelectedField aggField : aggFields) {
-                projection.addField(AGG_AVG + "_"  + aggField.getName(), avg(field(aggField.getName())));
+              if (selectedField.getName().equals(AGG_AVG)) {
+                List<SelectedField> aggFields = selectedField.getSelectionSet().getImmediateFields();
+                for (SelectedField aggField : aggFields) {
+                  projection.addField(AGG_AVG + "_" + aggField.getName(), avg(field(aggField.getName())));
+                }
+                continue;
               }
-              continue;
+              TypedField<?, ?> flexModelField = entity.getField(selectedField.getName());
+              if (flexModelField == null) {
+                continue;
+              }
+              projection.addField(selectedField.getName(), field(flexModelField.getModelName() + "." + flexModelField.getName()));
             }
-            TypedField<?, ?> flexModelField = entity.getField(selectedField.getName());
-            if (flexModelField == null) {
-              continue;
-            }
-            projection.addField(selectedField.getName(), field(flexModelField.getModelName() + "." + flexModelField.getName()));
-          }
-          return projection;
-        })
-      );
+            return projection;
+          });
+        return getQuery(pageNumber, pageSize, orderBy, filter, query);
+      });
       // 不支持关联字段查询
       return toResult(list.get(0));
     }

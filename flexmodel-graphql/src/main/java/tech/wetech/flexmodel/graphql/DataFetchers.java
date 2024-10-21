@@ -9,7 +9,7 @@ import java.util.function.BiFunction;
  * @author cjbi
  */
 public enum DataFetchers {
-  FIND((schema, model) -> schema + "_list" + "_" + model, FlexmodelFindDataFetcher::new, true),
+  FIND((schema, model) -> schema + "_list" + "_" + model, FlexmodelListDataFetcher::new, true),
   FIND_ONE((schema, model) -> schema + "_find_one" + "_" + model, FlexmodelFindOneDataFetcher::new, true),
   AGGREGATE((schema, model) -> schema + "_aggregate" + "_" + model, FlexmodelAggregateDataFetcher::new, true),
   MUTATION_DELETE((schema, model) -> schema + "_" + "delete_" + model, FlexmodelMutationDeleteDataFetcher::new, false),

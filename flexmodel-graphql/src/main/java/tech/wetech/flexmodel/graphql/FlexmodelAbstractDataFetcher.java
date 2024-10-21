@@ -97,4 +97,21 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
     return filter;
   }
 
+  protected Query getQuery(Integer pageNumber, Integer pageSize, Map<String, String> orderBy, String filter, Query query) {
+    if (pageSize != null && pageNumber != null) {
+      query.setPage(pageNumber, pageSize);
+    }
+    if (orderBy != null) {
+      query.setSort(sort -> {
+          orderBy.forEach((k, v) -> sort.addOrder(k, Direction.valueOf(v.toUpperCase())));
+          return sort;
+        }
+      );
+    }
+    if (filter != null) {
+      query.setFilter(filter);
+    }
+    return query;
+  }
+
 }
