@@ -131,6 +131,8 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       it.allFields.each {
         out.println "  ${it.fieldName} : ${toGraphQLType(it)}"
       }
+      out.println "  _join: Query"
+      out.println "  _join_mutation: Mutation"
       out.println "}"
       out.println ""
       "aggregated selection of \\\"${key}\\\""
@@ -140,6 +142,8 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "  _min: ${key}!"
       out.println "  _sum: ${key}!"
       out.println "  _avg: ${key}_avg_fields!"
+      out.println "  _join: Query"
+      out.println "  _join_mutation: Mutation"
       out.println "}"
       out.println ""
       out.println "type ${key}_avg_fields {"
@@ -337,6 +341,8 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "type mutation_response {"
     out.println "  \"data from the rows affected by the mutation\""
     out.println "  affected_rows: Int!"
+    out.println "  _join: Query"
+    out.println "  _join_mutation: Mutation"
     out.println "}"
 
   }
