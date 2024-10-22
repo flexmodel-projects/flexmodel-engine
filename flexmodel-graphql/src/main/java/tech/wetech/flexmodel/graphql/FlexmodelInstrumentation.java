@@ -83,11 +83,10 @@ public class FlexmodelInstrumentation implements Instrumentation {
           dataMap.put(key, newValue);
         });
       }
-      return CompletableFuture.completedFuture(executionResult.transform(builder -> builder.data(data)));
     } catch (Exception e) {
       log.error("Execution result transform error: {}", e.getMessage());
-      return CompletableFuture.completedFuture(executionResult);
     }
+    return CompletableFuture.completedFuture(executionResult);
   }
 
   private Object evaluate(String name, Object data) {
