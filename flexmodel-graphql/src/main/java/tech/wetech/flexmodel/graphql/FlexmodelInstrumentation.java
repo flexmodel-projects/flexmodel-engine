@@ -74,18 +74,18 @@ public class FlexmodelInstrumentation implements Instrumentation {
   @Override
   public CompletableFuture<ExecutionResult> instrumentExecutionResult(ExecutionResult executionResult, InstrumentationExecutionParameters parameters, InstrumentationState state) {
     Object data = executionResult.getData();
-    try {
-      FlexmodelInstrumentationState state1 = (FlexmodelInstrumentationState) state;
-      if (data instanceof Map dataMap) {
-        state1.getTransformMap().forEach((key, value) -> {
-          Map<String, Object> originValue = (Map<String, Object>) evaluate(key, dataMap);
+    if (data instanceof Map dataMap) {
+      ((FlexmodelInstrumentationState) state).getTransformMap().forEach((key, value) -> {
+        try {
+          Object originValue = evaluate(key, dataMap);
           Object newValue = evaluate(value, originValue);
           dataMap.put(key, newValue);
-        });
-      }
-    } catch (Exception e) {
-      log.error("Execution result transform error: {}", e.getMessage());
+        } catch (Exception e) {
+          log.error("Execution result transform error: {}, key={}, value={}", e.getMessage(), key, value);
+        }
+      });
     }
+
     return CompletableFuture.completedFuture(executionResult);
   }
 
@@ -95,7 +95,6 @@ public class FlexmodelInstrumentation implements Instrumentation {
 
     for (String partial : keys) {
       result = evaluatePartialVariable(partial, result);
-
       if (result == null) {
         return null;
       }

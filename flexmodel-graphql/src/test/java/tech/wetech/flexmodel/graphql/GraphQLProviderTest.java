@@ -116,10 +116,18 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     //        }
     String query = """
       query {
+        list: system_list_testDirectiveStudent {
+          classId
+          studentName
+          courses {
+            courseName
+            courseNo
+         }
+        }
         total: system_aggregate_testDirectiveStudent @transform(get: "_count") {
            _count
         }
-        system_aggregate_testDirectiveStudent @transform(get: "_avg.age") {
+        avgAge: system_aggregate_testDirectiveStudent @transform(get: "_avg.age") {
           _avg {
             age
           }
@@ -131,7 +139,9 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     // 打印结果
     System.out.println(executionResult);
     Assertions.assertNotNull(data);
+    Assertions.assertNotNull(data.get("list"));
     Assertions.assertEquals(3, data.get("total"));
+    Assertions.assertInstanceOf(Number.class, data.get("avgAge"));
   }
 
   @Test
