@@ -7,6 +7,7 @@ import graphql.execution.instrumentation.InstrumentationState;
 import graphql.execution.instrumentation.parameters.InstrumentationCreateStateParameters;
 import graphql.execution.instrumentation.parameters.InstrumentationExecutionParameters;
 import graphql.language.*;
+import graphql.util.Breadcrumb;
 import graphql.util.TraversalControl;
 import graphql.util.TraverserContext;
 import org.slf4j.Logger;
@@ -15,7 +16,6 @@ import tech.wetech.flexmodel.jsonlogic.JsonLogic;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 
@@ -43,7 +43,7 @@ public class FlexmodelInstrumentation implements Instrumentation {
       public TraversalControl visitDirective(Directive node, TraverserContext context) {
         switch (node.getName()) {
           case "transform":
-            String path = node2Path(context.visitedNodes());
+            String path = breadcrumbs2Path(context.getBreadcrumbs());
             String value = ((StringValue) node.getArgument("get").getValue()).getValue();
             state1.addTransform(path, value);
             break;
@@ -58,13 +58,16 @@ public class FlexmodelInstrumentation implements Instrumentation {
     return documentAndVariables;
   }
 
-  private String node2Path(Set<?> nodes) {
+  private String breadcrumbs2Path(List<Breadcrumb> breadcrumbs) {
     StringJoiner joiner = new StringJoiner(".");
-    for (Object node : nodes) {
-      if (node instanceof Field field) {
-        joiner.add(field.getAlias());
+    int index = breadcrumbs.size() - 1;
+    for (int i = index; i >= 0; i--) {
+      Breadcrumb breadcrumb = breadcrumbs.get(i);
+      if (breadcrumb.getNode() instanceof Field field) {
+        joiner.add(field.getAlias() != null ? field.getAlias() : field.getName());
       }
     }
+
     return joiner.toString();
   }
 

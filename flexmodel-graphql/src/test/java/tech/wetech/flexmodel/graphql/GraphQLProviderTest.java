@@ -119,6 +119,11 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
         total: system_aggregate_testDirectiveStudent @transform(get: "_count") {
            _count
         }
+        system_aggregate_testDirectiveStudent @transform(get: "_avg.age") {
+          _avg {
+            age
+          }
+        }
       }
       """;
     ExecutionResult executionResult = graphQL.execute(query);
