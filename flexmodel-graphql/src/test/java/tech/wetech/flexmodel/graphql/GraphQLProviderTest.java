@@ -17,11 +17,11 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
 
   @Test
   void testFind() {
-    String classesEntityName = "testSimpleQueryClasses";
-    String studentEntityName = "testSimpleQueryStudent";
-    String studentDetailEntityName = "testSimpleQueryStudentDetail";
-    String courseEntityName = "testSimpleQueryCourse";
-    String teacherEntityName = "testSimpleQueryTeacher";
+    String classesEntityName = "testFindClasses";
+    String studentEntityName = "testFindStudent";
+    String studentDetailEntityName = "testFindStudentDetail";
+    String courseEntityName = "testFindCourse";
+    String teacherEntityName = "testFindTeacher";
     createClassesEntity(session, classesEntityName);
     createStudentEntity(session, studentEntityName);
     createStudentDetailEntity(session, studentDetailEntityName);
@@ -39,30 +39,30 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     // 创建查询
     String query = """
       query {
-        classes: system_list_testSimpleQueryClasses(
+        classes: system_list_testFindClasses(
          page: 1,
          size:1,
          where: {classCode: {_eq: "C_001"}, _and: [{className: {_eq: "一年级1班"}}, {_or: [{classCode: { _eq: "C_002"}}]}]}
         ) {
           id, classCode, className, students { name: studentName, courses { courseName } }
         }
-        students: system_list_testSimpleQueryStudent(
+        students: system_list_testFindStudent(
           size: 3
           page: 1
           order_by: {classId: asc, id: desc}
         ) {
           id, studentName
         }
-        teachers: system_list_testSimpleQueryTeacher {
+        teachers: system_list_testFindTeacher {
          id, teacherName
         }
-        course: system_find_one_testSimpleQueryCourse {
+        course: system_find_one_testFindCourse {
            courseNo, courseName
         }
-        aggregate: system_aggregate_testSimpleQueryStudent {
+        aggregate: system_aggregate_testFindStudent {
            _count
         }
-        aggregate2: system_aggregate_testSimpleQueryStudent {
+        aggregate2: system_aggregate_testFindStudent {
            total: _count(distinct: true, field: id)
            _max {
              id, age
@@ -85,6 +85,48 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     System.out.println(executionResult);
     Assertions.assertNotNull(data);
     Assertions.assertNotNull(data.get("course"));
+  }
+
+  @Test
+  void testDirective() {
+    String classesEntityName = "testDirectiveClasses";
+    String studentEntityName = "testDirectiveStudent";
+    String studentDetailEntityName = "testDirectiveStudentDetail";
+    String courseEntityName = "testDirectiveCourse";
+    String teacherEntityName = "testDirectiveTeacher";
+    createClassesEntity(session, classesEntityName);
+    createStudentEntity(session, studentEntityName);
+    createStudentDetailEntity(session, studentDetailEntityName);
+    createCourseEntity(session, courseEntityName);
+    createTeacherEntity(session, teacherEntityName);
+    createAssociations(session, classesEntityName, studentEntityName, studentDetailEntityName, courseEntityName, teacherEntityName);
+    createCourseData(session, courseEntityName);
+    createClassesData(session, classesEntityName);
+    createStudentData(session, studentEntityName);
+    createTeacherData(session, teacherEntityName);
+
+    GraphQLProvider graphQLProvider = new GraphQLProvider(session.getFactory());
+    graphQLProvider.init();
+    GraphQL graphQL = graphQLProvider.getGraphQL();
+    //list: system_list_testDirectiveStudent {
+    //          id
+    //          studentName
+    //          gender
+    //          age
+    //        }
+    String query = """
+      query {
+        total: system_aggregate_testDirectiveStudent @transform(get: "_count") {
+           _count
+        }
+      }
+      """;
+    ExecutionResult executionResult = graphQL.execute(query);
+    Map<String, Object> data = executionResult.getData();
+    // 打印结果
+    System.out.println(executionResult);
+    Assertions.assertNotNull(data);
+    Assertions.assertEquals(3, data.get("total"));
   }
 
   @Test

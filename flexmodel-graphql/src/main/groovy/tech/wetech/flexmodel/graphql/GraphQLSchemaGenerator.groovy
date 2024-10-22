@@ -205,7 +205,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     }
 
     out.println ""
-    out.println ""
+    out.println "directive @transform(get: String!) on FIELD"
     out.println ""
     out.println "scalar JSON"
     out.println "scalar Date"

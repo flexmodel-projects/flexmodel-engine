@@ -56,12 +56,12 @@ public class GraphQLProvider {
       for (Model model : models) {
         if (model instanceof Entity entity) {
           for (DataFetchers fetchType : DataFetchers.values()) {
-            if(fetchType.isQuery()) {
+            if (fetchType.isQuery()) {
               queryDataFetchers.put(
                 fetchType.getKeyFunc().apply(schemaName, model.getName()),
                 fetchType.getDataFetcherFunc().apply(schemaName, model.getName(), sf));
             }
-            if(fetchType.isMutation()) {
+            if (fetchType.isMutation()) {
               mutationDataFetchers.put(
                 fetchType.getKeyFunc().apply(schemaName, model.getName()),
                 fetchType.getDataFetcherFunc().apply(schemaName, model.getName(), sf));
@@ -92,7 +92,9 @@ public class GraphQLProvider {
       .build();
     SchemaGenerator schemaGenerator = new SchemaGenerator();
     GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeDefinitionRegistry, runtimeWiring);
-    this.graphQL = GraphQL.newGraphQL(graphQLSchema).build();
+    this.graphQL = GraphQL.newGraphQL(graphQLSchema)
+      .instrumentation(new FlexmodelInstrumentation())
+      .build();
   }
 
   public GraphQL getGraphQL() {
