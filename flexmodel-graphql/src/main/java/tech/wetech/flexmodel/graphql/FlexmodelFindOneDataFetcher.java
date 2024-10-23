@@ -27,29 +27,31 @@ public class FlexmodelFindOneDataFetcher extends FlexmodelAbstractDataFetcher<Ma
 
   private Map<String, Object> findRootData(DataFetchingEnvironment env) {
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
+    Map<String, Object> where = getArgument(env, WHERE);
+    String filter = getFilterString(where);
     try (Session session = sessionFactory.createSession(schemaName)) {
       Entity entity = (Entity) session.getModel(modelName);
       IDField idField = entity.findIdField().orElseThrow();
 
       List<RelationField> relationFields = new ArrayList<>();
       List<Map<String, Object>> list = session.find(entity.getName(), query -> query
-//        .setFilter(f -> f)
-          .setProjection(projection -> {
-            projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
-            for (SelectedField selectedField : selectedFields) {
-              TypedField<?, ?> flexModelField = entity.getField(selectedField.getName());
-              if (flexModelField == null) {
-                continue;
-              }
-              if (flexModelField instanceof RelationField secondaryRelationField) {
-                relationFields.add(secondaryRelationField);
-                continue;
-              }
-              projection.addField(selectedField.getName(), field(flexModelField.getModelName() + "." + flexModelField.getName()));
+        .setFilter(filter)
+        .setProjection(projection -> {
+          projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
+          for (SelectedField selectedField : selectedFields) {
+            TypedField<?, ?> flexModelField = entity.getField(selectedField.getName());
+            if (flexModelField == null) {
+              continue;
             }
-            return projection;
-          })
-          .setPage(1, 1)
+            if (flexModelField instanceof RelationField secondaryRelationField) {
+              relationFields.add(secondaryRelationField);
+              continue;
+            }
+            projection.addField(selectedField.getName(), field(flexModelField.getModelName() + "." + flexModelField.getName()));
+          }
+          return projection;
+        })
+        .setPage(1, 1)
       );
       if (list.isEmpty()) {
         return null;

@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel.graphql;
 
+import graphql.execution.CoercedVariables;
+import graphql.execution.ValuesResolver;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
@@ -10,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static tech.wetech.flexmodel.Projections.field;
 
@@ -112,6 +115,26 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
       query.setFilter(filter);
     }
     return query;
+  }
+
+  protected Map<String, Object> getArguments(DataFetchingEnvironment env) {
+    Map<String, Object> newVariables = new HashMap<>();
+    newVariables.putAll(env.getVariables());
+    Map<String, Object> variables = env.getGraphQlContext()
+      .getOrDefault("__VARIABLES", new ConcurrentHashMap<>());
+    newVariables.putAll(variables);
+    return ValuesResolver.getArgumentValues(
+      env.getGraphQLSchema().getCodeRegistry(),
+      env.getFieldDefinition().getArguments(),
+      env.getField().getArguments(),
+      CoercedVariables.of(newVariables),
+      env.getGraphQlContext(),
+      env.getLocale());
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <R> R getArgument(DataFetchingEnvironment env, String name) {
+    return (R) getArguments(env).get(name);
   }
 
 }

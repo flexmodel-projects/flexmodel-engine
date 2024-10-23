@@ -17,9 +17,9 @@ public class FlexmodelMutationUpdateDataFetcher extends FlexmodelAbstractDataFet
 
   @Override
   public Map<String, Object> get(DataFetchingEnvironment environment) throws Exception {
-    Map<String, Object> where = environment.getArgument(WHERE);
+    Map<String, Object> where = getArgument(environment, WHERE);
     String filter = getFilterString(where);
-    Map<String, Object> setValue = environment.getArgument("_set");
+    Map<String, Object> setValue = getArgument(environment, "_set");
     assert setValue != null;
     try (Session session = sessionFactory.createSession(schemaName)) {
       int rows = session.update(modelName, setValue, filter);

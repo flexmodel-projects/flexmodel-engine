@@ -1,11 +1,15 @@
 package tech.wetech.flexmodel.graphql;
 
 import graphql.ExecutionResult;
+import graphql.execution.ExecutionContext;
+import graphql.execution.ExecutionStepInfo;
 import graphql.execution.instrumentation.DocumentAndVariables;
 import graphql.execution.instrumentation.Instrumentation;
+import graphql.execution.instrumentation.InstrumentationContext;
 import graphql.execution.instrumentation.InstrumentationState;
 import graphql.execution.instrumentation.parameters.InstrumentationCreateStateParameters;
 import graphql.execution.instrumentation.parameters.InstrumentationExecutionParameters;
+import graphql.execution.instrumentation.parameters.InstrumentationFieldParameters;
 import graphql.language.*;
 import graphql.util.Breadcrumb;
 import graphql.util.TraversalControl;
@@ -14,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.jsonlogic.JsonLogic;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -41,12 +46,18 @@ public class FlexmodelInstrumentation implements Instrumentation {
       @Override
       @SuppressWarnings("all")
       public TraversalControl visitDirective(Directive node, TraverserContext context) {
+        String path = breadcrumbs2Path(context.getBreadcrumbs());
         switch (node.getName()) {
-          case "transform":
-            String path = breadcrumbs2Path(context.getBreadcrumbs());
+          case "transform": {
             String value = ((StringValue) node.getArgument("get").getValue()).getValue();
             state1.addTransform(path, value);
             break;
+          }
+          case "export": {
+            String value = ((StringValue) node.getArgument("as").getValue()).getValue();
+            state1.addExportDirective(path, value);
+            break;
+          }
         }
         return super.visitDirective(node, context);
       }
@@ -127,5 +138,39 @@ public class FlexmodelInstrumentation implements Instrumentation {
     return null;
   }
 
+  @Override
+  public InstrumentationContext<Object> beginFieldExecution(InstrumentationFieldParameters parameters, InstrumentationState state) {
+    ExecutionContext executionContext = parameters.getExecutionContext();
+    ExecutionStepInfo executionStepInfo = parameters.getExecutionStepInfo();
+    final FlexmodelInstrumentationState state1 = (FlexmodelInstrumentationState) state;
+    return new InstrumentationContext<>() {
+      @Override
+      public void onDispatched() {}
+
+      @Override
+      public void onCompleted(Object result, Throwable t) {
+        Map<String, String> exportDirectiveMap = state1.getExportDirectiveMap();
+
+        String s = executionStepInfo.getPath()
+          .toString()
+          .substring(1)
+          .replace("/", ".")
+          .replaceAll("\\[\\d+\\]", "");
+
+        exportDirectiveMap.forEach((key, value) -> {
+          if (key.equals(s)) {
+            executionContext.getGraphQLContext().compute("__VARIABLES", (k, v) -> {
+              Map<String, Object> variables = (Map) v;
+              if (variables == null) {
+                variables = new HashMap<>();
+              }
+              variables.put(value, t == null ? result : null);
+              return variables;
+            });
+          }
+        });
+      }
+    };
+  }
 
 }

@@ -39,6 +39,44 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     // 创建查询
     String query = """
       query {
+        classes: system_list_testQueryClasses(
+         page: 1,
+         size:1,
+         where: {classCode: {_eq: "C_001"}, _and: [{className: {_eq: "一年级1班"}}, {_or: [{classCode: { _eq: "C_002"}}]}]}
+        ) {
+          id, classCode, className, students { name: studentName, courses { courseName } }
+        }
+        students: system_list_testQueryStudent(
+          size: 3
+          page: 1
+          order_by: {classId: asc, id: desc}
+        ) {
+          id, studentName
+        }
+        teachers: system_list_testQueryTeacher {
+         id, teacherName
+        }
+        course: system_find_one_testQueryCourse {
+           courseNo, courseName
+        }
+        aggregate: system_aggregate_testQueryStudent {
+           _count
+        }
+        aggregate2: system_aggregate_testQueryStudent {
+           total: _count(distinct: true, field: id)
+           _max {
+             id, age
+           }
+           _min {
+             id, age
+           }
+           _sum {
+             age
+           }
+           _avg {
+             age
+           }
+        }
         system_list_testQueryStudent {
           age
           classId
@@ -89,12 +127,6 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     GraphQLProvider graphQLProvider = new GraphQLProvider(session.getFactory());
     graphQLProvider.init();
     GraphQL graphQL = graphQLProvider.getGraphQL();
-    //list: system_list_testDirectiveStudent {
-    //          id
-    //          studentName
-    //          gender
-    //          age
-    //        }
     String query = """
       query {
         list: system_list_testDirectiveStudent {
@@ -124,6 +156,57 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     Assertions.assertEquals(3, data.get("total"));
     Assertions.assertInstanceOf(Number.class, data.get("avgAge"));
   }
+
+  @Test
+  void testJoin() {
+    String classesEntityName = "testJoinClasses";
+    String studentEntityName = "testJoinStudent";
+    String studentDetailEntityName = "testJoinStudentDetail";
+    String courseEntityName = "testJoinCourse";
+    String teacherEntityName = "testJoinTeacher";
+    createClassesEntity(session, classesEntityName);
+    createStudentEntity(session, studentEntityName);
+    createStudentDetailEntity(session, studentDetailEntityName);
+    createCourseEntity(session, courseEntityName);
+    createTeacherEntity(session, teacherEntityName);
+    createAssociations(session, classesEntityName, studentEntityName, studentDetailEntityName, courseEntityName, teacherEntityName);
+    createCourseData(session, courseEntityName);
+    createClassesData(session, classesEntityName);
+    createStudentData(session, studentEntityName);
+    createTeacherData(session, teacherEntityName);
+
+    GraphQLProvider graphQLProvider = new GraphQLProvider(session.getFactory());
+    graphQLProvider.init();
+    GraphQL graphQL = graphQLProvider.getGraphQL();
+    String query = """
+      query ($classId: Int = 1, $studentId: Int @internal) {
+        class: system_find_one_testJoinClasses(where: { id: { _eq: $classId } }) {
+          className
+          id
+          _join {
+            students: system_list_testJoinStudent(where: { classId: { _eq: $classId } }) {
+              id @export(as: "studentId")
+              studentName
+              _join {
+                detail: system_find_one_testJoinStudentDetail(where: { studentId: { _eq: $studentId } }) {
+                  description
+                }
+              }
+            }
+            total: system_aggregate_testJoinStudent(where: { classId: { _eq: $classId } }) {
+              _count
+            }
+          }
+        }
+      }
+      """;
+    ExecutionResult executionResult = graphQL.execute(b -> b.query(query).variables(Map.of("$studentId", 1)));
+    Map<String, Object> data = executionResult.getData();
+    // 打印结果
+    System.out.println(executionResult);
+    Assertions.assertNotNull(data);
+  }
+
 
   @Test
   void testMutation() {

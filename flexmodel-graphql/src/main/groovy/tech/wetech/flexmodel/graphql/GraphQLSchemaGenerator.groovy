@@ -18,10 +18,10 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     "text"    : "String",
     "decimal" : "Float",
     "int"     : "Int",
-    "bigint"  : "Long",
+    "bigint"  : "Int",
     "boolean" : "Boolean",
-    "datetime": "DateTime",
-    "date"    : "Date",
+    "datetime": "String",
+    "date"    : "String",
     "json"    : "JSON",
   ]
 
@@ -31,7 +31,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     "text"    : "String_comparison_exp",
     "decimal" : "Float_comparison_exp",
     "int"     : "Int_comparison_exp",
-    "bigint"  : "Long_comparison_exp",
+    "bigint"  : "Int_comparison_exp",
     "boolean" : "Boolean_comparison_exp",
     "date"    : "Date_comparison_exp",
     "datetime": "DateTime_comparison_exp",
@@ -209,14 +209,13 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     }
 
     out.println ""
-    out.println "directive @internal on FIELD"
+    out.println "directive @internal on VARIABLE_DEFINITION"
     out.println "directive @export(as: String) on FIELD"
     out.println "directive @transform(get: String!) on FIELD"
     out.println ""
     out.println "scalar JSON"
     out.println "scalar Date"
     out.println "scalar DateTime"
-    out.println "scalar Long"
     out.println ""
     out.println "\"Boolean expression to compare fields of type \\\"ID\\\". All fields are combined with logical 'AND.'\""
     out.println "input ID_comparison_exp {"
@@ -240,18 +239,6 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "  _lte: Int"
     out.println "  _in: [Int!]"
     out.println "  _nin: [Int!]"
-    out.println "}"
-    out.println ""
-    out.println "\"Boolean expression to compare fields of type \\\"Long\\\". All fields are combined with logical 'AND.'\""
-    out.println "input Long_comparison_exp {"
-    out.println "  _eq: Long"
-    out.println "  _ne: Long"
-    out.println "  _gt: Long"
-    out.println "  _lt: Long"
-    out.println "  _gte: Long"
-    out.println "  _lte: Long"
-    out.println "  _in: [Long!]"
-    out.println "  _nin: [Long!]"
     out.println "}"
     out.println ""
     out.println "\"Boolean expression to compare fields of type \\\"Float\\\". All fields are combined with logical 'AND.'\""

@@ -22,7 +22,7 @@ public class FlexmodelMutationCreateDataFetcher extends FlexmodelAbstractDataFet
   @Override
   @SuppressWarnings("all")
   public Map<String, Object> get(DataFetchingEnvironment environment) throws Exception {
-    Map<String, Object> arguments = environment.getArguments();
+    Map<String, Object> arguments = getArguments(environment);
     if (arguments.get("data") instanceof Map data) {
       Map<String, Object> result = new HashMap<>(data);
       try (Session session = sessionFactory.createSession(schemaName)) {

@@ -26,10 +26,10 @@ public class FlexmodelListDataFetcher extends FlexmodelAbstractDataFetcher<List<
   }
 
   public List<Map<String, Object>> findRootData(DataFetchingEnvironment env) {
-    Integer pageNumber = env.getArgument(PAGE_NUMBER);
-    Integer pageSize = env.getArgument(PAGE_SIZE);
-    Map<String, String> orderBy = env.getArgument(ORDER_BY);
-    Map<String, Object> where = env.getArgument(WHERE);
+    Integer pageNumber = getArgument(env, PAGE_NUMBER);
+    Integer pageSize = getArgument(env, PAGE_SIZE);
+    Map<String, String> orderBy = getArgument(env, ORDER_BY);
+    Map<String, Object> where = getArgument(env, WHERE);
     String filter = getFilterString(where);
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     try (Session session = sessionFactory.createSession(schemaName)) {
