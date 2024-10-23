@@ -34,21 +34,22 @@ public class FlexmodelFindOneDataFetcher extends FlexmodelAbstractDataFetcher<Ma
       List<RelationField> relationFields = new ArrayList<>();
       List<Map<String, Object>> list = session.find(entity.getName(), query -> query
 //        .setFilter(f -> f)
-        .setProjection(projection -> {
-          projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
-          for (SelectedField selectedField : selectedFields) {
-            TypedField<?, ?> flexModelField = entity.getField(selectedField.getName());
-            if (flexModelField == null) {
-              continue;
+          .setProjection(projection -> {
+            projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
+            for (SelectedField selectedField : selectedFields) {
+              TypedField<?, ?> flexModelField = entity.getField(selectedField.getName());
+              if (flexModelField == null) {
+                continue;
+              }
+              if (flexModelField instanceof RelationField secondaryRelationField) {
+                relationFields.add(secondaryRelationField);
+                continue;
+              }
+              projection.addField(selectedField.getName(), field(flexModelField.getModelName() + "." + flexModelField.getName()));
             }
-            if (flexModelField instanceof RelationField secondaryRelationField) {
-              relationFields.add(secondaryRelationField);
-              continue;
-            }
-            projection.addField(selectedField.getName(), field(flexModelField.getModelName() + "." + flexModelField.getName()));
-          }
-          return projection;
-        })
+            return projection;
+          })
+          .setPage(1, 1)
       );
       if (list.isEmpty()) {
         return null;

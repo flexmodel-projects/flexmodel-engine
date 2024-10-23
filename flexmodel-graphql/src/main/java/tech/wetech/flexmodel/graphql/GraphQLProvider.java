@@ -40,11 +40,21 @@ public class GraphQLProvider {
     context.setModelListClass(modelListClass);
     Map<String, DataFetcher<?>> queryDataFetchers = new HashMap<>();
     Map<String, DataFetcher<?>> mutationDataFetchers = new HashMap<>();
+
+    Map<String, Map<String, DataFetcher<?>>> joinDataFetchers = new HashMap<>();
+    Map<String, DataFetcher<?>> joinMap = Map.of(
+      "_join", (DataFetcher<?>) environment -> Map.of(),
+      "_join_mutation", (DataFetcher<?>) environment -> Map.of()
+    );
+    joinDataFetchers.put("mutation_response", joinMap);
+
     for (String schemaName : sf.getSchemaNames()) {
       List<Model> models = sf.getModels(schemaName);
       for (Model model : models) {
         if (model instanceof Entity entity) {
           modelListClass.getModelList().add(GenerationTool.buildModelClass("", schemaName, entity));
+          joinDataFetchers.put(schemaName + "_" + model.getName(), joinMap);
+          joinDataFetchers.put(schemaName + "_" + model.getName() + "_aggregate", joinMap);
         } else {
           // todo 支持非实体类型
         }
@@ -82,6 +92,9 @@ public class GraphQLProvider {
       .dataFetchers("Query", queryDataFetchers)
       .dataFetchers("Mutation", mutationDataFetchers)
       .build();
+
+    // supports _join/_join_mutation
+    codeRegistry = codeRegistry.transform(builder -> joinDataFetchers.forEach(builder::dataFetchers));
 
     RuntimeWiring runtimeWiring = newRuntimeWiring()
       .codeRegistry(codeRegistry)

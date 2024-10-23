@@ -16,12 +16,12 @@ import static tech.wetech.flexmodel.graphql.Models.*;
 public class GraphQLProviderTest extends AbstractIntegrationTest {
 
   @Test
-  void testFind() {
-    String classesEntityName = "testFindClasses";
-    String studentEntityName = "testFindStudent";
-    String studentDetailEntityName = "testFindStudentDetail";
-    String courseEntityName = "testFindCourse";
-    String teacherEntityName = "testFindTeacher";
+  void testQuery() {
+    String classesEntityName = "testQueryClasses";
+    String studentEntityName = "testQueryStudent";
+    String studentDetailEntityName = "testQueryStudentDetail";
+    String courseEntityName = "testQueryCourse";
+    String teacherEntityName = "testQueryTeacher";
     createClassesEntity(session, classesEntityName);
     createStudentEntity(session, studentEntityName);
     createStudentDetailEntity(session, studentDetailEntityName);
@@ -39,43 +39,24 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     // 创建查询
     String query = """
       query {
-        classes: system_list_testFindClasses(
-         page: 1,
-         size:1,
-         where: {classCode: {_eq: "C_001"}, _and: [{className: {_eq: "一年级1班"}}, {_or: [{classCode: { _eq: "C_002"}}]}]}
-        ) {
-          id, classCode, className, students { name: studentName, courses { courseName } }
-        }
-        students: system_list_testFindStudent(
-          size: 3
-          page: 1
-          order_by: {classId: asc, id: desc}
-        ) {
-          id, studentName
-        }
-        teachers: system_list_testFindTeacher {
-         id, teacherName
-        }
-        course: system_find_one_testFindCourse {
-           courseNo, courseName
-        }
-        aggregate: system_aggregate_testFindStudent {
-           _count
-        }
-        aggregate2: system_aggregate_testFindStudent {
-           total: _count(distinct: true, field: id)
-           _max {
-             id, age
-           }
-           _min {
-             id, age
-           }
-           _sum {
-             age
-           }
-           _avg {
-             age
-           }
+        system_list_testQueryStudent {
+          age
+          classId
+          gender
+          id
+          studentName
+          _join {
+            system_aggregate_Student {
+              _count
+            }
+            system_list_testQueryStudent(size:10, page:1) {
+              age
+              classId
+              gender
+              id
+              studentName
+            }
+          }
         }
       }
       """;
