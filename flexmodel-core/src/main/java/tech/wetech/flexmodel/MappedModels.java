@@ -2,6 +2,7 @@ package tech.wetech.flexmodel;
 
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author cjbi
@@ -9,6 +10,8 @@ import java.util.List;
 public interface MappedModels {
 
   List<Model> sync(AbstractSessionContext sqlContext);
+
+  List<Model> sync(AbstractSessionContext sqlContext, Set<String> includes);
 
   List<Model> lookup(String schemaName);
 

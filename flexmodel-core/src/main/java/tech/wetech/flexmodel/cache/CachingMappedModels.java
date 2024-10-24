@@ -5,6 +5,7 @@ import tech.wetech.flexmodel.MappedModels;
 import tech.wetech.flexmodel.Model;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author cjbi
@@ -23,6 +24,12 @@ public class CachingMappedModels implements MappedModels {
   public List<Model> sync(AbstractSessionContext context) {
     cache.invalidateAll();
     return delegate.sync(context);
+  }
+
+  @Override
+  public List<Model> sync(AbstractSessionContext sqlContext, Set<String> includes) {
+    cache.invalidateAll();
+    return delegate.sync(sqlContext, includes);
   }
 
   @Override

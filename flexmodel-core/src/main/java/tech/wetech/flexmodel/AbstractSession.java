@@ -6,6 +6,7 @@ import tech.wetech.flexmodel.validator.DataOperationsValidationDecorator;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -45,6 +46,11 @@ public abstract class AbstractSession implements Session {
   @Override
   public List<Model> syncModels() {
     return schemaOperationsDelegate.syncModels();
+  }
+
+  @Override
+  public List<Model> syncModels(Set<String> modelNames) {
+    return schemaOperationsDelegate.syncModels(modelNames);
   }
 
   @Override

@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 
 /**
@@ -14,6 +15,8 @@ public interface SchemaOperations {
    * 同步模型变更
    */
   List<Model> syncModels();
+
+  List<Model> syncModels(Set<String> modelNames);
 
   /**
    * 获取所有模型

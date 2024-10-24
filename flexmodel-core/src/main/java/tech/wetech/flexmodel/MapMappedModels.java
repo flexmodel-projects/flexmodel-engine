@@ -1,9 +1,6 @@
 package tech.wetech.flexmodel;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author cjbi
@@ -15,6 +12,11 @@ public class MapMappedModels implements MappedModels {
   @Override
   public List<Model> sync(AbstractSessionContext context) {
     // ignore
+    return Collections.emptyList();
+  }
+
+  @Override
+  public List<Model> sync(AbstractSessionContext sqlContext, Set<String> includes) {
     return Collections.emptyList();
   }
 
