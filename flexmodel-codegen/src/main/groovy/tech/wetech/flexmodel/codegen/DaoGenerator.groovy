@@ -174,7 +174,7 @@ class DaoGenerator extends AbstractGenerator {
     out.println "   */"
     out.println "  public <S extends ${modelClass.shortClassName}> S save(S record) {"
     out.println "    if (record.get${modelClass.idField.fieldName.capitalize()}() != null && findById(record.get${modelClass.idField.fieldName.capitalize()}()) != null) {"
-    out.println "      updateById(record, record.get${modelClass.idField.fieldName.capitalize()}());"
+    out.println "      updateIgnoreNullById(record, record.get${modelClass.idField.fieldName.capitalize()}());"
     out.println "    } else {"
     out.println "      create(record, id -> record.set${modelClass.idField.fieldName.capitalize()}(id));"
     out.println "    }"
