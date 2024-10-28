@@ -90,7 +90,7 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
     return result;
   }
 
-  protected Query getQuery(Integer pageNumber, Integer pageSize, Map<String, String> orderBy, String filter, Query query) {
+  protected Query getQuery(Integer pageNumber, Integer pageSize, Map<String, String> orderBy, Map<String, Object> where, Query query) {
     if (pageSize != null && pageNumber != null) {
       query.setPage(pageNumber, pageSize);
     }
@@ -101,8 +101,8 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
         }
       );
     }
-    if (filter != null) {
-      query.setFilter(filter);
+    if (where != null) {
+      query.setFilter(jsonObjectConverter.toJsonString(where));
     }
     return query;
   }

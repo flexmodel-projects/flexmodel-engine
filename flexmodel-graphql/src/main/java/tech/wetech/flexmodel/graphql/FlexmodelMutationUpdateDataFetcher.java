@@ -19,9 +19,10 @@ public class FlexmodelMutationUpdateDataFetcher extends FlexmodelAbstractDataFet
   public Map<String, Object> get(DataFetchingEnvironment environment) throws Exception {
     Map<String, Object> where = getArgument(environment, WHERE);
     Map<String, Object> setValue = getArgument(environment, "_set");
+    final String filter = where != null ? jsonObjectConverter.toJsonString(where) : null;
     assert setValue != null;
     try (Session session = sessionFactory.createSession(schemaName)) {
-      int rows = session.update(modelName, setValue, jsonObjectConverter.toJsonString(where));
+      int rows = session.update(modelName, setValue, filter);
       return Map.of(AFFECTED_ROWS, rows);
     }
   }

@@ -84,7 +84,7 @@ public class FlexmodelAggregateDataFetcher extends FlexmodelAbstractDataFetcher<
             }
             return projection;
           });
-        return getQuery(pageNumber, pageSize, orderBy, jsonObjectConverter.toJsonString(where), query);
+        return getQuery(pageNumber, pageSize, orderBy, where, query);
       });
       // 不支持关联字段查询
       return toResult(list.get(0));

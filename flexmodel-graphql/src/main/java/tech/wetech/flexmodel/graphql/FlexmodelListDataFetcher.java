@@ -51,7 +51,7 @@ public class FlexmodelListDataFetcher extends FlexmodelAbstractDataFetcher<List<
             }
             return projection;
           });
-          return getQuery(pageNumber, pageSize, orderBy, jsonObjectConverter.toJsonString(where), query);
+          return getQuery(pageNumber, pageSize, orderBy, where, query);
         }
       );
       List<Map<String, Object>> result = new ArrayList<>();
