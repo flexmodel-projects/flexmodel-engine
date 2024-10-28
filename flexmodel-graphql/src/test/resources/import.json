@@ -355,6 +355,97 @@
       "indexes": []
     },
     {
+      "name": "Config",
+      "comment": "配置",
+      "type": "entity",
+      "fields": [
+        {
+          "name": "id",
+          "type": "id",
+          "unique": true,
+          "nullable": true,
+          "generator": {
+            "type": "ULIDValueGenerator",
+            "generationTime": "INSERT"
+          },
+          "modelName": "Config",
+          "validators": [],
+          "generatedValue": "ULID"
+        },
+        {
+          "name": "key",
+          "comment": "名称",
+          "type": "string",
+          "length": 255,
+          "unique": false,
+          "nullable": false,
+          "modelName": "Config",
+          "validators": [
+            {
+              "type": "NotNullValidator",
+              "message": "must not be null"
+            }
+          ]
+        },
+        {
+          "name": "value",
+          "type": "text",
+          "length": 255,
+          "unique": false,
+          "nullable": true,
+          "modelName": "Config",
+          "validators": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "unique": false,
+          "nullable": false,
+          "generator": {
+            "type": "DatetimeNowValueGenerator",
+            "generationTime": "INSERT"
+          },
+          "modelName": "ApiInfo",
+          "validators": [
+            {
+              "type": "NotNullValidator",
+              "message": "must not be null"
+            }
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "unique": false,
+          "nullable": false,
+          "generator": {
+            "type": "DatetimeNowValueGenerator",
+            "generationTime": "ALWAYS"
+          },
+          "modelName": "Config",
+          "validators": [
+            {
+              "type": "NotNullValidator",
+              "message": "must not be null"
+            }
+          ]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "IDX_key",
+          "modelName": "Config",
+          "fields": [
+            {
+              "fieldName": "key",
+              "direction": "ASC"
+            }
+          ],
+          "unique": true
+        }
+      ]
+    },
+    {
       "type": "entity",
       "name": "Teacher",
       "fields": [

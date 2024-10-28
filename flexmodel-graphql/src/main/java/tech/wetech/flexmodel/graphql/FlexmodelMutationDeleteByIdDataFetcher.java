@@ -17,7 +17,7 @@ public class FlexmodelMutationDeleteByIdDataFetcher extends FlexmodelAbstractDat
 
   @Override
   public Map<String, Object> get(DataFetchingEnvironment environment) throws Exception {
-    Object id = environment.getArgument("id");
+    Object id = getArgument(environment, ID);
     try (Session session = sessionFactory.createSession(schemaName)) {
       Map<String, Object> data = session.findById(modelName, id);
       session.deleteById(modelName, id);

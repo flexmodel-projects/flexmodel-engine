@@ -24,7 +24,7 @@ public class DefaultSqlExpressionCalculator extends SqlExpressionCalculator {
       }
       SqlRuntimeContext sqlRuntimeContext = new SqlRuntimeContext();
       sqlRuntimeContext.setIdentifierQuoteString(sqlDialect.getIdentifierQuoteString());
-      return jsonLogic.evaluateSql(expression, sqlRuntimeContext);
+      return jsonLogic.evaluateSql(transform(expression), sqlRuntimeContext);
     } catch (Exception e) {
       throw new ExpressionCalculatorException(e.getMessage(), e);
     }
@@ -40,7 +40,7 @@ public class DefaultSqlExpressionCalculator extends SqlExpressionCalculator {
       sqlRuntimeContext.setIdentifierQuoteString(sqlDialect.getIdentifierQuoteString());
       NamedPlaceholderHandler placeholderHandler = new NamedPlaceholderHandler();
       sqlRuntimeContext.setPlaceholderHandler(placeholderHandler);
-      String sql = jsonLogic.evaluateSql(expression, sqlRuntimeContext);
+      String sql = jsonLogic.evaluateSql(transform(expression), sqlRuntimeContext);
       return new SqlClauseResult(sql, placeholderHandler.getParameters());
     } catch (Exception e) {
       throw new ExpressionCalculatorException(e.getMessage(), e);

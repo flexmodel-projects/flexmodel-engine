@@ -40,6 +40,9 @@ public class LogicSqlExpression implements SqlExpression {
     for (JsonLogicNode element : arguments) {
       list.add(evaluator.evaluate(element, sqlRuntimeContext).toString());
     }
+    if (list.size() == 1) {
+      list.add(SqlExpression.TRUE.toString());
+    }
     String whereClause = list.stream()
       .collect(Collectors.joining(" " + key() + " ", " (", " )"));
     return new SqlIdentifier(whereClause);

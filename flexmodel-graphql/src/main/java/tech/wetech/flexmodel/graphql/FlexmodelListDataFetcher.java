@@ -14,9 +14,9 @@ import static tech.wetech.flexmodel.Projections.field;
 /**
  * @author cjbi
  */
-public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<Map<String, Object>>> {
+public class FlexmodelListDataFetcher extends FlexmodelAbstractDataFetcher<List<Map<String, Object>>> {
 
-  public FlexmodelFindDataFetcher(String schemaName, String modelName, SessionFactory sessionFactory) {
+  public FlexmodelListDataFetcher(String schemaName, String modelName, SessionFactory sessionFactory) {
     super(schemaName, modelName, sessionFactory);
   }
 
@@ -26,9 +26,10 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
   }
 
   public List<Map<String, Object>> findRootData(DataFetchingEnvironment env) {
-    Integer pageNumber = env.getArgument("page_number");
-    Integer pageSize = env.getArgument("page_size");
-    Map<String, String> orderBy = env.getArgument("order_by");
+    Integer pageNumber = getArgument(env, PAGE_NUMBER);
+    Integer pageSize = getArgument(env, PAGE_SIZE);
+    Map<String, String> orderBy = getArgument(env, ORDER_BY);
+    Map<String, Object> where = getArgument(env, WHERE);
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     try (Session session = sessionFactory.createSession(schemaName)) {
       Entity entity = (Entity) session.getModel(modelName);
@@ -50,17 +51,7 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
             }
             return projection;
           });
-          if (pageSize != null && pageNumber != null) {
-            query.setPage(pageNumber, pageSize);
-          }
-          if (orderBy != null) {
-            query.setSort(sort -> {
-                orderBy.forEach((k, v) -> sort.addOrder(k, Direction.valueOf(v.toUpperCase())));
-                return sort;
-              }
-            );
-          }
-          return query;
+          return getQuery(pageNumber, pageSize, orderBy, where, query);
         }
       );
       List<Map<String, Object>> result = new ArrayList<>();
@@ -80,5 +71,7 @@ public class FlexmodelFindDataFetcher extends FlexmodelAbstractDataFetcher<List<
       return result;
     }
   }
+
+
 
 }

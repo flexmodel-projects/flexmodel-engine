@@ -63,6 +63,15 @@ public class SessionFactory {
     allModels.forEach(model -> cache.put(buildItem.getSchemaName() + ":" + model.getName(), model));
   }
 
+  public void loadScriptString(String schemaName, String scriptString) {
+    ImportDescribe describe = jsonObjectConverter.parseToObject(scriptString, ImportDescribe.class);
+    try (Session session = createFailSafeSession(schemaName)) {
+      List<RelationField> lazyCreateList = processModels(describe.getSchema(), session);
+      lazyCreateRelationFields(lazyCreateList, session);
+      processImportData(describe.getData(), session);
+    }
+  }
+
   public void loadScript(String schemaName, String scriptName) {
     try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(scriptName)) {
       if (is == null) {
@@ -70,13 +79,7 @@ public class SessionFactory {
         return;
       }
       String scriptJSON = new String(is.readAllBytes());
-      ImportDescribe describe = jsonObjectConverter.parseToObject(scriptJSON, ImportDescribe.class);
-
-      try (Session session = createFailSafeSession(schemaName)) {
-        List<RelationField> lazyCreateList = processModels(describe.getSchema(), session);
-        lazyCreateRelationFields(lazyCreateList, session);
-        processImportData(describe.getData(), session);
-      }
+      loadScriptString(schemaName, scriptJSON);
     } catch (IOException e) {
       log.error("Failed to read import script: {}", e.getMessage(), e);
     }

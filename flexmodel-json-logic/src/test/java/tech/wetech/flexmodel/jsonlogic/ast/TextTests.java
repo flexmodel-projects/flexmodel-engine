@@ -50,7 +50,7 @@ public class TextTests {
     NamedPlaceholderHandler placeholderHandler = new NamedPlaceholderHandler();
     sqlRuntimeContext.setPlaceholderHandler(placeholderHandler);
     String sql = jsonLogic.evaluateSql(json, sqlRuntimeContext);
-    assertEquals(" ( defaultvaluetest.wenben1 like concat('%', concat(:defaultvaluetest_wenben1_0,'%')) )", sql);
+    assertEquals(" ( defaultvaluetest.wenben1 like concat('%', concat(:defaultvaluetest_wenben1_0,'%')) and 1=1 )", sql);
     assertTrue(placeholderHandler.getParameters().containsValue("二十大"));
     assertTrue(jsonLogic.evaluateBoolean(json, Map.of("defaultvaluetest", Map.of("wenben1", "党的二十大"))));
   }
@@ -70,7 +70,7 @@ public class TextTests {
     NamedPlaceholderHandler placeholderHandler = new NamedPlaceholderHandler();
     sqlRuntimeContext.setPlaceholderHandler(placeholderHandler);
     String sql = jsonLogic.evaluateSql(json, sqlRuntimeContext);
-    assertEquals(" ( defaultvaluetest.wenben1 not like concat('%', concat(:defaultvaluetest_wenben1_0,'%')) )", sql);
+    assertEquals(" ( defaultvaluetest.wenben1 not like concat('%', concat(:defaultvaluetest_wenben1_0,'%')) and 1=1 )", sql);
     assertTrue(placeholderHandler.getParameters().containsValue("二十大"));
     assertFalse(jsonLogic.evaluateBoolean(json, Map.of("defaultvaluetest", Map.of("wenben1", "党的二十大"))));
   }

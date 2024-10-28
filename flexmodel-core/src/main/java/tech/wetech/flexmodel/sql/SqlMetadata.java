@@ -5,10 +5,7 @@ import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author cjbi
@@ -48,19 +45,27 @@ public class SqlMetadata {
   }
 
   public List<SqlTable> getTables() {
-    return getTables(null);
+    return getTables(null, null);
+  }
+
+  public List<SqlTable> getTables(Set<String> includes) {
+    return getTables(null, includes);
   }
 
   /**
    * @param tableNamePattern is nullable
    * @return
    */
-  public List<SqlTable> getTables(String tableNamePattern) {
+  public List<SqlTable> getTables(String tableNamePattern, Set<String> includes) {
     try (ResultSet tableResultSet = metaData.getTables(catalog, schema, tableNamePattern, new String[]{"TABLE"})) {
       List<SqlTable> tables = new ArrayList<>();
       while (tableResultSet.next()) {
         SqlTable table = new SqlTable();
-        table.setName(tableResultSet.getString("TABLE_NAME"));
+        String tableName = tableResultSet.getString("TABLE_NAME");
+        if (includes != null && !includes.contains(tableName)) {
+          continue;
+        }
+        table.setName(tableName);
         String comment = tableResultSet.getString("REMARKS");
         if (comment != null && !comment.isEmpty()) {
           table.setComment(comment);
@@ -162,7 +167,7 @@ public class SqlMetadata {
         column.setLength(columnSize);
         switch (JDBCType.valueOf(dataType)) {
           case BIT, TINYINT, SMALLINT, INTEGER,
-            BIGINT, FLOAT, DOUBLE, NUMERIC, DECIMAL -> {
+               BIGINT, FLOAT, DOUBLE, NUMERIC, DECIMAL -> {
             column.setPrecision(columnSize);
             column.setScale(decimalDigits);
           }

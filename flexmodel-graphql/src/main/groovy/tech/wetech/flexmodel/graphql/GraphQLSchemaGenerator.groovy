@@ -15,13 +15,13 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
   def typeMapping = [
     "id"      : "ID",
     "string"  : "String",
-    "text"    : "Text",
+    "text"    : "String",
     "decimal" : "Float",
     "int"     : "Int",
-    "bigint"  : "Long",
+    "bigint"  : "Int",
     "boolean" : "Boolean",
-    "datetime": "DateTime",
-    "date"    : "Date",
+    "datetime": "String",
+    "date"    : "String",
     "json"    : "JSON",
   ]
 
@@ -29,14 +29,13 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     "id"      : "Int_comparison_exp",
     "string"  : "String_comparison_exp",
     "text"    : "String_comparison_exp",
-    "decimal" : "Int_comparison_exp",
+    "decimal" : "Float_comparison_exp",
     "int"     : "Int_comparison_exp",
     "bigint"  : "Int_comparison_exp",
-    "boolean" : "String_comparison_exp",
-    "date": "String_comparison_exp",
-    "datetime": "String_comparison_exp",
-    "json"    : "String_comparison_exp",
-    "relation": "String_comparison_exp",
+    "boolean" : "Boolean_comparison_exp",
+    "date"    : "Date_comparison_exp",
+    "datetime": "DateTime_comparison_exp",
+    "json"    : "JSON_comparison_exp",
   ]
 
   def toGraphQLType(ModelField itt) {
@@ -68,7 +67,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "  ${DataFetchers.FIND.keyFunc.apply(it.schemaName, it.modelName)}("
       out.println "    \"filter the rows returned\""
       out.println "    where: ${key}_bool_exp"
-      out.println "    \"sort the rows by one or more columns\""
+      out.println "    \"sort the rows by one or more fields\""
       out.println "    order_by: ${key}_order_by"
       out.println "    \"Specify the max returned records per page (default to 30)\""
       out.println "    size: Int"
@@ -79,7 +78,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "  ${DataFetchers.AGGREGATE.keyFunc.apply(it.schemaName, it.modelName)}("
       out.println "    \"filter the rows returned\""
       out.println "    where: ${key}_bool_exp"
-      out.println "    \"sort the rows by one or more columns\""
+      out.println "    \"sort the rows by one or more fields\""
       out.println "    order_by: ${key}_order_by"
       out.println "    \"Specify the max returned records per page (default to 30)\""
       out.println "    size: Int"
@@ -132,22 +131,29 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       it.allFields.each {
         out.println "  ${it.fieldName} : ${toGraphQLType(it)}"
       }
+      out.println "  _join: Query"
+      out.println "  _join_mutation: Mutation"
       out.println "}"
       out.println ""
       "aggregated selection of \\\"${key}\\\""
       out.println "type ${key}_aggregate {"
-      out.println "  aggregate: ${key}_aggregate_fields"
-      out.println "  nodes: [${key}!]!"
+      out.println "  _count(distinct: Boolean, field: ${key}_select_field): Int!"
+      out.println "  _max: ${key}!"
+      out.println "  _min: ${key}!"
+      out.println "  _sum: ${key}!"
+      out.println "  _avg: ${key}_avg_fields!"
+      out.println "  _join: Query"
+      out.println "  _join_mutation: Mutation"
       out.println "}"
       out.println ""
-      out.println "\"aggregate fields of \\\"${key}\\\"\""
-      out.println "type ${key}_aggregate_fields {"
-      out.println "  count: ${key}_select_column"
-      out.println "  max: ${key}_select_column"
-      out.println "  min: ${key}_select_column"
-      out.println "  sum: ${key}_select_column"
-      out.println "  avg: ${key}_select_column"
+      out.println "type ${key}_avg_fields {"
+      it.allFields.each {
+        if (!it.isRelationField()) {
+          out.println "  ${it.fieldName}: Float"
+        }
+      }
       out.println "}"
+      out.println ""
     }
     context.modelListClass.modelList.each {
       out.println ""
@@ -193,7 +199,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     context.modelListClass.modelList.each {
       def key = "${it.schemaName}_${it.modelName}"
       out.println ""
-      out.println "enum ${key}_select_column {"
+      out.println "enum ${key}_select_field {"
       it.allFields.each {
         if (!it.isRelationField()) {
           out.println "  ${it.fieldName}"
@@ -203,59 +209,107 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     }
 
     out.println ""
+    out.println "directive @internal on VARIABLE_DEFINITION"
+    out.println "directive @export(as: String) on FIELD"
+    out.println "directive @transform(get: String!) on FIELD"
+    out.println ""
     out.println "scalar JSON"
     out.println "scalar Date"
     out.println "scalar DateTime"
-    out.println "scalar Text"
-    out.println "scalar Long"
     out.println ""
-    out.println "\"Boolean expression to compare columns of type \\\"Int\\\". All fields are combined with logical 'AND.'\""
+    out.println "\"Boolean expression to compare fields of type \\\"ID\\\". All fields are combined with logical 'AND.'\""
+    out.println "input ID_comparison_exp {"
+    out.println "  _eq: String"
+    out.println "  _ne: String"
+    out.println "  _in: [String!]"
+    out.println "  _nin: [String!]"
+    out.println "  _contains: String"
+    out.println "  _not_contains: String"
+    out.println "  _starts_with: String"
+    out.println "  _ends_with: String"
+    out.println "}"
+    out.println ""
+    out.println "\"Boolean expression to compare fields of type \\\"Int\\\". All fields are combined with logical 'AND.'\""
     out.println "input Int_comparison_exp {"
     out.println "  _eq: Int"
+    out.println "  _ne: Int"
     out.println "  _gt: Int"
-    out.println "  _gte: Int"
-    out.println "  _in: [Int!]"
-    out.println "  _is_null: Boolean"
     out.println "  _lt: Int"
+    out.println "  _gte: Int"
     out.println "  _lte: Int"
-    out.println "  _neq: Int"
+    out.println "  _in: [Int!]"
     out.println "  _nin: [Int!]"
     out.println "}"
     out.println ""
-    out.println "\"Boolean expression to compare columns of type \\\"String\\\". All fields are combined with logical 'AND.'\""
-    out.println "input String_comparison_exp {"
-    out.println "  _eq: String"
-    out.println "  _gt: String"
-    out.println "  _gte: String"
-    out.println "  _in: [String!]"
-    out.println "  _is_null: Boolean"
-    out.println "  _lt: String"
-    out.println "  _lte: String"
-    out.println "  _neq: String"
-    out.println "  _nin: [String!]"
-    out.println "  \"does the column NOT match the given POSIX regular expression, case insensitive\""
-    out.println "  _niregex: String"
-    out.println "  \"does the column NOT match the given POSIX regular expression, case sensitive\""
-    out.println "  _nregex: String"
-    out.println "  \"does the column NOT match the given SQL regular expression\""
-    out.println "  _nsimilar: String"
-    out.println "  \"does the column NOT match the given case-insensitive pattern\""
-    out.println "  _nilike: String"
-    out.println "  \"does the column NOT match the given pattern\""
-    out.println "  _nlike: String"
-    out.println "  \"does the column match the given POSIX regular expression, case insensitive\""
-    out.println "  _iregex: String"
-    out.println "  \"does the column match the given POSIX regular expression, case sensitive\""
-    out.println "  _regex: String"
-    out.println "  \"does the column match the given SQL regular expression\""
-    out.println "  _similar: String"
-    out.println "  \"does the column match the given case-insensitive pattern\""
-    out.println "  _ilike: String"
-    out.println "  \"does the column match the given pattern\""
-    out.println "  _like: String"
+    out.println "\"Boolean expression to compare fields of type \\\"Float\\\". All fields are combined with logical 'AND.'\""
+    out.println "input Float_comparison_exp {"
+    out.println "  _eq: Float"
+    out.println "  _ne: Float"
+    out.println "  _gt: Float"
+    out.println "  _lt: Float"
+    out.println "  _gte: Float"
+    out.println "  _lte: Float"
+    out.println "  _in: [Float!]"
+    out.println "  _nin: [Float!]"
     out.println "}"
     out.println ""
-    out.println "\"column ordering options\""
+    out.println "\"Boolean expression to compare fields of type \\\"String\\\". All fields are combined with logical 'AND.'\""
+    out.println "input String_comparison_exp {"
+    out.println "  _eq: String"
+    out.println "  _ne: String"
+    out.println "  _in: [String!]"
+    out.println "  _nin: [String!]"
+    out.println "  _contains: String"
+    out.println "  _not_contains: String"
+    out.println "  _starts_with: String"
+    out.println "  _ends_with: String"
+    out.println "}"
+    out.println ""
+    out.println "\"Boolean expression to compare fields of type \\\"JSON\\\". All fields are combined with logical 'AND.'\""
+    out.println "input JSON_comparison_exp {"
+    out.println "  _eq: String"
+    out.println "  _ne: String"
+    out.println "  _in: [String!]"
+    out.println "  _nin: [String!]"
+    out.println "  _contains: String"
+    out.println "  _not_contains: String"
+    out.println "  _starts_with: String"
+    out.println "  _ends_with: String"
+    out.println "}"
+    out.println ""
+    out.println "\"Boolean expression to compare fields of type \\\"Boolean\\\". All fields are combined with logical 'AND.'\""
+    out.println "input Boolean_comparison_exp {"
+    out.println "  _eq: Boolean"
+    out.println "  _ne: Boolean"
+    out.println "}"
+    out.println ""
+    out.println "\"Boolean expression to compare fields of type \\\"Date\\\". All fields are combined with logical 'AND.'\""
+    out.println "input Date_comparison_exp {"
+    out.println "  _eq: Date"
+    out.println "  _ne: Date"
+    out.println "  _gt: Date"
+    out.println "  _lt: Date"
+    out.println "  _gte: Date"
+    out.println "  _lte: Date"
+    out.println "  _in: [Date!]"
+    out.println "  _nin: [Date!]"
+    out.println "  _between: [Date!]"
+    out.println "}"
+    out.println ""
+    out.println "\"Boolean expression to compare fields of type \\\"DateTime\\\". All fields are combined with logical 'AND.'\""
+    out.println "input DateTime_comparison_exp {"
+    out.println "  _eq: DateTime"
+    out.println "  _ne: DateTime"
+    out.println "  _gt: DateTime"
+    out.println "  _lt: DateTime"
+    out.println "  _gte: DateTime"
+    out.println "  _lte: DateTime"
+    out.println "  _in: [DateTime!]"
+    out.println "  _nin: [DateTime!]"
+    out.println "  _between: [DateTime!]"
+    out.println "}"
+    out.println ""
+    out.println "\"field ordering options\""
     out.println "enum order_by {"
     out.println "    \"in ascending order, nulls last\""
     out.println "  asc"
@@ -274,6 +328,8 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "type mutation_response {"
     out.println "  \"data from the rows affected by the mutation\""
     out.println "  affected_rows: Int!"
+    out.println "  _join: Query"
+    out.println "  _join_mutation: Mutation"
     out.println "}"
 
   }

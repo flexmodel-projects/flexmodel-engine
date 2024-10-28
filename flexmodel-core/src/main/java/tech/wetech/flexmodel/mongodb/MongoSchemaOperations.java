@@ -11,6 +11,7 @@ import tech.wetech.flexmodel.sql.StringHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static tech.wetech.flexmodel.RelationField.Cardinality.ONE_TO_ONE;
 
@@ -35,6 +36,11 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   @Override
   public List<Model> syncModels() {
     return mongoContext.getMappedModels().sync(mongoContext);
+  }
+
+  @Override
+  public List<Model> syncModels(Set<String> modelNames) {
+    return mongoContext.getMappedModels().sync(mongoContext, modelNames);
   }
 
   @Override

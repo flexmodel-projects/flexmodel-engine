@@ -1,13 +1,12 @@
 package tech.wetech.flexmodel;
 
-import tech.wetech.flexmodel.event.record.DataOperationsEventDecorator;
-import tech.wetech.flexmodel.event.schema.SchemaOperationsEventDecorator;
 import tech.wetech.flexmodel.generator.DataOperationsGenerationDecorator;
 import tech.wetech.flexmodel.graph.JoinGraphNode;
 import tech.wetech.flexmodel.validator.DataOperationsValidationDecorator;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -24,18 +23,13 @@ public abstract class AbstractSession implements Session {
                          SchemaOperations schemaOperationsDelegate) {
     this.schemaName = sessionContext.getSchemaName();
     this.dataOperationsDelegate =
-      new DataOperationsEventDecorator(
-        sessionContext,
-        new DataOperationsGenerationDecorator(sessionContext,
-          new DataOperationsValidationDecorator(sessionContext,
-            dataOperationsDelegate
-          )
+      new DataOperationsGenerationDecorator(sessionContext,
+        new DataOperationsValidationDecorator(sessionContext,
+          dataOperationsDelegate
         )
       );
     this.schemaOperationsDelegate =
-      new SchemaOperationsEventDecorator(
-        sessionContext,
-        new SchemaOperationsPersistenceDecorator(sessionContext, schemaOperationsDelegate));
+      new SchemaOperationsPersistenceDecorator(sessionContext, schemaOperationsDelegate);
     this.factory = sessionContext.getFactory();
   }
 
@@ -52,6 +46,11 @@ public abstract class AbstractSession implements Session {
   @Override
   public List<Model> syncModels() {
     return schemaOperationsDelegate.syncModels();
+  }
+
+  @Override
+  public List<Model> syncModels(Set<String> modelNames) {
+    return schemaOperationsDelegate.syncModels(modelNames);
   }
 
   @Override

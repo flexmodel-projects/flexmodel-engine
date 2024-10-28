@@ -1,14 +1,18 @@
 package tech.wetech.flexmodel.graphql;
 
+import graphql.execution.CoercedVariables;
+import graphql.execution.ValuesResolver;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
 import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static tech.wetech.flexmodel.Projections.field;
 
@@ -20,6 +24,22 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
   protected final String schemaName;
   protected final String modelName;
   protected final SessionFactory sessionFactory;
+
+  protected static final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
+
+  protected static final String PAGE_NUMBER = "page";
+  protected static final String PAGE_SIZE = "size";
+  protected static final String ORDER_BY = "order_by";
+  protected static final String WHERE = "where";
+  protected static final String ID = "id";
+  protected static final String AFFECTED_ROWS = "affected_rows";
+  protected static final String AGG_COUNT = "_count";
+  protected static final String AGG_MAX = "_max";
+  protected static final String AGG_MIN = "_min";
+  protected static final String AGG_SUM = "_sum";
+  protected static final String AGG_AVG = "_avg";
+  protected static final String[] AGG_FIELDS = new String[]{AGG_COUNT, AGG_MAX, AGG_MIN, AGG_SUM, AGG_AVG};
+
 
   public FlexmodelAbstractDataFetcher(String schemaName, String modelName, SessionFactory sessionFactory) {
     this.schemaName = schemaName;
@@ -68,6 +88,43 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
       }
     }
     return result;
+  }
+
+  protected Query getQuery(Integer pageNumber, Integer pageSize, Map<String, String> orderBy, Map<String, Object> where, Query query) {
+    if (pageSize != null && pageNumber != null) {
+      query.setPage(pageNumber, pageSize);
+    }
+    if (orderBy != null) {
+      query.setSort(sort -> {
+          orderBy.forEach((k, v) -> sort.addOrder(k, Direction.valueOf(v.toUpperCase())));
+          return sort;
+        }
+      );
+    }
+    if (where != null) {
+      query.setFilter(jsonObjectConverter.toJsonString(where));
+    }
+    return query;
+  }
+
+  protected Map<String, Object> getArguments(DataFetchingEnvironment env) {
+    Map<String, Object> newVariables = new HashMap<>();
+    newVariables.putAll(env.getVariables());
+    Map<String, Object> variables = env.getGraphQlContext()
+      .getOrDefault("__VARIABLES", new ConcurrentHashMap<>());
+    newVariables.putAll(variables);
+    return ValuesResolver.getArgumentValues(
+      env.getGraphQLSchema().getCodeRegistry(),
+      env.getFieldDefinition().getArguments(),
+      env.getField().getArguments(),
+      CoercedVariables.of(newVariables),
+      env.getGraphQlContext(),
+      env.getLocale());
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <R> R getArgument(DataFetchingEnvironment env, String name) {
+    return (R) getArguments(env).get(name);
   }
 
 }

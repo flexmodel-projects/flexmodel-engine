@@ -134,8 +134,13 @@ public class JdbcMappedModels implements MappedModels {
 
   @Override
   public List<Model> sync(AbstractSessionContext context) {
+    return sync(context, null);
+  }
+
+  @Override
+  public List<Model> sync(AbstractSessionContext context, Set<String> includes) {
     SqlContext sqlContext = (SqlContext) context;
-    List<Entity> entities = convert(sqlContext.getSqlMetadata().getTables(), sqlContext);
+    List<Entity> entities = convert(sqlContext.getSqlMetadata().getTables(includes), sqlContext);
     Map<String, Model> metaMap = lookup(sqlContext.getSchemaName()).stream().collect(Collectors.toMap(Model::getName, model -> model));
     for (Entity entity : entities) {
       Model model = getIgnoreCase(entity.getName(), metaMap);

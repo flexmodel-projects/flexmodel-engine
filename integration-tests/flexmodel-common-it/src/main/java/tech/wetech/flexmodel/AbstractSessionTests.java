@@ -650,7 +650,9 @@ public abstract class AbstractSessionTests {
           .setFrom(courseEntityName)
           .setFilter("""
             {
-              "!=": [{ "var": ["teacher_id"] }, 999]
+              "teacher_id": {
+                "_ne": 999
+              }
             }
             """)
         )
@@ -737,12 +739,16 @@ public abstract class AbstractSessionTests {
     createTeacherEntity2(entityName);
     boolean exists = session.exists(entityName, query -> query.setFilter("""
       {
-        "or": [
+        "_or": [
           {
-            "==": [{ "var": ["name"] }, "张三"]
+            "name": {
+              "_eq": "张三"
+            }
           },
           {
-            "==": [{ "var": ["name"] }, "李四"]
+            "name": {
+              "_eq": "李四"
+            }
           }
         ]
       }
@@ -799,7 +805,9 @@ public abstract class AbstractSessionTests {
     createTeacherEntity2(entityName);
     int affectedRows = session.delete(entityName, """
       {
-        "==": [{ "var": ["id"] }, 999]
+        "id": {
+          "_eq": 999
+        }
       }
       """);
     Assertions.assertEquals(0, affectedRows);
@@ -1018,7 +1026,7 @@ public abstract class AbstractSessionTests {
         )
         .setFilter("""
           {
-            "!=": [{ "var": ["id"] }, 999]
+            "id": {"_ne": 999}
           }
           """)
         .setGroupBy(groupBy ->

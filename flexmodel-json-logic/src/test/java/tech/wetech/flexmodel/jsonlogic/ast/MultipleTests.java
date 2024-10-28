@@ -38,7 +38,7 @@ public class MultipleTests {
     NamedPlaceholderHandler placeholderHandler = new NamedPlaceholderHandler();
     sqlRuntimeContext.setPlaceholderHandler(placeholderHandler);
     String sql = jsonLogic.evaluateSql(json, sqlRuntimeContext);
-    assertEquals(" (defaultvaluetest.duoxuan2 in (:defaultvaluetest_duoxuan2_0, :defaultvaluetest_duoxuan2_1)  )", sql);
+    assertEquals(" (defaultvaluetest.duoxuan2 in (:defaultvaluetest_duoxuan2_0, :defaultvaluetest_duoxuan2_1)  and 1=1 )", sql);
     assertTrue(jsonLogic.evaluateBoolean(json, Map.of("defaultvaluetest", Map.of("duoxuan2", Arrays.asList("天空", "大地", "海洋")))));
   }
 
@@ -60,7 +60,7 @@ public class MultipleTests {
     NamedPlaceholderHandler placeholderHandler = new NamedPlaceholderHandler();
     sqlRuntimeContext.setPlaceholderHandler(placeholderHandler);
     String sql = jsonLogic.evaluateSql(json, sqlRuntimeContext);
-    assertEquals(" (defaultvaluetest.duoxuan2 in (:defaultvaluetest_duoxuan2_0, :defaultvaluetest_duoxuan2_1)  )", sql);
+    assertEquals(" (defaultvaluetest.duoxuan2 in (:defaultvaluetest_duoxuan2_0, :defaultvaluetest_duoxuan2_1)  and 1=1 )", sql);
     assertTrue(jsonLogic.evaluateBoolean(json, Map.of("defaultvaluetest", Map.of("duoxuan2", Map.of("multiple", Arrays.asList("天空", "大地", "海洋"))))));
   }
 
@@ -82,7 +82,7 @@ public class MultipleTests {
     NamedPlaceholderHandler placeholderHandler = new NamedPlaceholderHandler();
     sqlRuntimeContext.setPlaceholderHandler(placeholderHandler);
     String sql = jsonLogic.evaluateSql(json, sqlRuntimeContext);
-    assertEquals(" ( defaultvaluetest.duoxuan2 like concat('%', concat(:defaultvaluetest_duoxuan2_0,'%')) )", sql);
+    assertEquals(" ( defaultvaluetest.duoxuan2 like concat('%', concat(:defaultvaluetest_duoxuan2_0,'%')) and 1=1 )", sql);
     assertTrue(jsonLogic.evaluateBoolean(json, Map.of("defaultvaluetest", Map.of("duoxuan2", Arrays.asList("天空", "大地", "海洋")))));
   }
 

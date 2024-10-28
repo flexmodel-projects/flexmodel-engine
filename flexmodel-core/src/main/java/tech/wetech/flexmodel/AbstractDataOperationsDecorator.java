@@ -1,6 +1,5 @@
 package tech.wetech.flexmodel;
 
-import tech.wetech.flexmodel.event.record.*;
 import tech.wetech.flexmodel.graph.JoinGraphNode;
 
 import java.util.List;
@@ -28,12 +27,10 @@ public class AbstractDataOperationsDecorator implements DataOperations {
 
   @Override
   public int insert(String modelName, Map<String, Object> record, Consumer<Object> idConsumer) {
-    sessionContext.publishEvent(new PreInsertRecordEvent(sessionContext.getSchemaName(), modelName, record));
     AtomicReference<Object> atomicId = new AtomicReference<>();
     int rows = delegate.insert(modelName, record, atomicId::set);
     Object id = atomicId.get();
     idConsumer.accept(id);
-    sessionContext.publishEvent(new PostInsertRecordEvent(modelName, sessionContext.getSchemaName(), record, id, rows));
     return rows;
   }
 
@@ -54,42 +51,27 @@ public class AbstractDataOperationsDecorator implements DataOperations {
 
   @Override
   public int updateById(String modelName, Map<String, Object> record, Object id) {
-    sessionContext.publishEvent(new PreUpdateRecordEvent(sessionContext.getSchemaName(), modelName, record, id, null));
-    int rows = delegate.updateById(modelName, record, id);
-    sessionContext.publishEvent(new PostUpdateRecordEvent(sessionContext.getSchemaName(), modelName, record, id, null, rows));
-    return rows;
+    return delegate.updateById(modelName, record, id);
   }
 
   @Override
   public int update(String modelName, Map<String, Object> record, String filter) {
-    sessionContext.publishEvent(new PreUpdateRecordEvent(sessionContext.getSchemaName(), modelName, record, null, filter));
-    int rows = delegate.update(modelName, record, filter);
-    sessionContext.publishEvent(new PostUpdateRecordEvent(sessionContext.getSchemaName(), modelName, record, null, filter, rows));
-    return rows;
+    return delegate.update(modelName, record, filter);
   }
 
   @Override
   public int deleteById(String modelName, Object id) {
-    sessionContext.publishEvent(new PreDeleteRecordEvent(sessionContext.getSchemaName(), modelName, id, null));
-    int rows = delegate.deleteById(modelName, id);
-    sessionContext.publishEvent(new PostDeleteRecordEvent(sessionContext.getSchemaName(), modelName, id, null, rows));
-    return rows;
+    return delegate.deleteById(modelName, id);
   }
 
   @Override
   public int delete(String modelName, String filter) {
-    sessionContext.publishEvent(new PreDeleteRecordEvent(sessionContext.getSchemaName(), modelName, null, filter));
-    int rows = delegate.delete(modelName, filter);
-    sessionContext.publishEvent(new PostDeleteRecordEvent(sessionContext.getSchemaName(), modelName, null, filter, rows));
-    return rows;
+    return delegate.delete(modelName, filter);
   }
 
   @Override
   public int deleteAll(String modelName) {
-    sessionContext.publishEvent(new PreDeleteRecordEvent(sessionContext.getSchemaName(), modelName, null, null));
-    int rows = delegate.deleteAll(modelName);
-    sessionContext.publishEvent(new PostDeleteRecordEvent(sessionContext.getSchemaName(), modelName, null, null, rows));
-    return rows;
+    return delegate.deleteAll(modelName);
   }
 
 }

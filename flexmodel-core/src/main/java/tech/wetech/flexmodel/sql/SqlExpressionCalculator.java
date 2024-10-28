@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel.sql;
 
-import tech.wetech.flexmodel.ExpressionCalculator;
+import tech.wetech.flexmodel.AbstractExpressionCalculator;
 import tech.wetech.flexmodel.ExpressionCalculatorException;
 import tech.wetech.flexmodel.jsonlogic.JsonLogic;
 import tech.wetech.flexmodel.sql.dialect.SqlDialect;
@@ -8,7 +8,7 @@ import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 /**
  * @author cjbi
  */
-public abstract class SqlExpressionCalculator implements ExpressionCalculator<SqlClauseResult> {
+public abstract class SqlExpressionCalculator extends AbstractExpressionCalculator<SqlClauseResult> {
 
   protected final SqlDialect sqlDialect;
 

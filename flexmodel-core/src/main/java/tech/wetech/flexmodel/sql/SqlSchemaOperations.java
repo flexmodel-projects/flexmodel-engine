@@ -7,6 +7,7 @@ import tech.wetech.flexmodel.graph.JoinGraphNode;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import static tech.wetech.flexmodel.RelationField.Cardinality.MANY_TO_MANY;
 import static tech.wetech.flexmodel.RelationField.Cardinality.ONE_TO_ONE;
@@ -25,6 +26,11 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   @Override
   public List<Model> syncModels() {
     return sqlContext.getMappedModels().sync(sqlContext);
+  }
+
+  @Override
+  public List<Model> syncModels(Set<String> modelNames) {
+    return sqlContext.getMappedModels().sync(sqlContext, modelNames);
   }
 
   @Override

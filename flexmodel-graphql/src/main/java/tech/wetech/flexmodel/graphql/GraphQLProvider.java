@@ -40,11 +40,21 @@ public class GraphQLProvider {
     context.setModelListClass(modelListClass);
     Map<String, DataFetcher<?>> queryDataFetchers = new HashMap<>();
     Map<String, DataFetcher<?>> mutationDataFetchers = new HashMap<>();
+
+    Map<String, Map<String, DataFetcher<?>>> joinDataFetchers = new HashMap<>();
+    Map<String, DataFetcher<?>> joinMap = Map.of(
+      "_join", (DataFetcher<?>) environment -> Map.of(),
+      "_join_mutation", (DataFetcher<?>) environment -> Map.of()
+    );
+    joinDataFetchers.put("mutation_response", joinMap);
+
     for (String schemaName : sf.getSchemaNames()) {
       List<Model> models = sf.getModels(schemaName);
       for (Model model : models) {
         if (model instanceof Entity entity) {
           modelListClass.getModelList().add(GenerationTool.buildModelClass("", schemaName, entity));
+          joinDataFetchers.put(schemaName + "_" + model.getName(), joinMap);
+          joinDataFetchers.put(schemaName + "_" + model.getName() + "_aggregate", joinMap);
         } else {
           // todo 支持非实体类型
         }
@@ -56,12 +66,12 @@ public class GraphQLProvider {
       for (Model model : models) {
         if (model instanceof Entity entity) {
           for (DataFetchers fetchType : DataFetchers.values()) {
-            if(fetchType.isQuery()) {
+            if (fetchType.isQuery()) {
               queryDataFetchers.put(
                 fetchType.getKeyFunc().apply(schemaName, model.getName()),
                 fetchType.getDataFetcherFunc().apply(schemaName, model.getName(), sf));
             }
-            if(fetchType.isMutation()) {
+            if (fetchType.isMutation()) {
               mutationDataFetchers.put(
                 fetchType.getKeyFunc().apply(schemaName, model.getName()),
                 fetchType.getDataFetcherFunc().apply(schemaName, model.getName(), sf));
@@ -83,17 +93,20 @@ public class GraphQLProvider {
       .dataFetchers("Mutation", mutationDataFetchers)
       .build();
 
+    // supports _join/_join_mutation
+    codeRegistry = codeRegistry.transform(builder -> joinDataFetchers.forEach(builder::dataFetchers));
+
     RuntimeWiring runtimeWiring = newRuntimeWiring()
       .codeRegistry(codeRegistry)
-      .scalar(FlexmodelScalars.Text)
-      .scalar(ExtendedScalars.GraphQLLong)
       .scalar(ExtendedScalars.Json)
       .scalar(ExtendedScalars.DateTime)
       .scalar(ExtendedScalars.Date)
       .build();
     SchemaGenerator schemaGenerator = new SchemaGenerator();
     GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeDefinitionRegistry, runtimeWiring);
-    this.graphQL = GraphQL.newGraphQL(graphQLSchema).build();
+    this.graphQL = GraphQL.newGraphQL(graphQLSchema)
+      .instrumentation(new FlexmodelInstrumentation())
+      .build();
   }
 
   public GraphQL getGraphQL() {
