@@ -28,14 +28,13 @@ public class FlexmodelFindOneDataFetcher extends FlexmodelAbstractDataFetcher<Ma
   private Map<String, Object> findRootData(DataFetchingEnvironment env) {
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     Map<String, Object> where = getArgument(env, WHERE);
-    String filter = getFilterString(where);
     try (Session session = sessionFactory.createSession(schemaName)) {
       Entity entity = (Entity) session.getModel(modelName);
       IDField idField = entity.findIdField().orElseThrow();
 
       List<RelationField> relationFields = new ArrayList<>();
       List<Map<String, Object>> list = session.find(entity.getName(), query -> query
-        .setFilter(filter)
+        .setFilter(jsonObjectConverter.toJsonString(where))
         .setProjection(projection -> {
           projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
           for (SelectedField selectedField : selectedFields) {

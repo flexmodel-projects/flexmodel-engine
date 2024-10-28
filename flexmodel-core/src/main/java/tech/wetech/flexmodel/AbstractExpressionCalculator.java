@@ -1,13 +1,17 @@
-package tech.wetech.flexmodel.graphql;
+package tech.wetech.flexmodel;
+
+import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.util.*;
 
 /**
  * @author cjbi
  */
-public class FlexmodelInputWhereTransformer {
+@SuppressWarnings("all")
+public abstract class AbstractExpressionCalculator<T> implements ExpressionCalculator<T> {
 
-  protected static final Map<String, String> opMap = new HashMap<>();
+  private static final Map<String, String> opMap = new HashMap<>();
+  private static final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
 
   static {
     opMap.put("_and", "and");
@@ -27,9 +31,12 @@ public class FlexmodelInputWhereTransformer {
     opMap.put("_between", "between");
   }
 
+  protected String transform(String input) {
+    Map<String, Object> inputMap = jsonObjectConverter.parseToMap(input);
+    return jsonObjectConverter.toJsonString(transform(inputMap));
+  }
 
-  // 转换输入 Map 为目标格式
-  public static Map<String, Object> transform(Map<String, Object> input) {
+  private Map<String, Object> transform(Map<String, Object> input) {
     List<Object> andList = new ArrayList<>();
 
     // 递归处理输入 Map，构造 "_and" 条件

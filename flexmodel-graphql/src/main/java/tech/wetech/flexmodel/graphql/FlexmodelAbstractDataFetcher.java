@@ -90,16 +90,6 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
     return result;
   }
 
-  protected String getFilterString(Map<String, Object> where) {
-    String filter;
-    if (where != null && !where.isEmpty()) {
-      filter = jsonObjectConverter.toJsonString(FlexmodelInputWhereTransformer.transform(where));
-    } else {
-      filter = null;
-    }
-    return filter;
-  }
-
   protected Query getQuery(Integer pageNumber, Integer pageSize, Map<String, String> orderBy, String filter, Query query) {
     if (pageSize != null && pageNumber != null) {
       query.setPage(pageNumber, pageSize);

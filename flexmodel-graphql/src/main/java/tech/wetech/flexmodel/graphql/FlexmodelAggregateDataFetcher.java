@@ -32,7 +32,6 @@ public class FlexmodelAggregateDataFetcher extends FlexmodelAbstractDataFetcher<
     Integer pageSize = getArgument(env, PAGE_SIZE);
     Map<String, String> orderBy = getArgument(env, ORDER_BY);
     Map<String, Object> where = getArgument(env, WHERE);
-    String filter = getFilterString(where);
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     try (Session session = sessionFactory.createSession(schemaName)) {
       Entity entity = (Entity) session.getModel(modelName);
@@ -85,7 +84,7 @@ public class FlexmodelAggregateDataFetcher extends FlexmodelAbstractDataFetcher<
             }
             return projection;
           });
-        return getQuery(pageNumber, pageSize, orderBy, filter, query);
+        return getQuery(pageNumber, pageSize, orderBy, jsonObjectConverter.toJsonString(where), query);
       });
       // 不支持关联字段查询
       return toResult(list.get(0));

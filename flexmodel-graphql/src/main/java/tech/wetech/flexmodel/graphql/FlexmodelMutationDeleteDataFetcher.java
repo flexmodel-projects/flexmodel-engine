@@ -18,9 +18,8 @@ public class FlexmodelMutationDeleteDataFetcher extends FlexmodelAbstractDataFet
   @Override
   public Map<String, Object> get(DataFetchingEnvironment environment) throws Exception {
     Map<String, Object> where = getArgument(environment, WHERE);
-    String filter = getFilterString(where);
     try (Session session = sessionFactory.createSession(schemaName)) {
-      int rows = session.delete(modelName, filter);
+      int rows = session.delete(modelName, jsonObjectConverter.toJsonString(where));
       return Map.of(AFFECTED_ROWS, rows);
     }
   }

@@ -98,67 +98,67 @@ public class Example {
     }
 
     public Criteria equalTo(String field, Object value) {
-      addCriterion(field, value, "==");
+      addCriterion(field, value, "_eq");
       return this;
     }
 
     public Criteria notEqualTo(String field, Object value) {
-      addCriterion(field, value, "!=");
+      addCriterion(field, value, "_ne");
       return this;
     }
 
     public Criteria contains(String field, String value) {
-      addCriterion(field, value, "contains");
+      addCriterion(field, value, "_contains");
       return this;
     }
 
     public Criteria notContains(String field, String value) {
-      addCriterion(field, value, "not_contains");
+      addCriterion(field, value, "_not_contains");
       return this;
     }
 
     public Criteria startsWith(String field, String value) {
-      addCriterion(field, value, "starts_with");
+      addCriterion(field, value, "_starts_with");
       return this;
     }
 
     public Criteria endsWith(String field, String value) {
-      addCriterion(field, value, "ends_with");
+      addCriterion(field, value, "_ends_with");
       return this;
     }
 
     public Criteria greaterThan(String field, Object value) {
-      addCriterion(field, value, ">");
+      addCriterion(field, value, "_gt");
       return this;
     }
 
     public Criteria greaterThanOrEqualTo(String field, Object value) {
-      addCriterion(field, value, ">=");
+      addCriterion(field, value, "_gte");
       return this;
     }
 
     public Criteria lessThan(String field, Object value) {
-      addCriterion(field, value, "<");
+      addCriterion(field, value, "_lt");
       return this;
     }
 
     public Criteria lessThanOrEqualTo(String field, Object value) {
-      addCriterion(field, value, "<=");
+      addCriterion(field, value, "_lte");
       return this;
     }
 
     public Criteria in(String field, Iterable<?> values) {
-      addCriterion(field, values, "in");
+      addCriterion(field, values, "_in");
       return this;
     }
 
     public Criteria notIn(String field, Iterable<?> values) {
-      addCriterion(field, values, "not_in");
+      addCriterion(field, values, "_nin");
       return this;
     }
 
     public Criteria between(String field, Object value1, Object value2) {
-      addCriterion(field, value1, value2, "between");
+      addCriterion(field, value1, value2, "_between");
       return this;
     }
 
@@ -271,14 +271,14 @@ public class Example {
   public String toFilterString() {
     Map<String, Object> root = new HashMap<>();
     List<Map<String, Object>> andList = new ArrayList<>();
-    root.put("and", andList);
+    root.put("_and", andList);
     for (Criteria criteria : this.oredCriteria) {
       Map<String, Object> filterMap = new HashMap<>();
       List<Object> logicValues = new ArrayList<>();
       if (criteria.getAllCriteria().isEmpty()) {
         continue;
       }
-      filterMap.put(criteria.isAnd ? "and" : "or", logicValues);
+      filterMap.put(criteria.isAnd ? "_and" : "_or", logicValues);
       for (Criterion criterion : criteria.getAllCriteria()) {
         Map<String, Object> condition = getCondition(criterion);
         logicValues.add(condition);
@@ -294,13 +294,16 @@ public class Example {
   }
 
   private Map<String, Object> getCondition(Criterion criterion) {
-    List<Object> item = new ArrayList<>();
-    item.add(Map.of("var", List.of(criterion.getField())));
-    item.add(criterion.getValue());
+    Map<String, Object> condition = new HashMap<>();
+    Map<String, Object> comparedValues = new HashMap<>();
+    condition.put(criterion.getField(), comparedValues);
+
     if (criterion.isBetweenValue()) {
-      item.add(criterion.getSecondValue());
+      comparedValues.put(criterion.getOperator(), List.of(criterion.getValue(), criterion.getSecondValue()));
+    } else {
+      comparedValues.put(criterion.getOperator(), criterion.getValue());
     }
-    return Map.of(criterion.getOperator(), item);
+    return condition;
   }
 
 }
