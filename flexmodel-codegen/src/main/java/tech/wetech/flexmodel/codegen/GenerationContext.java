@@ -9,7 +9,7 @@ import java.util.Map;
 public class GenerationContext {
 
   private ModelClass modelClass;
-  protected Map<String, Object> extendVariables = new HashMap<>();
+  protected Map<String, Object> variables = new HashMap<>();
 
   public ModelClass getModelClass() {
     return modelClass;
@@ -19,13 +19,13 @@ public class GenerationContext {
     this.modelClass = modelClass;
   }
 
-  public void putExtendVariable(String key, Object value) {
-    extendVariables.put(key, value);
+  public void putVariable(String key, Object value) {
+    variables.put(key, value);
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T getExtendVariable(String key) {
-    return (T) extendVariables.get(key);
+  public <T> T getVariable(String key) {
+    return (T) variables.get(key);
   }
 
 }

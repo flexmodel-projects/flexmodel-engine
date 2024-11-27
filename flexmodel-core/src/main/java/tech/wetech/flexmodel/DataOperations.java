@@ -5,7 +5,6 @@ import tech.wetech.flexmodel.graph.JoinGraphNode;
 
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
@@ -236,7 +235,7 @@ public interface DataOperations {
   default int delete(String modelName, UnaryOperator<Example.Criteria> unaryOperator) {
     Example example = new Example();
     unaryOperator.apply(example.createCriteria());
-    return update(modelName, new TreeMap<>(), example.toFilterString());
+    return delete(modelName, example.toFilterString());
   }
 
 }

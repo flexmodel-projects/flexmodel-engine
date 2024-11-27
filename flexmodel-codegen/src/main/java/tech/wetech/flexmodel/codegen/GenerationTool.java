@@ -84,7 +84,7 @@ public class GenerationTool {
     for (Model model : models) {
       GenerationContext context = new GenerationContext();
       context.setModelClass(modelClassMap.get(model.getName()));
-      context.putExtendVariable("rootPackage", packageName);
+      context.putVariable("rootPackage", packageName);
       pojoGenerator.generate(context, Path.of(targetDirectory, "entity", model.getName() + ".java").toString());
       daoGenerator.generate(context, Path.of(targetDirectory, "dao", model.getName() + "DAO.java").toString());
     }

@@ -14,7 +14,7 @@ class DaoGenerator extends AbstractGenerator {
   @Override
   def generate(PrintWriter out, GenerationContext context) {
     def modelClass = context.modelClass
-    String rootPackage = context.getExtendVariable("rootPackage");
+    String rootPackage = context.getVariable("rootPackage");
     def className = "${modelClass.shortClassName}DAO"
     out.println "package ${rootPackage}.dao;"
     out.println ""
