@@ -14,8 +14,9 @@ class DaoGenerator extends AbstractGenerator {
   @Override
   def generate(PrintWriter out, GenerationContext context) {
     def modelClass = context.modelClass
+    String rootPackage = context.getExtendVariable("rootPackage");
     def className = "${modelClass.shortClassName}DAO"
-    out.println "package ${context.packageName}.dao;"
+    out.println "package ${rootPackage}.dao;"
     out.println ""
     out.println "import jakarta.inject.Inject;"
     out.println "import jakarta.inject.Singleton;"
@@ -50,7 +51,7 @@ class DaoGenerator extends AbstractGenerator {
     out.println "  private final JsonObjectConverter jsonObjectConverter;"
     out.println ""
     out.println "  // Schema name used for the database operations"
-    out.println "  private final String schemaName = \"${context.schemaName}\";"
+    out.println "  private final String schemaName = \"${modelClass.schemaName}\";"
     out.println "  // Model name associated with the ${modelClass.shortClassName} data"
     out.println "  private final String modelName = \"${modelClass.shortClassName}\";"
     out.println "  // Field name used for identifying records"

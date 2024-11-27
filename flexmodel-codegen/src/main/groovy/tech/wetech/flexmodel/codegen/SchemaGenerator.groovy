@@ -17,10 +17,10 @@ class SchemaGenerator extends AbstractModelListGenerator {
   @Override
   def generate(PrintWriter out, ModelListGenerationContext context) {
     def modelListClass = context.modelListClass
-    def className = context.schemaName.capitalize()
+    def className = modelListClass.schemaName.capitalize()
     JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
 
-    out.println "package ${context.packageName};"
+    out.println "package ${context.modelListClass.packageName};"
     out.println ""
     out.println "import tech.wetech.flexmodel.JsonObjectConverter;"
     out.println "import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;"
@@ -67,7 +67,7 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println ""
     out.println "  @Override"
     out.println "  public String getSchemaName() {"
-    out.println "    return \"${context.schemaName}\";"
+    out.println "    return \"${context.modelListClass.schemaName}\";"
     out.println "  }"
     out.println ""
     out.println "  @Override"

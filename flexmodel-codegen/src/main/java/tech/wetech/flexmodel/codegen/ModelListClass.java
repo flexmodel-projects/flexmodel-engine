@@ -11,6 +11,7 @@ import java.util.Set;
 public class ModelListClass {
 
   private String packageName;
+  private String schemaName;
   private final Set<String> imports = new HashSet<>();
   private final List<ModelClass> modelList = new ArrayList<>();
 
@@ -20,6 +21,15 @@ public class ModelListClass {
 
   public void setPackageName(String packageName) {
     this.packageName = packageName;
+  }
+
+  public String getSchemaName() {
+    return schemaName;
+  }
+
+  public ModelListClass setSchemaName(String schemaName) {
+    this.schemaName = schemaName;
+    return this;
   }
 
   public Set<String> getImports() {

@@ -23,6 +23,7 @@ public class ModelClass implements Serializable {
   private String fullClassName;
   private String comment;
   private ModelField idField;
+  private final List<ModelField> basicFields = new ArrayList<>();
   private final List<ModelField> relationFields = new ArrayList<>();
   private final List<ModelField> allFields = new ArrayList<>();
   private Model originalModel;
@@ -113,12 +114,23 @@ public class ModelClass implements Serializable {
     return this;
   }
 
+  public List<ModelField> getBasicFields() {
+    return basicFields;
+  }
+
   public List<ModelField> getRelationFields() {
     return relationFields;
   }
 
   public List<ModelField> getAllFields() {
     return allFields;
+  }
+
+  public ModelField getField(String name) {
+    return allFields.stream()
+      .filter(f -> f.getFieldName().equals(name))
+      .findFirst()
+      .orElse(null);
   }
 
   public Model getOriginalModel() {

@@ -83,17 +83,15 @@ public class GenerationTool {
     // generate single model file
     for (Model model : models) {
       GenerationContext context = new GenerationContext();
-      context.setSchemaName(schema.getName());
       context.setModelClass(modelClassMap.get(model.getName()));
-      context.setPackageName(packageName);
+      context.putExtendVariable("rootPackage", packageName);
       pojoGenerator.generate(context, Path.of(targetDirectory, "entity", model.getName() + ".java").toString());
       daoGenerator.generate(context, Path.of(targetDirectory, "dao", model.getName() + "DAO.java").toString());
     }
     // generate multiple model file
     ModelListGenerationContext multipleModelGenerationContext = new ModelListGenerationContext();
-    multipleModelGenerationContext.setSchemaName(schema.getName());
-    multipleModelGenerationContext.setPackageName(packageName);
     ModelListClass multipleModelClass = new ModelListClass();
+    multipleModelClass.setSchemaName(schema.getName());
     multipleModelClass.setPackageName(packageName);
     multipleModelGenerationContext.setModelListClass(multipleModelClass);
     for (Model model : models) {
@@ -136,6 +134,7 @@ public class GenerationTool {
         .setComment(field.getComment());
 
       if (field instanceof IDField idField) {
+        // id field
         TypeInfo typeInfo = TYPE_MAPPING.get(idField.getGeneratedValue().getType());
 
         modelField.setTypePackage(typeInfo.typePackage())
@@ -146,6 +145,7 @@ public class GenerationTool {
         modelClass.setIdField(modelField);
 
       } else if (field instanceof RelationField relationField) {
+        // relation field
         if (relationField.getCardinality() == ONE_TO_ONE) {
           modelField.setTypePackage(null)
             .setFullTypeName(modelField.getTypePackage() + "." + relationField.getTargetEntity())
@@ -160,11 +160,13 @@ public class GenerationTool {
         }
 
       } else {
-
+        // basic field
         TypeInfo typeInfo = TYPE_MAPPING.get(field.getType());
         modelField.setTypePackage(typeInfo.typePackage())
           .setShortTypeName(typeInfo.shortTypeName())
           .setFullTypeName(typeInfo.fullTypeName());
+
+        modelClass.getBasicFields().add(modelField);
       }
 
       if (modelField.getTypePackage() != null) {

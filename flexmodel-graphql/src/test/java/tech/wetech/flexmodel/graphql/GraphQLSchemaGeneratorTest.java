@@ -29,9 +29,9 @@ class GraphQLSchemaGeneratorTest {
     ImportDescribe describe = new JacksonObjectConverter().parseToObject(content, ImportDescribe.class);
     GraphQLSchemaGenerator daoGenerator = new GraphQLSchemaGenerator();
     ModelListGenerationContext generationContext = new ModelListGenerationContext();
-    generationContext.setSchemaName(schemaName);
-    generationContext.setPackageName(packageName);
     ModelListClass modelListClass = new ModelListClass();
+    modelListClass.setPackageName(packageName);
+    modelListClass.setSchemaName(schemaName);
     for (Model model : describe.getSchema()) {
       modelListClass.getModelList().add(GenerationTool.buildModelClass(packageName, schemaName, (Entity) model));
     }

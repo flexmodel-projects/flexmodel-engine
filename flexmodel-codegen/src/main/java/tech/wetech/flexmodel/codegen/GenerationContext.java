@@ -1,21 +1,15 @@
 package tech.wetech.flexmodel.codegen;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author cjbi
  */
 public class GenerationContext {
 
-  private String schemaName;
-  private String packageName;
   private ModelClass modelClass;
-
-  public String getSchemaName() {
-    return schemaName;
-  }
-
-  public void setSchemaName(String schemaName) {
-    this.schemaName = schemaName;
-  }
+  protected Map<String, Object> extendVariables = new HashMap<>();
 
   public ModelClass getModelClass() {
     return modelClass;
@@ -25,11 +19,13 @@ public class GenerationContext {
     this.modelClass = modelClass;
   }
 
-  public String getPackageName() {
-    return packageName;
+  public void putExtendVariable(String key, Object value) {
+    extendVariables.put(key, value);
   }
 
-  public void setPackageName(String packageName) {
-    this.packageName = packageName;
+  @SuppressWarnings("unchecked")
+  public <T> T getExtendVariable(String key) {
+    return (T) extendVariables.get(key);
   }
+
 }
