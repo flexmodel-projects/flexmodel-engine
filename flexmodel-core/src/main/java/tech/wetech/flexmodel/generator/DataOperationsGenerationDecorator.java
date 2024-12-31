@@ -16,11 +16,14 @@ import static tech.wetech.flexmodel.RelationField.Cardinality.*;
  */
 public class DataOperationsGenerationDecorator extends AbstractDataOperationsDecorator {
 
-  private final DataValueGeneratorFacade dataValueGeneratorFacade;
 
   public DataOperationsGenerationDecorator(AbstractSessionContext sessionContext, DataOperations delegate) {
     super(sessionContext, delegate);
-    this.dataValueGeneratorFacade = new DataValueGeneratorFacade(sessionContext);
+  }
+
+  private Object convertParameter(TypedField<?, ?> field, Object value) {
+    return sessionContext.getTypeHandlerMap().get(field instanceof IDField idField ? idField.getGeneratedValue().getType() : field.getType())
+      .convertParameter(value);
   }
 
   @Override
@@ -29,15 +32,26 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
     String schemaName = sessionContext.getSchemaName();
     MappedModels mappedModels = sessionContext.getMappedModels();
     AtomicReference<Object> atomicId = new AtomicReference<>();
-    int rows = delegate.insert(modelName, dataValueGeneratorFacade.generateValue(modelName, record, false), atomicId::set);
+    Model model = mappedModels.getModel(schemaName, modelName);
+    Map<String, Object> newRecord = new HashMap<>();
+    record.forEach((key, value) -> {
+      Field field = model.getField(key);
+      boolean isRelationField = field instanceof RelationField;
+      if (!isRelationField) {
+        if (field instanceof TypedField<?, ?> typedField) {
+          newRecord.put(key, convertParameter(typedField, value));
+        }
+      }
+    });
+    int rows = delegate.insert(modelName, newRecord, atomicId::set);
     Object id = atomicId.get();
     idConsumer.accept(id);
-    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
+
     insertRelationRecord(modelName, record, id);
     return rows;
   }
 
-  @SuppressWarnings({"rawtypes","unchecked"})
+  @SuppressWarnings({"rawtypes", "unchecked"})
   private void insertRelationRecord(String modelName, Map<String, Object> record, Object id) {
     String schemaName = sessionContext.getSchemaName();
     MappedModels mappedModels = sessionContext.getMappedModels();
@@ -87,17 +101,6 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
         }
       }
     });
-  }
-
-
-  @Override
-  public int updateById(String modelName, Map<String, Object> record, Object id) {
-    return delegate.updateById(modelName, dataValueGeneratorFacade.generateValue(modelName, record, true), id);
-  }
-
-  @Override
-  public int update(String modelName, Map<String, Object> record, String filter) {
-    return delegate.update(modelName, dataValueGeneratorFacade.generateValue(modelName, record, true), filter);
   }
 
 }

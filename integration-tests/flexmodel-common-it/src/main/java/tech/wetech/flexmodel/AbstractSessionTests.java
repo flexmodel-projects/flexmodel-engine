@@ -4,11 +4,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import tech.wetech.flexmodel.dto.TeacherDTO;
-import tech.wetech.flexmodel.generator.DateNowValueGenerator;
-import tech.wetech.flexmodel.generator.DatetimeNowValueGenerator;
 import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
-import tech.wetech.flexmodel.validator.NumberRangeValidator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -389,7 +386,7 @@ public abstract class AbstractSessionTests {
       // 姓名
       .addField(new StringField("name").setComment("姓名").setNullable(false).setLength(10))
       // 年龄
-      .addField(new IntField("age").setComment("年龄").addValidator(new NumberRangeValidator<>(1, 300)))
+      .addField(new IntField("age").setComment("年龄"))
       // 备注
       .addField(new TextField("description").setComment("备注"))
       // 生日
@@ -397,7 +394,7 @@ public abstract class AbstractSessionTests {
       // 是否禁用
       .addField(new BooleanField("isLocked").setNullable(false).setDefaultValue(false).setComment("是否禁用"))
       // 创建时间
-      .addField(new DatetimeField("createDatetime").setComment("创建日期时间").setGenerator(new DatetimeNowValueGenerator()))
+      .addField(new DatetimeField("createDatetime").setComment("创建日期时间"))
       // 扩展信息
       .addField(new JsonField("extra").setComment("扩展信息"))
       // 创建索引
@@ -873,14 +870,12 @@ public abstract class AbstractSessionTests {
     DatetimeField createDatetime = new DatetimeField("createDatetime");
     createDatetime.setModelName(entityName);
     createDatetime.setComment("创建日期时间");
-    createDatetime.setGenerator(new DatetimeNowValueGenerator());
     entity.addField(createDatetime);
     session.createField(createDatetime);
     // date
     DateField birthday = new DateField("birthday");
     birthday.setModelName(entityName);
     birthday.setComment("出生日期");
-    birthday.setGenerator(new DateNowValueGenerator());
     entity.addField(birthday);
     session.createField(birthday);
     // json
@@ -1102,7 +1097,7 @@ public abstract class AbstractSessionTests {
 
   @Test
   void testLoadScript() {
-    sessionFactory.loadScript("system", "import2.sql");
+    sessionFactory.loadScript("default", "import2.json");
   }
 
 }

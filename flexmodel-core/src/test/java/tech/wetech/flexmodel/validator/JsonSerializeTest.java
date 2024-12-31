@@ -3,7 +3,6 @@ package tech.wetech.flexmodel.validator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import tech.wetech.flexmodel.*;
-import tech.wetech.flexmodel.generator.DatetimeNowValueGenerator;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 /**
@@ -17,20 +16,16 @@ public class JsonSerializeTest {
     // 主键
     BigintField idField = new BigintField("id");
     idField.setComment("Primary Key");
-    entity.addField(new IDField("id").setGeneratedValue(IDField.GeneratedValue.UUID).setComment("Primary Key"));
+    entity.addField(new IDField("id").setComment("Primary Key"));
     entity.setComment("学生表");
     // 姓名
     StringField name = new StringField("name");
     name.setComment("姓名");
     name.setNullable(false);
     name.setLength(10);
-    name.addValidator(new RegexpValidator("^.{2,5}$"));
     entity.addField(name);
     BigintField age = new BigintField("age");
     age.setComment("年龄");
-    age.addValidator(new NumberRangeValidator<>(1, 100));
-    age.addValidator(new NumberMinValidator<>(1));
-    age.addValidator(new NumberMaxValidator<>(100));
     entity.addField(age);
     // 备注
     TextField description = new TextField("description");
@@ -50,7 +45,6 @@ public class JsonSerializeTest {
     DatetimeField createDatetime = new DatetimeField("createDatetime");
     createDatetime.setComment("创建日期时间");
     createDatetime.setNullable(false);
-    createDatetime.setGenerator(new DatetimeNowValueGenerator());
     entity.addField(createDatetime);
     // 扩展信息
     JsonField extra = new JsonField("extra");
@@ -60,7 +54,6 @@ public class JsonSerializeTest {
     StringField email = new StringField("email");
     email.setComment("邮箱");
     email.setLength(20);
-    email.addValidator(new EmailValidator());
     entity.addField(email);
 
     String json = new JacksonObjectConverter().toJsonString(entity);

@@ -10,7 +10,6 @@
           "unique": false,
           "nullable": true,
           "modelName": "Datasource",
-          "validators": [],
           "generatedValue": "STRING_NOT_GENERATED"
         },
         {
@@ -19,40 +18,28 @@
           "length": 255,
           "unique": false,
           "nullable": true,
-          "modelName": "Datasource",
-          "validators": []
+          "modelName": "Datasource"
         },
         {
           "name": "config",
           "type": "json",
           "unique": false,
           "nullable": true,
-          "modelName": "Datasource",
-          "validators": []
+          "modelName": "Datasource"
         },
         {
           "name": "createdAt",
           "type": "datetime",
           "unique": false,
           "nullable": true,
-          "generator": {
-            "type": "DatetimeNowValueGenerator",
-            "generationTime": "INSERT"
-          },
-          "modelName": "Datasource",
-          "validators": []
+          "modelName": "Datasource"
         },
         {
           "name": "updatedAt",
           "type": "datetime",
           "unique": false,
           "nullable": true,
-          "generator": {
-            "type": "DatetimeNowValueGenerator",
-            "generationTime": "ALWAYS"
-          },
-          "modelName": "Datasource",
-          "validators": []
+          "modelName": "Datasource"
         }
       ],
       "indexes": []

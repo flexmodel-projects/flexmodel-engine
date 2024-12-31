@@ -10,7 +10,6 @@
           "unique": false,
           "nullable": true,
           "modelName": "Datasource",
-          "validators": [],
           "generatedValue": "STRING_NOT_GENERATED"
         },
         {
@@ -19,40 +18,28 @@
           "length": 255,
           "unique": false,
           "nullable": true,
-          "modelName": "Datasource",
-          "validators": []
+          "modelName": "Datasource"
         },
         {
           "name": "config",
           "type": "json",
           "unique": false,
           "nullable": true,
-          "modelName": "Datasource",
-          "validators": []
+          "modelName": "Datasource"
         },
         {
           "name": "createdAt",
           "type": "datetime",
           "unique": false,
           "nullable": true,
-          "generator": {
-            "type": "DatetimeNowValueGenerator",
-            "generationTime": "INSERT"
-          },
-          "modelName": "Datasource",
-          "validators": []
+          "modelName": "Datasource"
         },
         {
           "name": "updatedAt",
           "type": "datetime",
           "unique": false,
           "nullable": true,
-          "generator": {
-            "type": "DatetimeNowValueGenerator",
-            "generationTime": "ALWAYS"
-          },
-          "modelName": "Datasource",
-          "validators": []
+          "modelName": "Datasource"
         },
         {
           "name": "enabled",
@@ -60,18 +47,7 @@
           "unique": false,
           "comment": "",
           "nullable": false,
-          "generator": {
-            "type": "FixedValueGenerator",
-            "value": true,
-            "generationTime": "INSERT"
-          },
           "modelName": "Datasource",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ],
           "defaultValue": true
         }
       ],
@@ -87,12 +63,7 @@
           "type": "id",
           "unique": true,
           "nullable": true,
-          "generator": {
-            "type": "ULIDValueGenerator",
-            "generationTime": "INSERT"
-          },
           "modelName": "ApiInfo",
-          "validators": [],
           "generatedValue": "ULID"
         },
         {
@@ -103,12 +74,6 @@
           "unique": false,
           "nullable": false,
           "modelName": "ApiInfo",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ]
         },
         {
           "name": "parentId",
@@ -116,8 +81,7 @@
           "length": 255,
           "unique": false,
           "nullable": true,
-          "modelName": "ApiInfo",
-          "validators": []
+          "modelName": "ApiInfo"
         },
         {
           "name": "type",
@@ -125,18 +89,7 @@
           "length": 255,
           "unique": false,
           "nullable": false,
-          "generator": {
-            "type": "FixedValueGenerator",
-            "value": "FOLDER",
-            "generationTime": "ALWAYS"
-          },
           "modelName": "ApiInfo",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ],
           "defaultValue": "FOLDER"
         },
         {
@@ -145,8 +98,7 @@
           "length": 255,
           "unique": false,
           "nullable": true,
-          "modelName": "ApiInfo",
-          "validators": []
+          "modelName": "ApiInfo"
         },
         {
           "name": "path",
@@ -154,50 +106,28 @@
           "length": 255,
           "unique": false,
           "nullable": true,
-          "modelName": "ApiInfo",
-          "validators": []
+          "modelName": "ApiInfo"
         },
         {
           "name": "createdAt",
           "type": "datetime",
           "unique": false,
           "nullable": false,
-          "generator": {
-            "type": "DatetimeNowValueGenerator",
-            "generationTime": "INSERT"
-          },
-          "modelName": "ApiInfo",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ]
+          "modelName": "ApiInfo"
         },
         {
           "name": "updatedAt",
           "type": "datetime",
           "unique": false,
           "nullable": false,
-          "generator": {
-            "type": "DatetimeNowValueGenerator",
-            "generationTime": "ALWAYS"
-          },
-          "modelName": "ApiInfo",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ]
+          "modelName": "ApiInfo"
         },
         {
           "name": "meta",
           "type": "json",
           "unique": false,
           "nullable": true,
-          "modelName": "ApiInfo",
-          "validators": []
+          "modelName": "ApiInfo"
         }
       ],
       "indexes": []
@@ -211,12 +141,7 @@
           "type": "id",
           "unique": false,
           "nullable": true,
-          "generator": {
-            "type": "ULIDValueGenerator",
-            "generationTime": "INSERT"
-          },
           "modelName": "ApiLog",
-          "validators": [],
           "generatedValue": "ULID"
         },
         {
@@ -225,56 +150,28 @@
           "length": 255,
           "unique": false,
           "nullable": false,
-          "modelName": "ApiLog",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ]
+          "modelName": "ApiLog"
         },
         {
           "name": "uri",
           "type": "text",
           "unique": false,
           "nullable": false,
-          "modelName": "ApiLog",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ]
+          "modelName": "ApiLog"
         },
         {
           "name": "data",
           "type": "json",
           "unique": false,
           "nullable": false,
-          "modelName": "ApiLog",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ]
+          "modelName": "ApiLog"
         },
         {
           "name": "createdAt",
           "type": "datetime",
           "unique": false,
           "nullable": false,
-          "generator": {
-            "type": "DatetimeNowValueGenerator",
-            "generationTime": "INSERT"
-          },
-          "modelName": "ApiLog",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ]
+          "modelName": "ApiLog"
         }
       ],
       "indexes": [
@@ -301,7 +198,6 @@
           "unique": false,
           "nullable": true,
           "modelName": "Datasource",
-          "validators": [],
           "generatedValue": "STRING_NOT_GENERATED"
         },
         {
@@ -309,47 +205,21 @@
           "type": "datetime",
           "unique": false,
           "nullable": false,
-          "generator": {
-            "type": "DatetimeNowValueGenerator",
-            "generationTime": "INSERT"
-          },
-          "modelName": "IdentityProvider",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ]
+          "modelName": "IdentityProvider"
         },
         {
           "name": "provider",
           "type": "json",
           "unique": false,
           "nullable": true,
-          "modelName": "IdentityProvider",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ]
+          "modelName": "IdentityProvider"
         },
         {
           "name": "updatedAt",
           "type": "datetime",
           "unique": false,
           "nullable": false,
-          "generator": {
-            "type": "DatetimeNowValueGenerator",
-            "generationTime": "ALWAYS"
-          },
-          "modelName": "IdentityProvider",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ]
+          "modelName": "IdentityProvider"
         }
       ],
       "indexes": []
@@ -364,12 +234,7 @@
           "type": "id",
           "unique": true,
           "nullable": true,
-          "generator": {
-            "type": "ULIDValueGenerator",
-            "generationTime": "INSERT"
-          },
           "modelName": "Config",
-          "validators": [],
           "generatedValue": "ULID"
         },
         {
@@ -379,13 +244,7 @@
           "length": 255,
           "unique": false,
           "nullable": false,
-          "modelName": "Config",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ]
+          "modelName": "Config"
         },
         {
           "name": "value",
@@ -393,42 +252,21 @@
           "length": 255,
           "unique": false,
           "nullable": true,
-          "modelName": "Config",
-          "validators": []
+          "modelName": "Config"
         },
         {
           "name": "createdAt",
           "type": "datetime",
           "unique": false,
           "nullable": false,
-          "generator": {
-            "type": "DatetimeNowValueGenerator",
-            "generationTime": "INSERT"
-          },
-          "modelName": "ApiInfo",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ]
+          "modelName": "ApiInfo"
         },
         {
           "name": "updatedAt",
           "type": "datetime",
           "unique": false,
           "nullable": false,
-          "generator": {
-            "type": "DatetimeNowValueGenerator",
-            "generationTime": "ALWAYS"
-          },
-          "modelName": "Config",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ]
+          "modelName": "Config"
         }
       ],
       "indexes": [
@@ -455,7 +293,6 @@
           "modelName": "Teacher",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "generatedValue": "BIGINT_NOT_GENERATED"
         },
         {
@@ -464,7 +301,6 @@
           "modelName": "Teacher",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "length": 255
         },
         {
@@ -473,7 +309,6 @@
           "modelName": "Teacher",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "length": 255
         }
       ],
@@ -489,7 +324,6 @@
           "modelName": "Student",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "generatedValue": "BIGINT_NOT_GENERATED"
         },
         {
@@ -498,7 +332,6 @@
           "modelName": "Student",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "length": 255
         },
         {
@@ -507,7 +340,6 @@
           "modelName": "Student",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "length": 255
         },
         {
@@ -515,16 +347,14 @@
           "type": "int",
           "modelName": "Student",
           "unique": false,
-          "nullable": true,
-          "validators": []
+          "nullable": true
         },
         {
           "name": "classId",
           "type": "int",
           "modelName": "Student",
           "unique": false,
-          "nullable": true,
-          "validators": []
+          "nullable": true
         },
         {
           "name": "courses",
@@ -532,7 +362,6 @@
           "modelName": "Student",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "cardinality": "MANY_TO_MANY",
           "targetEntity": "Course",
           "targetField": "courseNo",
@@ -544,7 +373,6 @@
           "modelName": "Student",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "cardinality": "ONE_TO_ONE",
           "targetEntity": "StudentDetail",
           "targetField": "studentId",
@@ -556,7 +384,6 @@
           "modelName": "Student",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "cardinality": "MANY_TO_MANY",
           "targetEntity": "Teacher",
           "targetField": "id",
@@ -575,7 +402,6 @@
           "modelName": "StudentDetail",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "generatedValue": "AUTO_INCREMENT"
         },
         {
@@ -583,16 +409,14 @@
           "type": "bigint",
           "modelName": "StudentDetail",
           "unique": false,
-          "nullable": true,
-          "validators": []
+          "nullable": true
         },
         {
           "name": "description",
           "type": "text",
           "modelName": "StudentDetail",
           "unique": false,
-          "nullable": true,
-          "validators": []
+          "nullable": true
         }
       ],
       "indexes": []
@@ -607,7 +431,6 @@
           "modelName": "Classes",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "generatedValue": "BIGINT_NOT_GENERATED"
         },
         {
@@ -616,7 +439,6 @@
           "modelName": "Classes",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "length": 255
         },
         {
@@ -625,7 +447,6 @@
           "modelName": "Classes",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "length": 255
         },
         {
@@ -634,7 +455,6 @@
           "modelName": "Classes",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "cardinality": "ONE_TO_MANY",
           "targetEntity": "Student",
           "targetField": "classId",
@@ -653,7 +473,6 @@
           "modelName": "Course",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "generatedValue": "STRING_NOT_GENERATED"
         },
         {
@@ -662,7 +481,6 @@
           "modelName": "Course",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "length": 255
         },
         {
@@ -671,7 +489,6 @@
           "modelName": "Course",
           "unique": false,
           "nullable": true,
-          "validators": [],
           "cardinality": "MANY_TO_MANY",
           "targetEntity": "Student",
           "targetField": "id",
