@@ -3,9 +3,7 @@ package tech.wetech.flexmodel.generator;
 import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.graph.JoinGraphNode;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -26,6 +24,36 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
       .convertParameter(value);
   }
 
+  public Map<String, Object> generateValue(String modelName, Map<String, Object> data) {
+    Entity entity = (Entity) sessionContext.getModel(modelName);
+    List<TypedField<?, ?>> fields = entity.getFields();
+    Map<String, Object> newData = new HashMap<>();
+    // 类型转换
+    data.forEach((key, value) -> {
+      TypedField<?, ?> field = entity.getField(key);
+      if (field != null && !(field instanceof RelationField)) {
+        newData.put(field.getName(), convertParameter(field, value)
+        );
+      }
+    });
+    for (TypedField<?, ?> field : fields) {
+      if (field instanceof RelationField) {
+        continue;
+      }
+      Object value = data.get(field.getName());
+      if (value == null) {
+        if (field instanceof IDField idField) {
+          if (idField.getGeneratedValue() == IDField.GeneratedValue.ULID) {
+            newData.put(field.getName(), ULID.random().toString());
+          } else if (idField.getGeneratedValue() == IDField.GeneratedValue.UUID) {
+            newData.put(field.getName(), UUID.randomUUID().toString());
+          }
+        }
+      }
+    }
+    return newData;
+  }
+
   @Override
   @SuppressWarnings("all")
   public int insert(String modelName, Map<String, Object> record, Consumer<Object> idConsumer) {
@@ -33,17 +61,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
     MappedModels mappedModels = sessionContext.getMappedModels();
     AtomicReference<Object> atomicId = new AtomicReference<>();
     Model model = mappedModels.getModel(schemaName, modelName);
-    Map<String, Object> newRecord = new HashMap<>();
-    record.forEach((key, value) -> {
-      Field field = model.getField(key);
-      boolean isRelationField = field instanceof RelationField;
-      if (!isRelationField) {
-        if (field instanceof TypedField<?, ?> typedField) {
-          newRecord.put(key, convertParameter(typedField, value));
-        }
-      }
-    });
-    int rows = delegate.insert(modelName, newRecord, atomicId::set);
+    int rows = delegate.insert(modelName, generateValue(modelName, record), atomicId::set);
     Object id = atomicId.get();
     idConsumer.accept(id);
 
