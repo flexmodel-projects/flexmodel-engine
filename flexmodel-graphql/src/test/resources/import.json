@@ -73,7 +73,7 @@
           "length": 255,
           "unique": false,
           "nullable": false,
-          "modelName": "ApiInfo",
+          "modelName": "ApiInfo"
         },
         {
           "name": "parentId",
