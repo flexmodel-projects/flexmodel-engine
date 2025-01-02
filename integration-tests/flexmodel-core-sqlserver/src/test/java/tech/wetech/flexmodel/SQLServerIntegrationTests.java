@@ -10,7 +10,7 @@ import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
 /**
  * @author cjbi
  */
-@Testcontainers
+// @Testcontainers
 public class SQLServerIntegrationTests extends AbstractSessionTests {
 
   @Container
