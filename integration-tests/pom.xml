@@ -21,7 +21,7 @@
     <module>flexmodel-core-oracle</module>
     <module>flexmodel-core-postgresql</module>
     <module>flexmodel-core-sqlite</module>
-    <module>flexmodel-core-sqlserver</module>
+    <!-- <module>flexmodel-core-sqlserver</module> -->
     <module>flexmodel-core-gbase</module>
     <module>flexmodel-core-dm</module>
     <module>flexmodel-core-tidb</module>
