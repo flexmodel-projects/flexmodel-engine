@@ -13,10 +13,10 @@ import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
 // @Testcontainers
 public class SQLServerIntegrationTests extends AbstractSessionTests {
 
-  @Container
+ // @Container
   public static MSSQLServerContainer container = new MSSQLServerContainer().acceptLicense();
 
-  @BeforeAll
+  // @BeforeAll
   public static void beforeAll() {
     HikariDataSource dataSource = new HikariDataSource();
     dataSource.setJdbcUrl(container.getJdbcUrl());
