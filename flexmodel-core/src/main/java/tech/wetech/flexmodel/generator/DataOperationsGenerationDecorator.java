@@ -24,7 +24,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
       .convertParameter(value);
   }
 
-  public Map<String, Object> generateValue(String modelName, Map<String, Object> data) {
+  public Map<String, Object> generateValue(String modelName, Map<String, Object> data, boolean isUpdate) {
     Entity entity = (Entity) sessionContext.getModel(modelName);
     List<TypedField<?, ?>> fields = entity.getFields();
     Map<String, Object> newData = new HashMap<>();
@@ -41,13 +41,16 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
         continue;
       }
       Object value = data.get(field.getName());
-      if (value == null) {
+      // 仅支持新增修改默认值
+      if (value == null && !isUpdate) {
         if (field instanceof IDField idField) {
           if (idField.getGeneratedValue() == IDField.GeneratedValue.ULID) {
             newData.put(field.getName(), ULID.random().toString());
           } else if (idField.getGeneratedValue() == IDField.GeneratedValue.UUID) {
             newData.put(field.getName(), UUID.randomUUID().toString());
           }
+        } else if (field.getDefaultValue() != null) {
+          newData.put(field.getName(), field.getDefaultValue());
         }
       }
     }
@@ -61,7 +64,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
     MappedModels mappedModels = sessionContext.getMappedModels();
     AtomicReference<Object> atomicId = new AtomicReference<>();
     Model model = mappedModels.getModel(schemaName, modelName);
-    int rows = delegate.insert(modelName, generateValue(modelName, record), atomicId::set);
+    int rows = delegate.insert(modelName, generateValue(modelName, record, false), atomicId::set);
     Object id = atomicId.get();
     idConsumer.accept(id);
 
@@ -121,4 +124,13 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
     });
   }
 
+  @Override
+  public int update(String modelName, Map<String, Object> record, String filter) {
+    return super.update(modelName, generateValue(modelName, record, true), filter);
+  }
+
+  @Override
+  public int updateById(String modelName, Map<String, Object> record, Object id) {
+    return super.updateById(modelName, generateValue(modelName, record, true), id);
+  }
 }

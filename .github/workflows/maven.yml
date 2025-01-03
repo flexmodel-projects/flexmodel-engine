@@ -31,3 +31,12 @@ jobs:
         run: |
           chmod +x mvnw
           ./mvnw -B -T 8 clean deploy
+      - name: Trigger other repository
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/flexmodel-projects/flexmodel-server/dispatches
+          owner: cjbi@outlook.com
+          repo: flexmodel-server
+          event_type: engine_deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
