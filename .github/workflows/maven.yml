@@ -11,9 +11,7 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 21
@@ -31,12 +29,13 @@ jobs:
         run: |
           chmod +x mvnw
           ./mvnw -B -T 8 clean deploy
-      - name: Trigger other repository
-        uses: octokit/request-action@v2.x
+  dispatch:
+    needs: [ "build" ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository dispatch
+        uses: peter-evans/repository-dispatch@v3
         with:
-          route: POST /repos/flexmodel-projects/flexmodel-server/dispatches
-          owner: cjbi@outlook.com
-          repo: flexmodel-server
-          event_type: engine_deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT }}
+          repository: flexmodel-projects/flexmodel-server
+          event-type: engine_deploy
