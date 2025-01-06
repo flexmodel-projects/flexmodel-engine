@@ -54,7 +54,7 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
     List<SelectedField> selectedFields = env.getSelectionSet().getFields(path + "/*");
     List<RelationField> relationFields = new ArrayList<>();
     List<Map<String, Object>> list = session.find(entity.getName(), query -> query
-      .setProjection(projection -> {
+      .withProjection(projection -> {
         IDField idField = entity.findIdField().orElseThrow();
         projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
         for (SelectedField selectedField : selectedFields) {
@@ -70,8 +70,8 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
         }
         return projection;
       })
-      .setJoins(joins -> joins.addLeftJoin(join -> join.setFrom(targetEntity.getName())))
-      .setFilter(f -> f.equalTo(entity.getName() + "." + entity.findIdField().map(IDField::getName).orElseThrow(), id))
+      .withJoin(joins -> joins.addLeftJoin(join -> join.setFrom(targetEntity.getName())))
+      .withFilter(f -> f.equalTo(entity.getName() + "." + entity.findIdField().map(IDField::getName).orElseThrow(), id))
     );
     List<Map<String, Object>> result = new ArrayList<>();
     for (Map<String, Object> map : list) {
@@ -95,7 +95,7 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
       query.setPage(pageNumber, pageSize);
     }
     if (orderBy != null) {
-      query.setSort(sort -> {
+      query.withSort(sort -> {
           orderBy.forEach((k, v) -> sort.addOrder(k, Direction.valueOf(v.toUpperCase())));
           return sort;
         }

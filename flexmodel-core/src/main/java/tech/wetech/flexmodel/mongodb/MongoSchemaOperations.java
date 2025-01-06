@@ -85,6 +85,11 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   }
 
   @Override
+  public NativeQueryModel createNativeQueryModel(NativeQueryModel model) {
+    return model;
+  }
+
+  @Override
   public TypedField<?, ?> createField(TypedField<?, ?> field) {
     if (field instanceof IDField) {
       Index index = new Index(field.getModelName());

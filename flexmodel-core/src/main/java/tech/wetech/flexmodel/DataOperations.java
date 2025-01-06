@@ -38,6 +38,10 @@ public interface DataOperations {
 
   <T> List<T> find(String modelName, Query query, Class<T> resultType);
 
+  <T> List<T> findByNativeQuery(String statement, Map<String, Object> params, Class<T> resultType);
+
+  <T> List<T> findByNativeQueryModel(String modelName, Map<String, Object> params, Class<T> resultType);
+
   /**
    * Count records based on conditions
    *

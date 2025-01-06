@@ -96,7 +96,7 @@ public class QueryHelper {
     if (model instanceof Entity entity) {
       List<Map<String, Object>> mapList = relationFn.apply(entity.getName(),
         new Query()
-          .setProjection(projection -> {
+          .withProjection(projection -> {
               Entity targetEntity = (Entity) sessionContext.getModel(relationField.getTargetEntity());
               for (TypedField<?, ?> field : targetEntity.getFields()) {
                 if (field instanceof RelationField) {
@@ -107,8 +107,8 @@ public class QueryHelper {
               return projection;
             }
           )
-          .setJoins(joins -> joins.addInnerJoin(join -> join.setFrom(relationField.getTargetEntity())))
-          .setFilter(f -> f.equalTo(entity.getName() + "." + entity.findIdField().orElseThrow().getName(), id))
+          .withJoin(joins -> joins.addInnerJoin(join -> join.setFrom(relationField.getTargetEntity())))
+          .withFilter(f -> f.equalTo(entity.getName() + "." + entity.findIdField().orElseThrow().getName(), id))
       );
       return mapList;
     }

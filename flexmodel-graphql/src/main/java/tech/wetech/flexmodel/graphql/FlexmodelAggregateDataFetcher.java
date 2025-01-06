@@ -36,7 +36,7 @@ public class FlexmodelAggregateDataFetcher extends FlexmodelAbstractDataFetcher<
     try (Session session = sessionFactory.createSession(schemaName)) {
       Entity entity = (Entity) session.getModel(modelName);
       List<Map<String, Object>> list = session.find(entity.getName(), query -> {
-        query.setProjection(projection -> {
+        query.withProjection(projection -> {
             for (SelectedField selectedField : selectedFields) {
               if (selectedField.getName().equals(AGG_COUNT)) {
                 Map<String, Object> args = selectedField.getArguments();

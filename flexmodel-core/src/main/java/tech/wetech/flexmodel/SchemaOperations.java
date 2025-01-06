@@ -50,6 +50,8 @@ public interface SchemaOperations {
 
   View createView(String viewName, String viewOn, Query query);
 
+  NativeQueryModel createNativeQueryModel(NativeQueryModel model);
+
   /**
    * 创建字段
    *
@@ -130,6 +132,12 @@ public interface SchemaOperations {
     Query query = new Query();
     queryUnaryOperator.apply(query);
     return createView(viewName, viewOn, query);
+  }
+
+  default NativeQueryModel createNativeQueryModel(String modelName, UnaryOperator<NativeQueryModel> modelUnaryOperator) {
+    NativeQueryModel model = new NativeQueryModel(modelName);
+    modelUnaryOperator.apply(model);
+    return createNativeQueryModel(model);
   }
 
 }

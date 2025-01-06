@@ -77,6 +77,11 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
     return view;
   }
 
+  @Override
+  public NativeQueryModel createNativeQueryModel(NativeQueryModel model) {
+    return model;
+  }
+
   private void createTable(SqlTable sqlTable) {
     String[] sqlCreateString = sqlContext.getSqlDialect().getTableExporter().getSqlCreateString(sqlTable);
     for (String sql : sqlCreateString) {

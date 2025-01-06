@@ -326,30 +326,30 @@ public abstract class AbstractSessionTests {
 
     // 1:1
     Map<String, Object> oneToOne = session.find(studentEntityName, query -> query
-      .setProjection(projection -> projection
+      .withProjection(projection -> projection
         .addField("studentName", field("studentName"))
         .addField("description", field(studentDetailEntityName + ".description"))
       )
-      .setJoins(joins -> joins
+      .withJoin(joins -> joins
         .addLeftJoin(join -> join.setFrom(studentDetailEntityName))
       )
-      .setFilter(f -> f.equalTo(studentEntityName + ".id", 1))
+      .withFilter(f -> f.equalTo(studentEntityName + ".id", 1))
     ).getFirst();
     Assertions.assertEquals("张三", oneToOne.get("studentName"));
     Assertions.assertEquals("张三的描述", oneToOne.get("description"));
 
     // 1:n
     List<Map<String, Object>> oneToMany = session.find(classesEntityName, query -> query
-      .setProjection(projection -> projection
+      .withProjection(projection -> projection
         .addField("className", field("className"))
         .addField("studentName", field(studentEntityName + ".studentName"))
       )
-      .setJoins(joins -> joins
+      .withJoin(joins -> joins
         .addLeftJoin(join -> join
           .setFrom(studentEntityName)
         )
       )
-      .setFilter(f -> f.equalTo(classesEntityName + ".id", 1))
+      .withFilter(f -> f.equalTo(classesEntityName + ".id", 1))
     );
     Assertions.assertFalse(oneToMany.isEmpty());
     Assertions.assertEquals("一年级1班", oneToMany.getFirst().get("className"));
@@ -357,14 +357,14 @@ public abstract class AbstractSessionTests {
 
     // n:n
     List<Map<String, Object>> manyToMany = session.find(studentEntityName, query -> query
-      .setProjection(projection -> projection
+      .withProjection(projection -> projection
         .addField("studentName", field("studentName"))
         .addField(teacherEntityName + ".teacherName", field("teacherName"))
       )
-      .setJoins(joins -> joins.addLeftJoin(join -> join
+      .withJoin(joins -> joins.addLeftJoin(join -> join
         .setFrom(teacherEntityName)
       ))
-      .setFilter(f -> f.equalTo(studentEntityName + ".id", 1))
+      .withFilter(f -> f.equalTo(studentEntityName + ".id", 1))
     );
     Assertions.assertFalse(manyToMany.isEmpty());
     Assertions.assertEquals(3, manyToMany.size());
@@ -505,24 +505,24 @@ public abstract class AbstractSessionTests {
 
   private void createTeacherCourseReportView(String viewName, String teacherEntityName, String teacherCourseEntityName) {
     session.createView(viewName, teacherEntityName, query -> query
-      .setProjection(projection ->
+      .withProjection(projection ->
         projection.addField("teacher_id", field(teacherEntityName + ".id"))
           .addField("teacher_name", field("name"))
           .addField("age_max", max(field("age")))
           .addField("age_count", count(field("age")))
       )
-      .setJoins(joiners -> joiners
+      .withJoin(joiners -> joiners
         .addLeftJoin(joiner -> joiner
           .setFrom(teacherCourseEntityName)
         )
       )
-      .setFilter(f -> f.greaterThanOrEqualTo(teacherEntityName + ".id", 1))
-      .setGroupBy(groupBy -> groupBy
+      .withFilter(f -> f.greaterThanOrEqualTo(teacherEntityName + ".id", 1))
+      .withGroupBy(groupBy -> groupBy
         .addField(teacherEntityName + ".id")
         .addField("teacher_name")
       )
-      .setSort(sort -> sort.addOrder(teacherEntityName + ".id", Direction.DESC))
-      .setPage(1,100)
+      .withSort(sort -> sort.addOrder(teacherEntityName + ".id", Direction.DESC))
+      .setPage(1, 100)
     );
   }
 
@@ -602,11 +602,11 @@ public abstract class AbstractSessionTests {
     createTeacherEntity2(entityName);
     List<Map<String, Object>> list = session.find(entityName, query ->
       query
-        .setProjection(project -> project
+        .withProjection(project -> project
           .addField("teacher_id", field("id"))
           .addField("teacher_name", field("name"))
         )
-        .setFilter(f -> f.or(or -> or.equalTo("name", "张三").equalTo("name", "李四"))));
+        .withFilter(f -> f.or(or -> or.equalTo("name", "张三").equalTo("name", "李四"))));
     Assertions.assertFalse(list.isEmpty());
     Assertions.assertEquals(2, list.size());
   }
@@ -620,7 +620,7 @@ public abstract class AbstractSessionTests {
     createTeacherCourseEntity(entityName, courseEntityName);
     createTeacherCourseReportView(teacherCourseReportViewName, entityName, courseEntityName);
     List<Map<String, Object>> list = session.find(teacherCourseReportViewName, query ->
-      query.setFilter(f -> f.equalTo("teacher_id", 2)));
+      query.withFilter(f -> f.equalTo("teacher_id", 2)));
     Assertions.assertFalse(list.isEmpty());
     Map<String, Object> item = list.getFirst();
     Assertions.assertEquals(2L, ((Number) item.get("teacher_id")).intValue());
@@ -637,12 +637,12 @@ public abstract class AbstractSessionTests {
     createTeacherCourseEntity(entityName, courseEntityName);
     // 聚合分组
     List<Map<String, Object>> groupList = session.find(entityName, query -> query
-      .setProjection(projection -> projection
+      .withProjection(projection -> projection
         .addField("teacher_name", field("name"))
         .addField("course_count", count(field(courseEntityName + ".teacher_id")))
         .addField("course_score_sum", sum(field(courseEntityName + ".c_score")))
       )
-      .setJoins(joiners -> joiners
+      .withJoin(joiners -> joiners
         .addInnerJoin(joiner -> joiner
           .setFrom(courseEntityName)
           .setFilter("""
@@ -654,10 +654,10 @@ public abstract class AbstractSessionTests {
             """)
         )
       )
-      .setGroupBy(groupBy -> groupBy
+      .withGroupBy(groupBy -> groupBy
         .addField("teacher_name")
       )
-      .setFilter(f -> f.equalTo("name", "李四"))
+      .withFilter(f -> f.equalTo("name", "李四"))
     );
     Assertions.assertFalse(groupList.isEmpty());
     Map<String, Object> groupFirst = groupList.getFirst();
@@ -666,55 +666,55 @@ public abstract class AbstractSessionTests {
     Assertions.assertEquals(338, ((Number) groupFirst.get("course_score_sum")).intValue());
     // group by time
     List<Map<String, Object>> dateFormatList = session.find(entityName, query -> query
-      .setProjection(projection -> projection
+      .withProjection(projection -> projection
         .addField("year", dateFormat(field("birthday"), "yyyy-MM-dd hh:mm:ss"))
         .addField("user_count", count(field("id"))))
-      .setGroupBy(groupBy ->
+      .withGroupBy(groupBy ->
         groupBy.addField("year")
       )
     );
     Assertions.assertFalse(dateFormatList.isEmpty());
     List<Map<String, Object>> dateFormatList1 = session.find(entityName, query -> query
-      .setProjection(projection -> projection
+      .withProjection(projection -> projection
         .addField("year", dateFormat(field("birthday"), "yyyy-MM-dd"))
         .addField("user_count", count(field("id"))))
-      .setGroupBy(groupBy ->
+      .withGroupBy(groupBy ->
         groupBy.addField("year")
       )
     );
     Assertions.assertFalse(dateFormatList1.isEmpty());
     List<Map<String, Object>> dateFormatList2 = session.find(entityName, query -> query
-      .setProjection(projection -> projection
+      .withProjection(projection -> projection
         .addField("year", dateFormat(field("createDatetime"), "yyyy-MM-dd hh:mm:ss"))
         .addField("user_count", count(field("id"))))
-      .setGroupBy(groupBy ->
+      .withGroupBy(groupBy ->
         groupBy.addField("year")
       )
     );
     Assertions.assertFalse(dateFormatList2.isEmpty());
     List<Map<String, Object>> dayOfYearList = session.find(entityName, query -> query
-      .setProjection(projection -> projection
+      .withProjection(projection -> projection
         .addField("dayOfYear", dayOfYear(field("birthday")))
         .addField("user_count", count(field("id"))))
-      .setGroupBy(groupBy ->
+      .withGroupBy(groupBy ->
         groupBy.addField("dayOfYear")
       )
     );
     Assertions.assertFalse(dayOfYearList.isEmpty());
     List<Map<String, Object>> dayOfMonthList = session.find(entityName, query -> query
-      .setProjection(projection -> projection
+      .withProjection(projection -> projection
         .addField("dayOfMonth", dayOfMonth(field("birthday")))
         .addField("user_count", count(field("id"))))
-      .setGroupBy(groupBy ->
+      .withGroupBy(groupBy ->
         groupBy.addField("dayOfMonth")
       )
     );
     Assertions.assertFalse(dayOfMonthList.isEmpty());
     List<Map<String, Object>> dayOfWeekList = session.find(entityName, query -> query
-      .setProjection(projection -> projection
+      .withProjection(projection -> projection
         .addField("dayOfWeek", dayOfWeek(field("birthday")))
         .addField("user_count", count(field("id"))))
-      .setGroupBy(groupBy ->
+      .withGroupBy(groupBy ->
         groupBy.addField("dayOfWeek")
       )
     );
@@ -726,7 +726,7 @@ public abstract class AbstractSessionTests {
     String entityName = "testCountByCondition_teacher";
     createTeacherEntity2(entityName);
     long total = session.count(entityName, query -> query
-      .setFilter(f -> f.or(or -> or.equalTo("name", "张三").equalTo("name", "李四"))));
+      .withFilter(f -> f.or(or -> or.equalTo("name", "张三").equalTo("name", "李四"))));
     Assertions.assertEquals(2, total);
   }
 
@@ -825,9 +825,9 @@ public abstract class AbstractSessionTests {
     createTeacherEntity2(entityName);
     createTeacherCourseEntity(entityName, courseEntityName);
     List<Map<String, Object>> list = session.find(entityName, query -> query
-      .setProjection(projection -> projection
+      .withProjection(projection -> projection
         .addField("teacher_name", field("name")))
-      .setSort(sort -> sort.addOrder("id")
+      .withSort(sort -> sort.addOrder("id")
       ));
     Assertions.assertFalse(list.isEmpty());
     Map<String, Object> first = list.getFirst();
@@ -1009,14 +1009,14 @@ public abstract class AbstractSessionTests {
 
   private void createScoreReportView(String viewName, String studentModelName, String scoreModelName) {
     session.createView(viewName, studentModelName, query ->
-      query.setProjection(projection -> projection
+      query.withProjection(projection -> projection
           .addField("student_id", field("id"))
           .addField("student_name", max(field("name")))
           .addField("score_sum", sum(field(scoreModelName + ".score")))
           .addField("score_avg", avg(field(scoreModelName + ".score")))
           .addField("course_count", count(field(scoreModelName + ".course_name")))
         )
-        .setJoins(joiners -> joiners
+        .withJoin(joiners -> joiners
           .addInnerJoin(joiner -> joiner.setFrom(scoreModelName).setLocalField("id").setForeignField("student_id"))
         )
         .setFilter("""
@@ -1024,13 +1024,13 @@ public abstract class AbstractSessionTests {
             "id": {"_ne": 999}
           }
           """)
-        .setGroupBy(groupBy ->
+        .withGroupBy(groupBy ->
           groupBy.addField("id")
         )
-        .setSort(sort -> sort
+        .withSort(sort -> sort
           .addOrder("id", DESC)
         )
-        .setPage(1,100)
+        .setPage(1, 100)
     );
   }
 

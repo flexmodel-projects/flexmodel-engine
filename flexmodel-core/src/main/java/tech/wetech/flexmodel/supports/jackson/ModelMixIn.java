@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tech.wetech.flexmodel.Entity;
+import tech.wetech.flexmodel.NativeQueryModel;
 import tech.wetech.flexmodel.View;
 
 /**
@@ -14,6 +15,7 @@ import tech.wetech.flexmodel.View;
 @JsonSubTypes({
   @JsonSubTypes.Type(value = Entity.class, name = "entity"),
   @JsonSubTypes.Type(value = View.class, name = "view"),
+  @JsonSubTypes.Type(value = NativeQueryModel.class, name = "native_query"),
 })
 public class ModelMixIn {
 

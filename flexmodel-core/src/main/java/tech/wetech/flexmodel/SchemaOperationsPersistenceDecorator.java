@@ -66,6 +66,15 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   }
 
   @Override
+  public NativeQueryModel createNativeQueryModel(NativeQueryModel model) {
+    String schemaName = sessionContext.getSchemaName();
+    MappedModels mappedModels = sessionContext.getMappedModels();
+    delegate.createNativeQueryModel(model);
+    mappedModels.persist(schemaName, model);
+    return model;
+  }
+
+  @Override
   public TypedField<?, ?> modifyField(TypedField<?, ?> field) {
     inspect(() -> delegate.modifyField(field));
     MappedModels mappedModels = sessionContext.getMappedModels();

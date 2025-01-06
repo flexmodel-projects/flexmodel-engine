@@ -7,6 +7,7 @@ import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.graph.JoinGraphNode;
+import tech.wetech.flexmodel.sql.StringHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -136,6 +137,20 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
     List<Map<String, Object>> mapList = findMapList(modelName, query);
     QueryHelper.deepQuery(mapList, this::findMapList, mongoContext.getModel(modelName), query, mongoContext, mongoContext.getDeepQueryMaxDepth());
     return mongoContext.getJsonObjectConverter().convertValueList(mapList, resultType);
+  }
+
+  @Override
+  public <T> List<T> findByNativeQuery(String statement, Map<String, Object> params, Class<T> resultType) {
+    String json = StringHelper.simpleRenderTemplate(statement, params);
+    Document result = mongoDatabase.runCommand(Document.parse(json));
+    List<?> list = (List<?>) ((Map<?, ?>) result.get("cursor")).get("firstBatch");
+    return mongoContext.getJsonObjectConverter().convertValueList(list, resultType);
+  }
+
+  @Override
+  public <T> List<T> findByNativeQueryModel(String modelName, Map<String, Object> params, Class<T> resultType) {
+    NativeQueryModel model = (NativeQueryModel) mongoContext.getModel(modelName);
+    return findByNativeQuery(model.getStatement(), params, resultType);
   }
 
   @SuppressWarnings({"rawtypes"})

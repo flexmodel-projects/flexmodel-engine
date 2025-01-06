@@ -162,6 +162,18 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
     return sqlContext.getJsonObjectConverter().convertValueList(mapList, resultType);
   }
 
+  @Override
+  public <T> List<T> findByNativeQuery(String statement, Map<String, Object> params, Class<T> resultType) {
+    return sqlExecutor.queryForList(StringHelper.replacePlaceholder(statement), params, new SqlResultHandler<>(resultType));
+  }
+
+  @Override
+  public <T> List<T> findByNativeQueryModel(String modelName, Map<String, Object> params, Class<T> resultType) {
+    NativeQueryModel model = (NativeQueryModel) sqlContext.getModel(modelName);
+    String statement = model.getStatement();
+    return findByNativeQuery(statement, params, resultType);
+  }
+
   @SuppressWarnings("all")
   private List<Map<String, Object>> findMapList(String modelName, Query query) {
     Pair<String, Map<String, Object>> pair = toQuerySqlWithPrepared(modelName, query);

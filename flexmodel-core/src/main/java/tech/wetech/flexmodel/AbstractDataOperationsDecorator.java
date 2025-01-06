@@ -45,6 +45,16 @@ public class AbstractDataOperationsDecorator implements DataOperations {
   }
 
   @Override
+  public <T> List<T> findByNativeQuery(String statement, Map<String, Object> params, Class<T> resultType) {
+    return delegate.findByNativeQuery(statement, params, resultType);
+  }
+
+  @Override
+  public <T> List<T> findByNativeQueryModel(String modelName, Map<String, Object> params, Class<T> resultType) {
+    return delegate.findByNativeQueryModel(modelName, params, resultType);
+  }
+
+  @Override
   public long count(String modelName, Query query) {
     return delegate.count(modelName, query);
   }

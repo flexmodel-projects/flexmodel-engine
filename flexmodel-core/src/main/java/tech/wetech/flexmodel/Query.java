@@ -82,14 +82,14 @@ public class Query implements Serializable {
     }
   }
 
-  public Query setProjection(UnaryOperator<Projection> projectUnaryOperator) {
+  public Query withProjection(UnaryOperator<Projection> projectUnaryOperator) {
     Projection projection = new Projection();
     projectUnaryOperator.apply(projection);
     this.projection = projection;
     return this;
   }
 
-  public Query setJoins(UnaryOperator<Joins> joinersUnaryOperator) {
+  public Query withJoin(UnaryOperator<Joins> joinersUnaryOperator) {
     Joins joins = new Joins();
     this.joins = joinersUnaryOperator.apply(joins);
     return this;
@@ -99,7 +99,7 @@ public class Query implements Serializable {
     return joins;
   }
 
-  public Query setGroupBy(UnaryOperator<GroupBy> groupByUnaryOperator) {
+  public Query withGroupBy(UnaryOperator<GroupBy> groupByUnaryOperator) {
     GroupBy groupBy = new GroupBy();
     this.groupBy = groupByUnaryOperator.apply(groupBy);
     return this;
@@ -114,7 +114,7 @@ public class Query implements Serializable {
     return this;
   }
 
-  public Query setFilter(UnaryOperator<Criteria> filter) {
+  public Query withFilter(UnaryOperator<Criteria> filter) {
     Example example = new Example();
     filter.apply(example.createCriteria());
     this.filter = example.toFilterString();
@@ -138,7 +138,7 @@ public class Query implements Serializable {
     return this;
   }
 
-  public Query setSort(UnaryOperator<Sort> unaryOperator) {
+  public Query withSort(UnaryOperator<Sort> unaryOperator) {
     this.sort = unaryOperator.apply(new Sort());
     return this;
   }
@@ -155,7 +155,7 @@ public class Query implements Serializable {
     return this;
   }
 
-  public Query setPage(UnaryOperator<Page> unaryOperator) {
+  public Query withPage(UnaryOperator<Page> unaryOperator) {
     this.page = unaryOperator.apply(new Page());
     return this;
   }

@@ -23,7 +23,7 @@ public abstract class AbstractSession implements Session {
     this.schemaName = sessionContext.getSchemaName();
     this.dataOperationsDelegate =
       new DataOperationsGenerationDecorator(sessionContext,
-          dataOperationsDelegate
+        dataOperationsDelegate
       );
     this.schemaOperationsDelegate =
       new SchemaOperationsPersistenceDecorator(sessionContext, schemaOperationsDelegate);
@@ -68,6 +68,11 @@ public abstract class AbstractSession implements Session {
   @Override
   public Entity createEntity(Entity entity) {
     return schemaOperationsDelegate.createEntity(entity);
+  }
+
+  @Override
+  public NativeQueryModel createNativeQueryModel(NativeQueryModel model) {
+    return schemaOperationsDelegate.createNativeQueryModel(model);
   }
 
   @Override
@@ -138,6 +143,16 @@ public abstract class AbstractSession implements Session {
   @Override
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
     return dataOperationsDelegate.find(modelName, query, resultType);
+  }
+
+  @Override
+  public <T> List<T> findByNativeQuery(String statement, Map<String, Object> params, Class<T> resultType) {
+    return dataOperationsDelegate.findByNativeQuery(statement, params, resultType);
+  }
+
+  @Override
+  public <T> List<T> findByNativeQueryModel(String modelName, Map<String, Object> params, Class<T> resultType) {
+    return dataOperationsDelegate.findByNativeQueryModel(modelName, params, resultType);
   }
 
   @Override

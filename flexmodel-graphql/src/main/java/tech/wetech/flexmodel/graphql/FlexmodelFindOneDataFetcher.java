@@ -36,7 +36,7 @@ public class FlexmodelFindOneDataFetcher extends FlexmodelAbstractDataFetcher<Ma
       List<RelationField> relationFields = new ArrayList<>();
       List<Map<String, Object>> list = session.find(entity.getName(), query -> query
         .setFilter(filter)
-        .setProjection(projection -> {
+        .withProjection(projection -> {
           projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
           for (SelectedField selectedField : selectedFields) {
             TypedField<?, ?> flexModelField = entity.getField(selectedField.getName());

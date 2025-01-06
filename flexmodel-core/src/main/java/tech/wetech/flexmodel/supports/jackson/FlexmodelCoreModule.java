@@ -20,6 +20,7 @@ public class FlexmodelCoreModule extends SimpleModule {
     setMixInAnnotation(Model.class, ModelMixIn.class);
     setMixInAnnotation(Entity.class, ModelMixIn.class);
     setMixInAnnotation(View.class, ModelMixIn.class);
+    setMixInAnnotation(NativeQueryModel.class, ModelMixIn.class);
     // Field
     setMixInAnnotation(TypedField.class, TypedFieldMixIn.class);
     setMixInAnnotation(IDField.class, TypedFieldMixIn.class);
