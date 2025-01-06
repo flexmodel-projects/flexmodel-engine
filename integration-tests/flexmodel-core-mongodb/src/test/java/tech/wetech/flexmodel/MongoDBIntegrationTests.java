@@ -60,11 +60,18 @@ public class MongoDBIntegrationTests extends AbstractSessionTests {
 
   @Test
   void testNativeQueryModel() {
-    String classesEntityName = "TestNativeQueryClasses";
+    String classesEntityName = "TestNativeQueryModelClasses";
     createClassesEntity(classesEntityName);
     createClassesData(classesEntityName);
     List<Map> list = session.findByNativeQuery(
-      "select * from " + classesEntityName + " where id=${id} and className=${className} limit 10",
+      """
+        {
+            "find": "TestNativeQueryModelClasses",
+            "filter": { "id": ${id}, "className": "${className}"},
+            "sort": {"id": -1},
+            "limit": 10
+        }
+        """,
       Map.of("id", 3,
         "className", "二年级1班"), Map.class);
     Assertions.assertFalse(list.isEmpty());
