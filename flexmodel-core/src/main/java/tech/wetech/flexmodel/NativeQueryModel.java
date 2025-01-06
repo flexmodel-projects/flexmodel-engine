@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  */
 public class NativeQueryModel implements Model {
 
-  private final String name;
+  private String name;
   private String statement;
 
   public NativeQueryModel(String name) {
@@ -32,6 +32,11 @@ public class NativeQueryModel implements Model {
   @Override
   public String getType() {
     return "native_query";
+  }
+
+  public NativeQueryModel setName(String name) {
+    this.name = name;
+    return this;
   }
 
   @Override
