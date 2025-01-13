@@ -217,7 +217,7 @@ public abstract class BaseSqlStatement {
     if (modelName == null) {
       return sqlDialect.quoteIdentifier(fieldName);
     }
-    return modelName + "." + sqlDialect.quoteIdentifier(fieldName);
+    return sqlDialect.quoteIdentifier(modelName) + "." + sqlDialect.quoteIdentifier(fieldName);
   }
 
   private String toPhysicalTableNameQuoteString(String name) {
