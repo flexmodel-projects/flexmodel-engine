@@ -83,10 +83,11 @@ public class GenerationTool {
     // generate single model file
     for (Model model : models) {
       GenerationContext context = new GenerationContext();
-      context.setModelClass(modelClassMap.get(model.getName()));
+      ModelClass modelClass = modelClassMap.get(model.getName());
+      context.setModelClass(modelClass);
       context.putVariable("rootPackage", packageName);
-      pojoGenerator.generate(context, Path.of(targetDirectory, "entity", model.getName() + ".java").toString());
-      daoGenerator.generate(context, Path.of(targetDirectory, "dao", model.getName() + "DAO.java").toString());
+      pojoGenerator.generate(context, Path.of(targetDirectory, "entity", modelClass.getShortClassName() + ".java").toString());
+      daoGenerator.generate(context, Path.of(targetDirectory, "dao", modelClass.getShortClassName() + "DAO.java").toString());
     }
     // generate multiple model file
     ModelListGenerationContext multipleModelGenerationContext = new ModelListGenerationContext();
@@ -114,22 +115,23 @@ public class GenerationTool {
 
   public static ModelClass buildModelClass(String packageName, String schemaName, Entity entity) {
 
+    String camelName = StringUtils.snakeToCamel(entity.getName());
     ModelClass modelClass = new ModelClass()
       .setComment(entity.getComment())
-      .setVariableName(StringUtils.uncapitalize(entity.getName()))
-      .setLowerCaseName(StringUtils.uncapitalize(entity.getName()))
-      .setShortClassName(StringUtils.capitalize(entity.getName()))
+      .setVariableName(StringUtils.uncapitalize(camelName))
+      .setLowerCaseName(StringUtils.uncapitalize(camelName))
+      .setShortClassName(StringUtils.capitalize(camelName))
       .setPackageName(packageName + ".entity")
       .setSchemaName(schemaName)
       .setModelName(entity.getName())
-      .setFullClassName(packageName + ".entity" + "." + StringUtils.capitalize(entity.getName()))
+      .setFullClassName(packageName + ".entity" + "." + StringUtils.capitalize(camelName))
       .setOriginalModel(entity);
 
     for (TypedField<?, ?> field : entity.getFields()) {
 
       ModelField modelField = new ModelField()
         .setModelClass(modelClass)
-        .setFieldName(field.getName())
+        .setFieldName(StringUtils.snakeToCamel(field.getName()))
         .setOriginalField(field)
         .setComment(field.getComment());
 

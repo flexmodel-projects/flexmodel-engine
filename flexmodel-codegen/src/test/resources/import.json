@@ -1,6 +1,149 @@
 {
   "schema": [
     {
+      "name": "flow_definition",
+      "comment": null,
+      "fields": [
+        {
+          "type": "bigint",
+          "name": "last_modified_by",
+          "modelName": "flow_definition",
+          "comment": null,
+          "unique": false,
+          "nullable": true,
+          "defaultValue": null
+        },
+        {
+          "type": "string",
+          "name": "caller",
+          "modelName": "flow_definition",
+          "comment": null,
+          "unique": false,
+          "nullable": true,
+          "defaultValue": null,
+          "length": 255
+        },
+        {
+          "type": "string",
+          "name": "flow_name",
+          "modelName": "flow_definition",
+          "comment": null,
+          "unique": false,
+          "nullable": true,
+          "defaultValue": null,
+          "length": 255
+        },
+        {
+          "type": "string",
+          "name": "flow_title",
+          "modelName": "flow_definition",
+          "comment": null,
+          "unique": false,
+          "nullable": true,
+          "defaultValue": null,
+          "length": 255
+        },
+        {
+          "type": "string",
+          "name": "status",
+          "modelName": "flow_definition",
+          "comment": null,
+          "unique": false,
+          "nullable": true,
+          "defaultValue": null,
+          "length": 3
+        },
+        {
+          "type": "string",
+          "name": "process_name",
+          "modelName": "flow_definition",
+          "comment": null,
+          "unique": false,
+          "nullable": true,
+          "defaultValue": null,
+          "length": 255
+        },
+        {
+          "type": "datetime",
+          "name": "create_time",
+          "modelName": "flow_definition",
+          "comment": null,
+          "unique": false,
+          "nullable": true,
+          "defaultValue": null
+        },
+        {
+          "type": "bigint",
+          "name": "created_by",
+          "modelName": "flow_definition",
+          "comment": null,
+          "unique": false,
+          "nullable": true,
+          "defaultValue": null
+        },
+        {
+          "type": "datetime",
+          "name": "update_time",
+          "modelName": "flow_definition",
+          "comment": null,
+          "unique": false,
+          "nullable": true,
+          "defaultValue": null
+        },
+        {
+          "type": "text",
+          "name": "flow_model",
+          "modelName": "flow_definition",
+          "comment": null,
+          "unique": false,
+          "nullable": true,
+          "defaultValue": null
+        },
+        {
+          "type": "string",
+          "name": "process_key",
+          "modelName": "flow_definition",
+          "comment": null,
+          "unique": false,
+          "nullable": true,
+          "defaultValue": null,
+          "length": 255
+        },
+        {
+          "type": "id",
+          "name": "id",
+          "modelName": "flow_definition",
+          "comment": null,
+          "unique": false,
+          "nullable": false,
+          "defaultValue": null,
+          "generatedValue": "BIGINT_NOT_GENERATED"
+        },
+        {
+          "type": "string",
+          "name": "tenant_id",
+          "modelName": "flow_definition",
+          "comment": null,
+          "unique": false,
+          "nullable": false,
+          "defaultValue": null,
+          "length": 255
+        },
+        {
+          "type": "string",
+          "name": "flow_key",
+          "modelName": "flow_definition",
+          "comment": null,
+          "unique": false,
+          "nullable": true,
+          "defaultValue": null,
+          "length": 255
+        }
+      ],
+      "indexes": [],
+      "type": "entity"
+    },
+    {
       "name": "Datasource",
       "type": "entity",
       "fields": [

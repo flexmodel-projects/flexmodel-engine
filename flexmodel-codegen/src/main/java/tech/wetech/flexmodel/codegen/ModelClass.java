@@ -28,6 +28,11 @@ public class ModelClass implements Serializable {
   private final List<ModelField> allFields = new ArrayList<>();
   private Model originalModel;
 
+  public ModelClass() {
+    // default imports
+    imports.add("com.fasterxml.jackson.annotation.JsonRootName");
+    imports.add("com.fasterxml.jackson.annotation.JsonProperty");
+  }
 
   public String getPackageName() {
     return packageName;
