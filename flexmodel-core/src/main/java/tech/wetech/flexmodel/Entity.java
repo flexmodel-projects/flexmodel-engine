@@ -9,9 +9,8 @@ import java.util.function.UnaryOperator;
 /**
  * @author cjbi
  */
-public class Entity implements Model {
+public class Entity extends AbstractModel<Entity> {
 
-  private String name;
   private String comment;
   private final Set<TypedField<?, ?>> fields = new LinkedHashSet<>();
   private final Set<Index> indexes = new LinkedHashSet<>();
@@ -20,18 +19,9 @@ public class Entity implements Model {
     this.name = name;
   }
 
-  public void setName(String name) {
-    this.name = name;
-  }
-
   @Override
   public String getType() {
     return "entity";
-  }
-
-  @Override
-  public String getName() {
-    return name;
   }
 
   public String getComment() {

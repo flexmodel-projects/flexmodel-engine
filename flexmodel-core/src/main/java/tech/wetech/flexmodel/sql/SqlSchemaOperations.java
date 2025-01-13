@@ -48,8 +48,6 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
     Model model = getModel(modelName);
     if (model instanceof Entity entity) {
       dropTable(toSqlTable(entity));
-    } else if (model instanceof View view) {
-      dropView(toSqlView(view));
     }
   }
 
@@ -66,18 +64,6 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   }
 
   @Override
-  public View createView(String viewName, String viewOn, Query query) {
-    View view = new View(viewName);
-    view.setViewOn(viewOn);
-    view.setQuery(query);
-    String[] sqlCreateString = sqlContext.getSqlDialect().getViewExporter().getSqlCreateString(toSqlView(view));
-    for (String sql : sqlCreateString) {
-      sqlContext.getJdbcOperations().update(sql);
-    }
-    return view;
-  }
-
-  @Override
   public NativeQueryModel createNativeQueryModel(NativeQueryModel model) {
     return model;
   }
@@ -90,13 +76,6 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
     createUniqueKeys(sqlTable);
     createIndexes(sqlTable);
     createForeignKey(sqlTable);
-  }
-
-  private void dropView(SqlView sqlView) {
-    String[] sqlCreateString = sqlContext.getSqlDialect().getViewExporter().getSqlDropString(sqlView);
-    for (String sql : sqlCreateString) {
-      sqlContext.getJdbcOperations().update(sql);
-    }
   }
 
   private void dropTable(SqlTable sqlTable) {
@@ -331,20 +310,6 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
     return sqlTable;
   }
 
-  private SqlView toSqlView(View view) {
-    Query query = view.getQuery();
-    String physicalViewName = toPhysicalTableString(view.getName());
-    SqlView sqlView = new SqlView();
-    sqlView.setName(physicalViewName);
-    sqlView.setColumnList(
-      view.getFields().stream()
-        .map(Field::getName)
-        .toList()
-    );
-    sqlView.setQuery(buildQuerySql(view.getViewOn(), query));
-    return sqlView;
-  }
-
   private SqlColumn toSqlColumn(TypedField<?, ?> field) {
     if (field instanceof RelationField relationField) {
       SqlColumn associationColumn = new SqlColumn();
@@ -431,10 +396,14 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   }
 
   private String toPhysicalSequenceString(String name) {
-    return sqlContext.getPhysicalNamingStrategy().toPhysicalSequenceName(name);
+    return name;
   }
 
   private String toPhysicalTableString(String name) {
-    return sqlContext.getPhysicalNamingStrategy().toPhysicalTableName(name);
+    Entity model = (Entity) sqlContext.getModel(name);
+    if (model == null) {
+      return name;
+    }
+    return model.getName();
   }
 }

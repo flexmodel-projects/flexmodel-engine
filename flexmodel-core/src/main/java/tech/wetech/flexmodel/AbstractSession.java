@@ -161,11 +161,6 @@ public abstract class AbstractSession implements Session {
   }
 
   @Override
-  public View createView(String viewName, String viewOn, Query query) {
-    return schemaOperationsDelegate.createView(viewName, viewOn, query);
-  }
-
-  @Override
   public void associate(JoinGraphNode joinGraphNode, Map<String, Object> data) {
     dataOperationsDelegate.associate(joinGraphNode, data);
   }

@@ -11,9 +11,8 @@ import java.util.regex.Pattern;
  *
  * @author cjbi
  */
-public class NativeQueryModel implements Model {
+public class NativeQueryModel extends AbstractModel<NativeQueryModel> {
 
-  private String name;
   private String statement;
 
   public NativeQueryModel(String name) {
@@ -32,16 +31,6 @@ public class NativeQueryModel implements Model {
   @Override
   public String getType() {
     return "native_query";
-  }
-
-  public NativeQueryModel setName(String name) {
-    this.name = name;
-    return this;
-  }
-
-  @Override
-  public String getName() {
-    return name;
   }
 
   /**

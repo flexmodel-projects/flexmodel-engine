@@ -48,7 +48,7 @@ abstract class BaseMongoStatement {
                         PhysicalNamingStrategy physicalNamingStrategy, Query query) {
     if (query.getJoins() != null) {
       for (Query.Join join : query.getJoins().getJoins()) {
-        String joinCollectionName = physicalNamingStrategy.toPhysicalTableName(join.getFrom());
+        String joinCollectionName = join.getFrom();
         Document lookup = createLookupDocument(pipeline, model, join, joinCollectionName);
         pipeline.add(new Document("$lookup", lookup));
 

@@ -8,7 +8,7 @@ import java.util.List;
 public class SqlView implements Exportable {
   private String name;
   private List<String> columnList;
-  private String sqlQuery;
+  private String statement;
 
   public String getName() {
     return name;
@@ -26,11 +26,12 @@ public class SqlView implements Exportable {
     this.columnList = columnList;
   }
 
-  public String getSqlQuery() {
-    return sqlQuery;
+  public String getStatement() {
+    return statement;
   }
 
-  public void setQuery(String query) {
-    this.sqlQuery = query;
+  public void setStatement(String statement) {
+    this.statement = statement;
   }
+
 }

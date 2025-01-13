@@ -20,7 +20,6 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   private final SqlExecutor sqlExecutor;
   private final MappedModels mappedModels;
   private final SqlDialect sqlDialect;
-  private final PhysicalNamingStrategy physicalNamingStrategy;
   private final ExpressionCalculator<SqlClauseResult> sqlExpressionCalculator;
   private final Map<String, SqlTypeHandler<?>> typeHandlerMap;
 
@@ -30,7 +29,6 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
     this.sqlExecutor = sqlContext.getJdbcOperations();
     this.mappedModels = sqlContext.getMappedModels();
     this.sqlDialect = sqlContext.getSqlDialect();
-    this.physicalNamingStrategy = sqlContext.getPhysicalNamingStrategy();
     this.sqlExpressionCalculator = sqlContext.getConditionCalculator();
     this.typeHandlerMap = sqlContext.getTypeHandlerMap();
   }
@@ -266,7 +264,11 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   }
 
   private String toPhysicalTablenameQuoteString(String name) {
-    return sqlDialect.quoteIdentifier(physicalNamingStrategy.toPhysicalTableName(name));
+    Entity entity = (Entity) sqlContext.getModel(name);
+    if (entity == null) {
+      return sqlDialect.quoteIdentifier(name);
+    }
+    return sqlDialect.quoteIdentifier(entity.getName());
   }
 
 }

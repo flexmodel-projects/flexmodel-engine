@@ -33,7 +33,7 @@ public class StandardViewExporter implements Exporter<SqlView> {
       buf.append(')');
     }
     buf.append(" as ");
-    buf.append(sqlView.getSqlQuery());
+    buf.append(sqlView.getStatement());
     return new String[]{buf.toString()};
   }
 

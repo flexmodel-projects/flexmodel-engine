@@ -24,20 +24,18 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   private final String schemaName;
   private final MappedModels mappedModels;
   private final MongoDatabase mongoDatabase;
-  private final PhysicalNamingStrategy physicalNamingStrategy;
   private final SchemaOperations schemaOperations;
 
   public MongoDataOperations(MongoContext mongoContext) {
     super(mongoContext);
     this.schemaName = mongoContext.getSchemaName();
     this.mongoDatabase = mongoContext.getMongoDatabase();
-    this.physicalNamingStrategy = mongoContext.getPhysicalNamingStrategy();
     this.mappedModels = mongoContext.getMappedModels();
     this.schemaOperations = new MongoSchemaOperations(mongoContext);
   }
 
   private String getCollectionName(String modelName) {
-    return physicalNamingStrategy.toPhysicalTableName(modelName);
+    return modelName;
   }
 
   @Override

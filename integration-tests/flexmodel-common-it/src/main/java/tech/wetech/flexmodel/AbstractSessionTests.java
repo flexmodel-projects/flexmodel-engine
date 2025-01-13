@@ -503,29 +503,6 @@ public abstract class AbstractSessionTests {
     session.insertAll(teacherCourseEntity, list);
   }
 
-  private void createTeacherCourseReportView(String viewName, String teacherEntityName, String teacherCourseEntityName) {
-    session.createView(viewName, teacherEntityName, query -> query
-      .withProjection(projection ->
-        projection.addField("teacher_id", field(teacherEntityName + ".id"))
-          .addField("teacher_name", field("name"))
-          .addField("age_max", max(field("age")))
-          .addField("age_count", count(field("age")))
-      )
-      .withJoin(joiners -> joiners
-        .addLeftJoin(joiner -> joiner
-          .setFrom(teacherCourseEntityName)
-        )
-      )
-      .withFilter(f -> f.greaterThanOrEqualTo(teacherEntityName + ".id", 1))
-      .withGroupBy(groupBy -> groupBy
-        .addField(teacherEntityName + ".id")
-        .addField("teacher_name")
-      )
-      .withSort(sort -> sort.addOrder(teacherEntityName + ".id", Direction.DESC))
-      .setPage(1, 100)
-    );
-  }
-
   @Test
   void testInsert() {
     String entityName = "testInsert_teacher";
@@ -609,24 +586,6 @@ public abstract class AbstractSessionTests {
         .withFilter(f -> f.or(or -> or.equalTo("name", "张三").equalTo("name", "李四"))));
     Assertions.assertFalse(list.isEmpty());
     Assertions.assertEquals(2, list.size());
-  }
-
-  @Test
-  void testFindByQueryConditionWhenIsView() {
-    String entityName = "testFindByQueryConditionWhenIsView_teacher";
-    String courseEntityName = "testFindByQueryConditionWhenIsView_teacher_courses";
-    String teacherCourseReportViewName = "testFindByQueryConditionWhenIsView_teacher_course_report";
-    createTeacherEntity2(entityName);
-    createTeacherCourseEntity(entityName, courseEntityName);
-    createTeacherCourseReportView(teacherCourseReportViewName, entityName, courseEntityName);
-    List<Map<String, Object>> list = session.find(teacherCourseReportViewName, query ->
-      query.withFilter(f -> f.equalTo("teacher_id", 2)));
-    Assertions.assertFalse(list.isEmpty());
-    Map<String, Object> item = list.getFirst();
-    Assertions.assertEquals(2L, ((Number) item.get("teacher_id")).intValue());
-    Assertions.assertEquals("李四", item.get("teacher_name"));
-    Assertions.assertEquals(37, ((Number) item.get("age_max")).intValue());
-    Assertions.assertEquals(4, ((Number) item.get("age_count")).intValue());
   }
 
   @Test
@@ -995,54 +954,6 @@ public abstract class AbstractSessionTests {
     Entity entity = (Entity) session.getModel(entityName);
     Assertions.assertNull(entity.getIndex("IDX_compound"));
     dropModel(entityName);
-  }
-
-  @Test
-  void testCreateView() {
-    String viewName = "testCreateView_student_score_report";
-    String studentModelName = "testCreateView_students";
-    String scoreModelName = "testCreateView_student_scores";
-    createStudentEntity2(studentModelName);
-    createScoreEntity2(scoreModelName);
-    createScoreReportView(viewName, studentModelName, scoreModelName);
-  }
-
-  private void createScoreReportView(String viewName, String studentModelName, String scoreModelName) {
-    session.createView(viewName, studentModelName, query ->
-      query.withProjection(projection -> projection
-          .addField("student_id", field("id"))
-          .addField("student_name", max(field("name")))
-          .addField("score_sum", sum(field(scoreModelName + ".score")))
-          .addField("score_avg", avg(field(scoreModelName + ".score")))
-          .addField("course_count", count(field(scoreModelName + ".course_name")))
-        )
-        .withJoin(joiners -> joiners
-          .addInnerJoin(joiner -> joiner.setFrom(scoreModelName).setLocalField("id").setForeignField("student_id"))
-        )
-        .setFilter("""
-          {
-            "id": {"_ne": 999}
-          }
-          """)
-        .withGroupBy(groupBy ->
-          groupBy.addField("id")
-        )
-        .withSort(sort -> sort
-          .addOrder("id", DESC)
-        )
-        .setPage(1, 100)
-    );
-  }
-
-  @Test
-  void testDropView() {
-    String viewName = "testDropView_student_score_report";
-    String studentModelName = "testDropView_students";
-    String scoreModelName = "testDropView_student_scores";
-    createStudentEntity2(studentModelName);
-    createScoreEntity2(scoreModelName);
-    createScoreReportView(viewName, studentModelName, scoreModelName);
-    dropModel(viewName);
   }
 
   @Test

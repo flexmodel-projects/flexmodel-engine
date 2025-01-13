@@ -76,15 +76,6 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   }
 
   @Override
-  public View createView(String viewName, String viewOn, Query query) {
-    mongoDatabase.createView(viewName, viewOn, createPipeline(viewOn, query));
-    View view = new View(viewName);
-    view.setViewOn(viewOn);
-    view.setQuery(query);
-    return view;
-  }
-
-  @Override
   public NativeQueryModel createNativeQueryModel(NativeQueryModel model) {
     return model;
   }
@@ -158,7 +149,11 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   }
 
   private String getCollectionName(String modelName) {
-    return physicalNamingStrategy.toPhysicalSequenceName(modelName);
+    Entity model = (Entity) mongoContext.getModel(modelName);
+    if (model == null) {
+      return modelName;
+    }
+    return model.getName();
   }
 
   @Override

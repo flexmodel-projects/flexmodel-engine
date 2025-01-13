@@ -48,8 +48,6 @@ public interface SchemaOperations {
    */
   Entity createEntity(Entity entity);
 
-  View createView(String viewName, String viewOn, Query query);
-
   NativeQueryModel createNativeQueryModel(NativeQueryModel model);
 
   /**
@@ -119,19 +117,6 @@ public interface SchemaOperations {
     Entity entity = new Entity(modelName);
     entityUnaryOperator.apply(entity);
     return createEntity(entity);
-  }
-
-  /**
-   * 创建视图
-   *
-   * @param viewName
-   * @param queryUnaryOperator
-   * @return
-   */
-  default View createView(String viewName, String viewOn, UnaryOperator<Query> queryUnaryOperator) {
-    Query query = new Query();
-    queryUnaryOperator.apply(query);
-    return createView(viewName, viewOn, query);
   }
 
   default NativeQueryModel createNativeQueryModel(String modelName, UnaryOperator<NativeQueryModel> modelUnaryOperator) {

@@ -57,15 +57,6 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   }
 
   @Override
-  public View createView(String viewName, String viewOn, Query query) {
-    String schemaName = sessionContext.getSchemaName();
-    MappedModels mappedModels = sessionContext.getMappedModels();
-    View view = inspect(() -> delegate.createView(viewName, viewOn, query), null);
-    mappedModels.persist(schemaName, view);
-    return view;
-  }
-
-  @Override
   public NativeQueryModel createNativeQueryModel(NativeQueryModel model) {
     String schemaName = sessionContext.getSchemaName();
     MappedModels mappedModels = sessionContext.getMappedModels();

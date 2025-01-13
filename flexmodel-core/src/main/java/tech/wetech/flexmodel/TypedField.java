@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -13,6 +15,7 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
   private boolean unique;
   private boolean nullable = true;
   private T defaultValue;
+  private Map<String, Object> additionalProperties = new HashMap<>();
 
   public TypedField(String name, String type) {
     this.name = name;
@@ -100,6 +103,25 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
   @Override
   public int hashCode() {
     return Objects.hash(name, type, modelName, comment, unique, nullable, defaultValue);
+  }
+
+  public SELF addAdditionalProperty(String key, Object value) {
+    this.additionalProperties.put(key, value);
+    return self();
+  }
+
+  public SELF setAdditionalProperties(Map<String, Object> additionalProperties) {
+    this.additionalProperties = additionalProperties;
+    return self();
+  }
+
+  public SELF mergeAdditionalProperty(Map<String, Object> thatAdditionalProperties) {
+    additionalProperties.putAll(thatAdditionalProperties);
+    return self();
+  }
+
+  public Map<String, Object> getAdditionalProperties() {
+    return additionalProperties;
   }
 
   @SuppressWarnings("unchecked")

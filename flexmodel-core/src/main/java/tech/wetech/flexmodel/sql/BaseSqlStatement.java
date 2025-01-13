@@ -214,17 +214,19 @@ public abstract class BaseSqlStatement {
 
   private String toFullColumnQuoteString(String modelName, String fieldName) {
     SqlDialect sqlDialect = sqlContext.getSqlDialect();
-    PhysicalNamingStrategy physicalNamingStrategy = sqlContext.getPhysicalNamingStrategy();
     if (modelName == null) {
       return sqlDialect.quoteIdentifier(fieldName);
     }
-    return sqlDialect.quoteIdentifier(physicalNamingStrategy.toPhysicalTableName(modelName)) + "." + sqlDialect.quoteIdentifier(fieldName);
+    return modelName + "." + sqlDialect.quoteIdentifier(fieldName);
   }
 
   private String toPhysicalTableNameQuoteString(String name) {
     SqlDialect sqlDialect = sqlContext.getSqlDialect();
-    PhysicalNamingStrategy physicalNamingStrategy = sqlContext.getPhysicalNamingStrategy();
-    return sqlDialect.quoteIdentifier(physicalNamingStrategy.toPhysicalTableName(name));
+    Entity entity = (Entity) sqlContext.getModel(name);
+    if (entity == null) {
+      return sqlDialect.quoteIdentifier(name);
+    }
+    return sqlDialect.quoteIdentifier(entity.getName());
   }
 
   public record Pair<T, U>(T first, U second) {
