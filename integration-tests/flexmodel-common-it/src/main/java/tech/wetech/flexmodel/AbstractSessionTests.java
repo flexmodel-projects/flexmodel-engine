@@ -369,13 +369,13 @@ public abstract class AbstractSessionTests {
     Assertions.assertFalse(manyToMany.isEmpty());
     Assertions.assertEquals(3, manyToMany.size());
 
-    // deep query list
-    List<Map<String, Object>> deepList = session.find(classesEntityName, query -> query.setDeep(true));
-    Assertions.assertFalse(deepList.isEmpty());
-    Assertions.assertNotNull(deepList.getFirst().get("students"));
-    // deep query by id
-    Map<String, Object> deepData = session.findById(classesEntityName, 1, true);
-    Assertions.assertNotNull(deepData.get("students"));
+    // nested query list
+    List<Map<String, Object>> nestedList = session.find(classesEntityName, query -> query.setNestedQueryEnabled(true));
+    Assertions.assertFalse(nestedList.isEmpty());
+    Assertions.assertNotNull(nestedList.getFirst().get("students"));
+    // nested query by id
+    Map<String, Object> nestedData = session.findById(classesEntityName, 1, true);
+    Assertions.assertNotNull(nestedData.get("students"));
   }
 
 

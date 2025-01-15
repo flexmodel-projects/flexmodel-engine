@@ -35,8 +35,8 @@ public class AbstractDataOperationsDecorator implements DataOperations {
   }
 
   @Override
-  public <T> T findById(String modelName, Object id, Class<T> resultType, boolean deep) {
-    return delegate.findById(modelName, id, resultType, deep);
+  public <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery) {
+    return delegate.findById(modelName, id, resultType, nestedQuery);
   }
 
   @Override

@@ -51,7 +51,7 @@ public class FlexmodelFindOneDataFetcher extends FlexmodelAbstractDataFetcher<Ma
           }
           return projection;
         })
-        .setPage(1, 1)
+        .withPage(1, 1)
       );
       if (list.isEmpty()) {
         return null;

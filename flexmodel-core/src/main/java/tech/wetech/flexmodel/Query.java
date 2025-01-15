@@ -18,7 +18,7 @@ public class Query implements Serializable {
   private GroupBy groupBy;
   private Sort sort;
   private Page page;
-  private boolean deep;
+  private boolean nestedQueryEnabled;
 
   public interface QueryCall extends Serializable {
   }
@@ -148,7 +148,7 @@ public class Query implements Serializable {
     return this;
   }
 
-  public Query setPage(int pageNumber, int pageSize) {
+  public Query withPage(int pageNumber, int pageSize) {
     this.page = new Page();
     page.setPageNumber(pageNumber);
     page.setPageSize(pageSize);
@@ -164,12 +164,12 @@ public class Query implements Serializable {
     return page;
   }
 
-  public boolean isDeep() {
-    return deep;
+  public boolean isNestedQueryEnabled() {
+    return nestedQueryEnabled;
   }
 
-  public Query setDeep(boolean deep) {
-    this.deep = deep;
+  public Query setNestedQueryEnabled(boolean nestedQueryEnabled) {
+    this.nestedQueryEnabled = nestedQueryEnabled;
     return this;
   }
 
@@ -251,6 +251,13 @@ public class Query implements Serializable {
 
     public String getFilter() {
       return filter;
+    }
+
+    public Join withFilter(UnaryOperator<Criteria> filter) {
+      Example example = new Example();
+      filter.apply(example.createCriteria());
+      this.filter = example.toFilterString();
+      return this;
     }
 
     public Join setFilter(String filter) {

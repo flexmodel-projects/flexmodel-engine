@@ -92,7 +92,7 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
 
   protected Query getQuery(Integer pageNumber, Integer pageSize, Map<String, String> orderBy, Map<String, Object> where, Query query) {
     if (pageSize != null && pageNumber != null) {
-      query.setPage(pageNumber, pageSize);
+      query.withPage(pageNumber, pageSize);
     }
     if (orderBy != null) {
       query.withSort(sort -> {

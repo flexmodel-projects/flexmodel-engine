@@ -82,4 +82,10 @@ public class Index implements Serializable {
     }
     return false;
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName() + "<" + getName() + ">";
+  }
+
 }

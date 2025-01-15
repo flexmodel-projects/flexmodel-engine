@@ -115,24 +115,24 @@ public class QueryHelper {
     return List.of();
   }
 
-  public static void deepQuery(List<Map<String, Object>> parentList,
-                               BiFunction<String, Query,
+  public static void nestedQuery(List<Map<String, Object>> parentList,
+                                 BiFunction<String, Query,
                                  List<Map<String, Object>>> relationFn,
-                               Model model,
-                               Query query,
-                               AbstractSessionContext sessionContext,
-                               int maxDepth) {
-    deepQuery(parentList, relationFn, model, query, sessionContext, new AtomicInteger(maxDepth));
+                                 Model model,
+                                 Query query,
+                                 AbstractSessionContext sessionContext,
+                                 int maxDepth) {
+    nestedQuery(parentList, relationFn, model, query, sessionContext, new AtomicInteger(maxDepth));
   }
 
 
-  private static void deepQuery(List<Map<String, Object>> parentList,
-                                BiFunction<String, Query,
+  private static void nestedQuery(List<Map<String, Object>> parentList,
+                                  BiFunction<String, Query,
                                   List<Map<String, Object>>> relationFn,
-                                Model model,
-                                Query query,
-                                AbstractSessionContext sessionContext,
-                                AtomicInteger maxDepth) {
+                                  Model model,
+                                  Query query,
+                                  AbstractSessionContext sessionContext,
+                                  AtomicInteger maxDepth) {
     if (maxDepth.get() <= 0) {
       return;
     }
@@ -144,7 +144,7 @@ public class QueryHelper {
           Object id = item.get(idField.getName());
           List<Map<String, Object>> list = findRelationList(sessionContext, relationFn, relationField, id);
           maxDepth.decrementAndGet();
-          deepQuery(list, relationFn, sessionContext.getModel(relationField.getTargetEntity()), null, sessionContext, maxDepth);
+          nestedQuery(list, relationFn, sessionContext.getModel(relationField.getTargetEntity()), null, sessionContext, maxDepth);
           if (!list.isEmpty()) {
             item.put(key, relationField.getCardinality() == RelationField.Cardinality.ONE_TO_ONE ? list.getFirst() : list);
           }

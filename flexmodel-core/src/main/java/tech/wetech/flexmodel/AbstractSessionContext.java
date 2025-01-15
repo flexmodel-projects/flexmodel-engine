@@ -18,7 +18,7 @@ public abstract class AbstractSessionContext {
   protected final JsonObjectConverter jsonObjectConverter;
   protected PhysicalNamingStrategy physicalNamingStrategy = new DefaultPhysicalNamingStrategy();
   protected boolean failFast = true;
-  protected int deepQueryMaxDepth = 5;
+  protected int nestedQueryMaxDepth = 5;
   protected final SessionFactory factory;
 
   protected AbstractSessionContext(String schemaName, MappedModels mappedModels, JsonObjectConverter jsonObjectConverter, SessionFactory factory) {
@@ -62,12 +62,12 @@ public abstract class AbstractSessionContext {
     return jsonObjectConverter;
   }
 
-  public int getDeepQueryMaxDepth() {
-    return deepQueryMaxDepth;
+  public int getNestedQueryMaxDepth() {
+    return nestedQueryMaxDepth;
   }
 
-  public void setDeepQueryMaxDepth(int deepQueryMaxDepth) {
-    this.deepQueryMaxDepth = deepQueryMaxDepth;
+  public void setNestedQueryMaxDepth(int nestedQueryMaxDepth) {
+    this.nestedQueryMaxDepth = nestedQueryMaxDepth;
   }
 
   public SessionFactory getFactory() {

@@ -53,7 +53,7 @@ class DaoGenerator extends AbstractGenerator {
     out.println "  // Schema name used for the database operations"
     out.println "  private final String schemaName = \"${modelClass.schemaName}\";"
     out.println "  // Model name associated with the ${modelClass.shortClassName} data"
-    out.println "  private final String modelName = \"${modelClass.shortClassName}\";"
+    out.println "  private final String modelName = \"${modelClass.originalModel.name}\";"
     out.println ""
     out.println "  // Injected session factory for creating sessions with the database"
     out.println "  @Inject"
@@ -64,7 +64,7 @@ class DaoGenerator extends AbstractGenerator {
 
     if (modelClass.idField) {
       out.println "  // Field name used for identifying records"
-      out.println "  private final String idFieldName = \"${modelClass.idField.fieldName}\";"
+      out.println "  private final String idFieldName = \"${modelClass.idField.originalField.name}\";"
       out.println ""
       out.println "  /**"
       out.println "   * Updates a {@link ${modelClass.shortClassName}} record identified by its ID."
@@ -175,6 +175,20 @@ class DaoGenerator extends AbstractGenerator {
       out.println "      create(record, id -> record.set${modelClass.idField.fieldName.capitalize()}(id));"
       out.println "    }"
       out.println "    return record;"
+      out.println "  }"
+      out.println ""
+
+      out.println "  /**"
+      out.println "   * delete a {@link ${modelClass.shortClassName}} record by its ID."
+      out.println "   *"
+      out.println "   * @param id The ID of the record to find."
+      out.println "   * @return The ${modelClass.shortClassName} record with the given ID, or {@code null} if not found."
+      out.println "   */"
+      out.println "  public int deleteById(${modelClass.idField.shortTypeName} id) {"
+      out.println "    try (Session session = sessionFactory.createSession(schemaName)) {"
+      out.println "      // delete the record with the given ID"
+      out.println "      return session.deleteById(modelName, id);"
+      out.println "    }"
       out.println "  }"
       out.println ""
 

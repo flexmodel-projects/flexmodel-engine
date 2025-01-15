@@ -136,8 +136,8 @@ public abstract class AbstractSession implements Session {
   }
 
   @Override
-  public <T> T findById(String modelName, Object id, Class<T> resultType, boolean deep) {
-    return dataOperationsDelegate.findById(modelName, id, resultType, deep);
+  public <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery) {
+    return dataOperationsDelegate.findById(modelName, id, resultType, nestedQuery);
   }
 
   @Override

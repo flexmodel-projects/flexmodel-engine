@@ -61,6 +61,10 @@ public class SessionFactory {
   private void processBuildItem(BuildItem buildItem) {
     List<Model> allModels = buildItem.getModels();
     allModels.forEach(model -> cache.put(buildItem.getSchemaName() + ":" + model.getName(), model));
+    try (Session session = createFailSafeSession(buildItem.getSchemaName())) {
+      List<RelationField> lazyCreateList = processModels(buildItem.getModels(), session);
+      lazyCreateRelationFields(lazyCreateList, session);
+    }
   }
 
   public void loadScriptString(String schemaName, String scriptString) {

@@ -115,7 +115,7 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
 
   @Override
   @SuppressWarnings({"rawtypes", "unchecked"})
-  public <T> T findById(String modelName, Object id, Class<T> resultType, boolean deep) {
+  public <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery) {
     String collectionName = getCollectionName(modelName);
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
@@ -123,9 +123,9 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
     Map dataMap = mongoDatabase.getCollection(collectionName, Map.class)
       .find(Filters.eq(idField.getName(), id))
       .first();
-    if (deep && dataMap != null) {
-      QueryHelper.deepQuery(List.of(dataMap), this::findMapList, mongoContext.getModel(modelName),
-        null, mongoContext, mongoContext.getDeepQueryMaxDepth());
+    if (nestedQuery && dataMap != null) {
+      QueryHelper.nestedQuery(List.of(dataMap), this::findMapList, mongoContext.getModel(modelName),
+        null, mongoContext, mongoContext.getNestedQueryMaxDepth());
     }
     return mongoContext.getJsonObjectConverter().convertValue(dataMap, resultType);
   }
@@ -133,7 +133,7 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   @Override
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
     List<Map<String, Object>> mapList = findMapList(modelName, query);
-    QueryHelper.deepQuery(mapList, this::findMapList, mongoContext.getModel(modelName), query, mongoContext, mongoContext.getDeepQueryMaxDepth());
+    QueryHelper.nestedQuery(mapList, this::findMapList, mongoContext.getModel(modelName), query, mongoContext, mongoContext.getNestedQueryMaxDepth());
     return mongoContext.getJsonObjectConverter().convertValueList(mapList, resultType);
   }
 

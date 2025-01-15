@@ -34,7 +34,7 @@ public interface DataOperations {
    * @param id        ID
    * @return Record
    */
-  <T> T findById(String modelName, Object id, Class<T> resultType, boolean deep);
+  <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery);
 
   <T> List<T> find(String modelName, Query query, Class<T> resultType);
 
@@ -160,12 +160,12 @@ public interface DataOperations {
    *
    * @param modelName Model name
    * @param id        ID
-   * @param deep      Whether to perform a deep fetch
+   * @param nestedQuery      Whether to perform a nested fetch
    * @return Record
    */
   @SuppressWarnings("unchecked")
-  default Map<String, Object> findById(String modelName, Object id, boolean deep) {
-    return findById(modelName, id, Map.class, deep);
+  default Map<String, Object> findById(String modelName, Object id, boolean nestedQuery) {
+    return findById(modelName, id, Map.class, nestedQuery);
   }
 
   /**

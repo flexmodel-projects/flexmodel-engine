@@ -127,7 +127,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   }
 
   @Override
-  public <T> T findById(String modelName, Object id, Class<T> resultType, boolean deep) {
+  public <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
     Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
@@ -143,8 +143,8 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
                  " " +
                  " where (" + sqlDialect.quoteIdentifier(idField.getName()) + "= :id)";
     Map<String, Object> dataMap = sqlExecutor.queryForObject(sql, Map.of("id", id), getSqlResultHandler(entity, null, Map.class));
-    if (deep && dataMap != null) {
-      QueryHelper.deepQuery(List.of(dataMap), this::findMapList, sqlContext.getModel(modelName), null, sqlContext, sqlContext.getDeepQueryMaxDepth());
+    if (nestedQuery && dataMap != null) {
+      QueryHelper.nestedQuery(List.of(dataMap), this::findMapList, sqlContext.getModel(modelName), null, sqlContext, sqlContext.getNestedQueryMaxDepth());
     }
     return sqlContext.getJsonObjectConverter().convertValue(dataMap, resultType);
   }
@@ -154,8 +154,8 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
     Pair<String, Map<String, Object>> pair = toQuerySqlWithPrepared(modelName, query);
     List mapList = sqlExecutor.queryForList(pair.first(), pair.second(), getSqlResultHandler(sqlContext.getModel(modelName), query, Map.class));
-    if (query.isDeep()) {
-      QueryHelper.deepQuery(mapList, this::findMapList, sqlContext.getModel(modelName), query, sqlContext, sqlContext.getDeepQueryMaxDepth());
+    if (query.isNestedQueryEnabled()) {
+      QueryHelper.nestedQuery(mapList, this::findMapList, sqlContext.getModel(modelName), query, sqlContext, sqlContext.getNestedQueryMaxDepth());
     }
     return sqlContext.getJsonObjectConverter().convertValueList(mapList, resultType);
   }
