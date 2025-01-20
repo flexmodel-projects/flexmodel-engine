@@ -109,6 +109,7 @@ public abstract class BaseSqlStatement {
         String localField = joiner.getLocalField();
         String foreignField = joiner.getForeignField();
         RelationField relationField;
+        // todo 支持子关联，通过别名区分关联表
         if (model instanceof Entity entity && (relationField = entity.findRelationByEntityName(joiner.getFrom()).orElse(null)) != null) {
           localField = entity.findIdField().map(IDField::getName).orElseThrow();
           foreignField = relationField.getTargetField();

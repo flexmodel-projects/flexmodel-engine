@@ -60,7 +60,11 @@ class PojoGenerator extends AbstractGenerator {
       generateGetter(out, field)
       generateSetter(out, field)
     }
-
+    if (modelClass.idField) {
+      generateToString(out, modelClass)
+      generateEquals(out, modelClass)
+    }
+    out.println ""
     // Close class
     out.println "}"
   }
@@ -88,6 +92,26 @@ class PojoGenerator extends AbstractGenerator {
     out.println ""
     out.println "  public void set${field.fieldName.capitalize()}(${field.shortTypeName} ${field.fieldName}) {"
     out.println "    this.${field.fieldName} = ${field.fieldName};"
+    out.println "  }"
+  }
+
+
+  def generateToString(PrintWriter out, ModelClass modelClass) {
+    out.println ""
+    out.println "  @Override"
+    out.println "  public String toString() {"
+    out.println "    return this.getClass().getSimpleName() + \"<\" + get${modelClass.idField.fieldName.capitalize()}() + \">\";"
+    out.println "  }"
+  }
+
+  def generateEquals(PrintWriter out, ModelClass modelClass) {
+    out.println ""
+    out.println "  @Override"
+    out.println "  public boolean equals(Object obj) {"
+    out.println "    if (this.get${modelClass.idField.fieldName.capitalize()}() != null && obj instanceof ${modelClass.shortClassName}) {"
+    out.println "      return this.get${modelClass.idField.fieldName.capitalize()}().equals(((${modelClass.shortClassName}) obj).get${modelClass.idField.fieldName.capitalize()}());"
+    out.println "    }"
+    out.println "    return super.equals(obj);"
     out.println "  }"
   }
 

@@ -115,16 +115,16 @@ public class GenerationTool {
 
   public static ModelClass buildModelClass(String packageName, String schemaName, Entity entity) {
 
-    String camelName = StringUtils.snakeToCamel(entity.getName());
+    String cCamelName = StringUtils.snakeToCamel(entity.getName());
     ModelClass modelClass = new ModelClass()
       .setComment(entity.getComment())
-      .setVariableName(StringUtils.uncapitalize(camelName))
-      .setLowerCaseName(StringUtils.uncapitalize(camelName))
-      .setShortClassName(StringUtils.capitalize(camelName))
+      .setVariableName(StringUtils.uncapitalize(cCamelName))
+      .setLowerCaseName(StringUtils.uncapitalize(cCamelName))
+      .setShortClassName(StringUtils.capitalize(cCamelName))
       .setPackageName(packageName + ".entity")
       .setSchemaName(schemaName)
       .setModelName(entity.getName())
-      .setFullClassName(packageName + ".entity" + "." + StringUtils.capitalize(camelName))
+      .setFullClassName(packageName + ".entity" + "." + StringUtils.capitalize(cCamelName))
       .setOriginalModel(entity);
 
     for (TypedField<?, ?> field : entity.getFields()) {
@@ -147,17 +147,18 @@ public class GenerationTool {
         modelClass.setIdField(modelField);
 
       } else if (field instanceof RelationField relationField) {
+        String ftName = StringUtils.capitalize(StringUtils.snakeToCamel(relationField.getTargetEntity()));
         // relation field
         if (relationField.getCardinality() == ONE_TO_ONE) {
           modelField.setTypePackage(null)
-            .setFullTypeName(modelField.getTypePackage() + "." + relationField.getTargetEntity())
-            .setShortTypeName(relationField.getTargetEntity())
+            .setFullTypeName(modelField.getTypePackage() + "." + ftName)
+            .setShortTypeName(ftName)
             .setRelationField(true);
           modelClass.getRelationFields().add(modelField);
         } else {
           modelField.setTypePackage("java.util")
             .setFullTypeName("java.util.List")
-            .setShortTypeName("List<" + relationField.getTargetEntity() + ">")
+            .setShortTypeName("List<" + ftName + ">")
             .setRelationField(true);
         }
 
