@@ -49,8 +49,8 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   }
 
   @Override
-  public Entity createCollection(Entity collection) {
-    inspect(() -> delegate.createCollection(collection));
+  public Entity createEntity(Entity collection) {
+    inspect(() -> delegate.createEntity(collection));
     String schemaName = sessionContext.getSchemaName();
     sessionContext.getMappedModels().persist(schemaName, collection);
     return collection;

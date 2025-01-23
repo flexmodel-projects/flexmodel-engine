@@ -39,7 +39,7 @@ public abstract class AbstractSessionTests {
   }
 
   void createClassesEntity(String entityName) {
-    session.createCollection(entityName, entity -> entity
+    session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("classCode"))
       .addField(new StringField("className"))
@@ -47,7 +47,7 @@ public abstract class AbstractSessionTests {
   }
 
   void createStudentCollection(String entityName) {
-    session.createCollection(entityName, entity -> entity
+    session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("studentName"))
       .addField(new StringField("gender"))
@@ -58,7 +58,7 @@ public abstract class AbstractSessionTests {
   }
 
   void createStudentDetailCollection(String entityName) {
-    session.createCollection(entityName, entity -> entity
+    session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(AUTO_INCREMENT))
       .addField(new BigintField("studentId"))
       .addField(new TextField("description"))
@@ -66,14 +66,14 @@ public abstract class AbstractSessionTests {
   }
 
   void createCourseCollection(String entityName) {
-    session.createCollection(entityName, entity -> entity
+    session.createEntity(entityName, entity -> entity
       .addField(new IDField("courseNo").setGeneratedValue(STRING_NOT_GENERATED))
       .addField(new StringField("courseName"))
     );
   }
 
   void createTeacherCollection(String entityName) {
-    session.createCollection(entityName, entity -> entity
+    session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("teacherName"))
       .addField(new StringField("subject"))
@@ -334,7 +334,7 @@ public abstract class AbstractSessionTests {
 
 
   void createTeacherCollection2(String entityName) {
-    session.createCollection(entityName, entity -> entity
+    session.createEntity(entityName, entity -> entity
       // 主键
       .addField(new IDField("id").setGeneratedValue(IDField.GeneratedValue.AUTO_INCREMENT).setComment("Primary Key"))
       // 姓名
@@ -439,7 +439,7 @@ public abstract class AbstractSessionTests {
       ]
       """;
     List<Map<String, Object>> list = jsonObjectConverter.parseToMapList(mockData);
-    session.createCollection(teacherCourseEntity, sScore -> sScore
+    session.createEntity(teacherCourseEntity, sScore -> sScore
       .addField(new IDField("id"))
       .addField(new StringField("c_name"))
       .addField(new DecimalField("c_score"))
@@ -749,7 +749,7 @@ public abstract class AbstractSessionTests {
 
 
   void createStudentCollection2(String entityName) {
-    Entity entity = session.createCollection(
+    Entity entity = session.createEntity(
       entityName, e -> e.setComment("学生")
         .addField(new IDField("id").setGeneratedValue(IDField.GeneratedValue.AUTO_INCREMENT).setComment("Primary Key"))
     );
@@ -800,7 +800,7 @@ public abstract class AbstractSessionTests {
   }
 
   private void createScoreEntity2(String scoreModelName) {
-    session.createCollection(scoreModelName, sScore ->
+    session.createEntity(scoreModelName, sScore ->
       sScore.addField(new BigintField("student_id"))
         .addField(new StringField("course_name"))
         .addField(new DecimalField("score"))

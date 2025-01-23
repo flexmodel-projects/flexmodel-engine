@@ -48,7 +48,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   }
 
   @Override
-  public Entity createCollection(Entity collection) {
+  public Entity createEntity(Entity collection) {
     SqlTable sqlTable = toSqlTable(collection);
     createTable(sqlTable);
     return collection;

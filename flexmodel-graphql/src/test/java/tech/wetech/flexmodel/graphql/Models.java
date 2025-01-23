@@ -16,7 +16,7 @@ public class Models {
   private static final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
 
   public static Entity createClassesEntity(Session session, String entityName) {
-    return session.createCollection(entityName, entity -> entity
+    return session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("classCode"))
       .addField(new StringField("className"))
@@ -25,7 +25,7 @@ public class Models {
   }
 
   public static Entity createStudentEntity(Session session, String entityName) {
-    return session.createCollection(entityName, entity -> entity
+    return session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("studentName"))
       .addField(new StringField("gender"))
@@ -36,7 +36,7 @@ public class Models {
   }
 
   public static Entity createStudentDetailEntity(Session session, String entityName) {
-    return session.createCollection(entityName, entity -> entity
+    return session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(AUTO_INCREMENT))
       .addField(new BigintField("studentId"))
       .addField(new TextField("description"))
@@ -44,14 +44,14 @@ public class Models {
   }
 
   public static Entity createCourseEntity(Session session, String entityName) {
-    return session.createCollection(entityName, entity -> entity
+    return session.createEntity(entityName, entity -> entity
       .addField(new IDField("courseNo").setGeneratedValue(STRING_NOT_GENERATED))
       .addField(new StringField("courseName"))
     );
   }
 
   public static Entity createTeacherEntity(Session session, String entityName) {
-    return session.createCollection(entityName, entity -> entity
+    return session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("teacherName"))
       .addField(new StringField("subject"))

@@ -117,7 +117,7 @@ public class SessionFactory {
       });
 
     try {
-      session.createCollection(clonedNewer);
+      session.createEntity(clonedNewer);
     } catch (Exception e) {
       updateEntityFields(session, older);
     }

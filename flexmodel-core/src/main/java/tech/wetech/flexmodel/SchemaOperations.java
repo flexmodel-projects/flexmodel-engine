@@ -46,7 +46,7 @@ public interface SchemaOperations {
    * @param collection
    * @return
    */
-  Entity createCollection(Entity collection);
+  Entity createEntity(Entity collection);
 
   NativeQueryModel createNativeQueryModel(NativeQueryModel model);
 
@@ -113,10 +113,10 @@ public interface SchemaOperations {
    * @param entityUnaryOperator
    * @return
    */
-  default Entity createCollection(String modelName, UnaryOperator<Entity> entityUnaryOperator) {
+  default Entity createEntity(String modelName, UnaryOperator<Entity> entityUnaryOperator) {
     Entity collection = new Entity(modelName);
     entityUnaryOperator.apply(collection);
-    return createCollection(collection);
+    return createEntity(collection);
   }
 
   default NativeQueryModel createNativeQueryModel(String modelName, UnaryOperator<NativeQueryModel> modelUnaryOperator) {

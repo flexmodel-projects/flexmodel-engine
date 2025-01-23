@@ -65,8 +65,8 @@ public abstract class AbstractSession implements Session {
   }
 
   @Override
-  public Entity createCollection(Entity collection) {
-    return schemaOperationsDelegate.createCollection(collection);
+  public Entity createEntity(Entity collection) {
+    return schemaOperationsDelegate.createEntity(collection);
   }
 
   @Override

@@ -56,7 +56,7 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   }
 
   @Override
-  public Entity createCollection(Entity collection) {
+  public Entity createEntity(Entity collection) {
     String collectionName = getCollectionName(collection.getName());
     mongoDatabase.createCollection(collectionName);
     for (Index index : collection.getIndexes()) {
