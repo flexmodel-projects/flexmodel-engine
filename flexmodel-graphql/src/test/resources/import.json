@@ -363,8 +363,8 @@
           "unique": false,
           "nullable": true,
           "cardinality": "MANY_TO_MANY",
-          "targetEntity": "Course",
-          "targetField": "courseNo",
+          "from": "Course",
+          "foreignField": "courseNo",
           "cascadeDelete": false
         },
         {
@@ -374,8 +374,8 @@
           "unique": false,
           "nullable": true,
           "cardinality": "ONE_TO_ONE",
-          "targetEntity": "StudentDetail",
-          "targetField": "studentId",
+          "from": "StudentDetail",
+          "foreignField": "studentId",
           "cascadeDelete": false
         },
         {
@@ -385,8 +385,8 @@
           "unique": false,
           "nullable": true,
           "cardinality": "MANY_TO_MANY",
-          "targetEntity": "Teacher",
-          "targetField": "id",
+          "from": "Teacher",
+          "foreignField": "id",
           "cascadeDelete": false
         }
       ],
@@ -456,8 +456,8 @@
           "unique": false,
           "nullable": true,
           "cardinality": "ONE_TO_MANY",
-          "targetEntity": "Student",
-          "targetField": "classId",
+          "from": "Student",
+          "foreignField": "classId",
           "cascadeDelete": true
         }
       ],
@@ -490,8 +490,8 @@
           "unique": false,
           "nullable": true,
           "cardinality": "MANY_TO_MANY",
-          "targetEntity": "Student",
-          "targetField": "id",
+          "from": "Student",
+          "foreignField": "id",
           "cascadeDelete": false
         }
       ],

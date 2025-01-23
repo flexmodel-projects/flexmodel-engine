@@ -13,8 +13,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static tech.wetech.flexmodel.RelationField.Cardinality.ONE_TO_ONE;
-
 /**
  * 用于执行代码生成，允许通过命令行参数配置。
  *
@@ -113,21 +111,21 @@ public class GenerationTool {
     ).toString());
   }
 
-  public static ModelClass buildModelClass(String packageName, String schemaName, Entity entity) {
+  public static ModelClass buildModelClass(String packageName, String schemaName, Entity collection) {
 
-    String cCamelName = StringUtils.snakeToCamel(entity.getName());
+    String cCamelName = StringUtils.snakeToCamel(collection.getName());
     ModelClass modelClass = new ModelClass()
-      .setComment(entity.getComment())
+      .setComment(collection.getComment())
       .setVariableName(StringUtils.uncapitalize(cCamelName))
       .setLowerCaseName(StringUtils.uncapitalize(cCamelName))
       .setShortClassName(StringUtils.capitalize(cCamelName))
       .setPackageName(packageName + ".entity")
       .setSchemaName(schemaName)
-      .setModelName(entity.getName())
+      .setModelName(collection.getName())
       .setFullClassName(packageName + ".entity" + "." + StringUtils.capitalize(cCamelName))
-      .setOriginalModel(entity);
+      .setOriginalModel(collection);
 
-    for (TypedField<?, ?> field : entity.getFields()) {
+    for (TypedField<?, ?> field : collection.getFields()) {
 
       ModelField modelField = new ModelField()
         .setModelClass(modelClass)
@@ -147,19 +145,19 @@ public class GenerationTool {
         modelClass.setIdField(modelField);
 
       } else if (field instanceof RelationField relationField) {
-        String ftName = StringUtils.capitalize(StringUtils.snakeToCamel(relationField.getTargetEntity()));
+        String ftName = StringUtils.capitalize(StringUtils.snakeToCamel(relationField.getFrom()));
         // relation field
-        if (relationField.getCardinality() == ONE_TO_ONE) {
+        if (relationField.isMultiple()) {
+          modelField.setTypePackage("java.util")
+            .setFullTypeName("java.util.List")
+            .setShortTypeName("List<" + ftName + ">")
+            .setRelationField(true);
+        } else {
           modelField.setTypePackage(null)
             .setFullTypeName(modelField.getTypePackage() + "." + ftName)
             .setShortTypeName(ftName)
             .setRelationField(true);
           modelClass.getRelationFields().add(modelField);
-        } else {
-          modelField.setTypePackage("java.util")
-            .setFullTypeName("java.util.List")
-            .setShortTypeName("List<" + ftName + ">")
-            .setRelationField(true);
         }
 
       } else {

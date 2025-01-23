@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static tech.wetech.flexmodel.RelationField.Cardinality.ONE_TO_ONE;
-
 /**
  * @author cjbi
  */
@@ -23,14 +21,12 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   private final String schemaName;
   private final MongoDatabase mongoDatabase;
   private final MappedModels mappedModels;
-  private final PhysicalNamingStrategy physicalNamingStrategy;
 
   public MongoSchemaOperations(MongoContext mongoContext) {
     super(mongoContext);
     this.schemaName = mongoContext.getSchemaName();
     this.mongoDatabase = mongoContext.getMongoDatabase();
     this.mappedModels = mongoContext.getMappedModels();
-    this.physicalNamingStrategy = mongoContext.getPhysicalNamingStrategy();
   }
 
   @Override
@@ -60,19 +56,19 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   }
 
   @Override
-  public Entity createEntity(Entity entity) {
-    String collectionName = getCollectionName(entity.getName());
+  public Entity createCollection(Entity collection) {
+    String collectionName = getCollectionName(collection.getName());
     mongoDatabase.createCollection(collectionName);
-    for (Index index : entity.getIndexes()) {
+    for (Index index : collection.getIndexes()) {
       createIndex(index);
     }
-    entity.findIdField().ifPresent(idField -> {
+    collection.findIdField().ifPresent(idField -> {
       Index index = new Index(idField.getModelName());
       index.setUnique(true);
       index.addField(idField.getName());
       createIndex(index);
     });
-    return entity;
+    return collection;
   }
 
   @Override
@@ -88,14 +84,6 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
       index.addField(field.getName());
       createIndex(index);
     }
-    if (field instanceof RelationField relationField) {
-      if (relationField.getCardinality() == ONE_TO_ONE) {
-        Index index = new Index(relationField.getTargetEntity());
-        index.setUnique(true);
-        index.addField(relationField.getTargetField());
-        createIndex(index);
-      }
-    }
     return field;
   }
 
@@ -106,7 +94,7 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   }
 
   @Override
-  public void dropField(String entityName, String fieldName) {
+  public void dropField(String modelName, String fieldName) {
     // ignored
   }
 

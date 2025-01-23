@@ -3,14 +3,10 @@ package tech.wetech.flexmodel.sql;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.*;
-import tech.wetech.flexmodel.graph.JoinGraphNode;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import static tech.wetech.flexmodel.RelationField.Cardinality.MANY_TO_MANY;
-import static tech.wetech.flexmodel.RelationField.Cardinality.ONE_TO_ONE;
 
 /**
  * @author cjbi
@@ -52,15 +48,10 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   }
 
   @Override
-  public Entity createEntity(Entity entity) {
-    SqlTable sqlTable = toSqlTable(entity);
+  public Entity createCollection(Entity collection) {
+    SqlTable sqlTable = toSqlTable(collection);
     createTable(sqlTable);
-    for (TypedField<?, ?> typedField : entity.getFields()) {
-      if (typedField instanceof RelationField relationField) {
-        createRelation(relationField);
-      }
-    }
-    return entity;
+    return collection;
   }
 
   @Override
@@ -75,7 +66,6 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
     }
     createUniqueKeys(sqlTable);
     createIndexes(sqlTable);
-    createForeignKey(sqlTable);
   }
 
   private void dropTable(SqlTable sqlTable) {
@@ -87,94 +77,22 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
 
   @Override
   public TypedField<?, ?> createField(TypedField<?, ?> field) {
-    if (field instanceof RelationField relationField) {
-      createRelation(relationField);
-    } else {
+    if (!(field instanceof RelationField)) {
       createColumn(toSqlColumn(field));
     }
     return field;
   }
 
-  private void createRelation(RelationField field) {
-    if (field.getCardinality() == MANY_TO_MANY) {
-      Entity entity = (Entity) getModel(field.getModelName());
-      Entity targetEntity = (Entity) getModel(field.getTargetEntity());
-      JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, field);
-
-      SqlTable joinTable = new SqlTable();
-      joinTable.setName(joinGraphNode.getJoinName());
-      SqlColumn joinColumn = new SqlColumn();
-      joinColumn.setTableName(joinGraphNode.getJoinName());
-      joinColumn.setName(joinGraphNode.getJoinFieldName());
-      joinColumn.setSqlTypeCode(sqlContext.getTypeHandler(joinGraphNode.getJoinFieldType()).getJdbcTypeCode());
-      joinTable.addColumn(joinColumn);
-      SqlColumn inverseJoinColumn = new SqlColumn();
-      inverseJoinColumn.setTableName(joinGraphNode.getJoinName());
-      inverseJoinColumn.setName(joinGraphNode.getInverseJoinFieldName());
-      inverseJoinColumn.setSqlTypeCode(sqlContext.getTypeHandler(joinGraphNode.getInverseJoinFieldType()).getJdbcTypeCode());
-      joinTable.addColumn(inverseJoinColumn);
-
-      SqlTable sqlTable = toSqlTable(entity);
-      SqlTable targetSqlTable = toSqlTable(targetEntity);
-
-      joinTable.createForeignKey(List.of(joinColumn), sqlTable, List.of(sqlTable.getColumn(entity.findIdField().map(IDField::getName).orElseThrow())));
-      joinTable.createForeignKey(List.of(inverseJoinColumn), targetSqlTable, List.of(targetSqlTable.getColumn(field.getTargetField())));
-      try {
-        createTable(joinTable);
-      } catch (Exception ignored) {
-      }
-    } else {
-      createForeignKey(field);
-    }
-  }
-
   @Override
   public TypedField<?, ?> modifyField(TypedField<?, ?> field) {
     try {
-      if (field instanceof RelationField relationField) {
-        createRelation(relationField);
-      } else {
+      if (!(field instanceof RelationField)) {
         modifyColumn(toSqlColumn(field));
       }
     } catch (Exception e) {
       log.error("Modify field occurred exception： {}", e.getMessage(), e);
     }
     return field;
-  }
-
-  private void createForeignKey(SqlTable sqlTable) {
-    Iterator<SqlForeignKey> fkIte = sqlTable.getForeignKeyIterator();
-    while (fkIte.hasNext()) {
-      SqlForeignKey sqlForeignKey = fkIte.next();
-      String[] sqlCreateString = sqlContext.getSqlDialect().getForeignKeyExporter().getSqlCreateString(sqlForeignKey);
-      for (String sql : sqlCreateString) {
-        sqlContext.getJdbcOperations().update(sql);
-      }
-    }
-  }
-
-  private void createForeignKey(RelationField relationField) {
-    SqlTable sqlTable = toSqlTable((Entity) sqlContext.getMappedModels().getModel(sqlContext.getSchemaName(), relationField.getModelName()));
-    SqlTable referenceTable = toSqlTable((Entity) sqlContext.getMappedModels()
-      .getModel(sqlContext.getSchemaName(), relationField.getTargetEntity()));
-    SqlColumn keyColumn = referenceTable.getColumn(relationField.getTargetField());
-    if (keyColumn == null) {
-      throw new RuntimeException("Foreign key [" + relationField.getTargetField() + "] not exists in [" + relationField.getTargetEntity() + "]");
-    }
-    List<SqlColumn> keyColumns = List.of(keyColumn);
-    if (relationField.getCardinality() == ONE_TO_ONE) {
-      SqlUniqueKey uniqueKey = referenceTable.createUniqueKey(keyColumns);
-      String[] sqlCreateString = sqlContext.getSqlDialect().getUniqueKeyExporter().getSqlCreateString(uniqueKey);
-      for (String sql : sqlCreateString) {
-        sqlContext.getJdbcOperations().update(sql);
-      }
-    }
-    SqlForeignKey foreignKey = referenceTable.createForeignKey(keyColumns, sqlTable, sqlTable.getPrimaryKey().getColumns());
-    foreignKey.setCascadeDeleteEnabled(relationField.isCascadeDelete());
-    String[] sqlCreateString = sqlContext.getSqlDialect().getForeignKeyExporter().getSqlCreateString(foreignKey);
-    for (String sql : sqlCreateString) {
-      sqlContext.getJdbcOperations().update(sql);
-    }
   }
 
   private void modifyColumn(SqlColumn sqlColumn) {
@@ -202,8 +120,8 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   }
 
   @Override
-  public void dropField(String entityName, String fieldName) {
-    dropColumn(toSqlColumn(new TypedField<>(fieldName, "unknown").setModelName(entityName)));
+  public void dropField(String modelName, String fieldName) {
+    dropColumn(toSqlColumn(new TypedField<>(fieldName, "unknown").setModelName(modelName)));
   }
 
   private void dropColumn(SqlColumn sqlColumn) {
@@ -313,9 +231,9 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   private SqlColumn toSqlColumn(TypedField<?, ?> field) {
     if (field instanceof RelationField relationField) {
       SqlColumn associationColumn = new SqlColumn();
-      associationColumn.setName(relationField.getTargetField());
+      associationColumn.setName(relationField.getForeignField());
       associationColumn.setTableName(
-        toPhysicalTableString(relationField.getTargetEntity())
+        toPhysicalTableString(relationField.getFrom())
       );
       associationColumn.setSqlTypeCode(
         sqlContext.getTypeHandler(((Entity) getModel(field.getModelName())).findIdField().orElseThrow()

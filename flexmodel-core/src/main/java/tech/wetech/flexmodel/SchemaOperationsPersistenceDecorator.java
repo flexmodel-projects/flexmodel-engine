@@ -49,11 +49,11 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   }
 
   @Override
-  public Entity createEntity(Entity entity) {
-    inspect(() -> delegate.createEntity(entity));
+  public Entity createCollection(Entity collection) {
+    inspect(() -> delegate.createCollection(collection));
     String schemaName = sessionContext.getSchemaName();
-    sessionContext.getMappedModels().persist(schemaName, entity);
-    return entity;
+    sessionContext.getMappedModels().persist(schemaName, collection);
+    return collection;
   }
 
   @Override
@@ -89,11 +89,11 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   }
 
   @Override
-  public void dropField(String entityName, String fieldName) {
+  public void dropField(String modelName, String fieldName) {
     String schemaName = sessionContext.getSchemaName();
-    inspect(() -> delegate.dropField(entityName, fieldName));
+    inspect(() -> delegate.dropField(modelName, fieldName));
     MappedModels mappedModels = sessionContext.getMappedModels();
-    Entity entity = (Entity) mappedModels.getModel(schemaName, entityName);
+    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
     entity.removeField(fieldName);
     for (Index index : entity.getIndexes()) {
       index.containsField(fieldName);

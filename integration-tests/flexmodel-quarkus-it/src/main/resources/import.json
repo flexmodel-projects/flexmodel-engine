@@ -296,36 +296,14 @@
           "nullable": true
         },
         {
-          "name": "courses",
-          "type": "relation",
-          "modelName": "Student",
-          "unique": false,
-          "nullable": true,
-          "cardinality": "MANY_TO_MANY",
-          "targetEntity": "Course",
-          "targetField": "courseNo",
-          "cascadeDelete": false
-        },
-        {
           "name": "studentDetail",
           "type": "relation",
           "modelName": "Student",
           "unique": false,
           "nullable": true,
-          "cardinality": "ONE_TO_ONE",
-          "targetEntity": "StudentDetail",
-          "targetField": "studentId",
-          "cascadeDelete": false
-        },
-        {
-          "name": "teachers",
-          "type": "relation",
-          "modelName": "Student",
-          "unique": false,
-          "nullable": true,
-          "cardinality": "MANY_TO_MANY",
-          "targetEntity": "Teacher",
-          "targetField": "id",
+          "multiple": true,
+          "from": "StudentDetail",
+          "foreignField": "studentId",
           "cascadeDelete": false
         }
       ],
@@ -394,9 +372,9 @@
           "modelName": "Classes",
           "unique": false,
           "nullable": true,
-          "cardinality": "ONE_TO_MANY",
-          "targetEntity": "Student",
-          "targetField": "classId",
+          "multiple": true,
+          "from": "Student",
+          "foreignField": "classId",
           "cascadeDelete": true
         }
       ],
@@ -429,8 +407,8 @@
           "unique": false,
           "nullable": true,
           "cardinality": "MANY_TO_MANY",
-          "targetEntity": "Student",
-          "targetField": "id",
+          "from": "Student",
+          "foreignField": "id",
           "cascadeDelete": false
         }
       ],

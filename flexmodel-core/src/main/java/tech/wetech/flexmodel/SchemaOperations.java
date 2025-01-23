@@ -43,10 +43,10 @@ public interface SchemaOperations {
   /**
    * 创建实体
    *
-   * @param entity
+   * @param collection
    * @return
    */
-  Entity createEntity(Entity entity);
+  Entity createCollection(Entity collection);
 
   NativeQueryModel createNativeQueryModel(NativeQueryModel model);
 
@@ -62,10 +62,10 @@ public interface SchemaOperations {
   /**
    * 删除字段
    *
-   * @param entityName 模型名称
+   * @param modelName 模型名称
    * @param fieldName  字段名称
    */
-  void dropField(String entityName, String fieldName);
+  void dropField(String modelName, String fieldName);
 
   /**
    * 创建索引
@@ -113,10 +113,10 @@ public interface SchemaOperations {
    * @param entityUnaryOperator
    * @return
    */
-  default Entity createEntity(String modelName, UnaryOperator<Entity> entityUnaryOperator) {
-    Entity entity = new Entity(modelName);
-    entityUnaryOperator.apply(entity);
-    return createEntity(entity);
+  default Entity createCollection(String modelName, UnaryOperator<Entity> entityUnaryOperator) {
+    Entity collection = new Entity(modelName);
+    entityUnaryOperator.apply(collection);
+    return createCollection(collection);
   }
 
   default NativeQueryModel createNativeQueryModel(String modelName, UnaryOperator<NativeQueryModel> modelUnaryOperator) {

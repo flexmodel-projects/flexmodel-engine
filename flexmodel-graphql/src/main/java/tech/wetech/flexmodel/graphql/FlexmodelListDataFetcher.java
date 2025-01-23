@@ -60,18 +60,14 @@ public class FlexmodelListDataFetcher extends FlexmodelAbstractDataFetcher<List<
         result.add(resultData);
         for (RelationField sencondaryRelationField : relationFields) {
           Object secondaryId = map.get(entity.findIdField().map(IDField::getName).orElseThrow());
+          List<Map<String, Object>> relationDataList = findRelationDataList(session, env, null, sencondaryRelationField.getFrom(), sencondaryRelationField, secondaryId);
           resultData.put(sencondaryRelationField.getName(),
-            sencondaryRelationField.getCardinality() == RelationField.Cardinality.ONE_TO_ONE ?
-              findAssociationDataList(session, env, null, sencondaryRelationField.getTargetEntity(), sencondaryRelationField, secondaryId).stream()
-                .findFirst()
-                .orElse(null)
-              : findAssociationDataList(session, env, null, sencondaryRelationField.getTargetEntity(), sencondaryRelationField, secondaryId));
+            sencondaryRelationField.isMultiple() ? relationDataList : relationDataList.stream().findFirst().orElse(null));
         }
       }
       return result;
     }
   }
-
 
 
 }

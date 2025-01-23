@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import static tech.wetech.flexmodel.IDField.GeneratedValue.*;
-import static tech.wetech.flexmodel.RelationField.Cardinality.*;
 
 /**
  * @author cjbi
@@ -17,7 +16,7 @@ public class Models {
   private static final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
 
   public static Entity createClassesEntity(Session session, String entityName) {
-    return session.createEntity(entityName, entity -> entity
+    return session.createCollection(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("classCode"))
       .addField(new StringField("className"))
@@ -26,7 +25,7 @@ public class Models {
   }
 
   public static Entity createStudentEntity(Session session, String entityName) {
-    return session.createEntity(entityName, entity -> entity
+    return session.createCollection(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("studentName"))
       .addField(new StringField("gender"))
@@ -37,7 +36,7 @@ public class Models {
   }
 
   public static Entity createStudentDetailEntity(Session session, String entityName) {
-    return session.createEntity(entityName, entity -> entity
+    return session.createCollection(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(AUTO_INCREMENT))
       .addField(new BigintField("studentId"))
       .addField(new TextField("description"))
@@ -45,14 +44,14 @@ public class Models {
   }
 
   public static Entity createCourseEntity(Session session, String entityName) {
-    return session.createEntity(entityName, entity -> entity
+    return session.createCollection(entityName, entity -> entity
       .addField(new IDField("courseNo").setGeneratedValue(STRING_NOT_GENERATED))
       .addField(new StringField("courseName"))
     );
   }
 
   public static Entity createTeacherEntity(Session session, String entityName) {
-    return session.createEntity(entityName, entity -> entity
+    return session.createCollection(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("teacherName"))
       .addField(new StringField("subject"))
@@ -64,38 +63,16 @@ public class Models {
     // 班级:学生
     session.createField(new RelationField("students")
       .setModelName(classRoomEntityName)
-      .setTargetEntity(studentEntityName)
-      .setTargetField("classId")
-      .setCardinality(ONE_TO_MANY)
+      .setFrom(studentEntityName)
+      .setForeignField("classId")
+      .setMultiple(true)
       .setCascadeDelete(true)
-    );
-    // 学生:课程 -> n:n
-    session.createField(new RelationField("courses")
-      .setModelName(studentEntityName)
-      .setTargetEntity(courseEntityName)
-      .setTargetField("courseNo")
-      .setCardinality(MANY_TO_MANY)
     );
     // 学生:学生明细 -> 1:1
     session.createField(new RelationField("studentDetail")
       .setModelName(studentEntityName)
-      .setTargetEntity(studentDetailEntityName)
-      .setTargetField("studentId")
-      .setCardinality(ONE_TO_ONE)
-    );
-    // 学生:教师 -> n:n
-    session.createField(new RelationField("teachers")
-      .setModelName(studentEntityName)
-      .setTargetEntity(teacherEntityName)
-      .setTargetField("id")
-      .setCardinality(MANY_TO_MANY)
-    );
-    // 教师:学生 -> n:n
-    session.createField(new RelationField("students")
-      .setModelName(courseEntityName)
-      .setTargetEntity(studentEntityName)
-      .setTargetField("id")
-      .setCardinality(MANY_TO_MANY)
+      .setFrom(studentDetailEntityName)
+      .setForeignField("studentId")
     );
   }
 

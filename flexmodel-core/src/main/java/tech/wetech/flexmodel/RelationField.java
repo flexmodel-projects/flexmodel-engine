@@ -1,22 +1,28 @@
 package tech.wetech.flexmodel;
 
+import java.util.Objects;
+
 /**
  * @author cjbi
  */
 public class RelationField extends TypedField<Long, RelationField> {
 
   /**
-   * 关联方式
+   * 多选
    */
-  private Cardinality cardinality = Cardinality.ONE_TO_MANY;
+  private boolean multiple;
   /**
    * 目标实体
    */
-  private String targetEntity;
+  private String from;
   /**
-   * 目标字段，如果存在则不创建外键字段，可不指定，不指定则为{entityName} + "Id"
+   * 本地字段
    */
-  private String targetField;
+  private String localField;
+  /**
+   * 外键字段
+   */
+  private String foreignField;
   /**
    * 级联删除，此功能依赖外键约束
    */
@@ -30,62 +36,59 @@ public class RelationField extends TypedField<Long, RelationField> {
     return cascadeDelete;
   }
 
-  public Cardinality getCardinality() {
-    return cardinality;
-  }
-
   public RelationField setCascadeDelete(boolean cascadeDelete) {
     this.cascadeDelete = cascadeDelete;
     return this;
   }
 
-  public RelationField setCardinality(Cardinality cardinality) {
-    this.cardinality = cardinality;
+  public String getFrom() {
+    return from;
+  }
+
+  public RelationField setFrom(String from) {
+    this.from = from;
     return this;
   }
 
-  public String getTargetEntity() {
-    return targetEntity;
+  public String getLocalField() {
+    return localField;
   }
 
-  public RelationField setTargetEntity(String targetEntity) {
-    this.targetEntity = targetEntity;
+  public RelationField setLocalField(String localField) {
+    this.localField = localField;
     return this;
   }
 
-  public String getTargetField() {
-    return targetField;
+  public String getForeignField() {
+    return foreignField;
   }
 
-  public RelationField setTargetField(String targetField) {
-    this.targetField = targetField;
+  public RelationField setForeignField(String foreignField) {
+    this.foreignField = foreignField;
     return this;
   }
 
-  public enum Cardinality {
-    ONE_TO_ONE, ONE_TO_MANY, MANY_TO_MANY
+  public boolean isMultiple() {
+    return multiple;
+  }
+
+  public RelationField setMultiple(boolean multiple) {
+    this.multiple = multiple;
+    return this;
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
     if (!(o instanceof RelationField that)) return false;
     if (!super.equals(o)) return false;
-
-      if (isCascadeDelete() != that.isCascadeDelete()) return false;
-    if (getCardinality() != that.getCardinality()) return false;
-    if (getTargetEntity() != null ? !getTargetEntity().equals(that.getTargetEntity()) : that.getTargetEntity() != null)
-      return false;
-      return getTargetField() != null ? getTargetField().equals(that.getTargetField()) : that.getTargetField() == null;
+    return isMultiple() == that.isMultiple() &&
+           isCascadeDelete() == that.isCascadeDelete() &&
+           Objects.equals(getFrom(), that.getFrom()) &&
+           Objects.equals(getForeignField(), that.getForeignField());
   }
 
   @Override
   public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + (getCardinality() != null ? getCardinality().hashCode() : 0);
-    result = 31 * result + (getTargetEntity() != null ? getTargetEntity().hashCode() : 0);
-    result = 31 * result + (getTargetField() != null ? getTargetField().hashCode() : 0);
-    result = 31 * result + (isCascadeDelete() ? 1 : 0);
-    return result;
+    return Objects.hash(super.hashCode(), isMultiple(), getFrom(), getForeignField(), isCascadeDelete());
   }
 }

@@ -1,7 +1,6 @@
 package tech.wetech.flexmodel;
 
 import tech.wetech.flexmodel.criterion.Example;
-import tech.wetech.flexmodel.graph.JoinGraphNode;
 
 import java.util.List;
 import java.util.Map;
@@ -14,8 +13,6 @@ import java.util.function.UnaryOperator;
  * @author cjbi
  */
 public interface DataOperations {
-
-  void associate(JoinGraphNode joinGraphNode, Map<String, Object> data);
 
   /**
    * Insert a record

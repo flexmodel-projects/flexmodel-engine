@@ -2,12 +2,10 @@ package tech.wetech.flexmodel.mongodb;
 
 import org.bson.Document;
 import tech.wetech.flexmodel.*;
-import tech.wetech.flexmodel.graph.JoinGraphNode;
 
 import java.util.*;
 
 import static tech.wetech.flexmodel.Query.Join.JoinType.INNER_JOIN;
-import static tech.wetech.flexmodel.RelationField.Cardinality.MANY_TO_MANY;
 
 /**
  * @author cjbi
@@ -63,42 +61,15 @@ abstract class BaseMongoStatement {
 
   private Document createLookupDocument(List<Document> pipeline, Model model, Query.Join join, String joinCollectionName) {
     Document lookup = new Document();
-    if (model instanceof Entity entity && isManyToManyRelation(entity, join.getFrom())) {
-      Entity targetEntity = (Entity) mongoContext.getMappedModels().getModel(mongoContext.getSchemaName(),
-        getRelationField(entity, join.getFrom()).getTargetEntity());
-      JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, getRelationField(entity, join.getFrom()));
-      Document exchangeLookup = new Document()
-        .append("from", joinGraphNode.getJoinName())
-        .append("localField", entity.findIdField().map(IDField::getName).orElseThrow())
-        .append("foreignField", joinGraphNode.getJoinFieldName())
-        .append("as", joinGraphNode.getJoinName());
-      pipeline.add(new Document("$lookup", exchangeLookup));
-
-      lookup.append("from", joinCollectionName)
-        .append("localField", joinGraphNode.getJoinName() + "." + joinGraphNode.getInverseJoinFieldName())
-        .append("foreignField", join.getForeignField())
-        .append("as", join.getFrom());
-
-    } else {
-      lookup.append("from", joinCollectionName)
-        .append("localField", join.getLocalField())
-        .append("foreignField", join.getForeignField())
-        .append("as", join.getFrom());
-    }
+    lookup.append("from", joinCollectionName)
+      .append("localField", join.getLocalField())
+      .append("foreignField", join.getForeignField())
+      .append("as", join.getFrom());
 
     if (join.getFilter() != null) {
       lookup.append("pipeline", List.of(Document.parse(String.format("{ $match: %s }", getMongoCondition(join.getFilter())))));
     }
     return lookup;
-  }
-
-  private boolean isManyToManyRelation(Entity entity, String fromEntityName) {
-    RelationField relationField = entity.findRelationByEntityName(fromEntityName).orElse(null);
-    return relationField != null && relationField.getCardinality() == MANY_TO_MANY;
-  }
-
-  private RelationField getRelationField(Entity entity, String fromEntityName) {
-    return entity.findRelationByEntityName(fromEntityName).orElseThrow();
   }
 
   private void addProjectionStage(List<Document> pipeline, Model model, Query query) {

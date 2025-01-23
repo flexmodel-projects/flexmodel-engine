@@ -44,7 +44,7 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
          size:1,
          where: {classCode: {_eq: "C_001"}, _and: [{className: {_eq: "一年级1班"}}, {_or: [{classCode: { _eq: "C_002"}}]}]}
         ) {
-          id, classCode, className, students { name: studentName, courses { courseName } }
+          id, classCode, className, students { name: studentName }
         }
         students: system_list_testQueryStudent(
           size: 3
@@ -55,9 +55,6 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
         }
         teachers: system_list_testQueryTeacher {
          id, teacherName
-        }
-        course: system_find_one_testQueryCourse {
-           courseNo, courseName
         }
         aggregate: system_aggregate_testQueryStudent {
            _count
@@ -103,7 +100,6 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     // 打印结果
     System.out.println(executionResult);
     Assertions.assertNotNull(data);
-    Assertions.assertNotNull(data.get("course"));
   }
 
   @Test
@@ -132,10 +128,6 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
         list: system_list_testDirectiveStudent {
           classId
           studentName
-          courses {
-            courseName
-            courseNo
-         }
         }
         total: system_aggregate_testDirectiveStudent @transform(get: "_count") {
            _count

@@ -1,14 +1,12 @@
 package tech.wetech.flexmodel.sql;
 
 import tech.wetech.flexmodel.*;
-import tech.wetech.flexmodel.graph.JoinGraphNode;
 import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 
 import java.util.*;
 
 import static tech.wetech.flexmodel.Query.Join.JoinType.INNER_JOIN;
 import static tech.wetech.flexmodel.Query.Join.JoinType.LEFT_JOIN;
-import static tech.wetech.flexmodel.RelationField.Cardinality.MANY_TO_MANY;
 
 /**
  * @author cjbi
@@ -109,24 +107,11 @@ public abstract class BaseSqlStatement {
         String localField = joiner.getLocalField();
         String foreignField = joiner.getForeignField();
         RelationField relationField;
-        // todo 支持子关联，通过别名区分关联表
-        if (model instanceof Entity entity && (relationField = entity.findRelationByEntityName(joiner.getFrom()).orElse(null)) != null) {
+        if (model instanceof Entity entity && (relationField = entity.findRelationByModelName(joiner.getFrom()).orElse(null)) != null) {
           localField = entity.findIdField().map(IDField::getName).orElseThrow();
-          foreignField = relationField.getTargetField();
-          if (relationField.getCardinality() == MANY_TO_MANY) {
-            Entity targetEntity = (Entity) sqlContext.getMappedModels().getModel(sqlContext.getSchemaName(), relationField.getTargetEntity());
-            JoinGraphNode joinGraphNode = new JoinGraphNode(entity, targetEntity, relationField);
-            joinCause.append(toPhysicalTableNameQuoteString(joinGraphNode.getJoinName())).append(" \n on \n").append(toFullColumnQuoteString(modelName, localField)).append("=").append(toFullColumnQuoteString(joinGraphNode.getJoinName(), joinGraphNode.getJoinFieldName()));
-            if (joiner.getJoinType() == LEFT_JOIN) {
-              joinCause.append("\nleft join ");
-            }
-            if (joiner.getJoinType() == INNER_JOIN) {
-              joinCause.append("\ninner join ");
-            }
-            joinCause.append(joinTableName).append(" \n on \n").append(toFullColumnQuoteString(joiner.getFrom(), foreignField)).append("=").append(toFullColumnQuoteString(joinGraphNode.getJoinName(), joinGraphNode.getInverseJoinFieldName()));
-          } else {
-            joinCause.append(joinTableName).append(" \n on \n").append(toFullColumnQuoteString(modelName, localField)).append("=").append(toFullColumnQuoteString(joiner.getFrom(), foreignField));
-          }
+          foreignField = relationField.getForeignField();
+          joinCause.append(joinTableName).append(" \n on \n").append(toFullColumnQuoteString(modelName, localField)).append("=").append(toFullColumnQuoteString(joiner.getFrom(), foreignField));
+
         } else {
           joinCause.append(joinTableName).append(" \n on \n").append(toFullColumnQuoteString(modelName, localField)).append("=").append(toFullColumnQuoteString(joiner.getFrom(), foreignField));
         }

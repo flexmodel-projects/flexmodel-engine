@@ -41,10 +41,10 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
   def toGraphQLType(ModelField itt) {
     if (itt.isRelationField()) {
       def rf = itt.originalField as RelationField
-      if (rf.cardinality == RelationField.Cardinality.ONE_TO_ONE) {
-        return "${itt.modelClass.schemaName}_${rf.targetEntity}"
+      if (rf.multiple) {
+        return "[${itt.modelClass.schemaName}_${rf.from}]"
       } else {
-        return "[${itt.modelClass.schemaName}_${rf.targetEntity}]"
+        return "${itt.modelClass.schemaName}_${rf.from}"
       }
     } else {
       def f = itt.originalField as TypedField

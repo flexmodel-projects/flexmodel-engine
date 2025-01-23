@@ -6,7 +6,6 @@ import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import tech.wetech.flexmodel.*;
-import tech.wetech.flexmodel.graph.JoinGraphNode;
 import tech.wetech.flexmodel.sql.StringHelper;
 
 import java.util.ArrayList;
@@ -36,12 +35,6 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
 
   private String getCollectionName(String modelName) {
     return modelName;
-  }
-
-  @Override
-  public void associate(JoinGraphNode joinGraphNode, Map<String, Object> data) {
-    String collectionName = getCollectionName(joinGraphNode.getJoinName());
-    mongoDatabase.getCollection(collectionName, Map.class).insertOne(data);
   }
 
   @Override

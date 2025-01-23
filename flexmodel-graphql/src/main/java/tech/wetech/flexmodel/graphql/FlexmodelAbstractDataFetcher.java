@@ -47,9 +47,9 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
     this.sessionFactory = sessionFactory;
   }
 
-  protected List<Map<String, Object>> findAssociationDataList(Session session, DataFetchingEnvironment env, String path, String modelName, RelationField relationField, Object id) {
+  protected List<Map<String, Object>> findRelationDataList(Session session, DataFetchingEnvironment env, String path, String modelName, RelationField relationField, Object id) {
     Entity entity = (Entity) session.getModel(relationField.getModelName());
-    Entity targetEntity = (Entity) session.getModel(relationField.getTargetEntity());
+    Entity targetEntity = (Entity) session.getModel(relationField.getFrom());
     path = path == null ? relationField.getName() : path + "/" + relationField.getName();
     List<SelectedField> selectedFields = env.getSelectionSet().getFields(path + "/*");
     List<RelationField> relationFields = new ArrayList<>();
@@ -79,12 +79,9 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
       result.add(resultData);
       for (RelationField sencondaryRelationField : relationFields) {
         Object secondaryId = map.get(entity.findIdField().map(IDField::getName).orElseThrow());
-        resultData.put(sencondaryRelationField.getName(),
-          sencondaryRelationField.getCardinality() == RelationField.Cardinality.ONE_TO_ONE ?
-            findAssociationDataList(session, env, path, sencondaryRelationField.getTargetEntity(), sencondaryRelationField, secondaryId).stream()
-              .findFirst()
-              .orElse(null)
-            : findAssociationDataList(session, env, path, sencondaryRelationField.getTargetEntity(), sencondaryRelationField, secondaryId));
+        List<Map<String, Object>> associationDataList = findRelationDataList(session, env, path, sencondaryRelationField.getFrom(), sencondaryRelationField, secondaryId);
+        resultData.put(sencondaryRelationField.getName(), sencondaryRelationField.isMultiple() ?
+          associationDataList : associationDataList.stream().findFirst().orElse(null));
       }
     }
     return result;

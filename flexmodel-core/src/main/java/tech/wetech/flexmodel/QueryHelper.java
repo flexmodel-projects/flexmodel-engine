@@ -49,10 +49,12 @@ public class QueryHelper {
           throw new SqlExecutionException("Join from model must not be null");
         }
         if (model instanceof Entity entity && join.getLocalField() == null && join.getForeignField() == null) {
-          RelationField relationField = entity.findRelationByEntityName(join.getFrom())
+          RelationField relationField = entity.findRelationByModelName(join.getFrom())
             .orElseThrow();
-          join.setLocalField(entity.findIdField().map(IDField::getName).orElseThrow());
-          join.setForeignField(relationField.getTargetField());
+          String localField = relationField.getLocalField() != null ?
+            relationField.getLocalField() : entity.findIdField().map(IDField::getName).orElseThrow();
+          join.setLocalField(localField);
+          join.setForeignField(relationField.getForeignField());
         } else {
           if (join.getLocalField() == null || join.getForeignField() == null) {
             throw new SqlExecutionException("LocalField and foreignField must not be null when is not association field");
@@ -97,7 +99,7 @@ public class QueryHelper {
       List<Map<String, Object>> mapList = relationFn.apply(entity.getName(),
         new Query()
           .withProjection(projection -> {
-              Entity targetEntity = (Entity) sessionContext.getModel(relationField.getTargetEntity());
+              Entity targetEntity = (Entity) sessionContext.getModel(relationField.getFrom());
               for (TypedField<?, ?> field : targetEntity.getFields()) {
                 if (field instanceof RelationField) {
                   continue;
@@ -107,7 +109,7 @@ public class QueryHelper {
               return projection;
             }
           )
-          .withJoin(joins -> joins.addInnerJoin(join -> join.setFrom(relationField.getTargetEntity())))
+          .withJoin(joins -> joins.addInnerJoin(join -> join.setFrom(relationField.getFrom())))
           .withFilter(f -> f.equalTo(entity.getName() + "." + entity.findIdField().orElseThrow().getName(), id))
       );
       return mapList;
@@ -117,7 +119,7 @@ public class QueryHelper {
 
   public static void nestedQuery(List<Map<String, Object>> parentList,
                                  BiFunction<String, Query,
-                                 List<Map<String, Object>>> relationFn,
+                                   List<Map<String, Object>>> relationFn,
                                  Model model,
                                  Query query,
                                  AbstractSessionContext sessionContext,
@@ -128,7 +130,7 @@ public class QueryHelper {
 
   private static void nestedQuery(List<Map<String, Object>> parentList,
                                   BiFunction<String, Query,
-                                  List<Map<String, Object>>> relationFn,
+                                    List<Map<String, Object>>> relationFn,
                                   Model model,
                                   Query query,
                                   AbstractSessionContext sessionContext,
@@ -144,9 +146,9 @@ public class QueryHelper {
           Object id = item.get(idField.getName());
           List<Map<String, Object>> list = findRelationList(sessionContext, relationFn, relationField, id);
           maxDepth.decrementAndGet();
-          nestedQuery(list, relationFn, sessionContext.getModel(relationField.getTargetEntity()), null, sessionContext, maxDepth);
+          nestedQuery(list, relationFn, sessionContext.getModel(relationField.getFrom()), null, sessionContext, maxDepth);
           if (!list.isEmpty()) {
-            item.put(key, relationField.getCardinality() == RelationField.Cardinality.ONE_TO_ONE ? list.getFirst() : list);
+            item.put(key, relationField.isMultiple() ? list : list.getFirst());
           }
         }
       }));

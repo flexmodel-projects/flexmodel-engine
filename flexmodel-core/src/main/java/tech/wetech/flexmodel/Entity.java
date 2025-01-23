@@ -53,10 +53,10 @@ public class Entity extends AbstractModel<Entity> {
       .orElse(null);
   }
 
-  public Optional<RelationField> findRelationByEntityName(String entityName) {
+  public Optional<RelationField> findRelationByModelName(String modelName) {
     for (TypedField<?, ?> field : fields) {
       if (field instanceof RelationField relationField) {
-        if (relationField.getTargetEntity().equals(entityName)) {
+        if (relationField.getFrom().equals(modelName)) {
           return Optional.of(relationField);
         }
       }

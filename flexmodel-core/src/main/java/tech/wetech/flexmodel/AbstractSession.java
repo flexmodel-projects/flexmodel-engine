@@ -1,7 +1,6 @@
 package tech.wetech.flexmodel;
 
 import tech.wetech.flexmodel.generator.DataOperationsGenerationDecorator;
-import tech.wetech.flexmodel.graph.JoinGraphNode;
 
 import java.util.List;
 import java.util.Map;
@@ -31,8 +30,8 @@ public abstract class AbstractSession implements Session {
   }
 
   @Override
-  public void dropField(String entityName, String fieldName) {
-    schemaOperationsDelegate.dropField(entityName, fieldName);
+  public void dropField(String modelName, String fieldName) {
+    schemaOperationsDelegate.dropField(modelName, fieldName);
   }
 
   @Override
@@ -66,8 +65,8 @@ public abstract class AbstractSession implements Session {
   }
 
   @Override
-  public Entity createEntity(Entity entity) {
-    return schemaOperationsDelegate.createEntity(entity);
+  public Entity createCollection(Entity collection) {
+    return schemaOperationsDelegate.createCollection(collection);
   }
 
   @Override
@@ -158,11 +157,6 @@ public abstract class AbstractSession implements Session {
   @Override
   public long count(String modelName, Query query) {
     return dataOperationsDelegate.count(modelName, query);
-  }
-
-  @Override
-  public void associate(JoinGraphNode joinGraphNode, Map<String, Object> data) {
-    dataOperationsDelegate.associate(joinGraphNode, data);
   }
 
   @Override

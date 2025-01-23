@@ -1,7 +1,5 @@
 package tech.wetech.flexmodel;
 
-import tech.wetech.flexmodel.graph.JoinGraphNode;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -18,11 +16,6 @@ public class AbstractDataOperationsDecorator implements DataOperations {
   public AbstractDataOperationsDecorator(AbstractSessionContext sessionContext, DataOperations delegate) {
     this.sessionContext = sessionContext;
     this.delegate = delegate;
-  }
-
-  @Override
-  public void associate(JoinGraphNode joinGraphNode, Map<String, Object> data) {
-    delegate.associate(joinGraphNode, data);
   }
 
   @Override

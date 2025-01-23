@@ -59,12 +59,8 @@ public class FlexmodelFindOneDataFetcher extends FlexmodelAbstractDataFetcher<Ma
       Map<String, Object> resultData = new HashMap<>(list.stream().findFirst().orElseThrow());
       for (RelationField sencondaryRelationField : relationFields) {
         Object secondaryId = resultData.get(entity.findIdField().map(IDField::getName).orElseThrow());
-        resultData.put(sencondaryRelationField.getName(),
-          sencondaryRelationField.getCardinality() == RelationField.Cardinality.ONE_TO_ONE ?
-            findAssociationDataList(session, env, null, sencondaryRelationField.getTargetEntity(), sencondaryRelationField, secondaryId).stream()
-              .findFirst()
-              .orElse(null)
-            : findAssociationDataList(session, env, null, sencondaryRelationField.getTargetEntity(), sencondaryRelationField, secondaryId));
+        List<Map<String, Object>> relationDataList = findRelationDataList(session, env, null, sencondaryRelationField.getFrom(), sencondaryRelationField, secondaryId);
+        resultData.put(sencondaryRelationField.getName(), sencondaryRelationField.isMultiple() ? relationDataList : relationDataList.stream().findFirst().orElse(null));
       }
       return resultData;
     }

@@ -1,7 +1,6 @@
 package tech.wetech.flexmodel.sql;
 
 import tech.wetech.flexmodel.*;
-import tech.wetech.flexmodel.graph.JoinGraphNode;
 import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 import tech.wetech.flexmodel.sql.type.SqlResultHandler;
 import tech.wetech.flexmodel.sql.type.SqlTypeHandler;
@@ -31,12 +30,6 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
     this.sqlDialect = sqlContext.getSqlDialect();
     this.sqlExpressionCalculator = sqlContext.getConditionCalculator();
     this.typeHandlerMap = sqlContext.getTypeHandlerMap();
-  }
-
-  @Override
-  public void associate(JoinGraphNode joinGraphNode, Map<String, Object> data) {
-    String sql = getInsertSqlString(joinGraphNode.getJoinName(), data);
-    sqlExecutor.update(sql, data);
   }
 
   @Override
