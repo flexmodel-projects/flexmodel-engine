@@ -124,6 +124,10 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
     return additionalProperties;
   }
 
+  public String getShowType() {
+    return type;
+  }
+
   @SuppressWarnings("unchecked")
   private SELF self() {
     return (SELF) this;

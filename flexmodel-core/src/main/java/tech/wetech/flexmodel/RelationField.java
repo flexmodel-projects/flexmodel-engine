@@ -91,4 +91,9 @@ public class RelationField extends TypedField<Long, RelationField> {
   public int hashCode() {
     return Objects.hash(super.hashCode(), isMultiple(), getFrom(), getForeignField(), isCascadeDelete());
   }
+
+  @Override
+  public String getShowType() {
+    return from + (multiple ? "[]" : "");
+  }
 }
