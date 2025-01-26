@@ -286,6 +286,14 @@ public class Query implements Serializable {
       return this;
     }
 
+    public Sort asc(String field) {
+      return addOrder(field, Direction.ASC);
+    }
+
+    public Sort desc(String field) {
+      return addOrder(field, Direction.DESC);
+    }
+
     public Sort addOrder(String field) {
       Order order = new Order();
       order.setField(field);
