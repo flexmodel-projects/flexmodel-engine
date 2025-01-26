@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * @author cjbi
@@ -28,8 +27,6 @@ public class SessionFactory {
   private final Cache cache;
   private final Logger log = LoggerFactory.getLogger(SessionFactory.class);
   private final JsonObjectConverter jsonObjectConverter;
-
-  private final Map<Class, Consumer> globalSubscribers = new HashMap<>();
 
   SessionFactory(String defaultIdentifier, DataSourceProvider defaultDataSourceProvider, Cache cache, String importScript) {
     this.cache = cache;
@@ -61,7 +58,7 @@ public class SessionFactory {
   private void processBuildItem(BuildItem buildItem) {
     List<Model> allModels = buildItem.getModels();
     allModels.forEach(model -> cache.put(buildItem.getSchemaName() + ":" + model.getName(), model));
-    try (Session session = createFailSafeSession(buildItem.getSchemaName())) {
+    try (Session session = createFailsafeSession(buildItem.getSchemaName())) {
       List<RelationField> lazyCreateList = processModels(buildItem.getModels(), session);
       lazyCreateRelationFields(lazyCreateList, session);
     }
@@ -69,7 +66,7 @@ public class SessionFactory {
 
   public void loadScriptString(String schemaName, String scriptString) {
     ImportDescribe describe = jsonObjectConverter.parseToObject(scriptString, ImportDescribe.class);
-    try (Session session = createFailSafeSession(schemaName)) {
+    try (Session session = createFailsafeSession(schemaName)) {
       List<RelationField> lazyCreateList = processModels(describe.getSchema(), session);
       lazyCreateRelationFields(lazyCreateList, session);
       processImportData(describe.getData(), session);
@@ -185,14 +182,6 @@ public class SessionFactory {
     dataSourceProviders.remove(identifier);
   }
 
-  public <T> void subscribeEvent(Class<T> subscribedToEventType, Consumer<T> event) {
-    globalSubscribers.put(subscribedToEventType, event);
-  }
-
-  public Map<Class, Consumer> getGlobalSubscribers() {
-    return globalSubscribers;
-  }
-
   /**
    * 宽松模式:
    * 允许ddl语句的错误
@@ -200,19 +189,19 @@ public class SessionFactory {
    * @param identifier
    * @return
    */
-  private Session createFailSafeSession(String identifier) {
+  private Session createFailsafeSession(String identifier) {
     try {
       return switch (dataSourceProviders.get(identifier)) {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
           SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), mappedModels, jsonObjectConverter, this);
-          sqlContext.setFailFast(false);
+          sqlContext.setFailsafe(true);
           yield new SqlSession(sqlContext);
         }
         case MongoDataSourceProvider mongodb -> {
           MongoDatabase mongoDatabase = mongodb.mongoDatabase();
           MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, mappedModels, jsonObjectConverter, this);
-          mongoContext.setFailFast(false);
+          mongoContext.setFailsafe(true);
           yield new MongoSession(mongoContext);
         }
         case null,

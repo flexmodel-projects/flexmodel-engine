@@ -108,7 +108,6 @@ public abstract class BaseSqlStatement {
         String foreignField = joiner.getForeignField();
         RelationField relationField;
         if (model instanceof Entity entity && (relationField = entity.findRelationByModelName(joiner.getFrom()).orElse(null)) != null) {
-          localField = entity.findIdField().map(IDField::getName).orElseThrow();
           foreignField = relationField.getForeignField();
           joinCause.append(joinTableName).append(" \n on \n").append(toFullColumnQuoteString(modelName, localField)).append("=").append(toFullColumnQuoteString(joiner.getFrom(), foreignField));
 

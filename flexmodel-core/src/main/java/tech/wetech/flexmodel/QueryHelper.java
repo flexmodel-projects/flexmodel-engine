@@ -109,7 +109,12 @@ public class QueryHelper {
               return projection;
             }
           )
-          .withJoin(joins -> joins.addInnerJoin(join -> join.setFrom(relationField.getFrom())))
+          .withJoin(joins -> joins.addInnerJoin(join -> join
+              .setFrom(relationField.getFrom())
+              .setLocalField(relationField.getLocalField())
+              .setForeignField(relationField.getForeignField())
+            )
+          )
           .withFilter(f -> f.equalTo(entity.getName() + "." + entity.findIdField().orElseThrow().getName(), id))
       );
       return mapList;
@@ -147,9 +152,8 @@ public class QueryHelper {
           List<Map<String, Object>> list = findRelationList(sessionContext, relationFn, relationField, id);
           maxDepth.decrementAndGet();
           nestedQuery(list, relationFn, sessionContext.getModel(relationField.getFrom()), null, sessionContext, maxDepth);
-          if (!list.isEmpty()) {
-            item.put(key, relationField.isMultiple() ? list : list.getFirst());
-          }
+          Object value = relationField.isMultiple() ? list : (!list.isEmpty() ? list.getFirst() : null);
+          item.put(key, value);
         }
       }));
   }

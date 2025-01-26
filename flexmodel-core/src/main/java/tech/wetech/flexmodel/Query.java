@@ -4,7 +4,10 @@ import tech.wetech.flexmodel.criterion.Example;
 import tech.wetech.flexmodel.criterion.Example.Criteria;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.UnaryOperator;
 
 /**
@@ -46,23 +49,23 @@ public class Query implements Serializable {
 
   public static class Joins implements Serializable {
 
-    private final Map<String, Join> joinMap = new HashMap<>();
+    private final List<Join> joins = new ArrayList<>();
 
     public List<Join> getJoins() {
-      return joinMap.values().stream().toList();
+      return joins;
     }
 
     public Joins addInnerJoin(UnaryOperator<Join> joinUnaryOperator) {
       Join join = new Join();
       join.setJoinType(Join.JoinType.INNER_JOIN);
-      this.joinMap.put(join.getFrom(), joinUnaryOperator.apply(join));
+      this.joins.add(joinUnaryOperator.apply(join));
       return this;
     }
 
     public Joins addLeftJoin(UnaryOperator<Join> joinUnaryOperator) {
       Join join = new Join();
       join.setJoinType(Join.JoinType.LEFT_JOIN);
-      this.joinMap.put(join.getFrom(), joinUnaryOperator.apply(join));
+      this.joins.add(joinUnaryOperator.apply(join));
       return this;
     }
 

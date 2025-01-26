@@ -17,7 +17,7 @@ public abstract class AbstractSessionContext {
   protected final MappedModels mappedModels;
   protected final JsonObjectConverter jsonObjectConverter;
   protected PhysicalNamingStrategy physicalNamingStrategy = new DefaultPhysicalNamingStrategy();
-  protected boolean failFast = true;
+  protected boolean failsafe = false;
   protected int nestedQueryMaxDepth = 5;
   protected final SessionFactory factory;
 
@@ -50,12 +50,12 @@ public abstract class AbstractSessionContext {
 
   public abstract Map<String, ? extends TypeHandler<?>> getTypeHandlerMap();
 
-  public boolean isFailFast() {
-    return failFast;
+  public boolean isFailsafe() {
+    return failsafe;
   }
 
-  public void setFailFast(boolean failFast) {
-    this.failFast = failFast;
+  public void setFailsafe(boolean failsafe) {
+    this.failsafe = failsafe;
   }
 
   public JsonObjectConverter getJsonObjectConverter() {
