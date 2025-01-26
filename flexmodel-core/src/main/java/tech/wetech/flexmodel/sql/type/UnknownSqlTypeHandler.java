@@ -17,7 +17,7 @@ public class UnknownSqlTypeHandler extends UnknownTypeHandler implements SqlType
   }
 
   @Override
-  public Object getNullableResult(ResultSet rs, String columnName) throws SQLException {
+  public Object getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
     return rs.getObject(columnName);
   }
 }

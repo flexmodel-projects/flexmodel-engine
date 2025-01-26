@@ -17,7 +17,7 @@ public class LegacyDatetimeSqlTypeHandler implements SqlTypeHandler {
   }
 
   @Override
-  public Timestamp convertParameter(Object value) {
+  public Timestamp convertParameter(tech.wetech.flexmodel.Field field, Object value) {
     if (value == null) {
       return null;
     }
@@ -28,7 +28,7 @@ public class LegacyDatetimeSqlTypeHandler implements SqlTypeHandler {
   }
 
   @Override
-  public LocalDateTime getNullableResult(ResultSet rs, String columnName) throws SQLException {
+  public LocalDateTime getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
     try {
       return rs.getObject(columnName, Timestamp.class).toLocalDateTime();
     } catch (NullPointerException e) {

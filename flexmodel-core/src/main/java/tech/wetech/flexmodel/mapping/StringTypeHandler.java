@@ -5,7 +5,7 @@ package tech.wetech.flexmodel.mapping;
  */
 public class StringTypeHandler implements TypeHandler<String> {
   @Override
-  public String convertParameter(Object value) {
+  public String convertParameter(tech.wetech.flexmodel.Field field, Object value) {
     if (value == null) {
       return null;
     }

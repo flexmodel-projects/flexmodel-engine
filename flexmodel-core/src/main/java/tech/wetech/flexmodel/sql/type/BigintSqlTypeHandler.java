@@ -17,7 +17,7 @@ public class BigintSqlTypeHandler extends BigintTypeHandler implements SqlTypeHa
   }
 
   @Override
-  public Long getNullableResult(ResultSet rs, String columnName) throws SQLException {
+  public Long getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
     return rs.getLong(columnName);
   }
 }

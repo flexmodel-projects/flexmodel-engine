@@ -17,7 +17,7 @@ public class IntSqlTypeHandler extends IntTypeHandler implements SqlTypeHandler<
   }
 
   @Override
-  public Integer getNullableResult(ResultSet rs, String columnName) throws SQLException {
+  public Integer getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
     return rs.getInt(columnName);
   }
 }

@@ -6,7 +6,7 @@ package tech.wetech.flexmodel.mapping;
 public class BigintTypeHandler implements TypeHandler<Long> {
 
   @Override
-  public Long convertParameter(Object value) {
+  public Long convertParameter(tech.wetech.flexmodel.Field field, Object value) {
     if (value == null) {
       return null;
     }

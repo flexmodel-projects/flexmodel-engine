@@ -9,6 +9,7 @@ import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +51,14 @@ public abstract class AbstractSessionTests {
     session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("studentName"))
-      .addField(new StringField("gender"))
+      .addField(new EnumField("gender").addElement("男").addElement("女"))
+      .addField(new EnumField("interest")
+        .addElement("唱")
+        .addElement("跳")
+        .addElement("rap")
+        .addElement("打篮球")
+        .setMultiple(true)
+      )
       .addField(new IntField("age"))
       .addField(new DecimalField("height").setPrecision(3).setScale(2))
       .addField(new BigintField("classId"))
@@ -132,6 +140,7 @@ public abstract class AbstractSessionTests {
           "id": 1,
           "studentName": "张三",
           "gender": "男",
+          "interest": ["唱", "跳", "rap", "打篮球"],
           "age": 10,
           "classId": 1,
           "studentDetail": {
@@ -156,6 +165,7 @@ public abstract class AbstractSessionTests {
           "id": 2,
           "studentName": "李四",
           "gender": "女",
+          "interest": ["唱", "跳"],
           "age": 10,
           "classId": 1,
           "studentDetail": {
@@ -175,6 +185,7 @@ public abstract class AbstractSessionTests {
         {
           "id": 3,
           "studentName": "王五",
+          "interest": ["打篮球"],
           "gender": "男",
           "age": 11,
           "classId": 2,
@@ -332,6 +343,17 @@ public abstract class AbstractSessionTests {
 
   }
 
+  @Test
+  void testEnum() {
+    String studentEntityName = "testEnumStudent";
+    createStudentCollection(studentEntityName);
+    createStudentData(studentEntityName);
+    List<Map> list = session.find("testEnumStudent", q -> q, Map.class);
+    Assertions.assertFalse(list.isEmpty());
+    Map first = list.getFirst();
+    Assertions.assertInstanceOf(String.class, first.get("gender"));
+    Assertions.assertInstanceOf(Collection.class, first.get("interest"));
+  }
 
   void createTeacherCollection2(String entityName) {
     session.createEntity(entityName, entity -> entity

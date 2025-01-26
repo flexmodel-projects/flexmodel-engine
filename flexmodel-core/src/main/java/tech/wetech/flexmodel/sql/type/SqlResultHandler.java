@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel.sql.type;
 
+import com.mongodb.lang.Nullable;
+
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -14,6 +16,7 @@ public class SqlResultHandler<T> {
   private final Class<T> resultType;
   private final boolean isResultMap;
   private final Map<String, SqlTypeHandler<?>> sqlTypeHanlderMap = new HashMap<>();
+  private final Map<String, tech.wetech.flexmodel.Field> fmTypeFieldMap = new HashMap<>();
   private final List<Field> fields;
 
   public SqlResultHandler(Class<T> resultType) {
@@ -31,13 +34,20 @@ public class SqlResultHandler<T> {
     }
   }
 
-  public void addSqlTypeHandler(String columnName, SqlTypeHandler<?> typeHandler) {
+  public void addSqlTypeHandler(String columnName, SqlTypeHandler<?> typeHandler, @Nullable tech.wetech.flexmodel.Field field) {
     sqlTypeHanlderMap.put(columnName, typeHandler);
+    if (field != null) {
+      fmTypeFieldMap.put(columnName, field);
+    }
   }
 
   @SuppressWarnings("all")
   public SqlTypeHandler getSqlTypeHandler(String columnName) {
     return sqlTypeHanlderMap.getOrDefault(columnName, new UnknownSqlTypeHandler());
+  }
+
+  public tech.wetech.flexmodel.Field getFmTypeField(String columnName) {
+    return fmTypeFieldMap.get(columnName);
   }
 
   public List<T> convertResultSetToList(ResultSet resultSet) throws SQLException {
@@ -58,7 +68,7 @@ public class SqlResultHandler<T> {
         String name = field.getName();
         try {
           SqlTypeHandler<?> typeHandler = this.getSqlTypeHandler(name);
-          field.set(dto, typeHandler.getResult(rs, name));
+          field.set(dto, typeHandler.getResult(rs, name, getFmTypeField(name)));
 //          field.set(dto, field.getType().getConstructor(String.class).newInstance(value));
         } catch (Exception e) {
           e.printStackTrace();
@@ -77,7 +87,7 @@ public class SqlResultHandler<T> {
     for (int i = 1; i <= columnCount; i++) {
       String columnName = metaData.getColumnLabel(i);
       SqlTypeHandler<?> typeHandler = this.getSqlTypeHandler(columnName);
-      rowMap.put(columnName, typeHandler.getResult(rs, columnName));
+      rowMap.put(columnName, typeHandler.getResult(rs, columnName, getFmTypeField(columnName)));
     }
     return rowMap;
   }

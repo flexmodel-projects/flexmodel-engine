@@ -17,7 +17,7 @@ public class StringSqlTypeHandler extends StringTypeHandler implements SqlTypeHa
   }
 
   @Override
-  public String getNullableResult(ResultSet rs, String columnName) throws SQLException {
+  public String getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
     return rs.getString(columnName);
   }
 }

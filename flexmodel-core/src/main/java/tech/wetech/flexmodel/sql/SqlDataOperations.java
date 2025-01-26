@@ -227,11 +227,11 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
     if (query == null || query.getProjection() == null) {
       for (Field field : model.getFields()) {
         if (field instanceof IDField idField) {
-          sqlResultHandler.addSqlTypeHandler(field.getName(), typeHandlerMap.get(idField.getGeneratedValue().getType()));
+          sqlResultHandler.addSqlTypeHandler(field.getName(), typeHandlerMap.get(idField.getGeneratedValue().getType()), field);
         } else if (field instanceof TypedField<?, ?> typedField) {
-          sqlResultHandler.addSqlTypeHandler(field.getName(), typeHandlerMap.get(typedField.getType()));
+          sqlResultHandler.addSqlTypeHandler(field.getName(), typeHandlerMap.get(typedField.getType()), field);
         } else if (field instanceof Query.QueryField) {
-          sqlResultHandler.addSqlTypeHandler(field.getName(), new UnknownSqlTypeHandler());
+          sqlResultHandler.addSqlTypeHandler(field.getName(), new UnknownSqlTypeHandler(), field);
         }
       }
     } else {
@@ -239,7 +239,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
       for (Map.Entry<String, Query.QueryCall> entry : fields.entrySet()) {
         String key = entry.getKey();
         Query.QueryCall value = entry.getValue();
-        sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler());
+        sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler(), null);
         if (value instanceof Query.QueryField queryField) {
           if (queryField.getAliasName() != null) {
             Model queryModel = sqlContext.getModel(queryField.getAliasName());
@@ -247,23 +247,23 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
               ? queryModel.getField(queryField.getFieldName())
               : model.getField(queryField.getFieldName());
             if (field instanceof TypedField<?, ?> typedField) {
-              sqlResultHandler.addSqlTypeHandler(key, sqlContext.getTypeHandler(typedField.getType()));
+              sqlResultHandler.addSqlTypeHandler(key, sqlContext.getTypeHandler(typedField.getType()), null);
             } else {
-              sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler());
+              sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler(), null);
             }
           } else {
-            sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler());
+            sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler(), null);
           }
           Field field = queryField.getAliasName() != null
             ? sqlContext.getModel(queryField.getAliasName()).getField(queryField.getFieldName())
             : model.getField(queryField.getFieldName());
           if (field instanceof TypedField<?, ?> typedField) {
-            sqlResultHandler.addSqlTypeHandler(key, sqlContext.getTypeHandler(typedField.getType()));
+            sqlResultHandler.addSqlTypeHandler(key, sqlContext.getTypeHandler(typedField.getType()), field);
           } else {
-            sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler());
+            sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler(), null);
           }
         } else {
-          sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler());
+          sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler(), null);
         }
       }
     }

@@ -17,7 +17,7 @@ public class DecimalSqlTypeHandler extends DecimalTypeHandler implements SqlType
   }
 
   @Override
-  public Double getNullableResult(ResultSet rs, String columnName) throws SQLException {
+  public Double getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
     return rs.getDouble(columnName);
   }
 }

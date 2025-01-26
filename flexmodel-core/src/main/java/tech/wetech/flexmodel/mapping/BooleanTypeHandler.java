@@ -6,7 +6,7 @@ package tech.wetech.flexmodel.mapping;
 public class BooleanTypeHandler implements TypeHandler<Boolean> {
 
   @Override
-  public Boolean convertParameter(Object value) {
+  public Boolean convertParameter(tech.wetech.flexmodel.Field field, Object value) {
     if (value == null) {
       return null;
     }

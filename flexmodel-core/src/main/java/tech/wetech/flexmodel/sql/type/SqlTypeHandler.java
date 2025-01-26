@@ -12,16 +12,14 @@ public interface SqlTypeHandler<T> extends TypeHandler<T> {
 
   int getJdbcTypeCode();
 
-  T convertParameter(Object value);
-
-  default T getResult(ResultSet rs, String columnName) throws SQLException {
+  default T getResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
     try {
-      return getNullableResult(rs, columnName);
+      return getNullableResult(rs, columnName, field);
     } catch (Exception e) {
       throw new ResultMapException("Error attempting to get column '" + columnName + "' from result set.  Cause: " + e, e);
     }
   }
 
-  T getNullableResult(ResultSet rs, String columnName) throws SQLException;
+  T getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException;
 
 }

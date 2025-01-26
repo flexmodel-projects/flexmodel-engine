@@ -18,7 +18,7 @@ public class DatetimeSqlTypeHandler extends DatetimeTypeHandler implements SqlTy
   }
 
   @Override
-  public LocalDateTime getNullableResult(ResultSet rs, String columnName) throws SQLException {
+  public LocalDateTime getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
     try {
       return rs.getObject(columnName, LocalDateTime.class);
     } catch (NullPointerException e) {

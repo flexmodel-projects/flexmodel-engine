@@ -202,8 +202,11 @@ public class JdbcMappedModels implements MappedModels {
   private List<Entity> convert(List<SqlTable> tables, SqlContext sqlContext) {
     List<Entity> modelList = new ArrayList<>();
     Map<Integer, String> jdbcCodeMap = new HashMap<>();
-    sqlContext.getTypeHandlerMap().forEach((key, value) -> jdbcCodeMap.put(value.getJdbcTypeCode(), key));
-    sqlContext.getTypeHandlerMap().forEach((key, value) -> jdbcCodeMap.put(value.getJdbcTypeCode(), key));
+    sqlContext.getTypeHandlerMap().forEach((key, value) -> {
+      if (!jdbcCodeMap.containsKey(value.getJdbcTypeCode())) {
+        jdbcCodeMap.put(value.getJdbcTypeCode(), key);
+      }
+    });
     for (SqlTable table : tables) {
       Entity entity = new Entity(table.getName());
       entity.setComment(table.getComment());

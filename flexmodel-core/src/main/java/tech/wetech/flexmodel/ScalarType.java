@@ -14,7 +14,8 @@ public enum ScalarType {
   BOOLEAN("boolean"),
   DATETIME("datetime"),
   DATE("date"),
-  JSON("json");
+  JSON("json"),
+  ENUM("enum");
   private final String type;
 
   ScalarType(String type) {

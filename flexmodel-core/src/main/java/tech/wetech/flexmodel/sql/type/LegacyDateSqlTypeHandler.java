@@ -18,7 +18,7 @@ public class LegacyDateSqlTypeHandler implements SqlTypeHandler {
   }
 
   @Override
-  public Date convertParameter(Object value) {
+  public Date convertParameter(tech.wetech.flexmodel.Field field, Object value) {
     if (value == null) {
       return null;
     }
@@ -29,7 +29,7 @@ public class LegacyDateSqlTypeHandler implements SqlTypeHandler {
   }
 
   @Override
-  public LocalDate getNullableResult(ResultSet rs, String columnName) throws SQLException {
+  public LocalDate getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
     try {
       return rs.getObject(columnName, Date.class).toLocalDate();
     } catch (NullPointerException e) {

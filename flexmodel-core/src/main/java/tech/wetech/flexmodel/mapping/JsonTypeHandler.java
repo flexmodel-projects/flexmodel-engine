@@ -14,7 +14,7 @@ public class JsonTypeHandler implements TypeHandler<Object> {
     }
 
     @Override
-  public Object convertParameter(Object value) {
+  public Object convertParameter(tech.wetech.flexmodel.Field field, Object value) {
     return value;
   }
 }

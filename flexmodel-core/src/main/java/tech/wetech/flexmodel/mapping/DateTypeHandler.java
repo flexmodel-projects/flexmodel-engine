@@ -7,7 +7,7 @@ import java.time.LocalDate;
  */
 public class DateTypeHandler implements TypeHandler<LocalDate> {
   @Override
-  public LocalDate convertParameter(Object value) {
+  public LocalDate convertParameter(tech.wetech.flexmodel.Field field, Object value) {
     if (value == null) {
       return null;
     }

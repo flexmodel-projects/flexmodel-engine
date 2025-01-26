@@ -22,7 +22,7 @@ public class JsonSqlTypeHandler extends JsonTypeHandler implements SqlTypeHandle
   }
 
   @Override
-  public Object getNullableResult(ResultSet rs, String columnName) throws SQLException {
+  public Object getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
     String jsonString = rs.getString(columnName);
     try {
       if (jsonString == null) {
@@ -35,7 +35,7 @@ public class JsonSqlTypeHandler extends JsonTypeHandler implements SqlTypeHandle
   }
 
   @Override
-  public Object convertParameter(Object value) {
+  public Object convertParameter(tech.wetech.flexmodel.Field field, Object value) {
     return jsonObjectConverter.toJsonString(value);
   }
 

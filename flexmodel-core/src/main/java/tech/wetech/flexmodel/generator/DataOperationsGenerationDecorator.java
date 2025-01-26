@@ -21,7 +21,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
 
   private Object convertParameter(TypedField<?, ?> field, Object value) {
     return sessionContext.getTypeHandlerMap().get(field instanceof IDField idField ? idField.getGeneratedValue().getType() : field.getType())
-      .convertParameter(value);
+      .convertParameter(field, value);
   }
 
   public Map<String, Object> generateValue(String modelName, Map<String, Object> data, boolean isUpdate) {

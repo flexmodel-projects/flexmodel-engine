@@ -5,7 +5,7 @@ package tech.wetech.flexmodel.mapping;
  */
 public class IntTypeHandler implements TypeHandler<Integer> {
   @Override
-  public Integer convertParameter(Object value) {
+  public Integer convertParameter(tech.wetech.flexmodel.Field field, Object value) {
     if (value == null) {
       return null;
     }

@@ -17,7 +17,7 @@ public class BooleanSqlTypeHandler extends BooleanTypeHandler implements SqlType
   }
 
   @Override
-  public Boolean getNullableResult(ResultSet rs, String columnName) throws SQLException {
+  public Boolean getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
     return rs.getBoolean(columnName);
   }
 }

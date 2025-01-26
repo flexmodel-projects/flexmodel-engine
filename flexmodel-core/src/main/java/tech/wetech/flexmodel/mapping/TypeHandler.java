@@ -5,6 +5,6 @@ package tech.wetech.flexmodel.mapping;
  */
 public interface TypeHandler<T> {
 
-  T convertParameter(Object value);
+  T convertParameter(tech.wetech.flexmodel.Field field, Object value);
 
 }
