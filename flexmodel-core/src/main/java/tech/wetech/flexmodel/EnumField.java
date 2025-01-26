@@ -46,7 +46,7 @@ public class EnumField extends TypedField<Object, EnumField> {
   }
 
   @Override
-  public String getShowType() {
+  public String getConcreteType() {
     if (isMultiple()) {
       return "Enum[]";
     }

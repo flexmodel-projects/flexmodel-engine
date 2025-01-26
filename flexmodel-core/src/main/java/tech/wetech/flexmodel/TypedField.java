@@ -124,7 +124,7 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
     return additionalProperties;
   }
 
-  public String getShowType() {
+  public String getConcreteType() {
     return type;
   }
 

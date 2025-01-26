@@ -93,7 +93,7 @@ public class RelationField extends TypedField<Long, RelationField> {
   }
 
   @Override
-  public String getShowType() {
+  public String getConcreteType() {
     return from + (multiple ? "[]" : "");
   }
 }
