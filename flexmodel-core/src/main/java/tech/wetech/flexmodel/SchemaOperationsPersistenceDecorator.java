@@ -93,7 +93,7 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
     String schemaName = sessionContext.getSchemaName();
     inspect(() -> delegate.dropField(modelName, fieldName));
     MappedModels mappedModels = sessionContext.getMappedModels();
-    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
+    Entity entity = (Entity) sessionContext.getModel(modelName);
     entity.removeField(fieldName);
     for (Index index : entity.getIndexes()) {
       index.containsField(fieldName);
@@ -118,7 +118,7 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
     inspect(() -> delegate.dropIndex(modelName, indexName));
     String schemaName = sessionContext.getSchemaName();
     MappedModels mappedModels = sessionContext.getMappedModels();
-    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
+    Entity entity = (Entity) sessionContext.getModel(modelName);
     entity.removeIndex(indexName);
     mappedModels.persist(schemaName, entity);
   }

@@ -35,7 +35,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   @Override
   public int insert(String modelName, Map<String, Object> record, Consumer<Object> id) {
     String sql = getInsertSqlString(modelName, record);
-    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
+    Entity entity = (Entity) sqlContext.getModel(modelName);
     Optional<IDField> idFieldOptional = entity.findIdField();
     if (idFieldOptional.isPresent()) {
       IDField idField = idFieldOptional.get();
@@ -71,7 +71,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   @Override
   public int updateById(String modelName, Map<String, Object> record, Object id) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
+    Entity entity = (Entity) sqlContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
 
     StringBuilder sql = new StringBuilder("update ")
@@ -98,7 +98,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   @Override
   public int update(String modelName, Map<String, Object> record, String filter) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
+    Entity entity = (Entity) sqlContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     SqlClauseResult sqlResult = getSqlCauseResult(filter);
 
@@ -122,7 +122,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   @Override
   public <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
+    Entity entity = (Entity) sqlContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     String columnsString = entity.getFields().stream()
       .filter(f -> !(f instanceof RelationField))
@@ -182,7 +182,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   @Override
   public int deleteById(String modelName, Object id) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
+    Entity entity = (Entity) sqlContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     String sql = "delete from " +
                  physicalTableName +
@@ -239,9 +239,23 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
       for (Map.Entry<String, Query.QueryCall> entry : fields.entrySet()) {
         String key = entry.getKey();
         Query.QueryCall value = entry.getValue();
+        sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler());
         if (value instanceof Query.QueryField queryField) {
-          Field field = queryField.getModelName() != null
-            ? mappedModels.getModel(schemaName, queryField.getModelName()).getField(queryField.getFieldName())
+          if (queryField.getAliasName() != null) {
+            Model queryModel = sqlContext.getModel(queryField.getAliasName());
+            Field field = queryModel != null
+              ? queryModel.getField(queryField.getFieldName())
+              : model.getField(queryField.getFieldName());
+            if (field instanceof TypedField<?, ?> typedField) {
+              sqlResultHandler.addSqlTypeHandler(key, sqlContext.getTypeHandler(typedField.getType()));
+            } else {
+              sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler());
+            }
+          } else {
+            sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler());
+          }
+          Field field = queryField.getAliasName() != null
+            ? sqlContext.getModel(queryField.getAliasName()).getField(queryField.getFieldName())
             : model.getField(queryField.getFieldName());
           if (field instanceof TypedField<?, ?> typedField) {
             sqlResultHandler.addSqlTypeHandler(key, sqlContext.getTypeHandler(typedField.getType()));

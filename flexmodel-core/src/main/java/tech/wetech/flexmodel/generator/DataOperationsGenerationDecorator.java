@@ -74,9 +74,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
 
   @SuppressWarnings({"rawtypes", "unchecked"})
   private void insertRelationRecord(String modelName, Map<String, Object> record, Object id) {
-    String schemaName = sessionContext.getSchemaName();
-    MappedModels mappedModels = sessionContext.getMappedModels();
-    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
+    Entity entity = (Entity) sessionContext.getModel(modelName);
     record.forEach((key, value) -> {
       if (value != null) {
         if (entity.getField(key) instanceof RelationField relationField) {

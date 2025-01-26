@@ -20,16 +20,12 @@ import static tech.wetech.flexmodel.IDField.GeneratedValue.AUTO_INCREMENT;
  */
 public class MongoDataOperations extends BaseMongoStatement implements DataOperations {
 
-  private final String schemaName;
-  private final MappedModels mappedModels;
   private final MongoDatabase mongoDatabase;
   private final SchemaOperations schemaOperations;
 
   public MongoDataOperations(MongoContext mongoContext) {
     super(mongoContext);
-    this.schemaName = mongoContext.getSchemaName();
     this.mongoDatabase = mongoContext.getMongoDatabase();
-    this.mappedModels = mongoContext.getMappedModels();
     this.schemaOperations = new MongoSchemaOperations(mongoContext);
   }
 
@@ -39,7 +35,7 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
 
   @Override
   public int insert(String modelName, Map<String, Object> record, Consumer<Object> idConsumer) {
-    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
+    Entity entity = (Entity) mongoContext.getModel(modelName);
     IDField idField = entity.findIdField().orElseThrow();
     if (!record.containsKey(idField.getName()) && idField.getGeneratedValue() == AUTO_INCREMENT) {
       setId(modelName, record);
@@ -66,7 +62,7 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   @Override
   public int updateById(String modelName, Map<String, Object> record, Object id) {
     String collectionName = getCollectionName(modelName);
-    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
+    Entity entity = (Entity) mongoContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     UpdateResult result = mongoDatabase.getCollection(collectionName, Map.class).updateOne(Filters.eq(idField.getName(), id), new Document("$set", new Document(record)));
     return (int) result.getModifiedCount();
@@ -84,7 +80,7 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   @Override
   public int deleteById(String modelName, Object id) {
     String collectionName = getCollectionName(modelName);
-    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
+    Entity entity = (Entity) mongoContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     return (int) mongoDatabase.getCollection(collectionName)
       .deleteMany(Filters.eq(idField.getName(), id)).getDeletedCount();
@@ -110,7 +106,7 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   @SuppressWarnings({"rawtypes", "unchecked"})
   public <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery) {
     String collectionName = getCollectionName(modelName);
-    Entity entity = (Entity) mappedModels.getModel(schemaName, modelName);
+    Entity entity = (Entity) mongoContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
 
     Map dataMap = mongoDatabase.getCollection(collectionName, Map.class)

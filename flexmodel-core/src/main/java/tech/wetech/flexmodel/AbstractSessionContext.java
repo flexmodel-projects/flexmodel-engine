@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.mapping.TypeHandler;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -20,6 +21,7 @@ public abstract class AbstractSessionContext {
   protected boolean failsafe = false;
   protected int nestedQueryMaxDepth = 5;
   protected final SessionFactory factory;
+  protected final Map<String, Model> aliasModelMap = new HashMap<>();
 
   protected AbstractSessionContext(String schemaName, MappedModels mappedModels, JsonObjectConverter jsonObjectConverter, SessionFactory factory) {
     this.schemaName = schemaName;
@@ -40,8 +42,18 @@ public abstract class AbstractSessionContext {
     return schemaName;
   }
 
-  public Model getModel(String modelName) {
-    return this.getMappedModels().getModel(getSchemaName(), modelName);
+  public void addAliasModelIfPresent(String alias, Model model) {
+    if (!aliasModelMap.containsKey(alias)) {
+      aliasModelMap.put(alias, model);
+    }
+  }
+
+  public Model getModel(String name) {
+    Model model = aliasModelMap.get(name);
+    if (model != null) {
+      return model;
+    }
+    return this.getMappedModels().getModel(getSchemaName(), name);
   }
 
   public MappedModels getMappedModels() {

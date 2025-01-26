@@ -15,8 +15,6 @@ import static tech.wetech.flexmodel.Projections.field;
 public class QueryHelper {
 
   public static void validate(AbstractSessionContext sessionContext, String modelName, Query query) {
-    String schemaName = sessionContext.getSchemaName();
-    MappedModels mappedModels = sessionContext.getMappedModels();
     Query.Projection projection = query.getProjection();
     Query.GroupBy groupBy = query.getGroupBy();
     if (groupBy != null) {
@@ -43,7 +41,7 @@ public class QueryHelper {
       }
     }
     if (query.getJoins() != null) {
-      Model model = mappedModels.getModel(schemaName, modelName);
+      Model model = sessionContext.getModel(modelName);
       for (Query.Join join : query.getJoins().getJoins()) {
         if (join.getFrom() == null) {
           throw new SqlExecutionException("Join from model must not be null");
@@ -60,6 +58,7 @@ public class QueryHelper {
             throw new SqlExecutionException("LocalField and foreignField must not be null when is not association field");
           }
         }
+        sessionContext.addAliasModelIfPresent(join.getAs(), sessionContext.getModel(join.getFrom()));
       }
     }
   }
@@ -96,28 +95,28 @@ public class QueryHelper {
                                                             RelationField relationField, Object id) {
     Model model = sessionContext.getModel(relationField.getModelName());
     if (model instanceof Entity entity) {
-      List<Map<String, Object>> mapList = relationFn.apply(entity.getName(),
+      return relationFn.apply(entity.getName(),
         new Query()
           .withProjection(projection -> {
-              Entity targetEntity = (Entity) sessionContext.getModel(relationField.getFrom());
-              for (TypedField<?, ?> field : targetEntity.getFields()) {
+              Entity from = (Entity) sessionContext.getModel(relationField.getFrom());
+              for (TypedField<?, ?> field : from.getFields()) {
                 if (field instanceof RelationField) {
                   continue;
                 }
-                projection.addField(field.getName(), field(field.getModelName() + "." + field.getName()));
+                projection.addField(field.getName(), field(relationField.getFrom() + "_rel" + "." + field.getName()));
               }
               return projection;
             }
           )
           .withJoin(joins -> joins.addInnerJoin(join -> join
               .setFrom(relationField.getFrom())
+              .setAs(relationField.getFrom() + "_rel")
               .setLocalField(relationField.getLocalField())
               .setForeignField(relationField.getForeignField())
             )
           )
-          .withFilter(f -> f.equalTo(entity.getName() + "." + entity.findIdField().orElseThrow().getName(), id))
+          .withFilter(f -> f.equalTo(entity.getName() + "." + relationField.getLocalField(), id))
       );
-      return mapList;
     }
     return List.of();
   }
@@ -129,6 +128,7 @@ public class QueryHelper {
                                  Query query,
                                  AbstractSessionContext sessionContext,
                                  int maxDepth) {
+    // fixme 改成in批量查询
     nestedQuery(parentList, relationFn, model, query, sessionContext, new AtomicInteger(maxDepth));
   }
 
@@ -144,18 +144,24 @@ public class QueryHelper {
       return;
     }
     Map<String, RelationField> relationFieldMap = QueryHelper.findRelationFields(model, query);
-    relationFieldMap.forEach((key, relationField) ->
+    relationFieldMap.entrySet().parallelStream().forEach(entry -> {
+      String key = entry.getKey();
+      RelationField relationField = entry.getValue();
       parentList.parallelStream().forEach(item -> {
         if (model instanceof Entity entity) {
-          IDField idField = entity.findIdField().orElseThrow();
-          Object id = item.get(idField.getName());
+          Object id = item.get(relationField.getLocalField());
+          if (id == null) {
+            item.put(key, relationField.isMultiple() ? List.of() : null);
+            return;
+          }
           List<Map<String, Object>> list = findRelationList(sessionContext, relationFn, relationField, id);
           maxDepth.decrementAndGet();
           nestedQuery(list, relationFn, sessionContext.getModel(relationField.getFrom()), null, sessionContext, maxDepth);
           Object value = relationField.isMultiple() ? list : (!list.isEmpty() ? list.getFirst() : null);
           item.put(key, value);
         }
-      }));
+      });
+    });
   }
 
 }

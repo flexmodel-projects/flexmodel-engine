@@ -187,8 +187,7 @@ abstract class BaseMongoStatement {
 
   protected List<Document> createPipeline(String modelName, Query query) {
     QueryHelper.validate(mongoContext, modelName, query);
-    String schemaName = mongoContext.getSchemaName();
-    Model model = mongoContext.getMappedModels().getModel(schemaName, modelName);
+    Model model = mongoContext.getModel(modelName);
     PhysicalNamingStrategy physicalNamingStrategy = mongoContext.getPhysicalNamingStrategy();
     List<Document> pipeline = new ArrayList<>();
     addMatchStage(pipeline, query);
@@ -200,9 +199,9 @@ abstract class BaseMongoStatement {
   }
 
   private String getNameSimply(Model model, Query.QueryField queryField) {
-    String modelName = queryField.getModelName();
+    String aliasName = queryField.getAliasName();
     String fieldName = queryField.getFieldName();
-    if (model.getName().equals(modelName)) {
+    if (model.getName().equals(aliasName)) {
       return fieldName;
     }
     return queryField.getName();

@@ -36,7 +36,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
 
   @Override
   public Model getModel(String modelName) {
-    return sqlContext.getMappedModels().getModel(sqlContext.getSchemaName(), modelName);
+    return sqlContext.getModel(modelName);
   }
 
   @Override

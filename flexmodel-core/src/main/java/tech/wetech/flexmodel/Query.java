@@ -210,6 +210,8 @@ public class Query implements Serializable {
 
   public static class Join implements QueryCall {
     private String from;
+
+    private String as;
     /**
      * 关联字段，非必须，当存在关联关系时候，可不指定
      */
@@ -231,6 +233,18 @@ public class Query implements Serializable {
 
     public Join setFrom(String from) {
       this.from = from;
+      return this;
+    }
+
+    public String getAs() {
+      if (as == null) {
+        return from;
+      }
+      return as;
+    }
+
+    public Join setAs(String as) {
+      this.as = as;
       return this;
     }
 
@@ -341,7 +355,7 @@ public class Query implements Serializable {
 
   public record QueryField(String name) implements Field, QueryCall {
 
-    public String getModelName() {
+    public String getAliasName() {
       if (name.contains(".")) {
         return name.split("\\.")[0];
       }

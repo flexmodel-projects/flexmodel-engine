@@ -30,7 +30,7 @@ public abstract class BaseSqlStatement {
   private Pair<String, Map<String, Object>> buildQuerySql(String modelName, Query query, boolean prepared) {
     QueryHelper.validate(sqlContext, modelName, query);
     Map<String, Object> params = new HashMap<>();
-    Model model = sqlContext.getMappedModels().getModel(sqlContext.getSchemaName(), modelName);
+    Model model = sqlContext.getModel(modelName);
     StringBuilder sqlBuilder = new StringBuilder("\nselect ");
     Map<String, String> projectionMap = new HashMap<>();
     appendProjection(modelName, query, model, projectionMap, sqlBuilder);
@@ -62,7 +62,7 @@ public abstract class BaseSqlStatement {
       sqlBuilder.append("\norder by ");
       StringJoiner sortColumns = new StringJoiner(", ");
       for (Query.Sort.Order order : sort.getOrders()) {
-        sortColumns.add(toFullColumnQuoteString(order.getField().getModelName(), order.getField().getFieldName()) + " " + order.getDirection().name().toLowerCase());
+        sortColumns.add(toFullColumnQuoteString(order.getField().getAliasName(), order.getField().getFieldName()) + " " + order.getDirection().name().toLowerCase());
       }
       sqlBuilder.append(sortColumns);
     }
@@ -74,7 +74,7 @@ public abstract class BaseSqlStatement {
       sqlBuilder.append("\ngroup by ");
       StringJoiner groupByColumns = new StringJoiner(", ");
       for (Query.QueryField field : query.getGroupBy().getFields()) {
-        groupByColumns.add(sqlDialect.supportsGroupByColumnAlias() ? toFullColumnQuoteString(field.getModelName(), field.getFieldName()) : projectionMap.getOrDefault(field.getFieldName(), toFullColumnQuoteString(field.getModelName(), field.getFieldName())));
+        groupByColumns.add(sqlDialect.supportsGroupByColumnAlias() ? toFullColumnQuoteString(field.getAliasName(), field.getFieldName()) : projectionMap.getOrDefault(field.getFieldName(), toFullColumnQuoteString(field.getAliasName(), field.getFieldName())));
       }
       sqlBuilder.append(groupByColumns);
     }
@@ -97,7 +97,7 @@ public abstract class BaseSqlStatement {
     if (joins != null) {
       StringBuilder joinCause = new StringBuilder();
       for (Query.Join joiner : joins.getJoins()) {
-        String joinTableName = toPhysicalTableNameQuoteString(joiner.getFrom());
+        String joinTableName = toPhysicalTableNameQuoteString(joiner.getFrom(), joiner.getAs());
         if (joiner.getJoinType() == LEFT_JOIN) {
           joinCause.append("\nleft join ");
         }
@@ -109,10 +109,10 @@ public abstract class BaseSqlStatement {
         RelationField relationField;
         if (model instanceof Entity entity && (relationField = entity.findRelationByModelName(joiner.getFrom()).orElse(null)) != null) {
           foreignField = relationField.getForeignField();
-          joinCause.append(joinTableName).append(" \n on \n").append(toFullColumnQuoteString(modelName, localField)).append("=").append(toFullColumnQuoteString(joiner.getFrom(), foreignField));
+          joinCause.append(joinTableName).append(" \n on \n").append(toFullColumnQuoteString(modelName, localField)).append("=").append(toFullColumnQuoteString(joiner.getAs(), foreignField));
 
         } else {
-          joinCause.append(joinTableName).append(" \n on \n").append(toFullColumnQuoteString(modelName, localField)).append("=").append(toFullColumnQuoteString(joiner.getFrom(), foreignField));
+          joinCause.append(joinTableName).append(" \n on \n").append(toFullColumnQuoteString(modelName, localField)).append("=").append(toFullColumnQuoteString(joiner.getAs(), foreignField));
         }
         StringBuilder joinCondition = new StringBuilder();
         if (joiner.getFilter() != null) {
@@ -131,7 +131,7 @@ public abstract class BaseSqlStatement {
   }
 
   private void appendFromClause(String modelName, StringBuilder sqlBuilder) {
-    String physicalFromTableName = toPhysicalTableNameQuoteString(modelName);
+    String physicalFromTableName = toPhysicalTableNameQuoteString(modelName, modelName);
     sqlBuilder.append("\nfrom ").append(physicalFromTableName);
   }
 
@@ -162,7 +162,7 @@ public abstract class BaseSqlStatement {
   private String toSqlCall(Query.QueryCall queryCall) {
     SqlDialect sqlDialect = sqlContext.getSqlDialect();
     if (queryCall instanceof Query.QueryField field) {
-      return toFullColumnQuoteString(field.getModelName(), field.getFieldName());
+      return toFullColumnQuoteString(field.getAliasName(), field.getFieldName());
     } else if (queryCall instanceof Query.QueryFunc func) {
       List<String> arguments = new ArrayList<>();
       for (Object arg : func.getArgs()) {
@@ -205,13 +205,9 @@ public abstract class BaseSqlStatement {
     return sqlDialect.quoteIdentifier(modelName) + "." + sqlDialect.quoteIdentifier(fieldName);
   }
 
-  private String toPhysicalTableNameQuoteString(String name) {
+  private String toPhysicalTableNameQuoteString(String name, String alias) {
     SqlDialect sqlDialect = sqlContext.getSqlDialect();
-    Entity entity = (Entity) sqlContext.getModel(name);
-    if (entity == null) {
-      return sqlDialect.quoteIdentifier(name);
-    }
-    return sqlDialect.quoteIdentifier(entity.getName());
+    return sqlDialect.quoteIdentifier(name) + " " + sqlDialect.quoteIdentifier(alias);
   }
 
   public record Pair<T, U>(T first, U second) {
