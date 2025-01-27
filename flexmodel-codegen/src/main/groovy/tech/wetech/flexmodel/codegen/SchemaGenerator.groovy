@@ -26,7 +26,7 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println "import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;"
     out.println "import tech.wetech.flexmodel.BuildItem;"
     out.println "import tech.wetech.flexmodel.Entity;"
-    out.println "import tech.wetech.flexmodel.Model;"
+    out.println "import tech.wetech.flexmodel.TypeWrapper;"
     out.println ""
     out.println "import java.util.ArrayList;"
     out.println "import java.util.List;"
@@ -71,8 +71,8 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println "  }"
     out.println ""
     out.println "  @Override"
-    out.println "  public List<Model> getModels() {"
-    out.println "    List<Model> list = new ArrayList<>();"
+    out.println "  public List<TypeWrapper> getModels() {"
+    out.println "    List<TypeWrapper> list = new ArrayList<>();"
     modelListClass.modelList.each { model ->
       out.println "    list.add(${model.variableName});"
     }

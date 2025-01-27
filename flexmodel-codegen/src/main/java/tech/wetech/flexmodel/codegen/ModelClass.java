@@ -24,6 +24,7 @@ public class ModelClass implements Serializable {
   private String comment;
   private ModelField idField;
   private final List<ModelField> basicFields = new ArrayList<>();
+  private final List<ModelField> enumFields = new ArrayList<>();
   private final List<ModelField> relationFields = new ArrayList<>();
   private final List<ModelField> allFields = new ArrayList<>();
   private Model originalModel;
@@ -121,6 +122,10 @@ public class ModelClass implements Serializable {
 
   public List<ModelField> getBasicFields() {
     return basicFields;
+  }
+
+  public List<ModelField> getEnumFields() {
+    return enumFields;
   }
 
   public List<ModelField> getRelationFields() {

@@ -1,7 +1,7 @@
 package tech.wetech.flexmodel.codegen;
 
+import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.*;
-import tech.wetech.flexmodel.sql.JdbcMappedModels;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.io.File;
@@ -42,18 +42,11 @@ public class GenerationTool {
 
   public static void run(Configuration configuration) {
     Configuration.Schema schema = configuration.getSchema();
-    Configuration.Connect dsConfig = schema.getConnect();
-    ConnectionWrapper connectionWrapper = new ConnectionWrapper(dsConfig.getUrl(), dsConfig.getUsername(), dsConfig.getPassword());
-    if ("mongodb".equals(dsConfig.getDbKind())) {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
     JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
-    JdbcMappedModels mappedModels = new JdbcMappedModels(connectionWrapper, new JacksonObjectConverter());
-    Set<TypeWrapper> models = new HashSet<>(mappedModels.lookup(schema.getName()));
-
+    Set<TypeWrapper> models = new HashSet<>();
     // read from script
     String importScript = configuration.getSchema().getImportScript();
-    File scriptFile = new File(configuration.getTarget().getBaseDir() + "/src/main/resources/" + importScript);
+    File scriptFile = new File(configuration.getTarget().getBaseDir() + importScript);
     if (scriptFile.exists()) {
       System.out.println("Import Script File: " + scriptFile);
       try {
@@ -67,25 +60,34 @@ public class GenerationTool {
 
     PojoGenerator pojoGenerator = new PojoGenerator();
     DaoGenerator daoGenerator = new DaoGenerator();
+    EnumGenerator enumGenerator = new EnumGenerator();
     String packageName = configuration.getTarget().getPackageName();
     String targetDirectory = configuration.getTarget().getDirectory() + File.separator +
                              packageName.replace(".", File.separator);
     StringUtils.createDirectoriesIfNotExists(targetDirectory + File.separator + "dao");
     StringUtils.createDirectoriesIfNotExists(targetDirectory + File.separator + "entity");
+    StringUtils.createDirectoriesIfNotExists(targetDirectory + File.separator + "enumeration");
 
     Map<String, ModelClass> modelClassMap = new HashMap<>();
+    Map<String, EnumClass> enumClassMap = new HashMap<>();
     for (TypeWrapper model : models) {
-      modelClassMap.put(model.getName(), buildModelClass(packageName, schema.getName(), (Entity) model));
+      if (model instanceof Entity) {
+        modelClassMap.put(model.getName(), buildModelClass(packageName, schema.getName(), (Entity) model));
+      } else if (model instanceof Enum) {
+        enumClassMap.put(model.getName(), buildEnumClass(packageName, schema.getName(), (Enum) model));
+      }
     }
 
     // generate single model file
     for (TypeWrapper model : models) {
-      GenerationContext context = new GenerationContext();
-      ModelClass modelClass = modelClassMap.get(model.getName());
-      context.setModelClass(modelClass);
-      context.putVariable("rootPackage", packageName);
-      pojoGenerator.generate(context, Path.of(targetDirectory, "entity", modelClass.getShortClassName() + ".java").toString());
-      daoGenerator.generate(context, Path.of(targetDirectory, "dao", modelClass.getShortClassName() + "DAO.java").toString());
+      if (model instanceof Entity) {
+        GenerationContext context = new GenerationContext();
+        ModelClass modelClass = modelClassMap.get(model.getName());
+        context.setModelClass(modelClass);
+        context.putVariable("rootPackage", packageName);
+        pojoGenerator.generate(context, Path.of(targetDirectory, "entity", modelClass.getShortClassName() + ".java").toString());
+        daoGenerator.generate(context, Path.of(targetDirectory, "dao", modelClass.getShortClassName() + "DAO.java").toString());
+      }
     }
     // generate multiple model file
     ModelListGenerationContext multipleModelGenerationContext = new ModelListGenerationContext();
@@ -94,10 +96,16 @@ public class GenerationTool {
     multipleModelClass.setPackageName(packageName);
     multipleModelGenerationContext.setModelListClass(multipleModelClass);
     for (TypeWrapper model : models) {
-      ModelClass modelClass = modelClassMap.get(model.getName());
-      multipleModelClass.getModelList().add(modelClass);
-      multipleModelClass.getImports().add(modelClass.getFullClassName());
+      if (model instanceof Entity) {
+        ModelClass modelClass = modelClassMap.get(model.getName());
+        multipleModelClass.getModelList().add(modelClass);
+        multipleModelClass.getImports().add(modelClass.getFullClassName());
+      }
     }
+    // generate enum class file
+    enumClassMap.forEach((name, enumClass) ->
+      enumGenerator.generate(enumClass, Path.of(targetDirectory, "enumeration", enumClass.getShortClassName() + ".java").toString())
+    );
 
     SchemaGenerator schemaClassGenerator = new SchemaGenerator();
     schemaClassGenerator.generate(multipleModelGenerationContext, Path.of(targetDirectory, StringUtils.capitalize(schema.getName()) + ".java").toString());
@@ -109,6 +117,18 @@ public class GenerationTool {
       "/target/classes/META-INF/services",
       "tech.wetech.flexmodel.BuildItem"
     ).toString());
+  }
+
+  private static EnumClass buildEnumClass(String packageName, String schemaName, Enum anEnum) {
+    String ftName = StringUtils.capitalize(StringUtils.snakeToCamel(anEnum.getName()));
+    EnumClass enumClass = new EnumClass();
+    enumClass.setSchemaName(schemaName);
+    enumClass.setPackageName(packageName + ".enumeration");
+    enumClass.setShortClassName(ftName);
+    enumClass.setElements(anEnum.getElements());
+    enumClass.setComment(anEnum.getComment());
+    enumClass.setOriginalEnum(anEnum);
+    return enumClass;
   }
 
   public static ModelClass buildModelClass(String packageName, String schemaName, Entity collection) {
@@ -160,6 +180,21 @@ public class GenerationTool {
           modelClass.getRelationFields().add(modelField);
         }
 
+      } else if (field instanceof EnumField anEnumField) {
+        String ftName = StringUtils.capitalize(StringUtils.snakeToCamel(anEnumField.getFrom()));
+        if (anEnumField.isMultiple()) {
+          modelField.setTypePackage("java.util")
+            .setFullTypeName("java.util.Set")
+            .setShortTypeName("Set<" + ftName + ">")
+            .setEnumField(true);
+        } else {
+          modelField.setTypePackage(packageName + ".enumeration")
+            .setFullTypeName(modelField.getTypePackage() + "." + ftName)
+            .setShortTypeName(ftName)
+            .setEnumField(true);
+        }
+        modelClass.getEnumFields().add(modelField);
+        modelClass.getImports().add(packageName + ".enumeration." + ftName);
       } else {
         // basic field
         TypeInfo typeInfo = TYPE_MAPPING.get(field.getType());

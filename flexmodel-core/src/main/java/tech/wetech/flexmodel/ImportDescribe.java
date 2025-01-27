@@ -9,14 +9,14 @@ import java.util.Map;
  */
 public class ImportDescribe {
 
-  private List<Model> schema = new ArrayList<>();
+  private List<TypeWrapper> schema = new ArrayList<>();
   private List<ImportData> data = new ArrayList<>();
 
-  public List<Model> getSchema() {
+  public List<TypeWrapper> getSchema() {
     return schema;
   }
 
-  public void setSchema(List<Model> schema) {
+  public void setSchema(List<TypeWrapper> schema) {
     this.schema = schema;
   }
 

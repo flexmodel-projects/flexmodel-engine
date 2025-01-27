@@ -91,13 +91,7 @@
               <name>system</name>
               <includes>1</includes>
               <excludes>2</excludes>
-              <import-script>import.json</import-script>
-              <connect>
-                <db-kind>sqlite</db-kind>
-                <url>jdbc:sqlite:file::memory:?cache=shared</url>
-                <username/>
-                <password/>
-              </connect>
+              <import-script>src/main/resource/import.json</import-script>
             </schema>
             <target>
               <packageName>tech.wetech.flexmodel</packageName>

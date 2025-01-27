@@ -197,86 +197,6 @@
       "indexes": []
     },
     {
-      "name": "ApiInfo",
-      "comment": "接口信息",
-      "type": "entity",
-      "fields": [
-        {
-          "name": "id",
-          "type": "id",
-          "unique": true,
-          "nullable": true,
-          "modelName": "ApiInfo",
-          "validators": [],
-          "generatedValue": "ULID"
-        },
-        {
-          "name": "name",
-          "comment": "名称",
-          "type": "string",
-          "length": 255,
-          "unique": false,
-          "nullable": false,
-          "modelName": "ApiInfo"
-        },
-        {
-          "name": "parentId",
-          "type": "string",
-          "length": 255,
-          "unique": false,
-          "nullable": true,
-          "modelName": "ApiInfo"
-        },
-        {
-          "name": "type",
-          "type": "string",
-          "length": 255,
-          "unique": false,
-          "nullable": false,
-          "modelName": "ApiInfo",
-          "defaultValue": "FOLDER"
-        },
-        {
-          "name": "method",
-          "type": "string",
-          "length": 255,
-          "unique": false,
-          "nullable": true,
-          "modelName": "ApiInfo"
-        },
-        {
-          "name": "path",
-          "type": "string",
-          "length": 255,
-          "unique": false,
-          "nullable": true,
-          "modelName": "ApiInfo"
-        },
-        {
-          "name": "createdAt",
-          "type": "datetime",
-          "unique": false,
-          "nullable": false,
-          "modelName": "ApiInfo"
-        },
-        {
-          "name": "updatedAt",
-          "type": "datetime",
-          "unique": false,
-          "nullable": false,
-          "modelName": "ApiInfo"
-        },
-        {
-          "name": "meta",
-          "type": "json",
-          "unique": false,
-          "nullable": true,
-          "modelName": "ApiInfo"
-        }
-      ],
-      "indexes": []
-    },
-    {
       "name": "ApiLog",
       "type": "entity",
       "fields": [
@@ -290,53 +210,32 @@
         },
         {
           "name": "level",
-          "type": "string",
-          "length": 255,
+          "type": "enum",
+          "from": "LogLevel",
+          "multiple": false,
           "unique": false,
           "nullable": false,
-          "modelName": "ApiLog",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ]
+          "modelName": "ApiLog"
         },
         {
           "name": "uri",
           "type": "text",
           "unique": false,
           "nullable": false,
-          "modelName": "ApiLog",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ]
+          "modelName": "ApiLog"
         },
         {
           "name": "data",
           "type": "json",
           "unique": false,
           "nullable": false,
-          "modelName": "ApiLog",
-          "validators": [
-            {
-              "type": "NotNullValidator",
-              "message": "must not be null"
-            }
-          ]
+          "modelName": "ApiLog"
         },
         {
           "name": "createdAt",
           "type": "datetime",
           "unique": false,
           "nullable": false,
-          "generator": {
-            "type": "DatetimeNowValueGenerator",
-            "generationTime": "INSERT"
-          },
           "modelName": "ApiLog"
         }
       ],
@@ -353,81 +252,6 @@
           "unique": false
         }
       ]
-    },
-    {
-      "name": "IdentityProvider",
-      "type": "entity",
-      "fields": [
-        {
-          "name": "name",
-          "type": "id",
-          "unique": false,
-          "nullable": true,
-          "modelName": "Datasource",
-          "generatedValue": "STRING_NOT_GENERATED"
-        },
-        {
-          "name": "createdAt",
-          "type": "datetime",
-          "unique": false,
-          "nullable": false,
-          "generator": {
-            "type": "DatetimeNowValueGenerator",
-            "generationTime": "INSERT"
-          },
-          "modelName": "IdentityProvider"
-        },
-        {
-          "name": "provider",
-          "type": "json",
-          "unique": false,
-          "nullable": true,
-          "modelName": "IdentityProvider"
-        },
-        {
-          "name": "updatedAt",
-          "type": "datetime",
-          "unique": false,
-          "nullable": false,
-          "generator": {
-            "type": "DatetimeNowValueGenerator",
-            "generationTime": "ALWAYS"
-          },
-          "modelName": "IdentityProvider"
-        }
-      ],
-      "indexes": []
-    },
-    {
-      "type": "entity",
-      "name": "Teacher",
-      "fields": [
-        {
-          "name": "id",
-          "type": "id",
-          "modelName": "Teacher",
-          "unique": false,
-          "nullable": true,
-          "generatedValue": "BIGINT_NOT_GENERATED"
-        },
-        {
-          "name": "teacherName",
-          "type": "string",
-          "modelName": "Teacher",
-          "unique": false,
-          "nullable": true,
-          "length": 255
-        },
-        {
-          "name": "subject",
-          "type": "string",
-          "modelName": "Teacher",
-          "unique": false,
-          "nullable": true,
-          "length": 255
-        }
-      ],
-      "indexes": []
     },
     {
       "type": "entity",
@@ -451,11 +275,21 @@
         },
         {
           "name": "gender",
-          "type": "string",
+          "type": "enum",
+          "from": "UserGender",
+          "multiple": false,
           "modelName": "Student",
           "unique": false,
-          "nullable": true,
-          "length": 255
+          "nullable": true
+        },
+        {
+          "name": "interest",
+          "type": "enum",
+          "from": "User_interest",
+          "multiple": true,
+          "modelName": "Student",
+          "unique": false,
+          "nullable": true
         },
         {
           "name": "age",
@@ -466,7 +300,7 @@
         },
         {
           "name": "classId",
-          "type": "int",
+          "type": "bigint",
           "modelName": "Student",
           "unique": false,
           "nullable": true
@@ -480,7 +314,7 @@
           "multiple": false,
           "from": "StudentDetail",
           "foreignField": "studentId",
-          "cascadeDelete": false
+          "cascadeDelete": true
         }
       ],
       "indexes": []
@@ -515,81 +349,36 @@
       "indexes": []
     },
     {
-      "type": "entity",
-      "name": "Classes",
-      "fields": [
-        {
-          "name": "id",
-          "type": "id",
-          "modelName": "Classes",
-          "unique": false,
-          "nullable": true,
-          "generatedValue": "BIGINT_NOT_GENERATED"
-        },
-        {
-          "name": "classCode",
-          "type": "string",
-          "modelName": "Classes",
-          "unique": false,
-          "nullable": true,
-          "length": 255
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "modelName": "Classes",
-          "unique": false,
-          "nullable": true,
-          "length": 255
-        },
-        {
-          "type": "relation",
-          "name": "students",
-          "modelName": "Classes",
-          "unique": false,
-          "nullable": true,
-          "multiple": true,
-          "from": "Student",
-          "foreignField": "classId",
-          "cascadeDelete": true
-        }
+      "name": "LogLevel",
+      "type": "enum",
+      "elements": [
+        "DEBUG",
+        "INFO",
+        "WARN",
+        "ERROR"
       ],
-      "indexes": []
+      "comment": "日志等级"
     },
     {
-      "type": "entity",
-      "name": "Course",
-      "fields": [
-        {
-          "name": "courseNo",
-          "type": "id",
-          "modelName": "Course",
-          "unique": false,
-          "nullable": true,
-          "generatedValue": "STRING_NOT_GENERATED"
-        },
-        {
-          "name": "courseName",
-          "type": "string",
-          "modelName": "Course",
-          "unique": false,
-          "nullable": true,
-          "length": 255
-        }
+      "name": "UserGender",
+      "type": "enum",
+      "elements": [
+        "未知",
+        "男",
+        "女"
       ],
-      "indexes": [
-        {
-          "name": "IDX_courseNo",
-          "modelName": "Course",
-          "fields": [
-            {
-              "fieldName": "courseNo",
-              "direction": "ASC"
-            }
-          ],
-          "unique": false
-        }
-      ]
+      "comment": "性别"
+    },
+    {
+      "name": "User_interest",
+      "type": "enum",
+      "elements": [
+        "唱",
+        "跳",
+        "rap",
+        "打篮球"
+      ],
+      "comment": "兴趣"
     }
   ],
   "data": [
@@ -718,51 +507,6 @@
       ]
     },
     {
-      "modelName": "Course",
-      "values": [
-        {
-          "courseNo": "Math",
-          "courseName": "数学"
-        },
-        {
-          "courseNo": "YuWen",
-          "courseName": "语文"
-        },
-        {
-          "courseNo": "Eng",
-          "courseName": "英语"
-        },
-        {
-          "courseNo": "History",
-          "courseName": "历史"
-        },
-        {
-          "courseNo": "politics",
-          "courseName": "政治"
-        }
-      ]
-    },
-    {
-      "modelName": "Classes",
-      "values": [
-        {
-          "id": 1,
-          "className": "一年级1班",
-          "classCode": "C_001"
-        },
-        {
-          "id": 2,
-          "className": "一年级2班",
-          "classCode": "C_002"
-        },
-        {
-          "id": 3,
-          "className": "二年级1班",
-          "classCode": "C_003"
-        }
-      ]
-    },
-    {
       "modelName": "Student",
       "values": [
         {
@@ -826,56 +570,6 @@
             {
               "courseNo": "Eng",
               "courseName": "英语"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "modelName": "Teacher",
-      "values": [
-        {
-          "id": 1,
-          "teacherName": "张老师",
-          "subject": "数学",
-          "students": [
-            {
-              "id": 1
-            },
-            {
-              "id": 2
-            },
-            {
-              "id": 3
-            }
-          ]
-        },
-        {
-          "id": 2,
-          "teacherName": "李老师",
-          "subject": "语文",
-          "students": [
-            {
-              "id": 1
-            },
-            {
-              "id": 2
-            },
-            {
-              "id": 3
-            }
-          ]
-        },
-        {
-          "id": 3,
-          "teacherName": "王老师",
-          "subject": "英语",
-          "students": [
-            {
-              "id": 1
-            },
-            {
-              "id": 3
             }
           ]
         }

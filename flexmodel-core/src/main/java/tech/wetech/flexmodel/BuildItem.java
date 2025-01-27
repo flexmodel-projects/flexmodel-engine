@@ -14,5 +14,5 @@ public interface BuildItem {
    *
    * @return
    */
-  List<Model> getModels();
+  List<TypeWrapper> getModels();
 }

@@ -12,13 +12,9 @@ class GenerationToolTest extends AbstractIntegrationTest {
     Configuration configuration = new Configuration();
     Configuration.Schema schemaConfig = new Configuration.Schema();
     schemaConfig.setName("system");
-    Configuration.Connect dsConfig = new Configuration.Connect();
-    dsConfig.setUrl("jdbc:sqlite:file::memory:?cache=shared");
-    dsConfig.setDbKind("sqlite");
-    schemaConfig.setConnect(dsConfig);
     configuration.setSchema(schemaConfig);
     Configuration.Target target = new Configuration.Target();
-    target.setBaseDir("src/test/resources");
+    target.setBaseDir("src/test/resources/");
     target.setDirectory("src/test/java");
     target.setPackageName("com.example");
     configuration.setTarget(target);

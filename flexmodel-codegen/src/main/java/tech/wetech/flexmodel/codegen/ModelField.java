@@ -15,6 +15,7 @@ public class ModelField {
   private String fullTypeName;
   private boolean identity;
   private boolean relationField;
+  private boolean enumField;
   private Field originalField;
 
   public ModelClass getModelClass() {
@@ -82,6 +83,15 @@ public class ModelField {
 
   public boolean isRelationField() {
     return relationField;
+  }
+
+  public boolean isEnumField() {
+    return enumField;
+  }
+
+  public ModelField setEnumField(boolean enumField) {
+    this.enumField = enumField;
+    return this;
   }
 
   public ModelField setRelationField(boolean relationField) {

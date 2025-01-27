@@ -56,7 +56,7 @@ public class SessionFactory {
   }
 
   private void processBuildItem(BuildItem buildItem) {
-    List<Model> allModels = buildItem.getModels();
+    List<TypeWrapper> allModels = buildItem.getModels();
     allModels.forEach(model -> cache.put(buildItem.getSchemaName() + ":" + model.getName(), model));
     try (Session session = createFailsafeSession(buildItem.getSchemaName())) {
       List<RelationField> lazyCreateList = processModels(buildItem.getModels(), session);
@@ -86,9 +86,9 @@ public class SessionFactory {
     }
   }
 
-  private List<RelationField> processModels(List<Model> models, Session session) {
+  private List<RelationField> processModels(List<TypeWrapper> models, Session session) {
     List<RelationField> lazyCreateList = new ArrayList<>();
-    for (Model model : models) {
+    for (TypeWrapper model : models) {
       if (!(model instanceof Entity newer)) {
         log.warn("Unsupported model type: {}", model.getName());
         continue;

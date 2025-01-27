@@ -1,9 +1,9 @@
 package tech.wetech.flexmodel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author cjbi
@@ -12,7 +12,7 @@ public class Enum implements TypeWrapper {
 
     private String name;
     private String comment;
-    private Set<String> elements = new LinkedHashSet<>();
+    private List<String> elements = new ArrayList<>();
     protected Map<String, Object> additionalProperties = new HashMap<>();
 
     public Enum(String name) {
@@ -34,7 +34,7 @@ public class Enum implements TypeWrapper {
         return "enum";
     }
 
-    public Enum setElements(Set<String> elements) {
+    public Enum setElements(List<String> elements) {
         this.elements = elements;
         return this;
     }
@@ -44,7 +44,7 @@ public class Enum implements TypeWrapper {
         return this;
     }
 
-    public Set<String> getElements() {
+    public List<String> getElements() {
         return elements;
     }
 
@@ -68,6 +68,19 @@ public class Enum implements TypeWrapper {
     public Enum addAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
         return this;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this.getName() != null && obj instanceof Entity) {
+            return this.getName().equals(((Entity) obj).getName());
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "<" + getName() + ">";
     }
 
 }

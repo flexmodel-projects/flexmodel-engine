@@ -49,7 +49,8 @@ public abstract class AbstractSessionTests {
 
   void createStudentCollection(String entityName) {
     Enum genderEnum = session.createEnum(entityName + "_gender", en ->
-      en.addElement("男")
+      en.addElement("未知")
+        .addElement("男")
         .addElement("女")
         .setComment("性别")
     );
