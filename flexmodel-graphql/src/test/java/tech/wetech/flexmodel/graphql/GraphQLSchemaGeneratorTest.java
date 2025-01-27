@@ -33,7 +33,9 @@ class GraphQLSchemaGeneratorTest {
     modelListClass.setPackageName(packageName);
     modelListClass.setSchemaName(schemaName);
     for (TypeWrapper model : describe.getSchema()) {
-      modelListClass.getModelList().add(GenerationTool.buildModelClass(packageName, schemaName, (Entity) model));
+      if (model instanceof Entity) {
+        modelListClass.getModelList().add(GenerationTool.buildModelClass(packageName, schemaName, (Entity) model));
+      }
     }
     generationContext.setModelListClass(modelListClass);
     String str = daoGenerator.generate(generationContext);

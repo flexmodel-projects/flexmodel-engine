@@ -1,31 +1,17 @@
 package tech.wetech.flexmodel.codegen
 
-import groovy.io.GroovyPrintWriter
+
 import groovy.util.logging.Log
-import org.apache.groovy.io.StringBuilderWriter
 
 /**
  * @author cjbi
  */
 @Log
-class EnumGenerator {
+class EnumGenerator extends AbstractGenerator {
 
-  File generate(EnumClass enumClass, String targetFile) {
-    log.info "Generating: $targetFile"
-    def file = new File(targetFile)
-    new File(targetFile).withPrintWriter { out ->
-      generate(out, enumClass)
-    }
-    return file
-  }
-
-  String generate(EnumClass enumClass) {
-    def writer = new StringBuilderWriter()
-    generate(new GroovyPrintWriter(writer), enumClass)
-    return writer.toString()
-  }
-
-  def generate(PrintWriter out, EnumClass enumClass) {
+  @Override
+  def generate(PrintWriter out, GenerationContext context) {
+    def enumClass = context.enumClass;
     def className = enumClass.shortClassName
     def elements = enumClass.elements
 

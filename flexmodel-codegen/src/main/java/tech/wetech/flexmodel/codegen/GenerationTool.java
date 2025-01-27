@@ -103,9 +103,13 @@ public class GenerationTool {
         multipleModelClass.getImports().add(modelClass.getFullClassName());
       }
     }
+
     // generate enum class file
-    enumClassMap.forEach((name, enumClass) ->
-      enumGenerator.generate(enumClass, Path.of(targetDirectory, "enumeration", enumClass.getShortClassName() + ".java").toString())
+    enumClassMap.forEach((name, enumClass) -> {
+        GenerationContext context = new GenerationContext();
+        context.setEnumClass(enumClass);
+        enumGenerator.generate(context, Path.of(targetDirectory, "enumeration", enumClass.getShortClassName() + ".java").toString());
+      }
     );
 
     SchemaGenerator schemaClassGenerator = new SchemaGenerator();

@@ -14,6 +14,7 @@ public class ModelListClass {
   private String schemaName;
   private final Set<String> imports = new HashSet<>();
   private final List<ModelClass> modelList = new ArrayList<>();
+  private final List<EnumClass> enumList = new ArrayList<>();
 
   public String getPackageName() {
     return packageName;
@@ -40,4 +41,7 @@ public class ModelListClass {
     return modelList;
   }
 
+  public List<EnumClass> getEnumList() {
+    return enumList;
+  }
 }

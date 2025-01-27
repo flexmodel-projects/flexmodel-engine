@@ -336,11 +336,21 @@
         },
         {
           "name": "gender",
-          "type": "string",
+          "type": "enum",
+          "from": "UserGender",
+          "multiple": false,
           "modelName": "Student",
           "unique": false,
-          "nullable": true,
-          "length": 255
+          "nullable": true
+        },
+        {
+          "name": "interest",
+          "type": "enum",
+          "from": "User_interest",
+          "multiple": true,
+          "modelName": "Student",
+          "unique": false,
+          "nullable": true
         },
         {
           "name": "age",
@@ -351,21 +361,10 @@
         },
         {
           "name": "classId",
-          "type": "int",
+          "type": "bigint",
           "modelName": "Student",
           "unique": false,
           "nullable": true
-        },
-        {
-          "name": "courses",
-          "type": "relation",
-          "modelName": "Student",
-          "unique": false,
-          "nullable": true,
-          "cardinality": "MANY_TO_MANY",
-          "from": "Course",
-          "foreignField": "courseNo",
-          "cascadeDelete": false
         },
         {
           "name": "studentDetail",
@@ -373,21 +372,10 @@
           "modelName": "Student",
           "unique": false,
           "nullable": true,
-          "cardinality": "ONE_TO_ONE",
+          "multiple": false,
           "from": "StudentDetail",
           "foreignField": "studentId",
-          "cascadeDelete": false
-        },
-        {
-          "name": "teachers",
-          "type": "relation",
-          "modelName": "Student",
-          "unique": false,
-          "nullable": true,
-          "cardinality": "MANY_TO_MANY",
-          "from": "Teacher",
-          "foreignField": "id",
-          "cascadeDelete": false
+          "cascadeDelete": true
         }
       ],
       "indexes": []
@@ -508,6 +496,27 @@
           "unique": false
         }
       ]
+    },
+    {
+      "name": "UserGender",
+      "type": "enum",
+      "elements": [
+        "未知",
+        "男",
+        "女"
+      ],
+      "comment": "性别"
+    },
+    {
+      "name": "User_interest",
+      "type": "enum",
+      "elements": [
+        "唱",
+        "跳",
+        "rap",
+        "打篮球"
+      ],
+      "comment": "兴趣"
     }
   ],
   "data": [
@@ -750,50 +759,69 @@
       ]
     },
     {
-      "modelName": "Teacher",
+      "modelName": "Student",
       "values": [
         {
           "id": 1,
-          "teacherName": "张老师",
-          "subject": "数学",
-          "students": [
+          "studentName": "张三",
+          "gender": "男",
+          "age": 10,
+          "classId": 1,
+          "studentDetail": {
+            "description": "张三的描述"
+          },
+          "courses": [
             {
-              "id": 1
+              "courseNo": "Math",
+              "courseName": "数学"
             },
             {
-              "id": 2
+              "courseNo": "YuWen",
+              "courseName": "语文"
             },
             {
-              "id": 3
+              "courseNo": "Eng",
+              "courseName": "英语"
             }
           ]
         },
         {
           "id": 2,
-          "teacherName": "李老师",
-          "subject": "语文",
-          "students": [
+          "studentName": "李四",
+          "gender": "女",
+          "age": 10,
+          "classId": 1,
+          "studentDetail": {
+            "description": "李四的描述"
+          },
+          "courses": [
             {
-              "id": 1
+              "courseNo": "Math",
+              "courseName": "数学"
             },
             {
-              "id": 2
-            },
-            {
-              "id": 3
+              "courseNo": "YuWen",
+              "courseName": "语文"
             }
           ]
         },
         {
           "id": 3,
-          "teacherName": "王老师",
-          "subject": "英语",
-          "students": [
+          "studentName": "王五",
+          "gender": "男",
+          "age": 11,
+          "classId": 2,
+          "studentDetail": {
+            "description": "王五的描述"
+          },
+          "courses": [
             {
-              "id": 1
+              "courseNo": "YuWen",
+              "courseName": "语文"
             },
             {
-              "id": 3
+              "courseNo": "Eng",
+              "courseName": "英语"
             }
           ]
         }
