@@ -382,15 +382,19 @@ public class JdbcMappedModels implements MappedModels {
       List<TypeWrapper> result = new ArrayList<>();
       for (Map<String, Object> data : mapList) {
         Object content = data.get("content");
-        switch (content) {
-          case String contentStr -> result.add(jsonObjectConverter.parseToObject(contentStr, Model.class));
-          case Blob blob ->
-            result.add(jsonObjectConverter.parseToObject(Arrays.toString(blob.getBinaryStream().readAllBytes()), Model.class));
-          case byte[] bytes -> result.add(jsonObjectConverter.parseToObject(Arrays.toString(bytes), Model.class));
-          case null, default -> {
-            assert content != null;
-            throw new RuntimeException("get model error, unknown data type:" + content.getClass());
+        try {
+          switch (content) {
+            case String contentStr -> result.add(jsonObjectConverter.parseToObject(contentStr, TypeWrapper.class));
+            case Blob blob ->
+              result.add(jsonObjectConverter.parseToObject(Arrays.toString(blob.getBinaryStream().readAllBytes()), TypeWrapper.class));
+            case byte[] bytes -> result.add(jsonObjectConverter.parseToObject(Arrays.toString(bytes), TypeWrapper.class));
+            case null, default -> {
+              assert content != null;
+              throw new RuntimeException("get model error, unknown data type:" + content.getClass());
+            }
           }
+        } catch (Exception e) {
+          log.error("parse model error, schemaName:{}, data:{}, message: {}", schemaName, data, e.getMessage());
         }
 
       }
@@ -472,7 +476,7 @@ public class JdbcMappedModels implements MappedModels {
                                " \nwhere " + sqlDialect.quoteIdentifier("schema_name") + "=:schemaName and " + sqlDialect.quoteIdentifier("model_name") + "=:modelName";
       String content = sqlExecutor.queryForScalar(sqlSelectString,
         Map.of("schemaName", schemaName, "modelName", modelName), String.class);
-      return jsonObjectConverter.parseToObject(content, Model.class);
+      return jsonObjectConverter.parseToObject(content, TypeWrapper.class);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

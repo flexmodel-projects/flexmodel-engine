@@ -10,8 +10,8 @@ import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import tech.wetech.flexmodel.Entity;
-import tech.wetech.flexmodel.Model;
 import tech.wetech.flexmodel.SessionFactory;
+import tech.wetech.flexmodel.TypeWrapper;
 import tech.wetech.flexmodel.codegen.GenerationTool;
 import tech.wetech.flexmodel.codegen.ModelListClass;
 import tech.wetech.flexmodel.codegen.ModelListGenerationContext;
@@ -49,8 +49,8 @@ public class GraphQLProvider {
     joinDataFetchers.put("mutation_response", joinMap);
 
     for (String schemaName : sf.getSchemaNames()) {
-      List<Model> models = sf.getModels(schemaName);
-      for (Model model : models) {
+      List<TypeWrapper> models = sf.getModels(schemaName);
+      for (TypeWrapper model : models) {
         if (model instanceof Entity entity) {
           modelListClass.getModelList().add(GenerationTool.buildModelClass("", schemaName, entity));
           joinDataFetchers.put(schemaName + "_" + model.getName(), joinMap);
@@ -62,8 +62,8 @@ public class GraphQLProvider {
     }
 
     for (String schemaName : sf.getSchemaNames()) {
-      List<Model> models = sf.getModels(schemaName);
-      for (Model model : models) {
+      List<TypeWrapper> models = sf.getModels(schemaName);
+      for (TypeWrapper model : models) {
         if (model instanceof Entity entity) {
           for (DataFetchers fetchType : DataFetchers.values()) {
             if (fetchType.isQuery()) {

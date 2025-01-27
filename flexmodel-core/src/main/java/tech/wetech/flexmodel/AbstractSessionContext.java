@@ -48,12 +48,12 @@ public abstract class AbstractSessionContext {
     }
   }
 
-  public Model getModel(String name) {
+  public TypeWrapper getModel(String name) {
     Model model = aliasModelMap.get(name);
     if (model != null) {
       return model;
     }
-    return (Model) this.getMappedModels().getModel(getSchemaName(), name);
+    return this.getMappedModels().getModel(getSchemaName(), name);
   }
 
   public MappedModels getMappedModels() {

@@ -49,7 +49,7 @@ public class GenerationTool {
     }
     JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
     JdbcMappedModels mappedModels = new JdbcMappedModels(connectionWrapper, new JacksonObjectConverter());
-    Set<Model> models = new HashSet<>(mappedModels.lookup(schema.getName()));
+    Set<TypeWrapper> models = new HashSet<>(mappedModels.lookup(schema.getName()));
 
     // read from script
     String importScript = configuration.getSchema().getImportScript();
@@ -74,12 +74,12 @@ public class GenerationTool {
     StringUtils.createDirectoriesIfNotExists(targetDirectory + File.separator + "entity");
 
     Map<String, ModelClass> modelClassMap = new HashMap<>();
-    for (Model model : models) {
+    for (TypeWrapper model : models) {
       modelClassMap.put(model.getName(), buildModelClass(packageName, schema.getName(), (Entity) model));
     }
 
     // generate single model file
-    for (Model model : models) {
+    for (TypeWrapper model : models) {
       GenerationContext context = new GenerationContext();
       ModelClass modelClass = modelClassMap.get(model.getName());
       context.setModelClass(modelClass);
@@ -93,7 +93,7 @@ public class GenerationTool {
     multipleModelClass.setSchemaName(schema.getName());
     multipleModelClass.setPackageName(packageName);
     multipleModelGenerationContext.setModelListClass(multipleModelClass);
-    for (Model model : models) {
+    for (TypeWrapper model : models) {
       ModelClass modelClass = modelClassMap.get(model.getName());
       multipleModelClass.getModelList().add(modelClass);
       multipleModelClass.getImports().add(modelClass.getFullClassName());

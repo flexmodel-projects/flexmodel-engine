@@ -187,7 +187,7 @@ abstract class BaseMongoStatement {
 
   protected List<Document> createPipeline(String modelName, Query query) {
     QueryHelper.validate(mongoContext, modelName, query);
-    Model model = mongoContext.getModel(modelName);
+    Model model = (Model) mongoContext.getModel(modelName);
     PhysicalNamingStrategy physicalNamingStrategy = mongoContext.getPhysicalNamingStrategy();
     List<Document> pipeline = new ArrayList<>();
     addMatchStage(pipeline, query);

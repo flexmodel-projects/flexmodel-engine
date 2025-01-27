@@ -113,7 +113,7 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
       .find(Filters.eq(idField.getName(), id))
       .first();
     if (nestedQuery && dataMap != null) {
-      QueryHelper.nestedQuery(List.of(dataMap), this::findMapList, mongoContext.getModel(modelName),
+      QueryHelper.nestedQuery(List.of(dataMap), this::findMapList, (Model) mongoContext.getModel(modelName),
         null, mongoContext, mongoContext.getNestedQueryMaxDepth());
     }
     return mongoContext.getJsonObjectConverter().convertValue(dataMap, resultType);
@@ -122,7 +122,7 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   @Override
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
     List<Map<String, Object>> mapList = findMapList(modelName, query);
-    QueryHelper.nestedQuery(mapList, this::findMapList, mongoContext.getModel(modelName), query, mongoContext, mongoContext.getNestedQueryMaxDepth());
+    QueryHelper.nestedQuery(mapList, this::findMapList, (Model) mongoContext.getModel(modelName), query, mongoContext, mongoContext.getNestedQueryMaxDepth());
     return mongoContext.getJsonObjectConverter().convertValueList(mapList, resultType);
   }
 

@@ -30,7 +30,7 @@ public abstract class BaseSqlStatement {
   private Pair<String, Map<String, Object>> buildQuerySql(String modelName, Query query, boolean prepared) {
     QueryHelper.validate(sqlContext, modelName, query);
     Map<String, Object> params = new HashMap<>();
-    Model model = sqlContext.getModel(modelName);
+    Model model = (Model) sqlContext.getModel(modelName);
     StringBuilder sqlBuilder = new StringBuilder("\nselect ");
     Map<String, String> projectionMap = new HashMap<>();
     appendProjection(modelName, query, model, projectionMap, sqlBuilder);

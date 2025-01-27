@@ -137,7 +137,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
                  " where (" + sqlDialect.quoteIdentifier(idField.getName()) + "= :id)";
     Map<String, Object> dataMap = sqlExecutor.queryForObject(sql, Map.of("id", id), getSqlResultHandler(entity, null, Map.class));
     if (nestedQuery && dataMap != null) {
-      QueryHelper.nestedQuery(List.of(dataMap), this::findMapList, sqlContext.getModel(modelName), null, sqlContext, sqlContext.getNestedQueryMaxDepth());
+      QueryHelper.nestedQuery(List.of(dataMap), this::findMapList, (Model) sqlContext.getModel(modelName), null, sqlContext, sqlContext.getNestedQueryMaxDepth());
     }
     return sqlContext.getJsonObjectConverter().convertValue(dataMap, resultType);
   }
@@ -146,9 +146,9 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   @SuppressWarnings("all")
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
     Pair<String, Map<String, Object>> pair = toQuerySqlWithPrepared(modelName, query);
-    List mapList = sqlExecutor.queryForList(pair.first(), pair.second(), getSqlResultHandler(sqlContext.getModel(modelName), query, Map.class));
+    List mapList = sqlExecutor.queryForList(pair.first(), pair.second(), getSqlResultHandler((Model) sqlContext.getModel(modelName), query, Map.class));
     if (query.isNestedQueryEnabled()) {
-      QueryHelper.nestedQuery(mapList, this::findMapList, sqlContext.getModel(modelName), query, sqlContext, sqlContext.getNestedQueryMaxDepth());
+      QueryHelper.nestedQuery(mapList, this::findMapList, (Model) sqlContext.getModel(modelName), query, sqlContext, sqlContext.getNestedQueryMaxDepth());
     }
     return sqlContext.getJsonObjectConverter().convertValueList(mapList, resultType);
   }
@@ -168,7 +168,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   @SuppressWarnings("all")
   private List<Map<String, Object>> findMapList(String modelName, Query query) {
     Pair<String, Map<String, Object>> pair = toQuerySqlWithPrepared(modelName, query);
-    List list = sqlExecutor.queryForList(pair.first(), pair.second(), getSqlResultHandler(sqlContext.getModel(modelName), query, Map.class));
+    List list = sqlExecutor.queryForList(pair.first(), pair.second(), getSqlResultHandler((Model) sqlContext.getModel(modelName), query, Map.class));
     return list;
   }
 
@@ -242,7 +242,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
         sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler(), null);
         if (value instanceof Query.QueryField queryField) {
           if (queryField.getAliasName() != null) {
-            Model queryModel = sqlContext.getModel(queryField.getAliasName());
+            Model queryModel = (Model) sqlContext.getModel(queryField.getAliasName());
             Field field = queryModel != null
               ? queryModel.getField(queryField.getFieldName())
               : model.getField(queryField.getFieldName());
@@ -255,7 +255,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
             sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler(), null);
           }
           Field field = queryField.getAliasName() != null
-            ? sqlContext.getModel(queryField.getAliasName()).getField(queryField.getFieldName())
+            ? ((Model) sqlContext.getModel(queryField.getAliasName())).getField(queryField.getFieldName())
             : model.getField(queryField.getFieldName());
           if (field instanceof TypedField<?, ?> typedField) {
             sqlResultHandler.addSqlTypeHandler(key, sqlContext.getTypeHandler(typedField.getType()), field);

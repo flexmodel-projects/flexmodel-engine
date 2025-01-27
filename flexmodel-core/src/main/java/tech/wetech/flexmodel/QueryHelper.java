@@ -41,7 +41,7 @@ public class QueryHelper {
       }
     }
     if (query.getJoins() != null) {
-      Model model = sessionContext.getModel(modelName);
+      Model model = (Model) sessionContext.getModel(modelName);
       for (Query.Join join : query.getJoins().getJoins()) {
         if (join.getFrom() == null) {
           throw new SqlExecutionException("Join from model must not be null");
@@ -58,7 +58,7 @@ public class QueryHelper {
             throw new SqlExecutionException("LocalField and foreignField must not be null when is not association field");
           }
         }
-        sessionContext.addAliasModelIfPresent(join.getAs(), sessionContext.getModel(join.getFrom()));
+        sessionContext.addAliasModelIfPresent(join.getAs(), (Model) sessionContext.getModel(join.getFrom()));
       }
     }
   }
@@ -93,7 +93,7 @@ public class QueryHelper {
                                                             BiFunction<String, Query,
                                                               List<Map<String, Object>>> relationFn,
                                                             RelationField relationField, Object id) {
-    Model model = sessionContext.getModel(relationField.getModelName());
+    Model model = (Model) sessionContext.getModel(relationField.getModelName());
     if (model instanceof Entity entity) {
       return relationFn.apply(entity.getName(),
         new Query()
@@ -156,7 +156,7 @@ public class QueryHelper {
           }
           List<Map<String, Object>> list = findRelationList(sessionContext, relationFn, relationField, id);
           maxDepth.decrementAndGet();
-          nestedQuery(list, relationFn, sessionContext.getModel(relationField.getFrom()), null, sessionContext, maxDepth);
+          nestedQuery(list, relationFn, (Model) sessionContext.getModel(relationField.getFrom()), null, sessionContext, maxDepth);
           Object value = relationField.isMultiple() ? list : (!list.isEmpty() ? list.getFirst() : null);
           item.put(key, value);
         }

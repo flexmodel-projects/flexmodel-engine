@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import tech.wetech.flexmodel.Entity;
+import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.NativeQueryModel;
 
 /**
