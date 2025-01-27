@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import tech.wetech.flexmodel.Entity;
 import tech.wetech.flexmodel.ImportDescribe;
-import tech.wetech.flexmodel.Model;
+import tech.wetech.flexmodel.TypeWrapper;
 import tech.wetech.flexmodel.codegen.GenerationTool;
 import tech.wetech.flexmodel.codegen.ModelListClass;
 import tech.wetech.flexmodel.codegen.ModelListGenerationContext;
@@ -32,7 +32,7 @@ class GraphQLSchemaGeneratorTest {
     ModelListClass modelListClass = new ModelListClass();
     modelListClass.setPackageName(packageName);
     modelListClass.setSchemaName(schemaName);
-    for (Model model : describe.getSchema()) {
+    for (TypeWrapper model : describe.getSchema()) {
       modelListClass.getModelList().add(GenerationTool.buildModelClass(packageName, schemaName, (Entity) model));
     }
     generationContext.setModelListClass(modelListClass);

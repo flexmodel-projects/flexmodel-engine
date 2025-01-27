@@ -47,8 +47,9 @@ public class GenerationTool {
     // read from script
     String importScript = configuration.getSchema().getImportScript();
     File scriptFile = new File(configuration.getTarget().getBaseDir() + importScript);
+    System.out.println("Import Script File Path: " + scriptFile.getAbsolutePath());
     if (scriptFile.exists()) {
-      System.out.println("Import Script File: " + scriptFile);
+      System.out.println("Script file is exists, import Script File: " + scriptFile);
       try {
         String content = Files.readString(scriptFile.toPath());
         ImportDescribe describe = jsonObjectConverter.parseToObject(content, ImportDescribe.class);
