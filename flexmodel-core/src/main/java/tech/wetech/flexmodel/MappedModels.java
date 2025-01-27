@@ -9,18 +9,18 @@ import java.util.Set;
  */
 public interface MappedModels {
 
-  List<Model> sync(AbstractSessionContext sqlContext);
+  List<TypeWrapper> sync(AbstractSessionContext sqlContext);
 
-  List<Model> sync(AbstractSessionContext sqlContext, Set<String> includes);
+  List<TypeWrapper> sync(AbstractSessionContext sqlContext, Set<String> includes);
 
-  List<Model> lookup(String schemaName);
+  List<TypeWrapper> lookup(String schemaName);
 
   void removeAll(String schemaName);
 
   void remove(String schemaName, String modelName);
 
-  void persist(String schemaName, Model model);
+  void persist(String schemaName, TypeWrapper wrapper);
 
-  Model getModel(String schemaName, String modelName);
+  TypeWrapper getModel(String schemaName, String modelName);
 
 }

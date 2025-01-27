@@ -158,7 +158,7 @@ public class SessionFactory {
     return dataSourceProviders.keySet();
   }
 
-  public List<Model> getModels(String schemaName) {
+  public List<TypeWrapper> getModels(String schemaName) {
     return mappedModels.lookup(schemaName);
   }
 

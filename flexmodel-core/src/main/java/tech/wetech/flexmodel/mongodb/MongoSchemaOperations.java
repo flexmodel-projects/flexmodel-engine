@@ -6,6 +6,7 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.sql.StringHelper;
 
@@ -30,22 +31,22 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   }
 
   @Override
-  public List<Model> syncModels() {
+  public List<TypeWrapper> syncModels() {
     return mongoContext.getMappedModels().sync(mongoContext);
   }
 
   @Override
-  public List<Model> syncModels(Set<String> modelNames) {
+  public List<TypeWrapper> syncModels(Set<String> modelNames) {
     return mongoContext.getMappedModels().sync(mongoContext, modelNames);
   }
 
   @Override
-  public List<Model> getAllModels() {
+  public List<TypeWrapper> getAllModels() {
     return mappedModels.lookup(mongoContext.getSchemaName());
   }
 
   @Override
-  public Model getModel(String modelName) {
+  public TypeWrapper getModel(String modelName) {
     return mappedModels.getModel(schemaName, modelName);
   }
 
@@ -74,6 +75,11 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   @Override
   public NativeQueryModel createNativeQueryModel(NativeQueryModel model) {
     return model;
+  }
+
+  @Override
+  public Enum createEnum(Enum anEnum) {
+    return anEnum;
   }
 
   @Override

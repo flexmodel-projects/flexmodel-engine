@@ -133,17 +133,17 @@ public class JdbcMappedModels implements MappedModels {
   }
 
   @Override
-  public List<Model> sync(AbstractSessionContext context) {
+  public List<TypeWrapper> sync(AbstractSessionContext context) {
     return sync(context, null);
   }
 
   @Override
-  public List<Model> sync(AbstractSessionContext context, Set<String> includes) {
+  public List<TypeWrapper> sync(AbstractSessionContext context, Set<String> includes) {
     SqlContext sqlContext = (SqlContext) context;
     List<Entity> entities = convert(sqlContext.getSqlMetadata().getTables(includes), sqlContext);
-    Map<String, Model> metaMap = lookup(sqlContext.getSchemaName()).stream().collect(Collectors.toMap(Model::getName, model -> model));
+    Map<String, TypeWrapper> metaMap = lookup(sqlContext.getSchemaName()).stream().collect(Collectors.toMap(TypeWrapper::getName, wrapper -> wrapper));
     for (Entity entity : entities) {
-      Model model = getIgnoreCase(entity.getName(), metaMap);
+      TypeWrapper model = getIgnoreCase(entity.getName(), metaMap);
       if (model == null) {
         this.persist(sqlContext.getSchemaName(), entity);
         metaMap.put(entity.getName(), entity);
@@ -371,7 +371,7 @@ public class JdbcMappedModels implements MappedModels {
   }
 
   @Override
-  public List<Model> lookup(String schemaName) {
+  public List<TypeWrapper> lookup(String schemaName) {
 
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
@@ -379,7 +379,7 @@ public class JdbcMappedModels implements MappedModels {
                                " \nfrom " + sqlDialect.quoteIdentifier(STORED_TABLES) +
                                " \nwhere " + sqlDialect.quoteIdentifier("schema_name") + "=:schemaName";
       List<Map<String, Object>> mapList = sqlExecutor.queryForList(sqlSelectString, Map.of("schemaName", schemaName));
-      List<Model> result = new ArrayList<>();
+      List<TypeWrapper> result = new ArrayList<>();
       for (Map<String, Object> data : mapList) {
         Object content = data.get("content");
         switch (content) {
@@ -424,14 +424,14 @@ public class JdbcMappedModels implements MappedModels {
   }
 
   @Override
-  public void persist(String schemaName, Model model) {
+  public void persist(String schemaName, TypeWrapper wrapper) {
     try (Connection connection = dataSource.getConnection()) {
-      String content = jsonObjectConverter.toJsonString(model);
+      String content = jsonObjectConverter.toJsonString(wrapper);
       log.trace("Persist:\n{}", content);
       connection.setAutoCommit(false);
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
-      Model older;
-      if ((older = this.getModel(schemaName, model.getName())) != null) {
+      TypeWrapper older;
+      if ((older = this.getModel(schemaName, wrapper.getName())) != null) {
         String oldContent = jsonObjectConverter.toJsonString(older);
         if (!oldContent.equals(content)) {
           String updateString = "update " + sqlDialect.quoteIdentifier(STORED_TABLES) + "set " + sqlDialect.quoteIdentifier("content") + "=:content" +
@@ -439,7 +439,7 @@ public class JdbcMappedModels implements MappedModels {
           sqlExecutor.update(
             updateString,
             Map.of("schemaName", schemaName,
-              "modelName", model.getName(),
+              "modelName", wrapper.getName(),
               "content", content));
         }
       } else {
@@ -447,8 +447,8 @@ public class JdbcMappedModels implements MappedModels {
                                  " values (:schemaName, :modelName, :modelType, :content)\n";
         sqlExecutor.update(sqlInsertString,
           Map.of("schemaName", schemaName,
-            "modelName", model.getName(),
-            "modelType", model.getType(),
+            "modelName", wrapper.getName(),
+            "modelType", wrapper.getType(),
             "content", content
           ));
       }
@@ -464,7 +464,7 @@ public class JdbcMappedModels implements MappedModels {
   }
 
   @Override
-  public Model getModel(String schemaName, String modelName) {
+  public TypeWrapper getModel(String schemaName, String modelName) {
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
       String sqlSelectString = "select " + sqlDialect.quoteIdentifier("content") +

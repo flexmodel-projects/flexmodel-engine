@@ -53,7 +53,7 @@ public abstract class AbstractSessionContext {
     if (model != null) {
       return model;
     }
-    return this.getMappedModels().getModel(getSchemaName(), name);
+    return (Model) this.getMappedModels().getModel(getSchemaName(), name);
   }
 
   public MappedModels getMappedModels() {

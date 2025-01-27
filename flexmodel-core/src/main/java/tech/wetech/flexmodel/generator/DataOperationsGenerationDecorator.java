@@ -63,7 +63,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
     String schemaName = sessionContext.getSchemaName();
     MappedModels mappedModels = sessionContext.getMappedModels();
     AtomicReference<Object> atomicId = new AtomicReference<>();
-    Model model = mappedModels.getModel(schemaName, modelName);
+    TypeWrapper model = mappedModels.getModel(schemaName, modelName);
     int rows = delegate.insert(modelName, generateValue(modelName, record, false), atomicId::set);
     Object id = atomicId.get();
     idConsumer.accept(id);

@@ -14,16 +14,16 @@ public interface SchemaOperations {
   /**
    * 同步模型变更
    */
-  List<Model> syncModels();
+  List<TypeWrapper> syncModels();
 
-  List<Model> syncModels(Set<String> modelNames);
+  List<TypeWrapper> syncModels(Set<String> modelNames);
 
   /**
    * 获取所有模型
    *
    * @return 模型列表
    */
-  List<Model> getAllModels();
+  List<TypeWrapper> getAllModels();
 
   /**
    * 获取模型
@@ -31,7 +31,7 @@ public interface SchemaOperations {
    * @param modelName 模型名称
    * @return 实体
    */
-  Model getModel(String modelName);
+  TypeWrapper getModel(String modelName);
 
   /**
    * 删除模型
@@ -48,7 +48,21 @@ public interface SchemaOperations {
    */
   Entity createEntity(Entity collection);
 
+  /**
+   * 创建本地查询
+   *
+   * @param model
+   * @return
+   */
   NativeQueryModel createNativeQueryModel(NativeQueryModel model);
+
+  /**
+   * 创建枚举
+   *
+   * @param anEnum
+   * @return
+   */
+  Enum createEnum(Enum anEnum);
 
   /**
    * 创建字段
@@ -63,7 +77,7 @@ public interface SchemaOperations {
    * 删除字段
    *
    * @param modelName 模型名称
-   * @param fieldName  字段名称
+   * @param fieldName 字段名称
    */
   void dropField(String modelName, String fieldName);
 
@@ -123,6 +137,12 @@ public interface SchemaOperations {
     NativeQueryModel model = new NativeQueryModel(modelName);
     modelUnaryOperator.apply(model);
     return createNativeQueryModel(model);
+  }
+
+  default Enum createEnum(String name, UnaryOperator<Enum> enumUnaryOperator) {
+    Enum anEnum = new Enum(name);
+    enumUnaryOperator.apply(anEnum);
+    return createEnum(anEnum);
   }
 
 }

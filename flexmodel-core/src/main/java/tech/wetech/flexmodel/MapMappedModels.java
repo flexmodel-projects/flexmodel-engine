@@ -7,21 +7,21 @@ import java.util.*;
  */
 public class MapMappedModels implements MappedModels {
 
-  private final Map<String, Map<String, Model>> map = new HashMap<>();
+  private final Map<String, Map<String, TypeWrapper>> map = new HashMap<>();
 
   @Override
-  public List<Model> sync(AbstractSessionContext context) {
+  public List<TypeWrapper> sync(AbstractSessionContext context) {
     // ignore
     return Collections.emptyList();
   }
 
   @Override
-  public List<Model> sync(AbstractSessionContext sqlContext, Set<String> includes) {
+  public List<TypeWrapper> sync(AbstractSessionContext sqlContext, Set<String> includes) {
     return Collections.emptyList();
   }
 
   @Override
-  public List<Model> lookup(String schemaName) {
+  public List<TypeWrapper> lookup(String schemaName) {
     return map.get(schemaName).values().stream().toList();
   }
 
@@ -36,18 +36,18 @@ public class MapMappedModels implements MappedModels {
   }
 
   @Override
-  public void persist(String schemaName, Model model) {
+  public void persist(String schemaName, TypeWrapper wrapper) {
     map.compute(schemaName, (key, value) -> {
       if (value == null) {
         value = new HashMap<>();
       }
-      value.put(model.getName(), model);
+      value.put(wrapper.getName(), wrapper);
       return value;
     });
   }
 
   @Override
-  public Model getModel(String schemaName, String modelName) {
+  public TypeWrapper getModel(String schemaName, String modelName) {
     return map.getOrDefault(schemaName, Collections.emptyMap()).get(modelName);
   }
 

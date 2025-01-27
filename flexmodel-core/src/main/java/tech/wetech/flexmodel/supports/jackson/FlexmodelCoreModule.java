@@ -17,6 +17,7 @@ public class FlexmodelCoreModule extends SimpleModule {
 
   public FlexmodelCoreModule() {
     // Model
+    setMixInAnnotation(TypeWrapper.class, ModelMixIn.class);
     setMixInAnnotation(Model.class, ModelMixIn.class);
     setMixInAnnotation(Entity.class, ModelMixIn.class);
     setMixInAnnotation(NativeQueryModel.class, ModelMixIn.class);

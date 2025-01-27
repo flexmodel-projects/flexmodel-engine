@@ -22,22 +22,22 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   }
 
   @Override
-  public List<Model> syncModels() {
+  public List<TypeWrapper> syncModels() {
     return delegate.syncModels();
   }
 
   @Override
-  public List<Model> syncModels(Set<String> modelNames) {
+  public List<TypeWrapper> syncModels(Set<String> modelNames) {
     return delegate.syncModels(modelNames);
   }
 
   @Override
-  public List<Model> getAllModels() {
+  public List<TypeWrapper> getAllModels() {
     return delegate.getAllModels();
   }
 
   @Override
-  public Model getModel(String modelName) {
+  public TypeWrapper getModel(String modelName) {
     return delegate.getModel(modelName);
   }
 
@@ -63,6 +63,15 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
     delegate.createNativeQueryModel(model);
     mappedModels.persist(schemaName, model);
     return model;
+  }
+
+  @Override
+  public Enum createEnum(Enum anEnum) {
+    String schemaName = sessionContext.getSchemaName();
+    MappedModels mappedModels = sessionContext.getMappedModels();
+    delegate.createEnum(anEnum);
+    mappedModels.persist(schemaName, anEnum);
+    return anEnum;
   }
 
   @Override

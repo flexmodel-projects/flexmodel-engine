@@ -40,22 +40,22 @@ public abstract class AbstractSession implements Session {
   }
 
   @Override
-  public List<Model> syncModels() {
+  public List<TypeWrapper> syncModels() {
     return schemaOperationsDelegate.syncModels();
   }
 
   @Override
-  public List<Model> syncModels(Set<String> modelNames) {
+  public List<TypeWrapper> syncModels(Set<String> modelNames) {
     return schemaOperationsDelegate.syncModels(modelNames);
   }
 
   @Override
-  public List<Model> getAllModels() {
+  public List<TypeWrapper> getAllModels() {
     return schemaOperationsDelegate.getAllModels();
   }
 
   @Override
-  public Model getModel(String modelName) {
+  public TypeWrapper getModel(String modelName) {
     return schemaOperationsDelegate.getModel(modelName);
   }
 
@@ -72,6 +72,11 @@ public abstract class AbstractSession implements Session {
   @Override
   public NativeQueryModel createNativeQueryModel(NativeQueryModel model) {
     return schemaOperationsDelegate.createNativeQueryModel(model);
+  }
+
+  @Override
+  public Enum createEnum(Enum anEnum) {
+    return schemaOperationsDelegate.createEnum(anEnum);
   }
 
   @Override

@@ -48,17 +48,23 @@ public abstract class AbstractSessionTests {
   }
 
   void createStudentCollection(String entityName) {
-    session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
-      .addField(new StringField("studentName"))
-      .addField(new EnumField("gender").addElement("男").addElement("女"))
-      .addField(new EnumField("interest")
-        .addElement("唱")
+    Enum genderEnum = session.createEnum(entityName + "_gender", en ->
+      en.addElement("男")
+        .addElement("女")
+        .setComment("性别")
+    );
+    Enum interestEnum = session.createEnum(entityName + "_interest", en ->
+      en.addElement("唱")
         .addElement("跳")
         .addElement("rap")
         .addElement("打篮球")
-        .setMultiple(true)
-      )
+        .setComment("兴趣")
+    );
+    session.createEntity(entityName, entity -> entity
+      .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
+      .addField(new StringField("studentName"))
+      .addField(new EnumField("gender").setFrom(genderEnum.getName()))
+      .addField(new EnumField("interest").setFrom(interestEnum.getName()).setMultiple(true))
       .addField(new IntField("age"))
       .addField(new DecimalField("height").setPrecision(3).setScale(2))
       .addField(new BigintField("classId"))
@@ -971,7 +977,7 @@ public abstract class AbstractSessionTests {
         .build();
       sessionFactory.addDataSourceProvider(identifier, dataSourceProvider);
       Session newSession = sessionFactory.createSession(identifier);
-      List<Model> models = newSession.syncModels();
+      List<TypeWrapper> models = newSession.syncModels();
       Assertions.assertFalse(models.isEmpty());
       Entity studentDetailEntity = (Entity) models.stream().filter(m -> m.getName().equals(studentDetailEntityName)).findFirst().get();
       Assertions.assertFalse(studentDetailEntity.getFields().isEmpty());

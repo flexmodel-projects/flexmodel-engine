@@ -1,39 +1,22 @@
 package tech.wetech.flexmodel;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * @author cjbi
  */
 public class EnumField extends TypedField<Object, EnumField> {
 
   /**
-   * 枚举元素
-   */
-  private Set<String> elements = new HashSet<>();
-
-  /**
    * 多选
    */
   private boolean multiple;
 
+  /**
+   * 从枚举定义中获取
+   */
+  private String from;
+
   public EnumField(String name) {
     super(name, ScalarType.ENUM.getType());
-  }
-
-  public EnumField addElement(String element) {
-    elements.add(element);
-    return this;
-  }
-
-  public EnumField setElements(Set<String> elements) {
-    this.elements = elements;
-    return this;
-  }
-
-  public Set<String> getElements() {
-    return elements;
   }
 
   public boolean isMultiple() {
@@ -48,8 +31,17 @@ public class EnumField extends TypedField<Object, EnumField> {
   @Override
   public String getConcreteType() {
     if (isMultiple()) {
-      return "Enum[]";
+      return from + "[]";
     }
-    return "Enum";
+    return from;
+  }
+
+  public String getFrom() {
+    return from;
+  }
+
+  public EnumField setFrom(String from) {
+    this.from = from;
+    return this;
   }
 }

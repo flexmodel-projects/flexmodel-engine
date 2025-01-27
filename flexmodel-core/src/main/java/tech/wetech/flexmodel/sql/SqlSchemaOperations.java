@@ -2,6 +2,7 @@ package tech.wetech.flexmodel.sql;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.*;
 
 import java.util.Iterator;
@@ -20,28 +21,28 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   }
 
   @Override
-  public List<Model> syncModels() {
+  public List<TypeWrapper> syncModels() {
     return sqlContext.getMappedModels().sync(sqlContext);
   }
 
   @Override
-  public List<Model> syncModels(Set<String> modelNames) {
+  public List<TypeWrapper> syncModels(Set<String> modelNames) {
     return sqlContext.getMappedModels().sync(sqlContext, modelNames);
   }
 
   @Override
-  public List<Model> getAllModels() {
+  public List<TypeWrapper> getAllModels() {
     return sqlContext.getMappedModels().lookup(sqlContext.getSchemaName());
   }
 
   @Override
-  public Model getModel(String modelName) {
+  public TypeWrapper getModel(String modelName) {
     return sqlContext.getModel(modelName);
   }
 
   @Override
   public void dropModel(String modelName) {
-    Model model = getModel(modelName);
+    TypeWrapper model = getModel(modelName);
     if (model instanceof Entity entity) {
       dropTable(toSqlTable(entity));
     }
@@ -57,6 +58,11 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   @Override
   public NativeQueryModel createNativeQueryModel(NativeQueryModel model) {
     return model;
+  }
+
+  @Override
+  public Enum createEnum(Enum anEnum) {
+    return anEnum;
   }
 
   private void createTable(SqlTable sqlTable) {
