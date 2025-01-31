@@ -89,19 +89,31 @@ public class SessionFactory {
   private List<RelationField> processModels(List<TypeWrapper> models, Session session) {
     List<RelationField> lazyCreateList = new ArrayList<>();
     for (TypeWrapper model : models) {
-      if (!(model instanceof Entity newer)) {
-        log.warn("Unsupported model type: {}", model.getName());
-        continue;
-      }
-
-      try {
-        Entity older = (Entity) session.getModel(newer.getName());
-        updateEntity(session, newer, older, lazyCreateList);
-      } catch (Exception e) {
-        log.warn("Error processing model: {}", e.getMessage(), e);
+      if (model instanceof Entity newer) {
+        try {
+          Entity older = (Entity) session.getModel(newer.getName());
+          updateEntity(session, newer, older, lazyCreateList);
+        } catch (Exception e) {
+          log.warn("Error processing model: {}", e.getMessage(), e);
+        }
+      } else if (model instanceof Enum newer) {
+        try {
+          updateEnum(session, newer);
+        } catch (Exception e) {
+          log.warn("Error processing model: {}", e.getMessage(), e);
+        }
       }
     }
     return lazyCreateList;
+  }
+
+  private void updateEnum(Session session, Enum newer) {
+    try {
+      session.dropModel(newer.getName());
+      session.createEnum(newer);
+    } catch (Exception e) {
+      log.warn("Error processing model: {}", e.getMessage(), e);
+    }
   }
 
   private void updateEntity(Session session, Entity newer, Entity older, List<RelationField> lazyCreateList) throws Exception {

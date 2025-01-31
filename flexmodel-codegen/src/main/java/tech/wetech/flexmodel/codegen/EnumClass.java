@@ -13,6 +13,8 @@ public class EnumClass implements Serializable {
   private String schemaName;
   private String packageName;
   private String shortClassName;
+  private String fullClassName;
+  private String variableName;
   private List<String> elements;
   private String comment;
   private Enum originalEnum;
@@ -41,6 +43,24 @@ public class EnumClass implements Serializable {
 
   public EnumClass setShortClassName(String shortClassName) {
     this.shortClassName = shortClassName;
+    return this;
+  }
+
+  public String getFullClassName() {
+    return fullClassName;
+  }
+
+  public EnumClass setFullClassName(String fullClassName) {
+    this.fullClassName = fullClassName;
+    return this;
+  }
+
+  public String getVariableName() {
+    return variableName;
+  }
+
+  public EnumClass setVariableName(String variableName) {
+    this.variableName = variableName;
     return this;
   }
 

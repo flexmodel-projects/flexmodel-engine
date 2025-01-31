@@ -501,9 +501,9 @@
       "name": "UserGender",
       "type": "enum",
       "elements": [
-        "未知",
-        "男",
-        "女"
+        "UNKNOWN",
+        "MALE",
+        "FEMALE"
       ],
       "comment": "性别"
     },
@@ -511,10 +511,10 @@
       "name": "User_interest",
       "type": "enum",
       "elements": [
-        "唱",
-        "跳",
+        "Chang",
+        "Tiao",
         "rap",
-        "打篮球"
+        "DaLanQiu"
       ],
       "comment": "兴趣"
     }
@@ -695,7 +695,7 @@
         {
           "id": 1,
           "studentName": "张三",
-          "gender": "男",
+          "gender": "MALE",
           "age": 10,
           "classId": 1,
           "studentDetail": {
@@ -719,7 +719,7 @@
         {
           "id": 2,
           "studentName": "李四",
-          "gender": "女",
+          "gender": "FEMALE",
           "age": 10,
           "classId": 1,
           "studentDetail": {
@@ -739,7 +739,7 @@
         {
           "id": 3,
           "studentName": "王五",
-          "gender": "男",
+          "gender": "MALE",
           "age": 11,
           "classId": 2,
           "studentDetail": {
@@ -764,7 +764,7 @@
         {
           "id": 1,
           "studentName": "张三",
-          "gender": "男",
+          "gender": "MALE",
           "age": 10,
           "classId": 1,
           "studentDetail": {
@@ -788,7 +788,7 @@
         {
           "id": 2,
           "studentName": "李四",
-          "gender": "女",
+          "gender": "FEMALE",
           "age": 10,
           "classId": 1,
           "studentDetail": {
@@ -808,7 +808,7 @@
         {
           "id": 3,
           "studentName": "王五",
-          "gender": "男",
+          "gender": "MALE",
           "age": 11,
           "classId": 2,
           "studentDetail": {

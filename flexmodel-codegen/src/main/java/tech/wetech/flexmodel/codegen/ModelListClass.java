@@ -44,4 +44,9 @@ public class ModelListClass {
   public List<EnumClass> getEnumList() {
     return enumList;
   }
+
+  public boolean containsEnumClass(String name) {
+    return enumList.stream()
+      .anyMatch(e -> e.getOriginalEnum().getName().equals(name));
+  }
 }

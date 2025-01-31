@@ -26,6 +26,7 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println "import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;"
     out.println "import tech.wetech.flexmodel.BuildItem;"
     out.println "import tech.wetech.flexmodel.Entity;"
+    out.println "import tech.wetech.flexmodel.Enum;"
     out.println "import tech.wetech.flexmodel.TypeWrapper;"
     out.println ""
     out.println "import java.util.ArrayList;"
@@ -52,18 +53,29 @@ class SchemaGenerator extends AbstractModelListGenerator {
       }
       out.println "  public static final Entity ${model.variableName};"
     }
+    modelListClass.enumList.each { model ->
+      out.println ""
+      if (model.comment) {
+        out.println "  /**"
+        out.println "   * ${model.comment}"
+        out.println "   */"
+      }
+      out.println "  public static final Enum ${model.variableName};"
+    }
     out.println ""
     out.println "  static {"
-    out.println ""
     out.println "    JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();"
     modelListClass.modelList.each { model ->
       out.println "    ${model.variableName} = jsonObjectConverter.parseToObject(\"\"\""
       out.println "    ${jsonObjectConverter.toJsonString(model.originalModel)}"
       out.println "    \"\"\", Entity.class);"
     }
-    out.println ""
+    modelListClass.enumList.each { model ->
+      out.println "    ${model.variableName} = jsonObjectConverter.parseToObject(\"\"\""
+      out.println "    ${jsonObjectConverter.toJsonString(model.originalEnum)}"
+      out.println "    \"\"\", Enum.class);"
+    }
     out.println "  }"
-    out.println ""
     out.println ""
     out.println "  @Override"
     out.println "  public String getSchemaName() {"

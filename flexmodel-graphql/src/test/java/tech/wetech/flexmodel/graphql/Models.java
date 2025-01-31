@@ -1,5 +1,6 @@
 package tech.wetech.flexmodel.graphql;
 
+import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
@@ -25,10 +26,24 @@ public class Models {
   }
 
   public static Entity createStudentEntity(Session session, String entityName) {
+    Enum genderEnum = session.createEnum(entityName + "_gender", en ->
+      en.addElement("UNKNOWN")
+        .addElement("MALE")
+        .addElement("FEMALE")
+        .setComment("性别")
+    );
+    Enum interestEnum = session.createEnum(entityName + "_interest", en ->
+      en.addElement("chang")
+        .addElement("tiao")
+        .addElement("rap")
+        .addElement("daLanQiu")
+        .setComment("兴趣")
+    );
     return session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("studentName"))
-      .addField(new StringField("gender"))
+      .addField(new EnumField("gender").setFrom(genderEnum.getName()))
+      .addField(new EnumField("interest").setFrom(interestEnum.getName()).setMultiple(true))
       .addField(new IntField("age"))
       .addField(new IntField("classId"))
       .addField(new JsonField("remark"))
@@ -106,7 +121,7 @@ public class Models {
         {
           "id": 1,
           "studentName": "张三",
-          "gender": "男",
+          "gender": "MALE",
           "age": 10,
           "classId": 1,
           "remark": {
@@ -133,7 +148,7 @@ public class Models {
         {
           "id": 2,
           "studentName": "李四",
-          "gender": "女",
+          "gender": "FEMALE",
           "age": 10,
           "classId": 1,
           "remark": {
@@ -156,7 +171,7 @@ public class Models {
         {
           "id": 3,
           "studentName": "王五",
-          "gender": "男",
+          "gender": "MALE",
           "age": 11,
           "classId": 2,
           "remark": null,

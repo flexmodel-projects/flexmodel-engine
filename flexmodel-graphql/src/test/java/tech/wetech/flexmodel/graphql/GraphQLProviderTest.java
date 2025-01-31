@@ -231,7 +231,7 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
             courseName
             courseNo
         }
-        student: system_create_testMutationStudent(data: {studentName: "张三丰", gender: "男", age: 200, classId: 1, remark: {test:"aa"}}) {
+        student: system_create_testMutationStudent(data: {studentName: "张三丰", gender: "MALE", age: 200, classId: 1, remark: {test:"aa"}}) {
             id
             remark
         }

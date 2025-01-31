@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel.graphql
 
-
+import tech.wetech.flexmodel.EnumField
 import tech.wetech.flexmodel.RelationField
 import tech.wetech.flexmodel.TypedField
 import tech.wetech.flexmodel.codegen.AbstractModelListGenerator
@@ -38,7 +38,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     "json"    : "JSON_comparison_exp",
   ]
 
-  def toGraphQLType(ModelField itt) {
+  def toGraphQLType(ModelField itt, ModelListGenerationContext context) {
     if (itt.isRelationField()) {
       def rf = itt.originalField as RelationField
       if (rf.multiple) {
@@ -46,9 +46,18 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       } else {
         return "${itt.modelClass.schemaName}_${rf.from}"
       }
-    } else {
+    } else if (itt.isIdentity() || itt.isBasicField()) {
       def f = itt.originalField as TypedField
       return "${typeMapping[f.type]}"
+    } else if (itt.isEnumField() && context.modelListClass.containsEnumClass((itt.originalField as EnumField).from)) {
+      def ef = itt.originalField as EnumField
+      if (ef.multiple) {
+        return "[${itt.modelClass.schemaName}_${ef.from}]"
+      } else {
+        return "${itt.modelClass.schemaName}_${ef.from}"
+      }
+    } else {
+      return "String"
     }
   }
 
@@ -58,6 +67,15 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "  query: Query"
     out.println "  mutation: Mutation"
     out.println "}"
+
+    context.modelListClass.enumList.each {
+      out.println ""
+      out.println "enum ${it.schemaName}_${it.originalEnum.name} {"
+      it.elements.each {
+        out.println "  ${it}"
+      }
+      out.println "}"
+    }
     out.println ""
     // gen query
     out.println "type Query {"
@@ -129,7 +147,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       def key = "${it.schemaName}_${it.modelName}"
       out.println "type ${key} {"
       it.allFields.each {
-        out.println "  ${it.fieldName} : ${toGraphQLType(it)}"
+        out.println "  ${it.fieldName} : ${toGraphQLType(it, context)}"
       }
       out.println "  _join: Query"
       out.println "  _join_mutation: Mutation"
@@ -157,6 +175,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     }
     context.modelListClass.modelList.each {
       out.println ""
+      def schemaName = it.schemaName
       def key = "${it.schemaName}_${it.modelName}"
       // gen input model
       out.println "\"Boolean expression to filter rows from the table \\\"${key}\\\". All fields are combined with a logical 'AND'.\""
@@ -164,9 +183,14 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "  _and: [${key}_bool_exp!]"
       out.println "  _or: [${key}_bool_exp!]"
       it.allFields.each {
-        if (!it.isRelationField()) {
+        if (!it.isRelationField() && !it.isEnumField()) {
           TypedField f = it.originalField as TypedField
           out.println "  ${it.fieldName}: ${comparisonMapping[f.type]}"
+        } else if (it.isEnumField() && context.modelListClass.containsEnumClass((it.originalField as EnumField).from)) {
+          EnumField enumField = it.originalField as EnumField
+          out.println "  ${it.fieldName}: ${schemaName}_${enumField.from}_comparison_exp"
+        } else {
+          out.println "  ${it.fieldName}: String_comparison_exp"
         }
       }
       out.println "}"
@@ -183,7 +207,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "input ${key}_insert_input {"
       it.allFields.each {
         if (!it.isRelationField()) {
-          out.println "  ${it.fieldName}: ${toGraphQLType(it)}"
+          out.println "  ${it.fieldName}: ${toGraphQLType(it, context)}"
         }
       }
       out.println "}"
@@ -191,7 +215,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "input ${key}_set_input {"
       it.allFields.each {
         if (!it.isRelationField()) {
-          out.println "  ${it.fieldName}: ${toGraphQLType(it)}"
+          out.println "  ${it.fieldName}: ${toGraphQLType(it, context)}"
         }
       }
       out.println "}"
@@ -308,6 +332,18 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "  _nin: [DateTime!]"
     out.println "  _between: [DateTime!]"
     out.println "}"
+    out.println ""
+    context.modelListClass.enumList.each {
+      out.println ""
+      out.println "\"Boolean expression to compare fields of type \\\"DateTime\\\". All fields are combined with logical 'AND.'\""
+      out.println "input ${it.schemaName}_${it.originalEnum.name}_comparison_exp {"
+      out.println "  _eq: ${it.schemaName}_${it.originalEnum.name}"
+      out.println "  _ne: ${it.schemaName}_${it.originalEnum.name}"
+      out.println "  _in: [${it.schemaName}_${it.originalEnum.name}!]"
+      out.println "  _nin: [${it.schemaName}_${it.originalEnum.name}!]"
+      out.println "}"
+      out.println ""
+    }
     out.println ""
     out.println "\"field ordering options\""
     out.println "enum order_by {"

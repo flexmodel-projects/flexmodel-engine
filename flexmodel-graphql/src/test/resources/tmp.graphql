@@ -1,0 +1,1380 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+enum system_UserGender {
+  Unknown
+  Male
+  FaMale
+}
+
+enum system_User_interest {
+  Chang
+  Tiao
+  rap
+  DaLanQiu
+}
+
+type Query {
+
+  system_list_Datasource(
+    "filter the rows returned"
+    where: system_Datasource_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_Datasource_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): [system_Datasource!]!
+
+  system_aggregate_Datasource(
+    "filter the rows returned"
+    where: system_Datasource_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_Datasource_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): system_Datasource_aggregate!
+
+  system_find_one_Datasource(
+    "filter the rows returned"
+    where: system_Datasource_bool_exp
+  ): system_Datasource
+
+  system_list_ApiInfo(
+    "filter the rows returned"
+    where: system_ApiInfo_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_ApiInfo_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): [system_ApiInfo!]!
+
+  system_aggregate_ApiInfo(
+    "filter the rows returned"
+    where: system_ApiInfo_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_ApiInfo_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): system_ApiInfo_aggregate!
+
+  system_find_one_ApiInfo(
+    "filter the rows returned"
+    where: system_ApiInfo_bool_exp
+  ): system_ApiInfo
+
+  system_list_ApiLog(
+    "filter the rows returned"
+    where: system_ApiLog_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_ApiLog_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): [system_ApiLog!]!
+
+  system_aggregate_ApiLog(
+    "filter the rows returned"
+    where: system_ApiLog_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_ApiLog_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): system_ApiLog_aggregate!
+
+  system_find_one_ApiLog(
+    "filter the rows returned"
+    where: system_ApiLog_bool_exp
+  ): system_ApiLog
+
+  system_list_IdentityProvider(
+    "filter the rows returned"
+    where: system_IdentityProvider_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_IdentityProvider_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): [system_IdentityProvider!]!
+
+  system_aggregate_IdentityProvider(
+    "filter the rows returned"
+    where: system_IdentityProvider_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_IdentityProvider_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): system_IdentityProvider_aggregate!
+
+  system_find_one_IdentityProvider(
+    "filter the rows returned"
+    where: system_IdentityProvider_bool_exp
+  ): system_IdentityProvider
+
+  system_list_Config(
+    "filter the rows returned"
+    where: system_Config_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_Config_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): [system_Config!]!
+
+  system_aggregate_Config(
+    "filter the rows returned"
+    where: system_Config_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_Config_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): system_Config_aggregate!
+
+  system_find_one_Config(
+    "filter the rows returned"
+    where: system_Config_bool_exp
+  ): system_Config
+
+  system_list_Teacher(
+    "filter the rows returned"
+    where: system_Teacher_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_Teacher_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): [system_Teacher!]!
+
+  system_aggregate_Teacher(
+    "filter the rows returned"
+    where: system_Teacher_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_Teacher_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): system_Teacher_aggregate!
+
+  system_find_one_Teacher(
+    "filter the rows returned"
+    where: system_Teacher_bool_exp
+  ): system_Teacher
+
+  system_list_Student(
+    "filter the rows returned"
+    where: system_Student_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_Student_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): [system_Student!]!
+
+  system_aggregate_Student(
+    "filter the rows returned"
+    where: system_Student_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_Student_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): system_Student_aggregate!
+
+  system_find_one_Student(
+    "filter the rows returned"
+    where: system_Student_bool_exp
+  ): system_Student
+
+  system_list_StudentDetail(
+    "filter the rows returned"
+    where: system_StudentDetail_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_StudentDetail_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): [system_StudentDetail!]!
+
+  system_aggregate_StudentDetail(
+    "filter the rows returned"
+    where: system_StudentDetail_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_StudentDetail_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): system_StudentDetail_aggregate!
+
+  system_find_one_StudentDetail(
+    "filter the rows returned"
+    where: system_StudentDetail_bool_exp
+  ): system_StudentDetail
+
+  system_list_Classes(
+    "filter the rows returned"
+    where: system_Classes_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_Classes_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): [system_Classes!]!
+
+  system_aggregate_Classes(
+    "filter the rows returned"
+    where: system_Classes_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_Classes_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): system_Classes_aggregate!
+
+  system_find_one_Classes(
+    "filter the rows returned"
+    where: system_Classes_bool_exp
+  ): system_Classes
+
+  system_list_Course(
+    "filter the rows returned"
+    where: system_Course_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_Course_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): [system_Course!]!
+
+  system_aggregate_Course(
+    "filter the rows returned"
+    where: system_Course_bool_exp
+    "sort the rows by one or more fields"
+    order_by: system_Course_order_by
+    "Specify the max returned records per page (default to 30)"
+    size: Int
+    "The page (aka. offset) of the paginated list (default to 1)"
+    page: Int
+  ): system_Course_aggregate!
+
+  system_find_one_Course(
+    "filter the rows returned"
+    where: system_Course_bool_exp
+  ): system_Course
+}
+type Mutation {
+
+  "delete data from the table: system_Datasource"
+  system_delete_Datasource(
+    "filter the rows which have to be deleted"
+    where: system_Datasource_bool_exp!
+  ): mutation_response
+
+  system_delete_Datasource_by_id(
+    id: ID!
+  ): system_Datasource
+
+  system_update_Datasource_by_id(
+    _set: system_Datasource_set_input
+    id: ID!
+  ): system_Datasource
+
+  system_create_Datasource(
+    data: system_Datasource_insert_input
+  ): system_Datasource
+
+  system_update_Datasource(
+    _set: system_Datasource_set_input
+    where: system_Datasource_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_ApiInfo"
+  system_delete_ApiInfo(
+    "filter the rows which have to be deleted"
+    where: system_ApiInfo_bool_exp!
+  ): mutation_response
+
+  system_delete_ApiInfo_by_id(
+    id: ID!
+  ): system_ApiInfo
+
+  system_update_ApiInfo_by_id(
+    _set: system_ApiInfo_set_input
+    id: ID!
+  ): system_ApiInfo
+
+  system_create_ApiInfo(
+    data: system_ApiInfo_insert_input
+  ): system_ApiInfo
+
+  system_update_ApiInfo(
+    _set: system_ApiInfo_set_input
+    where: system_ApiInfo_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_ApiLog"
+  system_delete_ApiLog(
+    "filter the rows which have to be deleted"
+    where: system_ApiLog_bool_exp!
+  ): mutation_response
+
+  system_delete_ApiLog_by_id(
+    id: ID!
+  ): system_ApiLog
+
+  system_update_ApiLog_by_id(
+    _set: system_ApiLog_set_input
+    id: ID!
+  ): system_ApiLog
+
+  system_create_ApiLog(
+    data: system_ApiLog_insert_input
+  ): system_ApiLog
+
+  system_update_ApiLog(
+    _set: system_ApiLog_set_input
+    where: system_ApiLog_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_IdentityProvider"
+  system_delete_IdentityProvider(
+    "filter the rows which have to be deleted"
+    where: system_IdentityProvider_bool_exp!
+  ): mutation_response
+
+  system_delete_IdentityProvider_by_id(
+    id: ID!
+  ): system_IdentityProvider
+
+  system_update_IdentityProvider_by_id(
+    _set: system_IdentityProvider_set_input
+    id: ID!
+  ): system_IdentityProvider
+
+  system_create_IdentityProvider(
+    data: system_IdentityProvider_insert_input
+  ): system_IdentityProvider
+
+  system_update_IdentityProvider(
+    _set: system_IdentityProvider_set_input
+    where: system_IdentityProvider_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_Config"
+  system_delete_Config(
+    "filter the rows which have to be deleted"
+    where: system_Config_bool_exp!
+  ): mutation_response
+
+  system_delete_Config_by_id(
+    id: ID!
+  ): system_Config
+
+  system_update_Config_by_id(
+    _set: system_Config_set_input
+    id: ID!
+  ): system_Config
+
+  system_create_Config(
+    data: system_Config_insert_input
+  ): system_Config
+
+  system_update_Config(
+    _set: system_Config_set_input
+    where: system_Config_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_Teacher"
+  system_delete_Teacher(
+    "filter the rows which have to be deleted"
+    where: system_Teacher_bool_exp!
+  ): mutation_response
+
+  system_delete_Teacher_by_id(
+    id: ID!
+  ): system_Teacher
+
+  system_update_Teacher_by_id(
+    _set: system_Teacher_set_input
+    id: ID!
+  ): system_Teacher
+
+  system_create_Teacher(
+    data: system_Teacher_insert_input
+  ): system_Teacher
+
+  system_update_Teacher(
+    _set: system_Teacher_set_input
+    where: system_Teacher_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_Student"
+  system_delete_Student(
+    "filter the rows which have to be deleted"
+    where: system_Student_bool_exp!
+  ): mutation_response
+
+  system_delete_Student_by_id(
+    id: ID!
+  ): system_Student
+
+  system_update_Student_by_id(
+    _set: system_Student_set_input
+    id: ID!
+  ): system_Student
+
+  system_create_Student(
+    data: system_Student_insert_input
+  ): system_Student
+
+  system_update_Student(
+    _set: system_Student_set_input
+    where: system_Student_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_StudentDetail"
+  system_delete_StudentDetail(
+    "filter the rows which have to be deleted"
+    where: system_StudentDetail_bool_exp!
+  ): mutation_response
+
+  system_delete_StudentDetail_by_id(
+    id: ID!
+  ): system_StudentDetail
+
+  system_update_StudentDetail_by_id(
+    _set: system_StudentDetail_set_input
+    id: ID!
+  ): system_StudentDetail
+
+  system_create_StudentDetail(
+    data: system_StudentDetail_insert_input
+  ): system_StudentDetail
+
+  system_update_StudentDetail(
+    _set: system_StudentDetail_set_input
+    where: system_StudentDetail_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_Classes"
+  system_delete_Classes(
+    "filter the rows which have to be deleted"
+    where: system_Classes_bool_exp!
+  ): mutation_response
+
+  system_delete_Classes_by_id(
+    id: ID!
+  ): system_Classes
+
+  system_update_Classes_by_id(
+    _set: system_Classes_set_input
+    id: ID!
+  ): system_Classes
+
+  system_create_Classes(
+    data: system_Classes_insert_input
+  ): system_Classes
+
+  system_update_Classes(
+    _set: system_Classes_set_input
+    where: system_Classes_bool_exp!
+  ): mutation_response
+
+  "delete data from the table: system_Course"
+  system_delete_Course(
+    "filter the rows which have to be deleted"
+    where: system_Course_bool_exp!
+  ): mutation_response
+
+  system_delete_Course_by_id(
+    id: ID!
+  ): system_Course
+
+  system_update_Course_by_id(
+    _set: system_Course_set_input
+    id: ID!
+  ): system_Course
+
+  system_create_Course(
+    data: system_Course_insert_input
+  ): system_Course
+
+  system_update_Course(
+    _set: system_Course_set_input
+    where: system_Course_bool_exp!
+  ): mutation_response
+}
+
+type system_Datasource {
+  config : JSON
+  enabled : Boolean
+  updatedAt : String
+  createdAt : String
+  name : ID
+  type : String
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_Datasource_aggregate {
+  _count(distinct: Boolean, field: system_Datasource_select_field): Int!
+  _max: system_Datasource!
+  _min: system_Datasource!
+  _sum: system_Datasource!
+  _avg: system_Datasource_avg_fields!
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_Datasource_avg_fields {
+  config: Float
+  enabled: Float
+  updatedAt: Float
+  createdAt: Float
+  name: Float
+  type: Float
+}
+
+type system_ApiInfo {
+  parentId : String
+  type : String
+  id : ID
+  createdAt : String
+  method : String
+  name : String
+  updatedAt : String
+  path : String
+  meta : JSON
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_ApiInfo_aggregate {
+  _count(distinct: Boolean, field: system_ApiInfo_select_field): Int!
+  _max: system_ApiInfo!
+  _min: system_ApiInfo!
+  _sum: system_ApiInfo!
+  _avg: system_ApiInfo_avg_fields!
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_ApiInfo_avg_fields {
+  parentId: Float
+  type: Float
+  id: Float
+  createdAt: Float
+  method: Float
+  name: Float
+  updatedAt: Float
+  path: Float
+  meta: Float
+}
+
+type system_ApiLog {
+  data : JSON
+  createdAt : String
+  level : String
+  id : ID
+  uri : String
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_ApiLog_aggregate {
+  _count(distinct: Boolean, field: system_ApiLog_select_field): Int!
+  _max: system_ApiLog!
+  _min: system_ApiLog!
+  _sum: system_ApiLog!
+  _avg: system_ApiLog_avg_fields!
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_ApiLog_avg_fields {
+  data: Float
+  createdAt: Float
+  level: Float
+  id: Float
+  uri: Float
+}
+
+type system_IdentityProvider {
+  createdAt : String
+  updatedAt : String
+  provider : JSON
+  name : ID
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_IdentityProvider_aggregate {
+  _count(distinct: Boolean, field: system_IdentityProvider_select_field): Int!
+  _max: system_IdentityProvider!
+  _min: system_IdentityProvider!
+  _sum: system_IdentityProvider!
+  _avg: system_IdentityProvider_avg_fields!
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_IdentityProvider_avg_fields {
+  createdAt: Float
+  updatedAt: Float
+  provider: Float
+  name: Float
+}
+
+type system_Config {
+  createdAt : String
+  id : ID
+  key : String
+  value : String
+  updatedAt : String
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_Config_aggregate {
+  _count(distinct: Boolean, field: system_Config_select_field): Int!
+  _max: system_Config!
+  _min: system_Config!
+  _sum: system_Config!
+  _avg: system_Config_avg_fields!
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_Config_avg_fields {
+  createdAt: Float
+  id: Float
+  key: Float
+  value: Float
+  updatedAt: Float
+}
+
+type system_Teacher {
+  teacherName : String
+  id : ID
+  subject : String
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_Teacher_aggregate {
+  _count(distinct: Boolean, field: system_Teacher_select_field): Int!
+  _max: system_Teacher!
+  _min: system_Teacher!
+  _sum: system_Teacher!
+  _avg: system_Teacher_avg_fields!
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_Teacher_avg_fields {
+  teacherName: Float
+  id: Float
+  subject: Float
+}
+
+type system_Student {
+  studentDetail : system_StudentDetail
+  age : Int
+  id : ID
+  interest : [system_User_interest]
+  classId : Int
+  studentName : String
+  gender : system_UserGender
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_Student_aggregate {
+  _count(distinct: Boolean, field: system_Student_select_field): Int!
+  _max: system_Student!
+  _min: system_Student!
+  _sum: system_Student!
+  _avg: system_Student_avg_fields!
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_Student_avg_fields {
+  age: Float
+  id: Float
+  interest: Float
+  classId: Float
+  studentName: Float
+  gender: Float
+}
+
+type system_StudentDetail {
+  id : ID
+  studentId : Int
+  description : String
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_StudentDetail_aggregate {
+  _count(distinct: Boolean, field: system_StudentDetail_select_field): Int!
+  _max: system_StudentDetail!
+  _min: system_StudentDetail!
+  _sum: system_StudentDetail!
+  _avg: system_StudentDetail_avg_fields!
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_StudentDetail_avg_fields {
+  id: Float
+  studentId: Float
+  description: Float
+}
+
+type system_Classes {
+  classCode : String
+  students : system_Student
+  id : ID
+  className : String
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_Classes_aggregate {
+  _count(distinct: Boolean, field: system_Classes_select_field): Int!
+  _max: system_Classes!
+  _min: system_Classes!
+  _sum: system_Classes!
+  _avg: system_Classes_avg_fields!
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_Classes_avg_fields {
+  classCode: Float
+  id: Float
+  className: Float
+}
+
+type system_Course {
+  courseNo : ID
+  courseName : String
+  students : system_Student
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_Course_aggregate {
+  _count(distinct: Boolean, field: system_Course_select_field): Int!
+  _max: system_Course!
+  _min: system_Course!
+  _sum: system_Course!
+  _avg: system_Course_avg_fields!
+  _join: Query
+  _join_mutation: Mutation
+}
+
+type system_Course_avg_fields {
+  courseNo: Float
+  courseName: Float
+}
+
+
+"Boolean expression to filter rows from the table \"system_Datasource\". All fields are combined with a logical 'AND'."
+input system_Datasource_bool_exp {
+  _and: [system_Datasource_bool_exp!]
+  _or: [system_Datasource_bool_exp!]
+  config: JSON_comparison_exp
+  enabled: Boolean_comparison_exp
+  updatedAt: DateTime_comparison_exp
+  createdAt: DateTime_comparison_exp
+  name: Int_comparison_exp
+  type: String_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_Datasource\"."
+
+input system_Datasource_order_by {
+  config: order_by
+  enabled: order_by
+  updatedAt: order_by
+  createdAt: order_by
+  name: order_by
+  type: order_by
+}
+
+input system_Datasource_insert_input {
+  config: JSON
+  enabled: Boolean
+  updatedAt: String
+  createdAt: String
+  name: ID
+  type: String
+}
+
+input system_Datasource_set_input {
+  config: JSON
+  enabled: Boolean
+  updatedAt: String
+  createdAt: String
+  name: ID
+  type: String
+}
+
+"Boolean expression to filter rows from the table \"system_ApiInfo\". All fields are combined with a logical 'AND'."
+input system_ApiInfo_bool_exp {
+  _and: [system_ApiInfo_bool_exp!]
+  _or: [system_ApiInfo_bool_exp!]
+  parentId: String_comparison_exp
+  type: String_comparison_exp
+  id: Int_comparison_exp
+  createdAt: DateTime_comparison_exp
+  method: String_comparison_exp
+  name: String_comparison_exp
+  updatedAt: DateTime_comparison_exp
+  path: String_comparison_exp
+  meta: JSON_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_ApiInfo\"."
+
+input system_ApiInfo_order_by {
+  parentId: order_by
+  type: order_by
+  id: order_by
+  createdAt: order_by
+  method: order_by
+  name: order_by
+  updatedAt: order_by
+  path: order_by
+  meta: order_by
+}
+
+input system_ApiInfo_insert_input {
+  parentId: String
+  type: String
+  id: ID
+  createdAt: String
+  method: String
+  name: String
+  updatedAt: String
+  path: String
+  meta: JSON
+}
+
+input system_ApiInfo_set_input {
+  parentId: String
+  type: String
+  id: ID
+  createdAt: String
+  method: String
+  name: String
+  updatedAt: String
+  path: String
+  meta: JSON
+}
+
+"Boolean expression to filter rows from the table \"system_ApiLog\". All fields are combined with a logical 'AND'."
+input system_ApiLog_bool_exp {
+  _and: [system_ApiLog_bool_exp!]
+  _or: [system_ApiLog_bool_exp!]
+  data: JSON_comparison_exp
+  createdAt: DateTime_comparison_exp
+  level: String_comparison_exp
+  id: Int_comparison_exp
+  uri: String_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_ApiLog\"."
+
+input system_ApiLog_order_by {
+  data: order_by
+  createdAt: order_by
+  level: order_by
+  id: order_by
+  uri: order_by
+}
+
+input system_ApiLog_insert_input {
+  data: JSON
+  createdAt: String
+  level: String
+  id: ID
+  uri: String
+}
+
+input system_ApiLog_set_input {
+  data: JSON
+  createdAt: String
+  level: String
+  id: ID
+  uri: String
+}
+
+"Boolean expression to filter rows from the table \"system_IdentityProvider\". All fields are combined with a logical 'AND'."
+input system_IdentityProvider_bool_exp {
+  _and: [system_IdentityProvider_bool_exp!]
+  _or: [system_IdentityProvider_bool_exp!]
+  createdAt: DateTime_comparison_exp
+  updatedAt: DateTime_comparison_exp
+  provider: JSON_comparison_exp
+  name: Int_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_IdentityProvider\"."
+
+input system_IdentityProvider_order_by {
+  createdAt: order_by
+  updatedAt: order_by
+  provider: order_by
+  name: order_by
+}
+
+input system_IdentityProvider_insert_input {
+  createdAt: String
+  updatedAt: String
+  provider: JSON
+  name: ID
+}
+
+input system_IdentityProvider_set_input {
+  createdAt: String
+  updatedAt: String
+  provider: JSON
+  name: ID
+}
+
+"Boolean expression to filter rows from the table \"system_Config\". All fields are combined with a logical 'AND'."
+input system_Config_bool_exp {
+  _and: [system_Config_bool_exp!]
+  _or: [system_Config_bool_exp!]
+  createdAt: DateTime_comparison_exp
+  id: Int_comparison_exp
+  key: String_comparison_exp
+  value: String_comparison_exp
+  updatedAt: DateTime_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_Config\"."
+
+input system_Config_order_by {
+  createdAt: order_by
+  id: order_by
+  key: order_by
+  value: order_by
+  updatedAt: order_by
+}
+
+input system_Config_insert_input {
+  createdAt: String
+  id: ID
+  key: String
+  value: String
+  updatedAt: String
+}
+
+input system_Config_set_input {
+  createdAt: String
+  id: ID
+  key: String
+  value: String
+  updatedAt: String
+}
+
+"Boolean expression to filter rows from the table \"system_Teacher\". All fields are combined with a logical 'AND'."
+input system_Teacher_bool_exp {
+  _and: [system_Teacher_bool_exp!]
+  _or: [system_Teacher_bool_exp!]
+  teacherName: String_comparison_exp
+  id: Int_comparison_exp
+  subject: String_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_Teacher\"."
+
+input system_Teacher_order_by {
+  teacherName: order_by
+  id: order_by
+  subject: order_by
+}
+
+input system_Teacher_insert_input {
+  teacherName: String
+  id: ID
+  subject: String
+}
+
+input system_Teacher_set_input {
+  teacherName: String
+  id: ID
+  subject: String
+}
+
+"Boolean expression to filter rows from the table \"system_Student\". All fields are combined with a logical 'AND'."
+input system_Student_bool_exp {
+  _and: [system_Student_bool_exp!]
+  _or: [system_Student_bool_exp!]
+  age: Int_comparison_exp
+  id: Int_comparison_exp
+  interest: system_User_interest_comparison_exp
+  classId: Int_comparison_exp
+  studentName: String_comparison_exp
+  gender: system_UserGender_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_Student\"."
+
+input system_Student_order_by {
+  age: order_by
+  id: order_by
+  interest: order_by
+  classId: order_by
+  studentName: order_by
+  gender: order_by
+}
+
+input system_Student_insert_input {
+  age: Int
+  id: ID
+  interest: [system_User_interest]
+  classId: Int
+  studentName: String
+  gender: system_UserGender
+}
+
+input system_Student_set_input {
+  age: Int
+  id: ID
+  interest: [system_User_interest]
+  classId: Int
+  studentName: String
+  gender: system_UserGender
+}
+
+"Boolean expression to filter rows from the table \"system_StudentDetail\". All fields are combined with a logical 'AND'."
+input system_StudentDetail_bool_exp {
+  _and: [system_StudentDetail_bool_exp!]
+  _or: [system_StudentDetail_bool_exp!]
+  id: Int_comparison_exp
+  studentId: Int_comparison_exp
+  description: String_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_StudentDetail\"."
+
+input system_StudentDetail_order_by {
+  id: order_by
+  studentId: order_by
+  description: order_by
+}
+
+input system_StudentDetail_insert_input {
+  id: ID
+  studentId: Int
+  description: String
+}
+
+input system_StudentDetail_set_input {
+  id: ID
+  studentId: Int
+  description: String
+}
+
+"Boolean expression to filter rows from the table \"system_Classes\". All fields are combined with a logical 'AND'."
+input system_Classes_bool_exp {
+  _and: [system_Classes_bool_exp!]
+  _or: [system_Classes_bool_exp!]
+  classCode: String_comparison_exp
+  id: Int_comparison_exp
+  className: String_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_Classes\"."
+
+input system_Classes_order_by {
+  classCode: order_by
+  id: order_by
+  className: order_by
+}
+
+input system_Classes_insert_input {
+  classCode: String
+  id: ID
+  className: String
+}
+
+input system_Classes_set_input {
+  classCode: String
+  id: ID
+  className: String
+}
+
+"Boolean expression to filter rows from the table \"system_Course\". All fields are combined with a logical 'AND'."
+input system_Course_bool_exp {
+  _and: [system_Course_bool_exp!]
+  _or: [system_Course_bool_exp!]
+  courseNo: Int_comparison_exp
+  courseName: String_comparison_exp
+}
+
+"Ordering options when selecting data from \"system_Course\"."
+
+input system_Course_order_by {
+  courseNo: order_by
+  courseName: order_by
+}
+
+input system_Course_insert_input {
+  courseNo: ID
+  courseName: String
+}
+
+input system_Course_set_input {
+  courseNo: ID
+  courseName: String
+}
+
+enum system_Datasource_select_field {
+  config
+  enabled
+  updatedAt
+  createdAt
+  name
+  type
+}
+
+enum system_ApiInfo_select_field {
+  parentId
+  type
+  id
+  createdAt
+  method
+  name
+  updatedAt
+  path
+  meta
+}
+
+enum system_ApiLog_select_field {
+  data
+  createdAt
+  level
+  id
+  uri
+}
+
+enum system_IdentityProvider_select_field {
+  createdAt
+  updatedAt
+  provider
+  name
+}
+
+enum system_Config_select_field {
+  createdAt
+  id
+  key
+  value
+  updatedAt
+}
+
+enum system_Teacher_select_field {
+  teacherName
+  id
+  subject
+}
+
+enum system_Student_select_field {
+  age
+  id
+  interest
+  classId
+  studentName
+  gender
+}
+
+enum system_StudentDetail_select_field {
+  id
+  studentId
+  description
+}
+
+enum system_Classes_select_field {
+  classCode
+  id
+  className
+}
+
+enum system_Course_select_field {
+  courseNo
+  courseName
+}
+
+directive @internal on VARIABLE_DEFINITION
+directive @export(as: String) on FIELD
+directive @transform(get: String!) on FIELD
+
+scalar JSON
+scalar Date
+scalar DateTime
+
+"Boolean expression to compare fields of type \"ID\". All fields are combined with logical 'AND.'"
+input ID_comparison_exp {
+  _eq: String
+  _ne: String
+  _in: [String!]
+  _nin: [String!]
+  _contains: String
+  _not_contains: String
+  _starts_with: String
+  _ends_with: String
+}
+
+"Boolean expression to compare fields of type \"Int\". All fields are combined with logical 'AND.'"
+input Int_comparison_exp {
+  _eq: Int
+  _ne: Int
+  _gt: Int
+  _lt: Int
+  _gte: Int
+  _lte: Int
+  _in: [Int!]
+  _nin: [Int!]
+}
+
+"Boolean expression to compare fields of type \"Float\". All fields are combined with logical 'AND.'"
+input Float_comparison_exp {
+  _eq: Float
+  _ne: Float
+  _gt: Float
+  _lt: Float
+  _gte: Float
+  _lte: Float
+  _in: [Float!]
+  _nin: [Float!]
+}
+
+"Boolean expression to compare fields of type \"String\". All fields are combined with logical 'AND.'"
+input String_comparison_exp {
+  _eq: String
+  _ne: String
+  _in: [String!]
+  _nin: [String!]
+  _contains: String
+  _not_contains: String
+  _starts_with: String
+  _ends_with: String
+}
+
+"Boolean expression to compare fields of type \"JSON\". All fields are combined with logical 'AND.'"
+input JSON_comparison_exp {
+  _eq: String
+  _ne: String
+  _in: [String!]
+  _nin: [String!]
+  _contains: String
+  _not_contains: String
+  _starts_with: String
+  _ends_with: String
+}
+
+"Boolean expression to compare fields of type \"Boolean\". All fields are combined with logical 'AND.'"
+input Boolean_comparison_exp {
+  _eq: Boolean
+  _ne: Boolean
+}
+
+"Boolean expression to compare fields of type \"Date\". All fields are combined with logical 'AND.'"
+input Date_comparison_exp {
+  _eq: Date
+  _ne: Date
+  _gt: Date
+  _lt: Date
+  _gte: Date
+  _lte: Date
+  _in: [Date!]
+  _nin: [Date!]
+  _between: [Date!]
+}
+
+"Boolean expression to compare fields of type \"DateTime\". All fields are combined with logical 'AND.'"
+input DateTime_comparison_exp {
+  _eq: DateTime
+  _ne: DateTime
+  _gt: DateTime
+  _lt: DateTime
+  _gte: DateTime
+  _lte: DateTime
+  _in: [DateTime!]
+  _nin: [DateTime!]
+  _between: [DateTime!]
+}
+
+
+"Boolean expression to compare fields of type \"DateTime\". All fields are combined with logical 'AND.'"
+input system_UserGender_comparison_exp {
+  _eq: system_UserGender
+  _ne: system_UserGender
+  _in: [system_UserGender!]
+  _nin: [system_UserGender!]
+}
+
+
+"Boolean expression to compare fields of type \"DateTime\". All fields are combined with logical 'AND.'"
+input system_User_interest_comparison_exp {
+  _eq: system_User_interest
+  _ne: system_User_interest
+  _in: [system_User_interest!]
+  _nin: [system_User_interest!]
+}
+
+
+"field ordering options"
+enum order_by {
+  "in ascending order, nulls last"
+  asc
+  "in descending order, nulls first"
+  desc
+}
+
+"ordering argument of a cursor"
+enum cursor_ordering {
+  "ascending ordering of the cursor"
+  ASC
+  "descending ordering of the cursor"
+  DESC
+}
+
+type mutation_response {
+  "data from the rows affected by the mutation"
+  affected_rows: Int!
+  _join: Query
+  _join_mutation: Mutation
+}

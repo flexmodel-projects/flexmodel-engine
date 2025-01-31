@@ -49,16 +49,16 @@ public abstract class AbstractSessionTests {
 
   void createStudentCollection(String entityName) {
     Enum genderEnum = session.createEnum(entityName + "_gender", en ->
-      en.addElement("未知")
-        .addElement("男")
-        .addElement("女")
+      en.addElement("UNKNOWN")
+        .addElement("MALE")
+        .addElement("FEMALE")
         .setComment("性别")
     );
     Enum interestEnum = session.createEnum(entityName + "_interest", en ->
-      en.addElement("唱")
-        .addElement("跳")
+      en.addElement("chang")
+        .addElement("tiao")
         .addElement("rap")
-        .addElement("打篮球")
+        .addElement("daLanQiu")
         .setComment("兴趣")
     );
     session.createEntity(entityName, entity -> entity
@@ -146,8 +146,8 @@ public abstract class AbstractSessionTests {
         {
           "id": 1,
           "studentName": "张三",
-          "gender": "男",
-          "interest": ["唱", "跳", "rap", "打篮球"],
+          "gender": "MALE",
+          "interest": ["chang", "tiao", "rap", "daLanQiu"],
           "age": 10,
           "classId": 1,
           "studentDetail": {
@@ -171,8 +171,8 @@ public abstract class AbstractSessionTests {
         {
           "id": 2,
           "studentName": "李四",
-          "gender": "女",
-          "interest": ["唱", "跳"],
+          "gender": "FEMALE",
+          "interest": ["chang", "tiao"],
           "age": 10,
           "classId": 1,
           "studentDetail": {
@@ -192,8 +192,8 @@ public abstract class AbstractSessionTests {
         {
           "id": 3,
           "studentName": "王五",
-          "interest": ["打篮球"],
-          "gender": "男",
+          "interest": ["daLanQiu"],
+          "gender": "MALE",
           "age": 11,
           "classId": 2,
           "studentDetail": {

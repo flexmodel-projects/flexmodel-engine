@@ -14,6 +14,7 @@ public class ModelField {
   private String shortTypeName;
   private String fullTypeName;
   private boolean identity;
+  private boolean isBasicField;
   private boolean relationField;
   private boolean enumField;
   private Field originalField;
@@ -78,6 +79,15 @@ public class ModelField {
 
   public ModelField setIdentity(boolean identity) {
     this.identity = identity;
+    return this;
+  }
+
+  public boolean isBasicField() {
+    return isBasicField;
+  }
+
+  public ModelField setBasicField(boolean basicField) {
+    isBasicField = basicField;
     return this;
   }
 

@@ -101,6 +101,9 @@ public class GenerationTool {
         ModelClass modelClass = modelClassMap.get(model.getName());
         multipleModelClass.getModelList().add(modelClass);
         multipleModelClass.getImports().add(modelClass.getFullClassName());
+      } else if (model instanceof Enum) {
+        EnumClass enumClass = enumClassMap.get(model.getName());
+        multipleModelClass.getEnumList().add(enumClass);
       }
     }
 
@@ -124,33 +127,35 @@ public class GenerationTool {
     ).toString());
   }
 
-  private static EnumClass buildEnumClass(String packageName, String schemaName, Enum anEnum) {
+  public static EnumClass buildEnumClass(String packageName, String schemaName, Enum anEnum) {
     String ftName = StringUtils.capitalize(StringUtils.snakeToCamel(anEnum.getName()));
     EnumClass enumClass = new EnumClass();
     enumClass.setSchemaName(schemaName);
     enumClass.setPackageName(packageName + ".enumeration");
     enumClass.setShortClassName(ftName);
+    enumClass.setFullClassName(enumClass.getPackageName() + "." + ftName);
+    enumClass.setVariableName(StringUtils.uncapitalize(ftName));
     enumClass.setElements(anEnum.getElements());
     enumClass.setComment(anEnum.getComment());
     enumClass.setOriginalEnum(anEnum);
     return enumClass;
   }
 
-  public static ModelClass buildModelClass(String packageName, String schemaName, Entity collection) {
+  public static ModelClass buildModelClass(String packageName, String schemaName, Entity entity) {
 
-    String cCamelName = StringUtils.snakeToCamel(collection.getName());
+    String cCamelName = StringUtils.snakeToCamel(entity.getName());
     ModelClass modelClass = new ModelClass()
-      .setComment(collection.getComment())
+      .setComment(entity.getComment())
       .setVariableName(StringUtils.uncapitalize(cCamelName))
       .setLowerCaseName(StringUtils.uncapitalize(cCamelName))
       .setShortClassName(StringUtils.capitalize(cCamelName))
       .setPackageName(packageName + ".entity")
       .setSchemaName(schemaName)
-      .setModelName(collection.getName())
+      .setModelName(entity.getName())
       .setFullClassName(packageName + ".entity" + "." + StringUtils.capitalize(cCamelName))
-      .setOriginalModel(collection);
+      .setOriginalModel(entity);
 
-    for (TypedField<?, ?> field : collection.getFields()) {
+    for (TypedField<?, ?> field : entity.getFields()) {
 
       ModelField modelField = new ModelField()
         .setModelClass(modelClass)
@@ -205,7 +210,8 @@ public class GenerationTool {
         TypeInfo typeInfo = TYPE_MAPPING.get(field.getType());
         modelField.setTypePackage(typeInfo.typePackage())
           .setShortTypeName(typeInfo.shortTypeName())
-          .setFullTypeName(typeInfo.fullTypeName());
+          .setFullTypeName(typeInfo.fullTypeName())
+          .setBasicField(true);
 
         modelClass.getBasicFields().add(modelField);
       }
