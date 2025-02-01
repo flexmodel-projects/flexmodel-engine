@@ -88,6 +88,9 @@ class SchemaGenerator extends AbstractModelListGenerator {
     modelListClass.modelList.each { model ->
       out.println "    list.add(${model.variableName});"
     }
+    modelListClass.enumList.each { anEnum ->
+      out.println "    list.add(${anEnum.variableName});"
+    }
     out.println "    return list;"
     out.println "  }"
     out.println ""
