@@ -64,7 +64,9 @@ public class FlexmodelMojo extends AbstractMojo {
       getLog().info("Compile source root: " + outputDirectory);
       // Configure the generator to output to the specified directory
       if (generator != null) {
-        generator.getTarget().setBaseDir(project.getBasedir().getAbsolutePath() + "/");
+        if (generator.getTarget().getBaseDir() == null) {
+          generator.getTarget().setBaseDir(project.getBasedir().getAbsolutePath());
+        }
         if (generator.getTarget().getDirectory() == null) {
           generator.getTarget().setDirectory(outputDirectory);
         }
