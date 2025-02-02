@@ -31,8 +31,6 @@ public class Configuration implements Serializable {
   public static class Schema implements Serializable {
     private String name;
     private String importScript = "import.json";
-    private String includes;
-    private String excludes;
 
     public String getName() {
       return name;
@@ -51,27 +49,11 @@ public class Configuration implements Serializable {
       return this;
     }
 
-    public String getIncludes() {
-      return includes;
-    }
-
-    public void setIncludes(String includes) {
-      this.includes = includes;
-    }
-
-    public String getExcludes() {
-      return excludes;
-    }
-
-    public void setExcludes(String excludes) {
-      this.excludes = excludes;
-    }
-
   }
 
   public static class Target implements Serializable {
 
-    private String packageName = "com.example";
+    private String packageName = "tech.wetech";
     private String directory =  null;
     private String baseDir = null;
 

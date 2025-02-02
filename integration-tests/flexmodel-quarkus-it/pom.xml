@@ -89,8 +89,6 @@
           <generator>
             <schema>
               <name>system</name>
-              <includes>1</includes>
-              <excludes>2</excludes>
               <import-script>src/main/resource/import.json</import-script>
             </schema>
             <target>

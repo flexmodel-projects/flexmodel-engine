@@ -46,7 +46,7 @@ public class GenerationTool {
     Set<TypeWrapper> models = new HashSet<>();
     // read from script
     String importScript = configuration.getSchema().getImportScript();
-    File scriptFile = new File(configuration.getTarget().getBaseDir() + importScript);
+    File scriptFile = Path.of(configuration.getTarget().getBaseDir(), importScript).toFile();
     System.out.println("Import Script File Path: " + scriptFile.getAbsolutePath());
     if (scriptFile.exists()) {
       System.out.println("Script file is exists, import Script File: " + scriptFile);
