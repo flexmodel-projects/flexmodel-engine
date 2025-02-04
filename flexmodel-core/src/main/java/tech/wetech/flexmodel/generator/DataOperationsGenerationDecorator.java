@@ -44,23 +44,21 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
       }
       Object value = data.get(field.getName());
       // 仅支持新增修改默认值
-      if (value == null) {
-        Object generatedValue = switch (field) {
-          case IDField idField -> generateValue(idField, isUpdate);
-          case DatetimeField datetimeField -> generateValue(datetimeField, isUpdate);
-          case DateField dateField -> generateValue(dateField, isUpdate);
-          default -> field.getDefaultValue();
-        };
-        if (generatedValue != null) {
-          newData.put(field.getName(), generatedValue);
-        }
+      Object generatedValue = switch (field) {
+        case IDField idField -> generateValue(idField, value, isUpdate);
+        case DatetimeField datetimeField -> generateValue(datetimeField, isUpdate);
+        case DateField dateField -> generateValue(dateField, isUpdate);
+        default -> field.getDefaultValue();
+      };
+      if (generatedValue != null) {
+        newData.put(field.getName(), generatedValue);
       }
     }
     return newData;
   }
 
-  private Object generateValue(IDField idField, boolean isUpdate) {
-    if (!isUpdate) {
+  private Object generateValue(IDField idField, Object value, boolean isUpdate) {
+    if (!isUpdate && value == null) {
       if (idField.getGeneratedValue() == IDField.GeneratedValue.ULID) {
         return ULID.random().toString();
       } else if (idField.getGeneratedValue() == IDField.GeneratedValue.UUID) {
