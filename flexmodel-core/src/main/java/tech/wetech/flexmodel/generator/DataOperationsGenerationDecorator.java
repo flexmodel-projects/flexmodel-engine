@@ -2,6 +2,8 @@ package tech.wetech.flexmodel.generator;
 
 import tech.wetech.flexmodel.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,19 +44,56 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
       }
       Object value = data.get(field.getName());
       // 仅支持新增修改默认值
-      if (value == null && !isUpdate) {
-        if (field instanceof IDField idField) {
-          if (idField.getGeneratedValue() == IDField.GeneratedValue.ULID) {
-            newData.put(field.getName(), ULID.random().toString());
-          } else if (idField.getGeneratedValue() == IDField.GeneratedValue.UUID) {
-            newData.put(field.getName(), UUID.randomUUID().toString());
-          }
-        } else if (field.getDefaultValue() != null) {
-          newData.put(field.getName(), field.getDefaultValue());
+      if (value == null) {
+        Object generatedValue = switch (field) {
+          case IDField idField -> generateValue(idField, isUpdate);
+          case DatetimeField datetimeField -> generateValue(datetimeField, isUpdate);
+          case DateField dateField -> generateValue(dateField, isUpdate);
+          default -> field.getDefaultValue();
+        };
+        if (generatedValue != null) {
+          newData.put(field.getName(), generatedValue);
         }
       }
     }
     return newData;
+  }
+
+  private Object generateValue(IDField idField, boolean isUpdate) {
+    if (!isUpdate) {
+      if (idField.getGeneratedValue() == IDField.GeneratedValue.ULID) {
+        return ULID.random().toString();
+      } else if (idField.getGeneratedValue() == IDField.GeneratedValue.UUID) {
+        return UUID.randomUUID().toString();
+      }
+    }
+    return null;
+  }
+
+  private Object generateValue(DatetimeField field, boolean isUpdate) {
+    if (field.getGeneratedValue() != null) {
+      if (field.getGeneratedValue() == DatetimeField.GeneratedValue.NOW_ON_CREATE && !isUpdate) {
+        return LocalDateTime.now();
+      } else if (field.getGeneratedValue() == DatetimeField.GeneratedValue.NOW_ON_UPDATE && isUpdate) {
+        return LocalDateTime.now();
+      } else if (field.getGeneratedValue() == DatetimeField.GeneratedValue.NOW_ON_CREATE_AND_UPDATE) {
+        return LocalDateTime.now();
+      }
+    }
+    return null;
+  }
+
+  private Object generateValue(DateField field, boolean isUpdate) {
+    if (field.getGeneratedValue() != null) {
+      if (field.getGeneratedValue() == DateField.GeneratedValue.NOW_ON_CREATE && !isUpdate) {
+        return LocalDate.now();
+      } else if (field.getGeneratedValue() == DateField.GeneratedValue.NOW_ON_UPDATE && isUpdate) {
+        return LocalDate.now();
+      } else if (field.getGeneratedValue() == DateField.GeneratedValue.NOW_ON_CREATE_AND_UPDATE) {
+        return LocalDate.now();
+      }
+    }
+    return null;
   }
 
   @Override
