@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author cjbi
@@ -56,19 +57,16 @@ public class SessionFactory {
   }
 
   private void processBuildItem(BuildItem buildItem) {
-    List<TypeWrapper> allModels = buildItem.getModels();
-    allModels.forEach(model -> cache.put(buildItem.getSchemaName() + ":" + model.getName(), model));
+    buildItem.getModels().forEach(model -> cache.put(buildItem.getSchemaName() + ":" + model.getName(), model));
     try (Session session = createFailsafeSession(buildItem.getSchemaName())) {
-      List<RelationField> lazyCreateList = processModels(buildItem.getModels(), session);
-      lazyCreateRelationFields(lazyCreateList, session);
+      processModels(buildItem.getModels(), session);
     }
   }
 
   public void loadScriptString(String schemaName, String scriptString) {
     ImportDescribe describe = jsonObjectConverter.parseToObject(scriptString, ImportDescribe.class);
     try (Session session = createFailsafeSession(schemaName)) {
-      List<RelationField> lazyCreateList = processModels(describe.getSchema(), session);
-      lazyCreateRelationFields(lazyCreateList, session);
+      processModels(describe.getSchema(), session);
       processImportData(describe.getData(), session);
     }
   }
@@ -86,13 +84,16 @@ public class SessionFactory {
     }
   }
 
-  private List<RelationField> processModels(List<TypeWrapper> models, Session session) {
-    List<RelationField> lazyCreateList = new ArrayList<>();
+  private void processModels(List<TypeWrapper> models, Session session) {
+    Map<String, TypeWrapper> wrapperMap = session.getAllModels().stream().collect(Collectors.toMap(TypeWrapper::getName, m -> m));
     for (TypeWrapper model : models) {
+      TypeWrapper older = wrapperMap.get(model.getName());
+      if (Objects.equals(jsonObjectConverter.toJsonString(older), jsonObjectConverter.toJsonString(model))) {
+        continue;
+      }
       if (model instanceof Entity newer) {
         try {
-          Entity older = (Entity) session.getModel(newer.getName());
-          updateEntity(session, newer, older, lazyCreateList);
+          updateEntity(session, newer, (Entity) older);
         } catch (Exception e) {
           log.warn("Error processing model: {}", e.getMessage(), e);
         }
@@ -104,7 +105,6 @@ public class SessionFactory {
         }
       }
     }
-    return lazyCreateList;
   }
 
   private void updateEnum(Session session, Enum newer) {
@@ -116,24 +116,16 @@ public class SessionFactory {
     }
   }
 
-  private void updateEntity(Session session, Entity newer, Entity older, List<RelationField> lazyCreateList) throws Exception {
-    Entity clonedNewer = newer.clone();
-    clonedNewer.getFields().stream()
-      .filter(field -> field instanceof RelationField)
-      .forEach(field -> {
-        clonedNewer.removeField(field.getName());
-        lazyCreateList.add((RelationField) field);
-      });
-
+  private void updateEntity(Session session, Entity newer, Entity older) throws Exception {
     try {
-      session.createEntity(clonedNewer);
+      session.createEntity(newer.clone());
     } catch (Exception e) {
-      updateEntityFields(session, older);
+      updateEntityFields(session, newer, older);
     }
   }
 
-  private void updateEntityFields(Session session, Entity older) {
-    older.getFields().forEach(field -> {
+  private void updateEntityFields(Session session, Entity newer, Entity older) {
+    newer.getFields().forEach(field -> {
       try {
         if (older.getField(field.getName()) == null) {
           session.createField(field);
@@ -144,16 +136,6 @@ public class SessionFactory {
         log.warn("Error updating field: {}", e.getMessage(), e);
       }
     });
-  }
-
-  private void lazyCreateRelationFields(List<RelationField> relationFields, Session session) {
-    for (RelationField relationField : relationFields) {
-      try {
-        session.createField(relationField);
-      } catch (Exception e) {
-        log.warn("Error lazy create relation field: {}, message: {}", relationField.getName(), e.getMessage());
-      }
-    }
   }
 
   private void processImportData(List<ImportDescribe.ImportData> data, Session session) {

@@ -92,7 +92,7 @@ public class QueryHelper {
   private static List<Map<String, Object>> findRelationList(AbstractSessionContext sessionContext,
                                                             BiFunction<String, Query,
                                                               List<Map<String, Object>>> relationFn,
-                                                            RelationField relationField, Object id) {
+                                                            RelationField relationField, List<Object> ids) {
     Model model = (Model) sessionContext.getModel(relationField.getModelName());
     if (model instanceof Entity entity) {
       return relationFn.apply(entity.getName(),
@@ -115,7 +115,7 @@ public class QueryHelper {
               .setForeignField(relationField.getForeignField())
             )
           )
-          .withFilter(f -> f.equalTo(entity.getName() + "." + relationField.getLocalField(), id))
+          .withFilter(f -> f.in(entity.getName() + "." + relationField.getLocalField(), ids))
       );
     }
     return List.of();
@@ -128,7 +128,6 @@ public class QueryHelper {
                                  Query query,
                                  AbstractSessionContext sessionContext,
                                  int maxDepth) {
-    // fixme 改成in批量查询
     nestedQuery(parentList, relationFn, model, query, sessionContext, new AtomicInteger(maxDepth));
   }
 
@@ -147,14 +146,21 @@ public class QueryHelper {
     relationFieldMap.entrySet().parallelStream().forEach(entry -> {
       String key = entry.getKey();
       RelationField relationField = entry.getValue();
-      parentList.parallelStream().forEach(item -> {
+      List<Object> ids = parentList.stream()
+        .map(item -> item.get(relationField.getLocalField()))
+        .filter(Objects::nonNull)
+        .toList();
+      Map<Object, List<Map<String, Object>>> relationDataGroup = findRelationList(sessionContext, relationFn, relationField, ids).stream()
+        .collect(Collectors.groupingBy(e -> e.get(relationField.getForeignField())));
+
+      parentList.forEach(item -> {
         if (model instanceof Entity entity) {
           Object id = item.get(relationField.getLocalField());
           if (id == null) {
             item.put(key, relationField.isMultiple() ? List.of() : null);
             return;
           }
-          List<Map<String, Object>> list = findRelationList(sessionContext, relationFn, relationField, id);
+          List<Map<String, Object>> list = relationDataGroup.getOrDefault(id, List.of());
           maxDepth.decrementAndGet();
           nestedQuery(list, relationFn, (Model) sessionContext.getModel(relationField.getFrom()), null, sessionContext, maxDepth);
           Object value = relationField.isMultiple() ? list : (!list.isEmpty() ? list.getFirst() : null);
