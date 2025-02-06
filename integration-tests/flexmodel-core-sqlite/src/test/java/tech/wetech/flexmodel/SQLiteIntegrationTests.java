@@ -18,7 +18,7 @@ public class SQLiteIntegrationTests extends AbstractSessionTests {
   public static void beforeAll() {
     HikariDataSource dataSource = new HikariDataSource();
     dataSource.setJdbcUrl("jdbc:sqlite:file::memory:?cache=shared");
-    initSession(new JdbcDataSourceProvider(dataSource));
+    initSession(new JdbcDataSourceProvider("default", dataSource));
   }
 
   @Test

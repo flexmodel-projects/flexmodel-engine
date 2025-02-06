@@ -14,7 +14,7 @@ import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
 public class DB2IntegrationTests extends AbstractSessionTests {
 
   @Container
-  public static Db2Container container =  new Db2Container().acceptLicense().withUrlParam("progressiveStreaming", "2");
+  public static Db2Container container = new Db2Container().acceptLicense().withUrlParam("progressiveStreaming", "2");
 
   @BeforeAll
   public static void beforeAll() {
@@ -22,6 +22,6 @@ public class DB2IntegrationTests extends AbstractSessionTests {
     dataSource.setJdbcUrl(container.getJdbcUrl());
     dataSource.setUsername(container.getUsername());
     dataSource.setPassword(container.getPassword());
-    initSession(new JdbcDataSourceProvider(dataSource));
+    initSession(new JdbcDataSourceProvider("default", dataSource));
   }
 }

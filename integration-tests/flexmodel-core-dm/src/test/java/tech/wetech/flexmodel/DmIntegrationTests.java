@@ -21,6 +21,6 @@ public class DmIntegrationTests extends AbstractSessionTests {
     dataSource.setJdbcUrl(container.getJdbcUrl());
     dataSource.setUsername(container.getUsername());
     dataSource.setPassword(container.getPassword());
-    initSession(new JdbcDataSourceProvider(dataSource));
+    initSession(new JdbcDataSourceProvider("default", dataSource));
   }
 }

@@ -29,13 +29,12 @@ public class SessionFactory {
   private final Logger log = LoggerFactory.getLogger(SessionFactory.class);
   private final JsonObjectConverter jsonObjectConverter;
 
-  SessionFactory(String defaultIdentifier, DataSourceProvider defaultDataSourceProvider, Cache cache, String importScript) {
+  SessionFactory(DataSourceProvider defaultDataSourceProvider, Cache cache) {
     this.cache = cache;
     this.jsonObjectConverter = new JacksonObjectConverter();
-    addDataSourceProvider(defaultIdentifier, defaultDataSourceProvider);
+    addDataSourceProvider(defaultDataSourceProvider);
     this.mappedModels = initializeMappedModels(defaultDataSourceProvider);
     processBuildItem();
-    loadScript(defaultIdentifier, importScript);
   }
 
   private MappedModels initializeMappedModels(DataSourceProvider dataSourceProvider) {
@@ -164,42 +163,42 @@ public class SessionFactory {
     return new Builder();
   }
 
-  public void addDataSourceProvider(String identifier, DataSourceProvider dataSource) {
-    dataSourceProviders.put(identifier, dataSource);
+  public void addDataSourceProvider(DataSourceProvider dataSource) {
+    dataSourceProviders.put(dataSource.getId(), dataSource);
   }
 
-  public DataSourceProvider getDataSourceProvider(String identifier) {
-    return dataSourceProviders.get(identifier);
+  public DataSourceProvider getDataSourceProvider(String dsId) {
+    return dataSourceProviders.get(dsId);
   }
 
-  public void removeDataSourceProvider(String identifier) {
-    dataSourceProviders.remove(identifier);
+  public void removeDataSourceProvider(String dsId) {
+    dataSourceProviders.remove(dsId);
   }
 
   /**
    * 宽松模式:
    * 允许ddl语句的错误
    *
-   * @param identifier
+   * @param id
    * @return
    */
-  private Session createFailsafeSession(String identifier) {
+  private Session createFailsafeSession(String id) {
     try {
-      return switch (dataSourceProviders.get(identifier)) {
+      return switch (dataSourceProviders.get(id)) {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
-          SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), mappedModels, jsonObjectConverter, this);
+          SqlContext sqlContext = new SqlContext(id, new NamedParameterSqlExecutor(connection), mappedModels, jsonObjectConverter, this);
           sqlContext.setFailsafe(true);
           yield new SqlSession(sqlContext);
         }
         case MongoDataSourceProvider mongodb -> {
           MongoDatabase mongoDatabase = mongodb.mongoDatabase();
-          MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, mappedModels, jsonObjectConverter, this);
+          MongoContext mongoContext = new MongoContext(id, mongoDatabase, mappedModels, jsonObjectConverter, this);
           mongoContext.setFailsafe(true);
           yield new MongoSession(mongoContext);
         }
         case null,
-             default -> throw new IllegalStateException("Unexpected identifier: " + identifier);
+             default -> throw new IllegalStateException("Unexpected identifier: " + id);
       };
     } catch (Exception e) {
       throw new RuntimeException(e);
@@ -229,9 +228,7 @@ public class SessionFactory {
 
   public static class Builder {
     private Cache cache;
-    private String defaultIdentifier = "default";
     private DataSourceProvider defaultDataSourceProvider = null;
-    private String importScript = "import.json";
 
     Builder() {
     }
@@ -241,19 +238,8 @@ public class SessionFactory {
       return this;
     }
 
-    public Builder setImportScript(String importScript) {
-      this.importScript = importScript;
-      return this;
-    }
-
-    public Builder setDefaultDataSourceProvider(String defaultIdentifier, DataSourceProvider dataSourceProvider) {
-      this.defaultIdentifier = defaultIdentifier;
+    public Builder setDefaultDataSourceProvider(DataSourceProvider dataSourceProvider) {
       this.defaultDataSourceProvider = dataSourceProvider;
-      return this;
-    }
-
-    public Builder setDefaultDataSourceProvider(DataSourceProvider defaultDataSourceProvider) {
-      this.defaultDataSourceProvider = defaultDataSourceProvider;
       return this;
     }
 
@@ -264,7 +250,7 @@ public class SessionFactory {
       if (cache == null) {
         this.cache = new ConcurrentHashMapCache();
       }
-      return new SessionFactory(defaultIdentifier, defaultDataSourceProvider, cache, importScript);
+      return new SessionFactory(defaultDataSourceProvider, cache);
     }
   }
 

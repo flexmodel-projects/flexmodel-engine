@@ -36,7 +36,7 @@ public class MongoDBIntegrationTests extends AbstractSessionTests {
     MongoClient mongoClient = MongoClients.create(container.getConnectionString());
     MongoDatabase database = mongoClient.getDatabase("test")
       .withCodecRegistry(pojoCodecRegistry);
-    initSession(new MongoDataSourceProvider(database));
+    initSession(new MongoDataSourceProvider("default", database));
   }
 
   @Test

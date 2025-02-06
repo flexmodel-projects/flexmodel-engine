@@ -7,5 +7,9 @@ import javax.sql.DataSource;
 /**
  * @author cjbi
  */
-public record JdbcDataSourceProvider(DataSource dataSource) implements DataSourceProvider {
+public record JdbcDataSourceProvider(String id, DataSource dataSource) implements DataSourceProvider {
+  @Override
+  public String getId() {
+    return id;
+  }
 }

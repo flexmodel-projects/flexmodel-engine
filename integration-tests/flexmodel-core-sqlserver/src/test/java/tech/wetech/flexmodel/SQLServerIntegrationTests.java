@@ -1,10 +1,7 @@
 package tech.wetech.flexmodel;
 
 import com.zaxxer.hikari.HikariDataSource;
-import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.MSSQLServerContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
 
 /**
@@ -13,7 +10,7 @@ import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
 // @Testcontainers
 public class SQLServerIntegrationTests extends AbstractSessionTests {
 
- // @Container
+  // @Container
   public static MSSQLServerContainer container = new MSSQLServerContainer().acceptLicense();
 
   // @BeforeAll
@@ -22,6 +19,6 @@ public class SQLServerIntegrationTests extends AbstractSessionTests {
     dataSource.setJdbcUrl(container.getJdbcUrl());
     dataSource.setUsername(container.getUsername());
     dataSource.setPassword(container.getPassword());
-    initSession(new JdbcDataSourceProvider(dataSource));
+    initSession(new JdbcDataSourceProvider("default", dataSource));
   }
 }

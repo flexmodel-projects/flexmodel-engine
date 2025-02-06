@@ -6,5 +6,9 @@ import tech.wetech.flexmodel.DataSourceProvider;
 /**
  * @author cjbi
  */
-public record MongoDataSourceProvider(MongoDatabase mongoDatabase) implements DataSourceProvider {
+public record MongoDataSourceProvider(String id, MongoDatabase mongoDatabase) implements DataSourceProvider {
+  @Override
+  public String getId() {
+    return id;
+  }
 }

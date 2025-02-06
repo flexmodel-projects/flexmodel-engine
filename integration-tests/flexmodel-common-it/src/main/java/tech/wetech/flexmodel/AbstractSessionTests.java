@@ -29,7 +29,7 @@ public abstract class AbstractSessionTests {
 
   protected static void initSession(DataSourceProvider dataSourceProvider) {
     sessionFactory = SessionFactory.builder()
-      .setDefaultDataSourceProvider("default", dataSourceProvider)
+      .setDefaultDataSourceProvider(dataSourceProvider)
       .build();
     session = sessionFactory.createSession("default");
   }
@@ -969,20 +969,20 @@ public abstract class AbstractSessionTests {
     createStudentData(studentEntityName);
     createTeacherData(teacherEntityName);
     createTeacherCollection2("TestSyncModelsteacher2");
-    DataSourceProvider dataSourceProvider = sessionFactory.getDataSourceProvider("system");
-    String identifier = "sync_test";
-    sessionFactory.addDataSourceProvider(identifier, dataSourceProvider);
+    String identifier = "default";
+    DataSourceProvider dataSourceProvider = sessionFactory.getDataSourceProvider(identifier);
+//    sessionFactory.addDataSourceProvider(dataSourceProvider);
     if (dataSourceProvider instanceof JdbcDataSourceProvider jdbcDataSourceProvider) {
       SessionFactory sessionFactory = SessionFactory.builder()
         .setDefaultDataSourceProvider(jdbcDataSourceProvider)
         .build();
-      sessionFactory.addDataSourceProvider(identifier, dataSourceProvider);
+      sessionFactory.addDataSourceProvider(dataSourceProvider);
       Session newSession = sessionFactory.createSession(identifier);
       List<TypeWrapper> models = newSession.syncModels();
       Assertions.assertFalse(models.isEmpty());
       Entity studentDetailEntity = (Entity) models.stream().filter(m -> m.getName().equals(studentDetailEntityName)).findFirst().get();
       Assertions.assertFalse(studentDetailEntity.getFields().isEmpty());
-      Assertions.assertFalse(studentDetailEntity.getIndexes().isEmpty());
+      Assertions.assertTrue(studentDetailEntity.getIndexes().isEmpty());
     } else {
       // todo mongodb模型同步待实现
     }

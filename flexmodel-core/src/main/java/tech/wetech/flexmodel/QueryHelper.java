@@ -104,6 +104,7 @@ public class QueryHelper {
                   continue;
                 }
                 projection.addField(field.getName(), field(relationField.getFrom() + "_rel" + "." + field.getName()));
+                sessionContext.addAliasModelIfPresent(relationField.getFrom() + "_rel", from);
               }
               return projection;
             }

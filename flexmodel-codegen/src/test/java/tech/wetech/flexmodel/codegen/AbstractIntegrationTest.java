@@ -22,9 +22,9 @@ public class AbstractIntegrationTest {
   static void init() {
     HikariDataSource dataSource = new HikariDataSource();
     dataSource.setJdbcUrl("jdbc:sqlite:file::memory:?cache=shared");
-    JdbcDataSourceProvider jdbcDataSourceProvider = new JdbcDataSourceProvider(dataSource);
+    JdbcDataSourceProvider jdbcDataSourceProvider = new JdbcDataSourceProvider(SCHEMA_NAME, dataSource);
     SessionFactory sessionFactory = SessionFactory.builder()
-      .setDefaultDataSourceProvider("system", jdbcDataSourceProvider)
+      .setDefaultDataSourceProvider(jdbcDataSourceProvider)
       .build();
     session = sessionFactory.createSession(SCHEMA_NAME);
   }
