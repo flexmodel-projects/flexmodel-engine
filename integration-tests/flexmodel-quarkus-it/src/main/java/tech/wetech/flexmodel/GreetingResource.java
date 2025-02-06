@@ -23,7 +23,7 @@ public class GreetingResource {
     dataSource.setMaxLifetime(30000); // 30s
     dataSource.setJdbcUrl("jdbc:sqlite:file::memory:?cache=shared");
     return SessionFactory.builder()
-      .setDefaultDataSourceProvider("system", new JdbcDataSourceProvider(dataSource))
+      .setDefaultDataSourceProvider(new JdbcDataSourceProvider("system", dataSource))
       .build();
   }
 

@@ -8,10 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 用于执行代码生成，允许通过命令行参数配置。
@@ -44,6 +41,7 @@ public class GenerationTool {
     Configuration.Schema schema = configuration.getSchema();
     JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
     Set<TypeWrapper> models = new HashSet<>();
+    List<ImportDescribe.ImportData> data = new ArrayList<>();
     // read from script
     String importScript = configuration.getSchema().getImportScript();
     File scriptFile = Path.of(configuration.getTarget().getBaseDir(), importScript).toFile();
@@ -54,6 +52,7 @@ public class GenerationTool {
         String content = Files.readString(scriptFile.toPath());
         ImportDescribe describe = jsonObjectConverter.parseToObject(content, ImportDescribe.class);
         models.addAll(describe.getSchema());
+        data.addAll(describe.getData());
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -116,13 +115,14 @@ public class GenerationTool {
     );
 
     SchemaGenerator schemaClassGenerator = new SchemaGenerator();
+    multipleModelGenerationContext.putVariable("import_data", data);
     schemaClassGenerator.generate(multipleModelGenerationContext, Path.of(targetDirectory, StringUtils.capitalize(schema.getName()) + ".java").toString());
 
     StringUtils.createDirectoriesIfNotExists(configuration.getTarget().getBaseDir() + "/target/classes/META-INF/services");
     BuildItemSPIFileGenerator buildItemSPIFileGenerator = new BuildItemSPIFileGenerator();
     buildItemSPIFileGenerator.generate(multipleModelGenerationContext, Path.of(
       configuration.getTarget().getBaseDir(),
-      "/target/classes/META-INF/services",
+      "target/classes/META-INF/services",
       "tech.wetech.flexmodel.BuildItem"
     ).toString());
   }

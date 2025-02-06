@@ -14,5 +14,7 @@ public interface BuildItem {
    *
    * @return
    */
-  List<TypeWrapper> getModels();
+  List<TypeWrapper> getSchema();
+
+  List<ImportDescribe.ImportData> getData();
 }

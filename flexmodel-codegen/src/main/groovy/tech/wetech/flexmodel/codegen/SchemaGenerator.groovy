@@ -28,6 +28,7 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println "import tech.wetech.flexmodel.Entity;"
     out.println "import tech.wetech.flexmodel.Enum;"
     out.println "import tech.wetech.flexmodel.TypeWrapper;"
+    out.println "import tech.wetech.flexmodel.ImportDescribe;"
     out.println ""
     out.println "import java.util.ArrayList;"
     out.println "import java.util.List;"
@@ -83,7 +84,7 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println "  }"
     out.println ""
     out.println "  @Override"
-    out.println "  public List<TypeWrapper> getModels() {"
+    out.println "  public List<TypeWrapper> getSchema() {"
     out.println "    List<TypeWrapper> list = new ArrayList<>();"
     modelListClass.modelList.each { model ->
       out.println "    list.add(${model.variableName});"
@@ -94,6 +95,18 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println "    return list;"
     out.println "  }"
     out.println ""
+    out.println "  @Override"
+    out.println "  public List<ImportDescribe.ImportData> getData() {"
+    out.println "    JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();"
+    out.println "    List<ImportDescribe.ImportData> list = new ArrayList<>();"
+    List<?> data = context.getVariable("import_data");
+    data.each {
+      out.println "    list.add(jsonObjectConverter.parseToObject(\"\"\""
+      out.println "    ${jsonObjectConverter.toJsonString(it)}"
+      out.println "    \"\"\", ImportDescribe.ImportData.class));"
+    }
+    out.println "    return list;"
+    out.println "  }"
     out.println "}"
 
   }

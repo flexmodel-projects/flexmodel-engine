@@ -56,9 +56,10 @@ public class SessionFactory {
   }
 
   private void processBuildItem(BuildItem buildItem) {
-    buildItem.getModels().forEach(model -> cache.put(buildItem.getSchemaName() + ":" + model.getName(), model));
+    buildItem.getSchema().forEach(model -> cache.put(buildItem.getSchemaName() + ":" + model.getName(), model));
     try (Session session = createFailsafeSession(buildItem.getSchemaName())) {
-      processModels(buildItem.getModels(), session);
+      processModels(buildItem.getSchema(), session);
+      processImportData(buildItem.getData(), session);
     }
   }
 
