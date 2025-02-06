@@ -70,8 +70,8 @@ public class SessionFactory {
     }
   }
 
-  public void loadScript(String schemaName, String scriptName) {
-    try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(scriptName)) {
+  public void loadScript(String schemaName, String scriptName, ClassLoader classLoader) {
+    try (InputStream is = classLoader.getResourceAsStream(scriptName)) {
       if (is == null) {
         log.warn("Script file not found: {}", scriptName);
         return;
@@ -81,6 +81,10 @@ public class SessionFactory {
     } catch (IOException e) {
       log.error("Failed to read import script: {}", e.getMessage(), e);
     }
+  }
+
+  public void loadScript(String schemaName, String scriptName) {
+    loadScript(schemaName, scriptName, this.getClass().getClassLoader());
   }
 
   private void processModels(List<TypeWrapper> models, Session session) {
