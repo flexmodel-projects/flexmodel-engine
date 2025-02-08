@@ -1,5 +1,6 @@
 package tech.wetech.flexmodel.codegen
 
+
 import tech.wetech.flexmodel.JsonObjectConverter
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter
 
@@ -24,6 +25,7 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println ""
     out.println "import tech.wetech.flexmodel.JsonObjectConverter;"
     out.println "import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;"
+    out.println "import tech.wetech.flexmodel.codegen.ObjectUtils;"
     out.println "import tech.wetech.flexmodel.BuildItem;"
     out.println "import tech.wetech.flexmodel.Entity;"
     out.println "import tech.wetech.flexmodel.Enum;"
@@ -32,10 +34,6 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println ""
     out.println "import java.util.ArrayList;"
     out.println "import java.util.List;"
-    out.println ""
-    modelListClass.imports.each(importStatement ->
-      out.println "import ${importStatement};"
-    )
     out.println ""
 
     // Write class-level comments
@@ -96,15 +94,17 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println "  }"
     out.println ""
     out.println "  @Override"
+    out.println "  @SuppressWarnings(\"all\")"
     out.println "  public List<ImportDescribe.ImportData> getData() {"
-    out.println "    JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();"
     out.println "    List<ImportDescribe.ImportData> list = new ArrayList<>();"
-    List<?> data = context.getVariable("import_data");
-    data.each {
-      out.println "    list.add(jsonObjectConverter.parseToObject(\"\"\""
-      out.println "    ${jsonObjectConverter.toJsonString(it)}"
-      out.println "    \"\"\", ImportDescribe.ImportData.class));"
+    out.println "    try {"
+    List<?> list = context.getVariable("import_data");
+    list.each {
+      out.println "      list.add((ImportDescribe.ImportData) ObjectUtils.deserialize(\"${ObjectUtils.serialize(it)}\"));"
     }
+    out.println "    } catch (Exception e) {"
+    out.println "      e.printStackTrace();"
+    out.println "    }"
     out.println "    return list;"
     out.println "  }"
     out.println "}"

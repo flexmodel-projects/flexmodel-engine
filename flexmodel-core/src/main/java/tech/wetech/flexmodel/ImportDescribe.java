@@ -1,5 +1,6 @@
 package tech.wetech.flexmodel;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -7,7 +8,7 @@ import java.util.Map;
 /**
  * @author cjbi
  */
-public class ImportDescribe {
+public class ImportDescribe implements Serializable {
 
   private List<TypeWrapper> schema = new ArrayList<>();
   private List<ImportData> data = new ArrayList<>();
@@ -28,7 +29,7 @@ public class ImportDescribe {
     this.data = data;
   }
 
-  public static class ImportData {
+  public static class ImportData implements Serializable {
     private String modelName;
     private List<Map<String, Object>> values;
 
