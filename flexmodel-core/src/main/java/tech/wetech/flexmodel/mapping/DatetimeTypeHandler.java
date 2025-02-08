@@ -16,13 +16,15 @@ public class DatetimeTypeHandler implements TypeHandler<LocalDateTime> {
     if (value instanceof LocalDateTime localDateTime) {
       return localDateTime;
     }
-    // 使用 DateTimeFormatterBuilder 创建解析器
-    DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-      .appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
-      .appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-      .appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS"))
-      .appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
-      .toFormatter();
-    return LocalDateTime.parse(value.toString(), formatter);
+    try {
+      return LocalDateTime.parse(value.toString());
+    } catch (Exception e) {
+      // 使用 DateTimeFormatterBuilder 创建解析器
+      DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+        .appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
+        .appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        .toFormatter();
+      return LocalDateTime.parse(value.toString(), formatter);
+    }
   }
 }

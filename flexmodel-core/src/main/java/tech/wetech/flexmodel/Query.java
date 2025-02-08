@@ -176,6 +176,16 @@ public class Query implements Serializable {
     return this;
   }
 
+  public Query enableNestedQuery() {
+    this.nestedQueryEnabled = true;
+    return this;
+  }
+
+  public Query disableNestedQuery() {
+    this.nestedQueryEnabled = false;
+    return this;
+  }
+
   public static class Page implements Serializable {
 
     public static final int DEFAULT_PAGE_NUMBER = 1;

@@ -39,7 +39,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
     Optional<IDField> idFieldOptional = entity.findIdField();
     if (idFieldOptional.isPresent()) {
       IDField idField = idFieldOptional.get();
-      if (record.containsKey(idField.getName())) {
+      if (record.get(idField.getName()) != null) {
         id.accept(record.get(idField.getName()));
         return sqlExecutor.update(sql, record);
       }
