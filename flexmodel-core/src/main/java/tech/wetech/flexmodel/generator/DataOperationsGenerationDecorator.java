@@ -42,13 +42,13 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
       if (field instanceof RelationField) {
         continue;
       }
-      Object value = data.get(field.getName());
+      Object value = newData.get(field.getName());
       // 仅支持新增修改默认值
       Object generatedValue = switch (field) {
         case IDField idField -> generateValue(idField, value, isUpdate);
-        case DatetimeField datetimeField -> generateValue(datetimeField, isUpdate);
-        case DateField dateField -> generateValue(dateField, isUpdate);
-        default -> field.getDefaultValue();
+        case DatetimeField datetimeField -> generateValue(datetimeField, value, isUpdate);
+        case DateField dateField -> generateValue(dateField, value, isUpdate);
+        default -> value != null ? value : convertParameter(field, field.getDefaultValue());
       };
       if (generatedValue != null) {
         newData.put(field.getName(), generatedValue);
@@ -68,8 +68,8 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
     return null;
   }
 
-  private Object generateValue(DatetimeField field, boolean isUpdate) {
-    if (field.getGeneratedValue() != null) {
+  private Object generateValue(DatetimeField field, Object value, boolean isUpdate) {
+    if (field.getGeneratedValue() != null && value == null) {
       if (field.getGeneratedValue() == DatetimeField.GeneratedValue.NOW_ON_CREATE && !isUpdate) {
         return LocalDateTime.now();
       } else if (field.getGeneratedValue() == DatetimeField.GeneratedValue.NOW_ON_UPDATE && isUpdate) {
@@ -78,11 +78,11 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
         return LocalDateTime.now();
       }
     }
-    return null;
+    return value;
   }
 
-  private Object generateValue(DateField field, boolean isUpdate) {
-    if (field.getGeneratedValue() != null) {
+  private Object generateValue(DateField field, Object value, boolean isUpdate) {
+    if (field.getGeneratedValue() != null && value == null) {
       if (field.getGeneratedValue() == DateField.GeneratedValue.NOW_ON_CREATE && !isUpdate) {
         return LocalDate.now();
       } else if (field.getGeneratedValue() == DateField.GeneratedValue.NOW_ON_UPDATE && isUpdate) {
@@ -91,7 +91,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
         return LocalDate.now();
       }
     }
-    return null;
+    return value;
   }
 
   @Override

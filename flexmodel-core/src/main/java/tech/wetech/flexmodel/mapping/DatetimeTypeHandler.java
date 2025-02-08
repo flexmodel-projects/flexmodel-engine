@@ -21,6 +21,7 @@ public class DatetimeTypeHandler implements TypeHandler<LocalDateTime> {
     } catch (Exception e) {
       // 使用 DateTimeFormatterBuilder 创建解析器
       DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+        .appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"))
         .appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))
         .appendOptional(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
         .toFormatter();

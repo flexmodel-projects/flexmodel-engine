@@ -48,6 +48,21 @@ public class ImportDescribe implements Serializable {
     public void setValues(List<Map<String, Object>> values) {
       this.values = values;
     }
+
+    @Override
+    public String toString() {
+      return "ImportData{" +
+             "modelName='" + modelName + '\'' +
+             ", values=" + values +
+             '}';
+    }
   }
 
+  @Override
+  public String toString() {
+    return "ImportDescribe{" +
+           "schema=" + schema +
+           ", data=" + data +
+           '}';
+  }
 }
