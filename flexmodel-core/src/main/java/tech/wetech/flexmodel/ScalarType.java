@@ -5,7 +5,6 @@ package tech.wetech.flexmodel;
  */
 public enum ScalarType {
   ID("id"),
-  RELATION("relation"),
   STRING("string"),
   TEXT("text"),
   DECIMAL("decimal"),
@@ -15,7 +14,8 @@ public enum ScalarType {
   DATETIME("datetime"),
   DATE("date"),
   JSON("json"),
-  ENUM("enum");
+  ENUM("enum"),
+  RELATION("relation");
   private final String type;
 
   ScalarType(String type) {

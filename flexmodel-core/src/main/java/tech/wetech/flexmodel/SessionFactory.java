@@ -147,7 +147,7 @@ public class SessionFactory {
       try {
         session.insertAll(item.getModelName(), item.getValues());
       } catch (Exception e) {
-        log.warn("Error importing data: {}", e.getMessage(), e);
+        log.warn("Error importing data: {}", e.getMessage());
       }
     });
   }
