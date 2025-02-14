@@ -58,15 +58,13 @@ public class GenerationTool {
       }
     }
 
-    PojoGenerator pojoGenerator = new PojoGenerator();
-    DaoGenerator daoGenerator = new DaoGenerator();
-    EnumGenerator enumGenerator = new EnumGenerator();
     String packageName = configuration.getTarget().getPackageName();
     String targetDirectory = configuration.getTarget().getDirectory() + File.separator +
                              packageName.replace(".", File.separator);
     StringUtils.createDirectoriesIfNotExists(targetDirectory + File.separator + "dao");
     StringUtils.createDirectoriesIfNotExists(targetDirectory + File.separator + "entity");
     StringUtils.createDirectoriesIfNotExists(targetDirectory + File.separator + "enumeration");
+    StringUtils.createDirectoriesIfNotExists(targetDirectory + File.separator + "dsl");
 
     Map<String, ModelClass> modelClassMap = new HashMap<>();
     Map<String, EnumClass> enumClassMap = new HashMap<>();
@@ -79,6 +77,9 @@ public class GenerationTool {
     }
 
     // generate single model file
+    DaoGenerator daoGenerator = new DaoGenerator();
+    PojoGenerator pojoGenerator = new PojoGenerator();
+    DSLGenerator dslGenerator = new DSLGenerator();
     for (TypeWrapper model : models) {
       if (model instanceof Entity) {
         GenerationContext context = new GenerationContext();
@@ -86,11 +87,14 @@ public class GenerationTool {
         context.setModelClass(modelClass);
         context.putVariable("rootPackage", packageName);
         pojoGenerator.generate(context, Path.of(targetDirectory, "entity", modelClass.getShortClassName() + ".java").toString());
+        dslGenerator.generate(context, Path.of(targetDirectory, "dsl", modelClass.getShortClassName() + "DSL.java").toString());
         daoGenerator.generate(context, Path.of(targetDirectory, "dao", modelClass.getShortClassName() + "DAO.java").toString());
       }
     }
+
     // generate multiple model file
     ModelListGenerationContext multipleModelGenerationContext = new ModelListGenerationContext();
+    multipleModelGenerationContext.putVariable("rootPackage", packageName);
     ModelListClass multipleModelClass = new ModelListClass();
     multipleModelClass.setSchemaName(schema.getName());
     multipleModelClass.setPackageName(packageName);
@@ -107,6 +111,7 @@ public class GenerationTool {
     }
 
     // generate enum class file
+    EnumGenerator enumGenerator = new EnumGenerator();
     enumClassMap.forEach((name, enumClass) -> {
         GenerationContext context = new GenerationContext();
         context.setEnumClass(enumClass);

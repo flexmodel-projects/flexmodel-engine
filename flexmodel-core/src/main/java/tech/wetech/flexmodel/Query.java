@@ -1,7 +1,6 @@
 package tech.wetech.flexmodel;
 
-import tech.wetech.flexmodel.criterion.Example;
-import tech.wetech.flexmodel.criterion.Example.Criteria;
+import tech.wetech.flexmodel.dsl.Predicate;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -117,10 +116,8 @@ public class Query implements Serializable {
     return this;
   }
 
-  public Query withFilter(UnaryOperator<Criteria> filter) {
-    Example example = new Example();
-    filter.apply(example.createCriteria());
-    this.filter = example.toFilterString();
+  public Query withFilter(Predicate condition) {
+    this.filter = condition.toJsonString();
     return this;
   }
 
@@ -280,10 +277,8 @@ public class Query implements Serializable {
       return filter;
     }
 
-    public Join withFilter(UnaryOperator<Criteria> filter) {
-      Example example = new Example();
-      filter.apply(example.createCriteria());
-      this.filter = example.toFilterString();
+    public Join withFilter(Predicate condition) {
+      this.filter = condition.toJsonString();
       return this;
     }
 

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static tech.wetech.flexmodel.Projections.field;
+import static tech.wetech.flexmodel.dsl.Expressions.field;
 
 /**
  * @author cjbi
@@ -56,7 +56,7 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
     List<Map<String, Object>> list = session.find(entity.getName(), query -> query
       .withProjection(projection -> {
         IDField idField = entity.findIdField().orElseThrow();
-        projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
+        projection.addField(idField.getName(), Projections.field(entity.getName() + "." + idField.getName()));
         for (SelectedField selectedField : selectedFields) {
           TypedField<?, ?> flexModelField = targetEntity.getField(selectedField.getName());
           if (flexModelField == null) {
@@ -66,12 +66,12 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
             relationFields.add(secondaryRelationField);
             continue;
           }
-          projection.addField(selectedField.getName(), field(targetEntity.getName() + "." + flexModelField.getName()));
+          projection.addField(selectedField.getName(), Projections.field(targetEntity.getName() + "." + flexModelField.getName()));
         }
         return projection;
       })
       .withJoin(joins -> joins.addLeftJoin(join -> join.setFrom(targetEntity.getName())))
-      .withFilter(f -> f.equalTo(entity.getName() + "." + entity.findIdField().map(IDField::getName).orElseThrow(), id))
+      .withFilter(field(entity.getName() + "." + entity.findIdField().map(IDField::getName).orElseThrow()).eq(id))
     );
     List<Map<String, Object>> result = new ArrayList<>();
     for (Map<String, Object> map : list) {

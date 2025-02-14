@@ -17,6 +17,7 @@ class SchemaGenerator extends AbstractModelListGenerator {
    */
   @Override
   def generate(PrintWriter out, ModelListGenerationContext context) {
+    String rootPackage = context.getVariable("rootPackage");
     def modelListClass = context.modelListClass
     def className = modelListClass.schemaName.capitalize()
     JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
@@ -31,6 +32,10 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println "import tech.wetech.flexmodel.Enum;"
     out.println "import tech.wetech.flexmodel.TypeWrapper;"
     out.println "import tech.wetech.flexmodel.ImportDescribe;"
+    modelListClass.modelList.each {
+      out.println "import ${rootPackage}.dsl.${it.shortClassName}DSL;"
+    }
+
     out.println ""
     out.println "import java.util.ArrayList;"
     out.println "import java.util.List;"
@@ -50,31 +55,8 @@ class SchemaGenerator extends AbstractModelListGenerator {
         out.println "   * ${model.comment}"
         out.println "   */"
       }
-      out.println "  public static final Entity ${model.variableName};"
+      out.println "  public static final ${model.shortClassName}DSL ${model.variableName} = new ${model.shortClassName}DSL();"
     }
-    modelListClass.enumList.each { model ->
-      out.println ""
-      if (model.comment) {
-        out.println "  /**"
-        out.println "   * ${model.comment}"
-        out.println "   */"
-      }
-      out.println "  public static final Enum ${model.variableName};"
-    }
-    out.println ""
-    out.println "  static {"
-    out.println "    JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();"
-    modelListClass.modelList.each { model ->
-      out.println "    ${model.variableName} = jsonObjectConverter.parseToObject(\"\"\""
-      out.println "    ${jsonObjectConverter.toJsonString(model.originalModel)}"
-      out.println "    \"\"\", Entity.class);"
-    }
-    modelListClass.enumList.each { model ->
-      out.println "    ${model.variableName} = jsonObjectConverter.parseToObject(\"\"\""
-      out.println "    ${jsonObjectConverter.toJsonString(model.originalEnum)}"
-      out.println "    \"\"\", Enum.class);"
-    }
-    out.println "  }"
     out.println ""
     out.println "  @Override"
     out.println "  public String getSchemaName() {"
@@ -83,6 +65,17 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println ""
     out.println "  @Override"
     out.println "  public List<TypeWrapper> getSchema() {"
+    out.println "    JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();"
+    modelListClass.modelList.each { model ->
+      out.println "    Entity ${model.variableName} = jsonObjectConverter.parseToObject(\"\"\""
+      out.println "    ${jsonObjectConverter.toJsonString(model.originalModel)}"
+      out.println "    \"\"\", Entity.class);"
+    }
+    modelListClass.enumList.each { model ->
+      out.println "    Enum ${model.variableName} = jsonObjectConverter.parseToObject(\"\"\""
+      out.println "    ${jsonObjectConverter.toJsonString(model.originalEnum)}"
+      out.println "    \"\"\", Enum.class);"
+    }
     out.println "    List<TypeWrapper> list = new ArrayList<>();"
     modelListClass.modelList.each { model ->
       out.println "    list.add(${model.variableName});"

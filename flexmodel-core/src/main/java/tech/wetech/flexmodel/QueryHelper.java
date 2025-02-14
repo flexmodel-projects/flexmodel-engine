@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import static tech.wetech.flexmodel.Projections.field;
+import static tech.wetech.flexmodel.dsl.Expressions.field;
 
 /**
  * @author cjbi
@@ -89,37 +89,8 @@ public class QueryHelper {
     return relationFields;
   }
 
-  private static List<Map<String, Object>> findRelationList(AbstractSessionContext sessionContext,
-                                                            BiFunction<String, Query,
-                                                              List<Map<String, Object>>> relationFn,
-                                                            RelationField relationField, List<Object> ids) {
-    Model model = (Model) sessionContext.getModel(relationField.getModelName());
-    if (model instanceof Entity entity) {
-      return relationFn.apply(entity.getName(),
-        new Query()
-          .withProjection(projection -> {
-              Entity from = (Entity) sessionContext.getModel(relationField.getFrom());
-              for (TypedField<?, ?> field : from.getFields()) {
-                if (field instanceof RelationField) {
-                  continue;
-                }
-                projection.addField(field.getName(), field(relationField.getFrom() + "_rel" + "." + field.getName()));
-                sessionContext.addAliasModelIfPresent(relationField.getFrom() + "_rel", from);
-              }
-              return projection;
-            }
-          )
-          .withJoin(joins -> joins.addInnerJoin(join -> join
-              .setFrom(relationField.getFrom())
-              .setAs(relationField.getFrom() + "_rel")
-              .setLocalField(relationField.getLocalField())
-              .setForeignField(relationField.getForeignField())
-            )
-          )
-          .withFilter(f -> f.in(entity.getName() + "." + relationField.getLocalField(), ids))
-      );
-    }
-    return List.of();
+  private static List<Map<String, Object>> findRelationList(BiFunction<String, Query, List<Map<String, Object>>> relationFn, RelationField relationField, Set<Object> ids) {
+    return relationFn.apply(relationField.getFrom(), new Query().withFilter(field("locked").in(ids)));
   }
 
   public static void nestedQuery(List<Map<String, Object>> parentList,
@@ -147,15 +118,16 @@ public class QueryHelper {
     relationFieldMap.entrySet().parallelStream().forEach(entry -> {
       String key = entry.getKey();
       RelationField relationField = entry.getValue();
-      List<Object> ids = parentList.stream()
+      // 获取本地字段的值
+      Set<Object> ids = parentList.stream()
         .map(item -> item.get(relationField.getLocalField()))
         .filter(Objects::nonNull)
-        .toList();
-      Map<Object, List<Map<String, Object>>> relationDataGroup = findRelationList(sessionContext, relationFn, relationField, ids).stream()
+        .collect(Collectors.toSet());
+      Map<Object, List<Map<String, Object>>> relationDataGroup = findRelationList(relationFn, relationField, ids).stream()
         .collect(Collectors.groupingBy(e -> e.get(relationField.getForeignField())));
 
       parentList.forEach(item -> {
-        if (model instanceof Entity entity) {
+        if (model instanceof Entity) {
           Object id = item.get(relationField.getLocalField());
           if (id == null) {
             item.put(key, relationField.isMultiple() ? List.of() : null);

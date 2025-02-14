@@ -1,7 +1,5 @@
 package tech.wetech.flexmodel;
 
-import tech.wetech.flexmodel.criterion.Example;
-
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -155,9 +153,9 @@ public interface DataOperations {
   /**
    * Find a record by ID
    *
-   * @param modelName Model name
-   * @param id        ID
-   * @param nestedQuery      Whether to perform a nested fetch
+   * @param modelName   Model name
+   * @param id          ID
+   * @param nestedQuery Whether to perform a nested fetch
    * @return Record
    */
   @SuppressWarnings("unchecked")
@@ -220,10 +218,10 @@ public interface DataOperations {
    * @param unaryOperator Unary operator for criteria
    * @return Number of affected rows
    */
-  default int update(String modelName, Map<String, Object> record, UnaryOperator<Example.Criteria> unaryOperator) {
-    Example example = new Example();
-    unaryOperator.apply(example.createCriteria());
-    return update(modelName, record, example.toFilterString());
+  default int update(String modelName, Map<String, Object> record, UnaryOperator<Query> unaryOperator) {
+    Query query = new Query();
+    unaryOperator.apply(query);
+    return update(modelName, record, query.getFilter());
   }
 
   /**
@@ -233,10 +231,10 @@ public interface DataOperations {
    * @param unaryOperator Unary operator for criteria
    * @return Number of affected rows
    */
-  default int delete(String modelName, UnaryOperator<Example.Criteria> unaryOperator) {
-    Example example = new Example();
-    unaryOperator.apply(example.createCriteria());
-    return delete(modelName, example.toFilterString());
+  default int delete(String modelName, UnaryOperator<Query> unaryOperator) {
+    Query query = new Query();
+    unaryOperator.apply(query);
+    return delete(modelName, query.getFilter());
   }
 
 }

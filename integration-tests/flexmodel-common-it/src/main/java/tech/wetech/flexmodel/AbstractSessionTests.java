@@ -3,6 +3,7 @@ package tech.wetech.flexmodel;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tech.wetech.flexmodel.dsl.Expressions;
 import tech.wetech.flexmodel.dto.TeacherDTO;
 import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
@@ -326,7 +327,7 @@ public abstract class AbstractSessionTests {
       .withJoin(joins -> joins
         .addLeftJoin(join -> join.setFrom(studentDetailEntityName))
       )
-      .withFilter(f -> f.equalTo(studentEntityName + ".id", 1))
+      .withFilter(Expressions.field(studentEntityName + ".id").eq(1))
     ).getFirst();
     Assertions.assertEquals("张三", oneToOne.get("studentName"));
     Assertions.assertEquals("张三的描述", oneToOne.get("description"));
@@ -342,7 +343,7 @@ public abstract class AbstractSessionTests {
           .setFrom(studentEntityName)
         )
       )
-      .withFilter(f -> f.equalTo(classesEntityName + ".id", 1))
+      .withFilter(Expressions.field(classesEntityName + ".id").eq(1))
     );
     Assertions.assertFalse(oneToMany.isEmpty());
     Assertions.assertEquals("一年级1班", oneToMany.getFirst().get("className"));
@@ -566,7 +567,7 @@ public abstract class AbstractSessionTests {
           .addField("teacher_id", field("id"))
           .addField("teacher_name", field("name"))
         )
-        .withFilter(f -> f.or(or -> or.equalTo("name", "张三").equalTo("name", "李四"))));
+        .withFilter(Expressions.field("name").eq("张三").or(Expressions.field("name").eq("李四"))));
     Assertions.assertFalse(list.isEmpty());
     Assertions.assertEquals(2, list.size());
   }
@@ -599,7 +600,7 @@ public abstract class AbstractSessionTests {
       .withGroupBy(groupBy -> groupBy
         .addField("teacher_name")
       )
-      .withFilter(f -> f.equalTo("name", "李四"))
+      .withFilter(Expressions.field("name").eq("李四"))
     );
     Assertions.assertFalse(groupList.isEmpty());
     Map<String, Object> groupFirst = groupList.getFirst();
@@ -668,7 +669,7 @@ public abstract class AbstractSessionTests {
     String entityName = "testCountByCondition_teacher";
     createTeacherCollection2(entityName);
     long total = session.count(entityName, query -> query
-      .withFilter(f -> f.or(or -> or.equalTo("name", "张三").equalTo("name", "李四"))));
+      .withFilter(Expressions.field("name").eq("张三").or(Expressions.field("name").eq("李四"))));
     Assertions.assertEquals(2, total);
   }
 
