@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel;
 
+import tech.wetech.flexmodel.dsl.Predicate;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -125,6 +127,13 @@ public interface DataOperations {
     return find(modelName, query, resultType);
   }
 
+  default <T> List<T> find(String modelName, Predicate predicate, Class<T> resultType, boolean nestedQuery) {
+    Query query = new Query();
+    query.withFilter(predicate);
+    query.setNestedQueryEnabled(nestedQuery);
+    return find(modelName, query, resultType);
+  }
+
   /**
    * Find a record by ID
    *
@@ -176,6 +185,14 @@ public interface DataOperations {
     return list;
   }
 
+  default List<Map<String, Object>> find(String modelName, Predicate predicate) {
+    Query query = new Query();
+    query.withFilter(predicate);
+    List list = find(modelName, query, Map.class);
+    return list;
+  }
+
+
   @SuppressWarnings("all")
   default List<Map<String, Object>> find(String modelName, Query query) {
     List list = find(modelName, query, Map.class);
@@ -185,6 +202,12 @@ public interface DataOperations {
   default long count(String modelName, UnaryOperator<Query> queryUnaryOperator) {
     Query query = new Query();
     queryUnaryOperator.apply(query);
+    return count(modelName, query);
+  }
+
+  default long count(String modelName, Predicate predicate) {
+    Query query = new Query();
+    query.withFilter(predicate);
     return count(modelName, query);
   }
 
@@ -213,28 +236,24 @@ public interface DataOperations {
   /**
    * Update records based on conditions
    *
-   * @param modelName     Model name
-   * @param record        Record
-   * @param unaryOperator Unary operator for criteria
+   * @param modelName Model name
+   * @param record    Record
+   * @param predicate predicate
    * @return Number of affected rows
    */
-  default int update(String modelName, Map<String, Object> record, UnaryOperator<Query> unaryOperator) {
-    Query query = new Query();
-    unaryOperator.apply(query);
-    return update(modelName, record, query.getFilter());
+  default int update(String modelName, Map<String, Object> record, Predicate predicate) {
+    return update(modelName, record, predicate.toJsonString());
   }
 
   /**
    * Delete records based on conditions
    *
-   * @param modelName     Model name
-   * @param unaryOperator Unary operator for criteria
+   * @param modelName Model name
+   * @param predicate Unary operator for criteria
    * @return Number of affected rows
    */
-  default int delete(String modelName, UnaryOperator<Query> unaryOperator) {
-    Query query = new Query();
-    unaryOperator.apply(query);
-    return delete(modelName, query.getFilter());
+  default int delete(String modelName, Predicate predicate) {
+    return delete(modelName, predicate.toJsonString());
   }
 
 }

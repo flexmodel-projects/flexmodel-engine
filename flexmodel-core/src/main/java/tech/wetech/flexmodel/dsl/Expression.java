@@ -12,6 +12,10 @@ public interface Expression {
   Map<String, Object> toMap();
 
   default String toJsonString() {
+    Map<String, Object> map = toMap();
+    if (map == null || map.isEmpty()) {
+      return null;
+    }
     return new JacksonObjectConverter().toJsonString(toMap());
   }
 
