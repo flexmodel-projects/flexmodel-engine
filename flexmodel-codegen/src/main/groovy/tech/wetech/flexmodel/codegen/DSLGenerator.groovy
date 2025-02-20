@@ -1,4 +1,7 @@
 package tech.wetech.flexmodel.codegen
+
+import tech.wetech.flexmodel.TypedField
+
 /**
  * PojoGenerator Class
  * Generates Java POJOs based on the provided model definitions.
@@ -54,7 +57,7 @@ class DSLGenerator extends AbstractGenerator {
         out.println "   * ${field.comment}"
         out.println "   */"
       }
-      out.println "  public final FieldExpression<${field.shortTypeName}> ${field.fieldName} = new FieldExpression<>(\"${field.originalField.name}\");"
+      out.println "  public final FieldExpression<${field.shortTypeName}> ${field.fieldName} = new FieldExpression<>(\"${((TypedField) field.originalField).modelName}.${field.originalField.name}\");"
     }
 
     out.println ""

@@ -1,9 +1,6 @@
 package tech.wetech.flexmodel.dsl;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author cjbi
@@ -62,6 +59,14 @@ public class FieldExpression<T> implements Expression {
 
   public Predicate nin(Collection<T> values) {
     return new Predicate(fieldName, "_nin", values);
+  }
+
+  public Predicate in(T... values) {
+    return new Predicate(fieldName, "_in", List.of(values));
+  }
+
+  public Predicate nin(T... values) {
+    return new Predicate(fieldName, "_nin", List.of(values));
   }
 
   public Predicate between(T start, T end) {

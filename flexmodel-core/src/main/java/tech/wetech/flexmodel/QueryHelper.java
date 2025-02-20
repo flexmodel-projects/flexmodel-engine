@@ -90,7 +90,7 @@ public class QueryHelper {
   }
 
   private static List<Map<String, Object>> findRelationList(BiFunction<String, Query, List<Map<String, Object>>> relationFn, RelationField relationField, Set<Object> ids) {
-    return relationFn.apply(relationField.getFrom(), new Query().withFilter(field("locked").in(ids)));
+    return relationFn.apply(relationField.getFrom(), new Query().withFilter(field(relationField.getForeignField()).in(ids)));
   }
 
   public static void nestedQuery(List<Map<String, Object>> parentList,
