@@ -10,6 +10,11 @@
   <artifactId>flexmodel-core</artifactId>
   <dependencies>
     <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy</artifactId>
+      <version>1.17.1</version>
+    </dependency>
+    <dependency>
       <groupId>tech.wetech.flexmodel</groupId>
       <artifactId>flexmodel-json-logic</artifactId>
       <version>${project.version}</version>

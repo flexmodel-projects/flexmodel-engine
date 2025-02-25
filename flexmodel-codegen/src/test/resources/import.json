@@ -313,6 +313,7 @@
           "nullable": true,
           "multiple": false,
           "from": "StudentDetail",
+          "localField": "id",
           "foreignField": "studentId",
           "cascadeDelete": true
         }

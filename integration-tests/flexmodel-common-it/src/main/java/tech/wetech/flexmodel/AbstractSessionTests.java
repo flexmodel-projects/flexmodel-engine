@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import tech.wetech.flexmodel.dsl.Expressions;
 import tech.wetech.flexmodel.dto.TeacherDTO;
+import tech.wetech.flexmodel.entity.Classes;
+import tech.wetech.flexmodel.entity.Student;
+import tech.wetech.flexmodel.entity.StudentDetail;
 import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
@@ -48,7 +51,7 @@ public abstract class AbstractSessionTests {
     );
   }
 
-  void createStudentCollection(String entityName) {
+  void createStudentEntity(String entityName) {
     Enum genderEnum = session.createEnum(entityName + "_gender", en ->
       en.addElement("UNKNOWN")
         .addElement("MALE")
@@ -73,7 +76,7 @@ public abstract class AbstractSessionTests {
     );
   }
 
-  void createStudentDetailCollection(String entityName) {
+  void createStudentDetailEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(AUTO_INCREMENT))
       .addField(new BigintField("studentId"))
@@ -81,14 +84,14 @@ public abstract class AbstractSessionTests {
     );
   }
 
-  void createCourseCollection(String entityName) {
+  void createCourseEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
       .addField(new IDField("courseNo").setGeneratedValue(STRING_NOT_GENERATED))
       .addField(new StringField("courseName"))
     );
   }
 
-  void createTeacherCollection(String entityName) {
+  void createTeacherEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("teacherName"))
@@ -103,6 +106,7 @@ public abstract class AbstractSessionTests {
       new RelationField("students")
         .setModelName(classRoomEntityName)
         .setFrom(studentEntityName)
+        .setLocalField("id")
         .setForeignField("classId")
         .setMultiple(true)
         .setCascadeDelete(true)
@@ -112,7 +116,17 @@ public abstract class AbstractSessionTests {
       new RelationField("studentDetail")
         .setModelName(studentEntityName)
         .setFrom(studentDetailEntityName)
+        .setLocalField("id")
         .setForeignField("studentId")
+        .setMultiple(false)
+    );
+    // 明细:学生 -> 1:1
+    session.createField(
+      new RelationField("student")
+        .setModelName(studentDetailEntityName)
+        .setFrom(studentEntityName)
+        .setLocalField("studentId")
+        .setForeignField("id")
         .setMultiple(false)
     );
   }
@@ -308,10 +322,10 @@ public abstract class AbstractSessionTests {
     String courseEntityName = "TestRelationCourse";
     String teacherEntityName = "TestRelationTeacher";
     createClassesEntity(classesEntityName);
-    createStudentCollection(studentEntityName);
-    createStudentDetailCollection(studentDetailEntityName);
-    createCourseCollection(courseEntityName);
-    createTeacherCollection(teacherEntityName);
+    createStudentEntity(studentEntityName);
+    createStudentDetailEntity(studentDetailEntityName);
+    createCourseEntity(courseEntityName);
+    createTeacherEntity(teacherEntityName);
     createAssociations(classesEntityName, studentEntityName, studentDetailEntityName, courseEntityName, teacherEntityName);
     createCourseData(courseEntityName);
     createClassesData(classesEntityName);
@@ -354,7 +368,7 @@ public abstract class AbstractSessionTests {
   @Test
   void testEnum() {
     String studentEntityName = "testEnumStudent";
-    createStudentCollection(studentEntityName);
+    createStudentEntity(studentEntityName);
     createStudentData(studentEntityName);
     List<Map> list = session.find("testEnumStudent", q -> q, Map.class);
     Assertions.assertFalse(list.isEmpty());
@@ -842,7 +856,7 @@ public abstract class AbstractSessionTests {
   }
 
   @Test
-  void testCreateCollection() {
+  void testCreateEntity() {
     createStudentCollection2("testCreateEntity_holiday");
   }
 
@@ -861,10 +875,10 @@ public abstract class AbstractSessionTests {
     String courseEntityName = "TestModifyFieldCourse";
     String teacherEntityName = "TestModifyFieldTeacher";
     createClassesEntity(classesEntityName);
-    createStudentCollection(studentEntityName);
-    createStudentDetailCollection(studentDetailEntityName);
-    createCourseCollection(courseEntityName);
-    createTeacherCollection(teacherEntityName);
+    createStudentEntity(studentEntityName);
+    createStudentDetailEntity(studentDetailEntityName);
+    createCourseEntity(courseEntityName);
+    createTeacherEntity(teacherEntityName);
     createAssociations(classesEntityName, studentEntityName, studentDetailEntityName, courseEntityName, teacherEntityName);
     createCourseData(courseEntityName);
     createClassesData(classesEntityName);
@@ -960,10 +974,10 @@ public abstract class AbstractSessionTests {
     String courseEntityName = "TestSyncModelsCourse";
     String teacherEntityName = "TestSyncModelsTeacher";
     createClassesEntity(classesEntityName);
-    createStudentCollection(studentEntityName);
-    createStudentDetailCollection(studentDetailEntityName);
-    createCourseCollection(courseEntityName);
-    createTeacherCollection(teacherEntityName);
+    createStudentEntity(studentEntityName);
+    createStudentDetailEntity(studentDetailEntityName);
+    createCourseEntity(courseEntityName);
+    createTeacherEntity(teacherEntityName);
     createAssociations(classesEntityName, studentEntityName, studentDetailEntityName, courseEntityName, teacherEntityName);
     createCourseData(courseEntityName);
     createClassesData(classesEntityName);
@@ -993,6 +1007,38 @@ public abstract class AbstractSessionTests {
   @Test
   void testLoadScript() {
     sessionFactory.loadScript("default", "import.json");
+  }
+
+  @Test
+  void testLazyLoad() {
+    String classesEntityName = "testLazyLoad_Classes";
+    String studentEntityName = "testLazyLoad_Student";
+    String studentDetailEntityName = "testLazyLoad_StudentDetail";
+    String courseEntityName = "testLazyLoad_Course";
+    String teacherEntityName = "testLazyLoad_Teacher";
+    createClassesEntity(classesEntityName);
+    createStudentEntity(studentEntityName);
+    createStudentDetailEntity(studentDetailEntityName);
+    createCourseEntity(courseEntityName);
+    createTeacherEntity(teacherEntityName);
+    createAssociations(classesEntityName, studentEntityName, studentDetailEntityName, courseEntityName, teacherEntityName);
+    createCourseData(courseEntityName);
+    createClassesData(classesEntityName);
+    createStudentData(studentEntityName);
+    createTeacherData(teacherEntityName);
+    List<Classes> classesList = session.find(classesEntityName, new Query(), Classes.class);
+    for (Classes classes : classesList) {
+      for (Student student : classes.getStudents()) {
+        StudentDetail studentDetail = student.getStudentDetail();
+        StudentDetail studentDetail2 = student.getStudentDetail();
+        StudentDetail studentDetail3 = student.getStudentDetail();
+        Assertions.assertNotNull(studentDetail);
+        Assertions.assertNotNull(studentDetail2);
+        Assertions.assertNotNull(studentDetail3);
+        Assertions.assertNotNull(studentDetail.getStudent());
+      }
+    }
+//    System.out.println(new JacksonObjectConverter().toJsonString(classesList));
   }
 
 }

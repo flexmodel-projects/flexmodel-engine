@@ -127,10 +127,9 @@ public interface DataOperations {
     return find(modelName, query, resultType);
   }
 
-  default <T> List<T> find(String modelName, Predicate predicate, Class<T> resultType, boolean nestedQuery) {
+  default <T> List<T> find(String modelName, Predicate predicate, Class<T> resultType) {
     Query query = new Query();
     query.withFilter(predicate);
-    query.setNestedQueryEnabled(nestedQuery);
     return find(modelName, query, resultType);
   }
 

@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel;
 
+import tech.wetech.flexmodel.lazy.LazyObjProxy;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -29,12 +31,12 @@ public class AbstractDataOperationsDecorator implements DataOperations {
 
   @Override
   public <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery) {
-    return delegate.findById(modelName, id, resultType, nestedQuery);
+    return LazyObjProxy.createProxy(delegate.findById(modelName, id, resultType, nestedQuery), modelName, sessionContext);
   }
 
   @Override
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
-    return delegate.find(modelName, query, resultType);
+    return LazyObjProxy.createProxyList(delegate.find(modelName, query, resultType), modelName, sessionContext);
   }
 
   @Override
