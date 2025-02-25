@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.lazy;
 
 import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.implementation.FixedValue;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
 import org.slf4j.Logger;
@@ -27,9 +28,14 @@ public class LazyObjProxy {
         .method(ElementMatchers.isGetter())
         .intercept(MethodDelegation.to(new LazyLoadInterceptor(modelName,
           sessionContext.getJsonObjectConverter().convertValue(obj, Map.class), sessionContext))) // 委托给 LazyLoadInterceptor
+        .method(ElementMatchers.named("entityInfo"))
+        .intercept(FixedValue.value(sessionContext.getModel(modelName)))
+        .method(ElementMatchers.named("originClass"))
+        .intercept(FixedValue.value(obj.getClass()))
         .make()
         .load(obj.getClass().getClassLoader())
         .getLoaded();
+
       return (T) sessionContext.getJsonObjectConverter().convertValue(obj, subClazz);
     } catch (Throwable e) {
       log.warn("Failed to create lazy class, message: {}", e.toString());

@@ -1038,7 +1038,7 @@ public abstract class AbstractSessionTests {
         Assertions.assertNotNull(studentDetail.getStudent());
       }
     }
-//    System.out.println(new JacksonObjectConverter().toJsonString(classesList));
+    System.out.println(new JacksonObjectConverter().toJsonString(classesList));
   }
 
 }

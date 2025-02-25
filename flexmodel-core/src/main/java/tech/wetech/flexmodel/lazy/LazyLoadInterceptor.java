@@ -65,6 +65,9 @@ public class LazyLoadInterceptor {
               return list;
             }
           } else {
+            if (localValue == null) {
+              return null;
+            }
             try (Session session = sessionContext.getFactory().createSession(sessionContext.getSchemaName())) {
               List<?> list = session.find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(localValue), method.getReturnType());
               if (list.isEmpty()) {
