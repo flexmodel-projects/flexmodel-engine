@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel;
 
-import tech.wetech.flexmodel.lazy.LazyObjProxy;
+import tech.wetech.flexmodel.reflect.LazyObjProxy;
 
 import java.util.List;
 import java.util.Map;

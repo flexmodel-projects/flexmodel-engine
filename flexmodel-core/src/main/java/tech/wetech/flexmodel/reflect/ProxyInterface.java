@@ -1,4 +1,4 @@
-package tech.wetech.flexmodel.lazy;
+package tech.wetech.flexmodel.reflect;
 
 import tech.wetech.flexmodel.Entity;
 

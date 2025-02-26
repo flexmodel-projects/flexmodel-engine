@@ -1,4 +1,4 @@
-package tech.wetech.flexmodel.lazy;
+package tech.wetech.flexmodel.reflect;
 
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.dsl.Expressions;
 
-import java.beans.Introspector;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
@@ -21,8 +20,6 @@ import java.util.concurrent.Callable;
  * @author cjbi
  */
 public class LazyLoadInterceptor {
-
-  private static final int MAX_STACK_DEPTH = 1000;
 
   private final String modelName;
   private final AbstractSessionContext sessionContext;
@@ -39,16 +36,10 @@ public class LazyLoadInterceptor {
   @RuntimeType
   public Object intercept(@This Object proxy, @Origin Class<?> clazz, @Origin Method method, @SuperCall Callable<?> superCall) throws Throwable {
     try {
-      StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-      if (stackTrace.length > MAX_STACK_DEPTH) {
-        // 设置最大栈深度， 避免死循环
-        log.warn("Stack depth exceeds the maximum allowed depth of {}", MAX_STACK_DEPTH);
-        return superCall.call();
-      }
       boolean loaded = loadCache.getOrDefault(method, false);
       if (!loaded) {
         Entity entity = (Entity) sessionContext.getModel(modelName);
-        String fieldName = getFieldNameFromGetter(method);
+        String fieldName = ReflectionUtils.getFieldNameFromGetter(method);
         TypedField<?, ?> field = entity.getField(fieldName);
         if (field instanceof RelationField relationField) {
           log.debug("intercept: {}", method.getName());
@@ -80,7 +71,6 @@ public class LazyLoadInterceptor {
           }
         }
       }
-
       return superCall.call();
     } finally {
       loadCache.put(method, true);
@@ -90,27 +80,13 @@ public class LazyLoadInterceptor {
 
   public void invokeSetter(Object proxy, Object value, Class<?> clazz, String fieldName, Class<?> parameterType) {
     try {
-      Method setter = clazz.getMethod("set" + toUpperCamelCase(fieldName), parameterType);
+      Method setter = clazz.getMethod("set" + ReflectionUtils.toUpperCamelCase(fieldName), parameterType);
       setter.invoke(proxy, value);
     } catch (Throwable e) {
       e.printStackTrace();
     }
   }
 
-  private String toUpperCamelCase(String str) {
-    char[] cs = str.toCharArray();
-    cs[0] -= 32;
-    return String.valueOf(cs);
-  }
 
-  public String getFieldNameFromGetter(Method method) {
-    String attr;
-    if (method.getName().startsWith("get")) {
-      attr = method.getName().substring(3);
-    } else {
-      attr = method.getName().substring(2);
-    }
-    return Introspector.decapitalize(attr);
-  }
 
 }

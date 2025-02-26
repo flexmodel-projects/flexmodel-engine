@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.*;
-import tech.wetech.flexmodel.lazy.ProxyInterface;
+import tech.wetech.flexmodel.reflect.ProxyInterface;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;

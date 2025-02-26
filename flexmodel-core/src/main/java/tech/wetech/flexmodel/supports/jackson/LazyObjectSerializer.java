@@ -5,7 +5,8 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import tech.wetech.flexmodel.Entity;
 import tech.wetech.flexmodel.RelationField;
-import tech.wetech.flexmodel.lazy.ProxyInterface;
+import tech.wetech.flexmodel.reflect.ProxyInterface;
+import tech.wetech.flexmodel.reflect.ReflectionUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -42,7 +43,7 @@ public class LazyObjectSerializer extends StdSerializer<ProxyInterface> {
         continue;
       }
       try {
-        String upperCamelCase = toUpperCamelCase(field.getName());
+        String upperCamelCase = ReflectionUtils.toUpperCamelCase(field.getName());
         String getter = "get" + upperCamelCase;
         String is = "is" + upperCamelCase;
         for (Method declaredMethod : aClass.getDeclaredMethods()) {
@@ -57,12 +58,5 @@ public class LazyObjectSerializer extends StdSerializer<ProxyInterface> {
     }
     return data;
   }
-
-  private String toUpperCamelCase(String str) {
-    char[] cs = str.toCharArray();
-    cs[0] -= 32;
-    return String.valueOf(cs);
-  }
-
 
 }
