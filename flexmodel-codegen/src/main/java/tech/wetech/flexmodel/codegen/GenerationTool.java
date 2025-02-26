@@ -147,8 +147,10 @@ public class GenerationTool {
   }
 
   public static ModelClass buildModelClass(String packageName, String schemaName, Entity entity) {
-
-    String cCamelName = StringUtils.snakeToCamel(entity.getName());
+    CodegenProperties codegenProperties = getCodegenProperties(entity);
+    String cCamelName = StringUtils.snakeToCamel(
+      codegenProperties.getReplaceString() != null ?
+        entity.getName().replaceAll(codegenProperties.getReplaceString(), "") : entity.getName());
     ModelClass modelClass = new ModelClass()
       .setComment(entity.getComment())
       .setVariableName(StringUtils.uncapitalize(cCamelName))
@@ -227,6 +229,15 @@ public class GenerationTool {
       modelClass.getAllFields().add(modelField);
     }
     return modelClass;
+  }
+
+  private static CodegenProperties getCodegenProperties(Entity entity) {
+    CodegenProperties codegenProperties = new JacksonObjectConverter()
+      .convertValue(entity.getAdditionalProperties().get("codegen"), CodegenProperties.class);
+    if (codegenProperties == null) {
+      codegenProperties = new CodegenProperties();
+    }
+    return codegenProperties;
   }
 
 }

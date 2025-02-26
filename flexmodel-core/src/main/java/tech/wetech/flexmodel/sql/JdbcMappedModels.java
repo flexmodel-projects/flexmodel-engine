@@ -21,7 +21,7 @@ import static tech.wetech.flexmodel.ScalarType.*;
  * @author cjbi
  */
 public class JdbcMappedModels implements MappedModels {
-  public static final String STORED_TABLES = "flex_models";
+  public static final String STORED_TABLES = "fe_models";
   private final DataSource dataSource;
   private final SqlDialect sqlDialect;
   private final Logger log = LoggerFactory.getLogger(JdbcMappedModels.class);
@@ -186,7 +186,7 @@ public class JdbcMappedModels implements MappedModels {
         sqlIn.add(":" + named);
       }
       String sqlDeleteString = MessageFormat.format(" \ndelete from {0} \nwhere {1}=:schemaName and {2} in ({3})",
-        sqlDialect.quoteIdentifier("flex_models"),
+        sqlDialect.quoteIdentifier(STORED_TABLES),
         sqlDialect.quoteIdentifier("schema_name"),
         sqlDialect.quoteIdentifier("model_name"),
         sqlIn
@@ -387,7 +387,8 @@ public class JdbcMappedModels implements MappedModels {
             case String contentStr -> result.add(jsonObjectConverter.parseToObject(contentStr, TypeWrapper.class));
             case Blob blob ->
               result.add(jsonObjectConverter.parseToObject(Arrays.toString(blob.getBinaryStream().readAllBytes()), TypeWrapper.class));
-            case byte[] bytes -> result.add(jsonObjectConverter.parseToObject(Arrays.toString(bytes), TypeWrapper.class));
+            case byte[] bytes ->
+              result.add(jsonObjectConverter.parseToObject(Arrays.toString(bytes), TypeWrapper.class));
             case null, default -> {
               assert content != null;
               throw new RuntimeException("get model error, unknown data type:" + content.getClass());
@@ -447,7 +448,7 @@ public class JdbcMappedModels implements MappedModels {
               "content", content));
         }
       } else {
-        String sqlInsertString = "insert into " + sqlDialect.quoteIdentifier("flex_models") +
+        String sqlInsertString = "insert into " + sqlDialect.quoteIdentifier(STORED_TABLES) +
                                  " values (:schemaName, :modelName, :modelType, :content)\n";
         sqlExecutor.update(sqlInsertString,
           Map.of("schemaName", schemaName,
@@ -472,7 +473,7 @@ public class JdbcMappedModels implements MappedModels {
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
       String sqlSelectString = "select " + sqlDialect.quoteIdentifier("content") +
-                               " \nfrom " + sqlDialect.quoteIdentifier("flex_models") +
+                               " \nfrom " + sqlDialect.quoteIdentifier(STORED_TABLES) +
                                " \nwhere " + sqlDialect.quoteIdentifier("schema_name") + "=:schemaName and " + sqlDialect.quoteIdentifier("model_name") + "=:modelName";
       String content = sqlExecutor.queryForScalar(sqlSelectString,
         Map.of("schemaName", schemaName, "modelName", modelName), String.class);
