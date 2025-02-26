@@ -28,12 +28,14 @@ public class SessionFactory {
   private final Cache cache;
   private final Logger log = LoggerFactory.getLogger(SessionFactory.class);
   private final JsonObjectConverter jsonObjectConverter;
+  private final boolean failsafe;
 
-  SessionFactory(DataSourceProvider defaultDataSourceProvider, Cache cache) {
+  SessionFactory(DataSourceProvider defaultDataSourceProvider, Cache cache, boolean failsafe) {
     this.cache = cache;
     this.jsonObjectConverter = new JacksonObjectConverter();
     addDataSourceProvider(defaultDataSourceProvider);
     this.mappedModels = initializeMappedModels(defaultDataSourceProvider);
+    this.failsafe = failsafe;
     processBuildItem();
   }
 
@@ -187,7 +189,7 @@ public class SessionFactory {
    * @param id
    * @return
    */
-  private Session createFailsafeSession(String id) {
+  public Session createFailsafeSession(String id) {
     try {
       return switch (dataSourceProviders.get(id)) {
         case JdbcDataSourceProvider jdbc -> {
@@ -212,6 +214,9 @@ public class SessionFactory {
 
   public Session createSession(String identifier) {
     try {
+      if (failsafe) {
+        return createFailsafeSession(identifier);
+      }
       return switch (dataSourceProviders.get(identifier)) {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
@@ -234,6 +239,7 @@ public class SessionFactory {
   public static class Builder {
     private Cache cache;
     private DataSourceProvider defaultDataSourceProvider = null;
+    private boolean failsafe = false;
 
     Builder() {
     }
@@ -248,6 +254,11 @@ public class SessionFactory {
       return this;
     }
 
+    public Builder setFailsafe(boolean failsafe) {
+      this.failsafe = failsafe;
+      return this;
+    }
+
     public SessionFactory build() {
       if (defaultDataSourceProvider == null) {
         throw new IllegalStateException("Please set defaultDataSourceProvider");
@@ -255,7 +266,7 @@ public class SessionFactory {
       if (cache == null) {
         this.cache = new ConcurrentHashMapCache();
       }
-      return new SessionFactory(defaultDataSourceProvider, cache);
+      return new SessionFactory(defaultDataSourceProvider, cache, failsafe);
     }
   }
 
