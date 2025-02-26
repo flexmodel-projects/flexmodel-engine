@@ -5,6 +5,7 @@ import tech.wetech.flexmodel.jsonlogic.evaluator.JsonLogicEvaluationException;
 import tech.wetech.flexmodel.jsonlogic.evaluator.JsonLogicEvaluator;
 import tech.wetech.flexmodel.jsonlogic.evaluator.JsonLogicExpression;
 import tech.wetech.flexmodel.jsonlogic.evaluator.mongodb.expressions.ComparisonMongoExpression;
+import tech.wetech.flexmodel.jsonlogic.evaluator.mongodb.expressions.InMongoExpression;
 import tech.wetech.flexmodel.jsonlogic.evaluator.mongodb.expressions.LogicMongoExpression;
 
 import java.util.ArrayList;
@@ -27,6 +28,9 @@ public class MongoJsonLogicEvaluator implements JsonLogicEvaluator {
     addOperation(ComparisonMongoExpression.GTE);
     addOperation(ComparisonMongoExpression.LT);
     addOperation(ComparisonMongoExpression.LTE);
+
+    addOperation(InMongoExpression.IN);
+    addOperation(InMongoExpression.NOT_IN);
   }
 
   @Override

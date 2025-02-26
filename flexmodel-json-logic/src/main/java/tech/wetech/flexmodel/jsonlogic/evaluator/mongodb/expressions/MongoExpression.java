@@ -4,7 +4,9 @@ import tech.wetech.flexmodel.jsonlogic.evaluator.JsonLogicExpression;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author cjbi
@@ -60,6 +62,10 @@ public abstract class MongoExpression implements JsonLogicExpression {
   }
 
   public String format(Object value) {
+    if (value instanceof Collection<?> collection) {
+      return collection.stream().map(this::format)
+        .collect(Collectors.joining(", ", "[", "]"));
+    }
     if (value == null) {
       return "null";
     }

@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MongoRendererTests {
   private static final JsonLogic jsonLogic = new JsonLogic();
+
   @Test
   void test() throws JsonLogicException {
     String json = """
@@ -29,6 +30,26 @@ public class MongoRendererTests {
         , { age: { $lt: 21.0 } }
         ]
         }
+        """,
+      bsonString);
+  }
+
+  @Test
+  void testIn() throws JsonLogicException {
+    String expression = """
+      {
+        "in": [
+          {
+            "var": "user"
+          },
+          ["A", "B", "C", 1]
+        ]
+      }
+      """;
+    String bsonString = jsonLogic.evaluateMongoBsonString(expression);
+    assertEquals(
+      """
+        { user: { $in: ["A", "B", "C", 1.0] } }
         """,
       bsonString);
   }

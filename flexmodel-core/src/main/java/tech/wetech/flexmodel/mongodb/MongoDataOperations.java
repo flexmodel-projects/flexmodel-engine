@@ -122,7 +122,9 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   @Override
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
     List<Map<String, Object>> mapList = findMapList(modelName, query);
-    QueryHelper.nestedQuery(mapList, this::findMapList, (Model) mongoContext.getModel(modelName), query, mongoContext, mongoContext.getNestedQueryMaxDepth());
+    if (query.isNestedQueryEnabled()) {
+      QueryHelper.nestedQuery(mapList, this::findMapList, (Model) mongoContext.getModel(modelName), query, mongoContext, mongoContext.getNestedQueryMaxDepth());
+    }
     return mongoContext.getJsonObjectConverter().convertValueList(mapList, resultType);
   }
 
