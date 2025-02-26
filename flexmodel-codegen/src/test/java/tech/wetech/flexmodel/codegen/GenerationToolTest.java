@@ -17,6 +17,7 @@ class GenerationToolTest extends AbstractIntegrationTest {
     target.setBaseDir("src/test/resources/");
     target.setDirectory("src/test/java");
     target.setPackageName("com.example");
+    target.setReplaceString("fs_|fe_");
     configuration.setTarget(target);
     GenerationTool.run(configuration);
   }

@@ -53,9 +53,10 @@ public class Configuration implements Serializable {
 
   public static class Target implements Serializable {
 
-    private String packageName = "tech.wetech";
-    private String directory =  null;
-    private String baseDir = null;
+    private String packageName = "com.example";
+    private String replaceString;
+    private String directory;
+    private String baseDir;
 
     public String getPackageName() {
       return packageName;
@@ -63,6 +64,14 @@ public class Configuration implements Serializable {
 
     public void setPackageName(String packageName) {
       this.packageName = packageName;
+    }
+
+    public String getReplaceString() {
+      return replaceString;
+    }
+
+    public void setReplaceString(String replaceString) {
+      this.replaceString = replaceString;
     }
 
     public String getDirectory() {

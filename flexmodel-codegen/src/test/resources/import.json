@@ -153,12 +153,7 @@
           "unique": false,
           "nullable": true,
           "modelName": "Datasource",
-          "generatedValue": "STRING_NOT_GENERATED",
-          "additionalProperties": {
-            "codegen": {
-              "replaceString": "fs_|fe_"
-            }
-          }
+          "generatedValue": "STRING_NOT_GENERATED"
         },
         {
           "name": "type",
@@ -199,12 +194,7 @@
           "defaultValue": true
         }
       ],
-      "indexes": [],
-      "additionalProperties": {
-        "codegen": {
-          "replaceString": "fs_|fe_"
-        }
-      }
+      "indexes": []
     },
     {
       "name": "fs_api_log",
@@ -261,12 +251,7 @@
           ],
           "unique": false
         }
-      ],
-      "additionalProperties": {
-        "codegen": {
-          "replaceString": "fs_|fe_"
-        }
-      }
+      ]
     },
     {
       "type": "entity",
