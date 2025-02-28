@@ -298,7 +298,7 @@ public class Query implements Serializable {
 
   public static class Sort implements Serializable {
 
-    private final List<Order> orders = new ArrayList<>();
+    private List<Order> orders = new ArrayList<>();
 
     public Sort addOrder(String field, Direction direction) {
       Order order = new Order()
@@ -320,6 +320,11 @@ public class Query implements Serializable {
       Order order = new Order();
       order.setField(field);
       orders.add(order);
+      return this;
+    }
+
+    public Sort setOrders(List<Order> orders) {
+      this.orders = orders;
       return this;
     }
 
