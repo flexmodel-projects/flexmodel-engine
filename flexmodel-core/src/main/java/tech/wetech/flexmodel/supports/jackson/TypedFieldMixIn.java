@@ -11,18 +11,18 @@ import tech.wetech.flexmodel.*;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = IDField.class, name = "id"),
-  @JsonSubTypes.Type(value = StringField.class, name = "string"),
-  @JsonSubTypes.Type(value = TextField.class, name = "text"),
-  @JsonSubTypes.Type(value = DecimalField.class, name = "decimal"),
-  @JsonSubTypes.Type(value = IntField.class, name = "int"),
-  @JsonSubTypes.Type(value = BigintField.class, name = "bigint"),
-  @JsonSubTypes.Type(value = BooleanField.class, name = "boolean"),
-  @JsonSubTypes.Type(value = DatetimeField.class, name = "datetime"),
-  @JsonSubTypes.Type(value = DateField.class, name = "date"),
-  @JsonSubTypes.Type(value = JsonField.class, name = "json"),
-  @JsonSubTypes.Type(value = RelationField.class, name = "relation"),
-  @JsonSubTypes.Type(value = EnumField.class, name = "enum"),
+  @JsonSubTypes.Type(value = IDField.class, name = "ID"),
+  @JsonSubTypes.Type(value = StringField.class, name = "STRING"),
+  @JsonSubTypes.Type(value = TextField.class, name = "TEXT"),
+  @JsonSubTypes.Type(value = DecimalField.class, name = "DECIMAL"),
+  @JsonSubTypes.Type(value = IntField.class, name = "INT"),
+  @JsonSubTypes.Type(value = BigintField.class, name = "BIGINT"),
+  @JsonSubTypes.Type(value = BooleanField.class, name = "BOOLEAN"),
+  @JsonSubTypes.Type(value = DatetimeField.class, name = "DATETIME"),
+  @JsonSubTypes.Type(value = DateField.class, name = "DATE"),
+  @JsonSubTypes.Type(value = JsonField.class, name = "JSON"),
+  @JsonSubTypes.Type(value = RelationField.class, name = "RELATION"),
+  @JsonSubTypes.Type(value = EnumField.class, name = "ENUM"),
 })
 public abstract class TypedFieldMixIn {
 

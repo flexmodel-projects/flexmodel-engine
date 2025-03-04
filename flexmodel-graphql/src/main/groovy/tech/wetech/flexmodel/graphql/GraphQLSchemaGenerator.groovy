@@ -2,6 +2,7 @@ package tech.wetech.flexmodel.graphql
 
 import tech.wetech.flexmodel.EnumField
 import tech.wetech.flexmodel.RelationField
+import tech.wetech.flexmodel.ScalarType
 import tech.wetech.flexmodel.TypedField
 import tech.wetech.flexmodel.codegen.AbstractModelListGenerator
 import tech.wetech.flexmodel.codegen.ModelField
@@ -13,29 +14,29 @@ import tech.wetech.flexmodel.codegen.ModelListGenerationContext
 class GraphQLSchemaGenerator extends AbstractModelListGenerator {
 
   def typeMapping = [
-    "id"      : "ID",
-    "string"  : "String",
-    "text"    : "String",
-    "decimal" : "Float",
-    "int"     : "Int",
-    "bigint"  : "Int",
-    "boolean" : "Boolean",
-    "datetime": "String",
-    "date"    : "String",
-    "json"    : "JSON",
+    (ScalarType.ID.getType())      : "ID",
+    (ScalarType.STRING.getType())  : "String",
+    (ScalarType.TEXT.getType())    : "String",
+    (ScalarType.DECIMAL.getType()) : "Float",
+    (ScalarType.INT.getType())     : "Int",
+    (ScalarType.BIGINT.getType())  : "Int",
+    (ScalarType.BOOLEAN.getType()) : "Boolean",
+    (ScalarType.DATETIME.getType()): "String",
+    (ScalarType.DATE.getType())    : "String",
+    (ScalarType.JSON.getType())    : "JSON",
   ]
 
   def comparisonMapping = [
-    "id"      : "Int_comparison_exp",
-    "string"  : "String_comparison_exp",
-    "text"    : "String_comparison_exp",
-    "decimal" : "Float_comparison_exp",
-    "int"     : "Int_comparison_exp",
-    "bigint"  : "Int_comparison_exp",
-    "boolean" : "Boolean_comparison_exp",
-    "date"    : "Date_comparison_exp",
-    "datetime": "DateTime_comparison_exp",
-    "json"    : "JSON_comparison_exp",
+    (ScalarType.ID.getType())      : "Int_comparison_exp",
+    (ScalarType.STRING.getType())  : "String_comparison_exp",
+    (ScalarType.TEXT.getType())    : "String_comparison_exp",
+    (ScalarType.DECIMAL.getType()) : "Float_comparison_exp",
+    (ScalarType.INT.getType())     : "Int_comparison_exp",
+    (ScalarType.BIGINT.getType())  : "Int_comparison_exp",
+    (ScalarType.BOOLEAN.getType()) : "Boolean_comparison_exp",
+    (ScalarType.DATETIME.getType()): "Date_comparison_exp",
+    (ScalarType.DATE.getType())    : "DateTime_comparison_exp",
+    (ScalarType.JSON.getType())    : "JSON_comparison_exp",
   ]
 
   def toGraphQLType(ModelField itt, ModelListGenerationContext context) {

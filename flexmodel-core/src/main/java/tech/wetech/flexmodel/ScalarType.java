@@ -4,18 +4,18 @@ package tech.wetech.flexmodel;
  * @author cjbi
  */
 public enum ScalarType {
-  ID("id"),
-  STRING("string"),
-  TEXT("text"),
-  DECIMAL("decimal"),
-  INT("int"),
-  BIGINT("bigint"),
-  BOOLEAN("boolean"),
-  DATETIME("datetime"),
-  DATE("date"),
-  JSON("json"),
-  ENUM("enum"),
-  RELATION("relation");
+  ID("ID"),
+  STRING("STRING"),
+  TEXT("TEXT"),
+  DECIMAL("DECIMAL"),
+  INT("INT"),
+  BIGINT("BIGINT"),
+  BOOLEAN("BOOLEAN"),
+  DATETIME("DATETIME"),
+  DATE("DATE"),
+  JSON("JSON"),
+  ENUM("ENUM"),
+  RELATION("RELATION");
   private final String type;
 
   ScalarType(String type) {

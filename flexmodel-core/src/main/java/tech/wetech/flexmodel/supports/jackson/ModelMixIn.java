@@ -13,9 +13,9 @@ import tech.wetech.flexmodel.NativeQueryModel;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = Entity.class, name = "entity"),
-  @JsonSubTypes.Type(value = NativeQueryModel.class, name = "native_query"),
-  @JsonSubTypes.Type(value = Enum.class, name = "enum"),
+  @JsonSubTypes.Type(value = Entity.class, name = "ENTITY"),
+  @JsonSubTypes.Type(value = NativeQueryModel.class, name = "NATIVE_QUERY"),
+  @JsonSubTypes.Type(value = Enum.class, name = "ENUM"),
 })
 public class ModelMixIn {
 

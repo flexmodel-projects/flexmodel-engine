@@ -2,11 +2,11 @@
   "schema": [
     {
       "name": "Datasource",
-      "type": "entity",
+      "type": "ENTITY",
       "fields": [
         {
           "name": "name",
-          "type": "id",
+          "type": "ID",
           "unique": false,
           "nullable": true,
           "modelName": "Datasource",
@@ -14,7 +14,7 @@
         },
         {
           "name": "type",
-          "type": "string",
+          "type": "STRING",
           "length": 255,
           "unique": false,
           "nullable": true,
@@ -22,28 +22,28 @@
         },
         {
           "name": "config",
-          "type": "json",
+          "type": "JSON",
           "unique": false,
           "nullable": true,
           "modelName": "Datasource"
         },
         {
           "name": "createdAt",
-          "type": "datetime",
+          "type": "DATETIME",
           "unique": false,
           "nullable": true,
           "modelName": "Datasource"
         },
         {
           "name": "updatedAt",
-          "type": "datetime",
+          "type": "DATETIME",
           "unique": false,
           "nullable": true,
           "modelName": "Datasource"
         },
         {
           "name": "enabled",
-          "type": "boolean",
+          "type": "BOOLEAN",
           "unique": false,
           "comment": "",
           "nullable": false,
@@ -55,11 +55,11 @@
     },
     {
       "name": "ApiInfo",
-      "type": "entity",
+      "type": "ENTITY",
       "fields": [
         {
           "name": "id",
-          "type": "id",
+          "type": "ID",
           "unique": true,
           "nullable": true,
           "modelName": "ApiInfo",
@@ -67,7 +67,7 @@
         },
         {
           "name": "name",
-          "type": "string",
+          "type": "STRING",
           "length": 255,
           "unique": false,
           "nullable": false,
@@ -75,7 +75,7 @@
         },
         {
           "name": "parentId",
-          "type": "string",
+          "type": "STRING",
           "length": 255,
           "unique": false,
           "nullable": true,
@@ -83,7 +83,7 @@
         },
         {
           "name": "type",
-          "type": "string",
+          "type": "STRING",
           "length": 255,
           "unique": false,
           "nullable": false,
@@ -92,7 +92,7 @@
         },
         {
           "name": "method",
-          "type": "string",
+          "type": "STRING",
           "length": 255,
           "unique": false,
           "nullable": true,
@@ -100,7 +100,7 @@
         },
         {
           "name": "path",
-          "type": "string",
+          "type": "STRING",
           "length": 255,
           "unique": false,
           "nullable": true,
@@ -108,21 +108,21 @@
         },
         {
           "name": "createdAt",
-          "type": "datetime",
+          "type": "DATETIME",
           "unique": false,
           "nullable": false,
           "modelName": "ApiInfo"
         },
         {
           "name": "updatedAt",
-          "type": "datetime",
+          "type": "DATETIME",
           "unique": false,
           "nullable": false,
           "modelName": "ApiInfo"
         },
         {
           "name": "meta",
-          "type": "json",
+          "type": "JSON",
           "unique": false,
           "nullable": true,
           "modelName": "ApiInfo"
@@ -132,11 +132,11 @@
     },
     {
       "name": "ApiLog",
-      "type": "entity",
+      "type": "ENTITY",
       "fields": [
         {
           "name": "id",
-          "type": "id",
+          "type": "ID",
           "unique": false,
           "nullable": true,
           "modelName": "ApiLog",
@@ -144,7 +144,7 @@
         },
         {
           "name": "level",
-          "type": "string",
+          "type": "STRING",
           "length": 255,
           "unique": false,
           "nullable": false,
@@ -152,21 +152,21 @@
         },
         {
           "name": "uri",
-          "type": "text",
+          "type": "TEXT",
           "unique": false,
           "nullable": false,
           "modelName": "ApiLog"
         },
         {
           "name": "data",
-          "type": "json",
+          "type": "JSON",
           "unique": false,
           "nullable": false,
           "modelName": "ApiLog"
         },
         {
           "name": "createdAt",
-          "type": "datetime",
+          "type": "DATETIME",
           "unique": false,
           "nullable": false,
           "modelName": "ApiLog"
@@ -188,11 +188,11 @@
     },
     {
       "name": "IdentityProvider",
-      "type": "entity",
+      "type": "ENTITY",
       "fields": [
         {
           "name": "name",
-          "type": "id",
+          "type": "ID",
           "unique": false,
           "nullable": true,
           "modelName": "Datasource",
@@ -200,21 +200,21 @@
         },
         {
           "name": "createdAt",
-          "type": "datetime",
+          "type": "DATETIME",
           "unique": false,
           "nullable": false,
           "modelName": "IdentityProvider"
         },
         {
           "name": "provider",
-          "type": "json",
+          "type": "JSON",
           "unique": false,
           "nullable": true,
           "modelName": "IdentityProvider"
         },
         {
           "name": "updatedAt",
-          "type": "datetime",
+          "type": "DATETIME",
           "unique": false,
           "nullable": false,
           "modelName": "IdentityProvider"
@@ -223,12 +223,12 @@
       "indexes": []
     },
     {
-      "type": "entity",
+      "type": "ENTITY",
       "name": "Teacher",
       "fields": [
         {
           "name": "id",
-          "type": "id",
+          "type": "ID",
           "modelName": "Teacher",
           "unique": false,
           "nullable": true,
@@ -236,7 +236,7 @@
         },
         {
           "name": "teacherName",
-          "type": "string",
+          "type": "STRING",
           "modelName": "Teacher",
           "unique": false,
           "nullable": true,
@@ -244,7 +244,7 @@
         },
         {
           "name": "subject",
-          "type": "string",
+          "type": "STRING",
           "modelName": "Teacher",
           "unique": false,
           "nullable": true,
@@ -254,12 +254,12 @@
       "indexes": []
     },
     {
-      "type": "entity",
+      "type": "ENTITY",
       "name": "Student",
       "fields": [
         {
           "name": "id",
-          "type": "id",
+          "type": "ID",
           "modelName": "Student",
           "unique": false,
           "nullable": true,
@@ -267,7 +267,7 @@
         },
         {
           "name": "studentName",
-          "type": "string",
+          "type": "STRING",
           "modelName": "Student",
           "unique": false,
           "nullable": true,
@@ -275,7 +275,7 @@
         },
         {
           "name": "gender",
-          "type": "string",
+          "type": "STRING",
           "modelName": "Student",
           "unique": false,
           "nullable": true,
@@ -283,21 +283,21 @@
         },
         {
           "name": "age",
-          "type": "int",
+          "type": "INT",
           "modelName": "Student",
           "unique": false,
           "nullable": true
         },
         {
           "name": "classId",
-          "type": "int",
+          "type": "INT",
           "modelName": "Student",
           "unique": false,
           "nullable": true
         },
         {
           "name": "studentDetail",
-          "type": "relation",
+          "type": "RELATION",
           "modelName": "Student",
           "unique": false,
           "nullable": true,
@@ -310,12 +310,12 @@
       "indexes": []
     },
     {
-      "type": "entity",
+      "type": "ENTITY",
       "name": "StudentDetail",
       "fields": [
         {
           "name": "id",
-          "type": "id",
+          "type": "ID",
           "modelName": "StudentDetail",
           "unique": false,
           "nullable": true,
@@ -323,14 +323,14 @@
         },
         {
           "name": "studentId",
-          "type": "int",
+          "type": "INT",
           "modelName": "StudentDetail",
           "unique": false,
           "nullable": true
         },
         {
           "name": "description",
-          "type": "text",
+          "type": "TEXT",
           "modelName": "StudentDetail",
           "unique": false,
           "nullable": true
@@ -339,12 +339,12 @@
       "indexes": []
     },
     {
-      "type": "entity",
+      "type": "ENTITY",
       "name": "Classes",
       "fields": [
         {
           "name": "id",
-          "type": "id",
+          "type": "ID",
           "modelName": "Classes",
           "unique": false,
           "nullable": true,
@@ -352,7 +352,7 @@
         },
         {
           "name": "classCode",
-          "type": "string",
+          "type": "STRING",
           "modelName": "Classes",
           "unique": false,
           "nullable": true,
@@ -360,14 +360,14 @@
         },
         {
           "name": "className",
-          "type": "string",
+          "type": "STRING",
           "modelName": "Classes",
           "unique": false,
           "nullable": true,
           "length": 255
         },
         {
-          "type": "relation",
+          "type": "RELATION",
           "name": "students",
           "modelName": "Classes",
           "unique": false,
@@ -381,12 +381,12 @@
       "indexes": []
     },
     {
-      "type": "entity",
+      "type": "ENTITY",
       "name": "Course",
       "fields": [
         {
           "name": "courseNo",
-          "type": "id",
+          "type": "ID",
           "modelName": "Course",
           "unique": false,
           "nullable": true,
@@ -394,7 +394,7 @@
         },
         {
           "name": "courseName",
-          "type": "string",
+          "type": "STRING",
           "modelName": "Course",
           "unique": false,
           "nullable": true,
@@ -402,7 +402,7 @@
         },
         {
           "name": "students",
-          "type": "relation",
+          "type": "RELATION",
           "modelName": "Course",
           "unique": false,
           "nullable": true,

@@ -1,6 +1,8 @@
 package tech.wetech.flexmodel;
 
 import static tech.wetech.flexmodel.IDField.GeneratedValue.AUTO_INCREMENT;
+import static tech.wetech.flexmodel.ScalarType.BIGINT;
+import static tech.wetech.flexmodel.ScalarType.STRING;
 
 /**
  * ID字段类型默认为字符串，当为自增时则为数字，为UUID时则为字符串
@@ -28,23 +30,23 @@ public class IDField extends TypedField<Object, IDField> {
     /**
      * 自增ID
      */
-    AUTO_INCREMENT("bigint"),
+    AUTO_INCREMENT(BIGINT.getType()),
     /**
      * UUID
      */
-    UUID("string"),
+    UUID(STRING.getType()),
     /**
      * ULID
      */
-    ULID("string"),
+    ULID(STRING.getType()),
     /**
      * 长整型不自动生成
      */
-    BIGINT_NOT_GENERATED("bigint"),
+    BIGINT_NOT_GENERATED(BIGINT.getType()),
     /**
      * 字符串不自动生成
      */
-    STRING_NOT_GENERATED("string"),
+    STRING_NOT_GENERATED(STRING.getType()),
     ;
     private final String type;
 

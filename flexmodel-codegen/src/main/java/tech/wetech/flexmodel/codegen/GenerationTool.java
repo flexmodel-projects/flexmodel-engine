@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+import static tech.wetech.flexmodel.ScalarType.*;
+
 /**
  * 用于执行代码生成，允许通过命令行参数配置。
  *
@@ -24,17 +26,17 @@ public class GenerationTool {
 
   static {
     TYPE_MAPPING = new HashMap<>();
-    TYPE_MAPPING.put("id", null);
-    TYPE_MAPPING.put("relation", null);
-    TYPE_MAPPING.put("string", new TypeInfo(null, "String", "String"));
-    TYPE_MAPPING.put("text", new TypeInfo(null, "String", "String"));
-    TYPE_MAPPING.put("decimal", new TypeInfo(null, "Double", "Double"));
-    TYPE_MAPPING.put("int", new TypeInfo(null, "Integer", "Integer"));
-    TYPE_MAPPING.put("bigint", new TypeInfo(null, "Long", "Long"));
-    TYPE_MAPPING.put("boolean", new TypeInfo(null, "Boolean", "Boolean"));
-    TYPE_MAPPING.put("datetime", new TypeInfo("java.time", "LocalDateTime", "java.time.LocalDateTime"));
-    TYPE_MAPPING.put("date", new TypeInfo("java.time", "LocalDate", "java.time.LocalDate"));
-    TYPE_MAPPING.put("json", new TypeInfo(null, "Object", "Object"));
+    TYPE_MAPPING.put(ID.getType(), null);
+    TYPE_MAPPING.put(RELATION.getType(), null);
+    TYPE_MAPPING.put(STRING.getType(), new TypeInfo(null, "String", "String"));
+    TYPE_MAPPING.put(TEXT.getType(), new TypeInfo(null, "String", "String"));
+    TYPE_MAPPING.put(DECIMAL.getType(), new TypeInfo(null, "Double", "Double"));
+    TYPE_MAPPING.put(INT.getType(), new TypeInfo(null, "Integer", "Integer"));
+    TYPE_MAPPING.put(BIGINT.getType(), new TypeInfo(null, "Long", "Long"));
+    TYPE_MAPPING.put(BOOLEAN.getType(), new TypeInfo(null, "Boolean", "Boolean"));
+    TYPE_MAPPING.put(DATETIME.getType(), new TypeInfo("java.time", "LocalDateTime", "java.time.LocalDateTime"));
+    TYPE_MAPPING.put(DATE.getType(), new TypeInfo("java.time", "LocalDate", "java.time.LocalDate"));
+    TYPE_MAPPING.put(JSON.getType(), new TypeInfo(null, "Object", "Object"));
   }
 
   public static void run(Configuration configuration) {

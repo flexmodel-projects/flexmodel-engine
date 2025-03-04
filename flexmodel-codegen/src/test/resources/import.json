@@ -5,7 +5,7 @@
       "comment": null,
       "fields": [
         {
-          "type": "bigint",
+          "type": "BIGINT",
           "name": "last_modified_by",
           "modelName": "flow_definition",
           "comment": null,
@@ -14,7 +14,7 @@
           "defaultValue": null
         },
         {
-          "type": "string",
+          "type": "STRING",
           "name": "caller",
           "modelName": "flow_definition",
           "comment": null,
@@ -24,7 +24,7 @@
           "length": 255
         },
         {
-          "type": "string",
+          "type": "STRING",
           "name": "flow_name",
           "modelName": "flow_definition",
           "comment": null,
@@ -34,7 +34,7 @@
           "length": 255
         },
         {
-          "type": "string",
+          "type": "STRING",
           "name": "flow_title",
           "modelName": "flow_definition",
           "comment": null,
@@ -44,7 +44,7 @@
           "length": 255
         },
         {
-          "type": "string",
+          "type": "STRING",
           "name": "status",
           "modelName": "flow_definition",
           "comment": null,
@@ -54,7 +54,7 @@
           "length": 3
         },
         {
-          "type": "string",
+          "type": "STRING",
           "name": "process_name",
           "modelName": "flow_definition",
           "comment": null,
@@ -64,7 +64,7 @@
           "length": 255
         },
         {
-          "type": "datetime",
+          "type": "DATETIME",
           "name": "create_time",
           "modelName": "flow_definition",
           "comment": null,
@@ -73,7 +73,7 @@
           "defaultValue": null
         },
         {
-          "type": "bigint",
+          "type": "BIGINT",
           "name": "created_by",
           "modelName": "flow_definition",
           "comment": null,
@@ -82,7 +82,7 @@
           "defaultValue": null
         },
         {
-          "type": "datetime",
+          "type": "DATETIME",
           "name": "update_time",
           "modelName": "flow_definition",
           "comment": null,
@@ -91,7 +91,7 @@
           "defaultValue": null
         },
         {
-          "type": "text",
+          "type": "TEXT",
           "name": "flow_model",
           "modelName": "flow_definition",
           "comment": null,
@@ -100,7 +100,7 @@
           "defaultValue": null
         },
         {
-          "type": "string",
+          "type": "STRING",
           "name": "process_key",
           "modelName": "flow_definition",
           "comment": null,
@@ -110,7 +110,7 @@
           "length": 255
         },
         {
-          "type": "id",
+          "type": "ID",
           "name": "id",
           "modelName": "flow_definition",
           "comment": null,
@@ -120,7 +120,7 @@
           "generatedValue": "BIGINT_NOT_GENERATED"
         },
         {
-          "type": "string",
+          "type": "STRING",
           "name": "tenant_id",
           "modelName": "flow_definition",
           "comment": null,
@@ -130,7 +130,7 @@
           "length": 255
         },
         {
-          "type": "string",
+          "type": "STRING",
           "name": "flow_key",
           "modelName": "flow_definition",
           "comment": null,
@@ -141,15 +141,15 @@
         }
       ],
       "indexes": [],
-      "type": "entity"
+      "type": "ENTITY"
     },
     {
       "name": "fs_datasource",
-      "type": "entity",
+      "type": "ENTITY",
       "fields": [
         {
           "name": "name",
-          "type": "id",
+          "type": "ID",
           "unique": false,
           "nullable": true,
           "modelName": "Datasource",
@@ -157,7 +157,7 @@
         },
         {
           "name": "type",
-          "type": "string",
+          "type": "STRING",
           "length": 255,
           "unique": false,
           "nullable": true,
@@ -165,28 +165,28 @@
         },
         {
           "name": "config",
-          "type": "json",
+          "type": "JSON",
           "unique": false,
           "nullable": true,
           "modelName": "fs_datasource"
         },
         {
           "name": "createdAt",
-          "type": "datetime",
+          "type": "DATETIME",
           "unique": false,
           "nullable": true,
           "modelName": "fs_datasource"
         },
         {
           "name": "updatedAt",
-          "type": "datetime",
+          "type": "DATETIME",
           "unique": false,
           "nullable": true,
           "modelName": "fs_datasource"
         },
         {
           "name": "enabled",
-          "type": "boolean",
+          "type": "BOOLEAN",
           "unique": false,
           "comment": "",
           "nullable": false,
@@ -198,11 +198,11 @@
     },
     {
       "name": "fs_api_log",
-      "type": "entity",
+      "type": "ENTITY",
       "fields": [
         {
           "name": "id",
-          "type": "id",
+          "type": "ID",
           "unique": false,
           "nullable": true,
           "modelName": "fs_api_log",
@@ -210,7 +210,7 @@
         },
         {
           "name": "level",
-          "type": "enum",
+          "type": "ENUM",
           "from": "LogLevel",
           "multiple": false,
           "unique": false,
@@ -219,21 +219,21 @@
         },
         {
           "name": "uri",
-          "type": "text",
+          "type": "TEXT",
           "unique": false,
           "nullable": false,
           "modelName": "fs_api_log"
         },
         {
           "name": "data",
-          "type": "json",
+          "type": "JSON",
           "unique": false,
           "nullable": false,
           "modelName": "fs_api_log"
         },
         {
           "name": "createdAt",
-          "type": "datetime",
+          "type": "DATETIME",
           "unique": false,
           "nullable": false,
           "modelName": "fs_api_log"
@@ -254,12 +254,12 @@
       ]
     },
     {
-      "type": "entity",
+      "type": "ENTITY",
       "name": "Student",
       "fields": [
         {
           "name": "id",
-          "type": "id",
+          "type": "ID",
           "modelName": "Student",
           "unique": false,
           "nullable": true,
@@ -267,7 +267,7 @@
         },
         {
           "name": "studentName",
-          "type": "string",
+          "type": "STRING",
           "modelName": "Student",
           "unique": false,
           "nullable": true,
@@ -275,7 +275,7 @@
         },
         {
           "name": "gender",
-          "type": "enum",
+          "type": "ENUM",
           "from": "UserGender",
           "multiple": false,
           "modelName": "Student",
@@ -284,7 +284,7 @@
         },
         {
           "name": "interest",
-          "type": "enum",
+          "type": "ENUM",
           "from": "User_interest",
           "multiple": true,
           "modelName": "Student",
@@ -293,21 +293,21 @@
         },
         {
           "name": "age",
-          "type": "int",
+          "type": "INT",
           "modelName": "Student",
           "unique": false,
           "nullable": true
         },
         {
           "name": "classId",
-          "type": "bigint",
+          "type": "BIGINT",
           "modelName": "Student",
           "unique": false,
           "nullable": true
         },
         {
           "name": "studentDetail",
-          "type": "relation",
+          "type": "RELATION",
           "modelName": "Student",
           "unique": false,
           "nullable": true,
@@ -321,12 +321,12 @@
       "indexes": []
     },
     {
-      "type": "entity",
+      "type": "ENTITY",
       "name": "StudentDetail",
       "fields": [
         {
           "name": "id",
-          "type": "id",
+          "type": "ID",
           "modelName": "StudentDetail",
           "unique": false,
           "nullable": true,
@@ -334,14 +334,14 @@
         },
         {
           "name": "studentId",
-          "type": "bigint",
+          "type": "BIGINT",
           "modelName": "StudentDetail",
           "unique": false,
           "nullable": true
         },
         {
           "name": "description",
-          "type": "text",
+          "type": "TEXT",
           "modelName": "StudentDetail",
           "unique": false,
           "nullable": true
@@ -351,7 +351,7 @@
     },
     {
       "name": "LogLevel",
-      "type": "enum",
+      "type": "ENUM",
       "elements": [
         "DEBUG",
         "INFO",
@@ -362,7 +362,7 @@
     },
     {
       "name": "UserGender",
-      "type": "enum",
+      "type": "ENUM",
       "elements": [
         "UNKNOWN",
         "MALE",
@@ -372,7 +372,7 @@
     },
     {
       "name": "User_interest",
-      "type": "enum",
+      "type": "ENUM",
       "elements": [
         "chang",
         "tiao",
