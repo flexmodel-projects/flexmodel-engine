@@ -31,7 +31,7 @@ public class Enum implements TypeWrapper {
 
     @Override
     public String getType() {
-        return "enum";
+        return "ENUM";
     }
 
     public Enum setElements(List<String> elements) {

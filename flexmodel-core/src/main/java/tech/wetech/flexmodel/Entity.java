@@ -21,7 +21,7 @@ public class Entity extends AbstractModel<Entity> {
 
   @Override
   public String getType() {
-    return "entity";
+    return "ENTITY";
   }
 
   public String getComment() {

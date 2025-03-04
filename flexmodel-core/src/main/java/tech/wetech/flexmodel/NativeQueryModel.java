@@ -30,7 +30,7 @@ public class NativeQueryModel extends AbstractModel<NativeQueryModel> {
 
   @Override
   public String getType() {
-    return "native_query";
+    return "NATIVE_QUERY";
   }
 
   /**
