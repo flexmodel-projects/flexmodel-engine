@@ -30,10 +30,11 @@ public class SessionFactory {
   private final JsonObjectConverter jsonObjectConverter;
   private final boolean failsafe;
 
-  SessionFactory(DataSourceProvider defaultDataSourceProvider, Cache cache, boolean failsafe) {
+  SessionFactory(DataSourceProvider defaultDataSourceProvider, List<DataSourceProvider> dataSourceProviders, Cache cache, boolean failsafe) {
     this.cache = cache;
     this.jsonObjectConverter = new JacksonObjectConverter();
     addDataSourceProvider(defaultDataSourceProvider);
+    dataSourceProviders.forEach(this::addDataSourceProvider);
     this.mappedModels = initializeMappedModels(defaultDataSourceProvider);
     this.failsafe = failsafe;
     processBuildItem();
@@ -239,6 +240,7 @@ public class SessionFactory {
   public static class Builder {
     private Cache cache;
     private DataSourceProvider defaultDataSourceProvider = null;
+    private final List<DataSourceProvider> dataSourceProviders = new ArrayList<>();
     private boolean failsafe = false;
 
     Builder() {
@@ -254,6 +256,11 @@ public class SessionFactory {
       return this;
     }
 
+    public Builder addDataSourceProvider(DataSourceProvider dataSourceProvider) {
+      this.dataSourceProviders.add(dataSourceProvider);
+      return this;
+    }
+
     public Builder setFailsafe(boolean failsafe) {
       this.failsafe = failsafe;
       return this;
@@ -266,7 +273,7 @@ public class SessionFactory {
       if (cache == null) {
         this.cache = new ConcurrentHashMapCache();
       }
-      return new SessionFactory(defaultDataSourceProvider, cache, failsafe);
+      return new SessionFactory(defaultDataSourceProvider, dataSourceProviders, cache, failsafe);
     }
   }
 
