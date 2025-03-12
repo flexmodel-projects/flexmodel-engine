@@ -185,7 +185,12 @@ public class GenerationTool {
         modelClass.setIdField(modelField);
 
       } else if (field instanceof RelationField relationField) {
-        String ftName = StringUtils.capitalize(StringUtils.snakeToCamel(relationField.getFrom()));
+        String ftName = StringUtils.capitalize(
+          StringUtils.snakeToCamel(
+            replaceString != null ?
+              relationField.getFrom().replaceAll(replaceString, "") :
+              relationField.getFrom())
+        );
         // relation field
         if (relationField.isMultiple()) {
           modelField.setTypePackage("java.util")
@@ -201,7 +206,12 @@ public class GenerationTool {
         }
 
       } else if (field instanceof EnumField anEnumField) {
-        String ftName = StringUtils.capitalize(StringUtils.snakeToCamel(anEnumField.getFrom()));
+        String ftName = StringUtils.capitalize(
+          StringUtils.snakeToCamel(
+            replaceString != null ?
+              anEnumField.getFrom().replaceAll(replaceString, "") :
+              anEnumField.getFrom())
+        );
         if (anEnumField.isMultiple()) {
           modelField.setTypePackage("java.util")
             .setFullTypeName("java.util.Set")
