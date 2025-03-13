@@ -102,7 +102,7 @@ public class Entity extends AbstractModel<Entity> {
   public Entity addIndex(UnaryOperator<Index> indexUnaryOperator) {
     Index index = new Index(name);
     indexUnaryOperator.apply(index);
-    indexes.add(index);
+    addIndex(index);
     return this;
   }
 
