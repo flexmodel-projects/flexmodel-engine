@@ -11,8 +11,8 @@ import java.util.function.UnaryOperator;
 public class Entity extends AbstractModel<Entity> {
 
   private String comment;
-  private List<TypedField<?, ?>> fields;
-  private List<Index> indexes;
+  private List<TypedField<?, ?>> fields = new ArrayList<>();
+  private List<Index> indexes = new ArrayList<>();
 
   public Entity(String name) {
     this.name = name;
@@ -78,9 +78,6 @@ public class Entity extends AbstractModel<Entity> {
   }
 
   public Entity addField(TypedField<?, ?> field) {
-    if (fields == null) {
-      fields = new ArrayList<>();
-    }
     field.setModelName(name);
     fields.add(field);
     return this;
@@ -91,9 +88,6 @@ public class Entity extends AbstractModel<Entity> {
   }
 
   public Entity addIndex(Index index) {
-    if (fields == null) {
-      fields = new ArrayList<>();
-    }
     index.setModelName(name);
     indexes.add(index);
     return this;
