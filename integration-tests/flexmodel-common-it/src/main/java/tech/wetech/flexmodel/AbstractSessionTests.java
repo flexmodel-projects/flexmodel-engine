@@ -803,43 +803,36 @@ public abstract class AbstractSessionTests {
     name.setComment("姓名");
     name.setNullable(false);
     name.setLength(10);
-    entity.addField(name);
     session.createField(name);
     // text
     TextField description = new TextField("description").setComment("备注");
     description.setModelName(entityName);
-    entity.addField(description);
     session.createField(description);
     // number
     IntField age = new IntField("age");
     age.setModelName(entityName);
     age.setComment("年龄");
-    entity.addField(age);
     session.createField(age);
     // boolean
     BooleanField deleted = new BooleanField("is_deleted");
     deleted.setModelName(entityName);
     deleted.setComment("软删除");
     deleted.setDefaultValue(false);
-    entity.addField(deleted);
     session.createField(deleted);
     // datetime
     DatetimeField createDatetime = new DatetimeField("createDatetime");
     createDatetime.setModelName(entityName);
     createDatetime.setComment("创建日期时间");
-    entity.addField(createDatetime);
     session.createField(createDatetime);
     // date
     DateField birthday = new DateField("birthday");
     birthday.setModelName(entityName);
     birthday.setComment("出生日期");
-    entity.addField(birthday);
     session.createField(birthday);
     // json
     JsonField interests = new JsonField("interests");
     interests.setModelName(entityName);
     interests.setComment("兴趣爱好");
-    entity.addField(interests);
     session.createField(interests);
   }
 
