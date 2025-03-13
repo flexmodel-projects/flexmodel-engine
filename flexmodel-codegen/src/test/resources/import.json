@@ -5,6 +5,16 @@
       "comment": null,
       "fields": [
         {
+          "type": "ID",
+          "name": "id",
+          "modelName": "flow_definition",
+          "comment": null,
+          "unique": false,
+          "nullable": false,
+          "defaultValue": null,
+          "generatedValue": "BIGINT_NOT_GENERATED"
+        },
+        {
           "type": "BIGINT",
           "name": "last_modified_by",
           "modelName": "flow_definition",
@@ -108,16 +118,6 @@
           "nullable": true,
           "defaultValue": null,
           "length": 255
-        },
-        {
-          "type": "ID",
-          "name": "id",
-          "modelName": "flow_definition",
-          "comment": null,
-          "unique": false,
-          "nullable": false,
-          "defaultValue": null,
-          "generatedValue": "BIGINT_NOT_GENERATED"
         },
         {
           "type": "STRING",

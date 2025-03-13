@@ -1,9 +1,8 @@
 package tech.wetech.flexmodel;
 
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.UnaryOperator;
 
 /**
@@ -12,8 +11,8 @@ import java.util.function.UnaryOperator;
 public class Entity extends AbstractModel<Entity> {
 
   private String comment;
-  private final Set<TypedField<?, ?>> fields = new LinkedHashSet<>();
-  private final Set<Index> indexes = new LinkedHashSet<>();
+  private List<TypedField<?, ?>> fields;
+  private List<Index> indexes = new ArrayList<>();
 
   public Entity(String name) {
     this.name = name;
@@ -35,7 +34,12 @@ public class Entity extends AbstractModel<Entity> {
 
   @Override
   public List<TypedField<?, ?>> getFields() {
-    return fields.stream().toList();
+    return fields;
+  }
+
+  public Entity setFields(List<TypedField<?, ?>> fields) {
+    this.fields = fields;
+    return this;
   }
 
   @Override
@@ -65,10 +69,18 @@ public class Entity extends AbstractModel<Entity> {
   }
 
   public List<Index> getIndexes() {
-    return indexes.stream().toList();
+    return indexes;
+  }
+
+  public Entity setIndexes(List<Index> indexes) {
+    this.indexes = indexes;
+    return this;
   }
 
   public Entity addField(TypedField<?, ?> field) {
+    if (fields == null) {
+      fields = new ArrayList<>();
+    }
     field.setModelName(name);
     fields.add(field);
     return this;
@@ -79,6 +91,9 @@ public class Entity extends AbstractModel<Entity> {
   }
 
   public Entity addIndex(Index index) {
+    if (fields == null) {
+      fields = new ArrayList<>();
+    }
     index.setModelName(name);
     indexes.add(index);
     return this;

@@ -8,7 +8,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static tech.wetech.flexmodel.ScalarType.*;
 
@@ -42,7 +45,7 @@ public class GenerationTool {
   public static void run(Configuration configuration) {
     Configuration.Schema schema = configuration.getSchema();
     JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
-    Set<TypeWrapper> models = new HashSet<>();
+    List<TypeWrapper> models = new ArrayList<>();
     List<ImportDescribe.ImportData> data = new ArrayList<>();
     // read from script
     String importScript = configuration.getSchema().getImportScript();
@@ -53,6 +56,7 @@ public class GenerationTool {
       try {
         String content = Files.readString(scriptFile.toPath());
         ImportDescribe describe = jsonObjectConverter.parseToObject(content, ImportDescribe.class);
+        Map<String, Object> map = jsonObjectConverter.parseToMap(content);
         models.addAll(describe.getSchema());
         data.addAll(describe.getData());
       } catch (IOException e) {
