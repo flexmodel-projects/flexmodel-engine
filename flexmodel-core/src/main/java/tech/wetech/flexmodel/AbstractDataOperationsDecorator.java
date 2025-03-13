@@ -1,11 +1,14 @@
 package tech.wetech.flexmodel;
 
+import tech.wetech.flexmodel.dsl.Expressions;
+import tech.wetech.flexmodel.dsl.Predicate;
 import tech.wetech.flexmodel.reflect.LazyObjProxy;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * @author cjbi
@@ -66,16 +69,65 @@ public class AbstractDataOperationsDecorator implements DataOperations {
 
   @Override
   public int deleteById(String modelName, Object id) {
+    try {
+      Entity entity = (Entity) sessionContext.getModel(modelName);
+      Supplier<Map<String, Object>> sp = () -> delegate.findById(modelName, id);
+      entity.getFields().parallelStream()
+        .forEach(field -> {
+          if (field instanceof RelationField relationField && relationField.isCascadeDelete()) {
+            Map<String, Object> data = sp.get();
+            if (data != null) {
+              Object localVal = data.get(relationField.getLocalField());
+              if (localVal != null) {
+                Predicate expr = Expressions.field(relationField.getForeignField()).eq(localVal);
+                delete(relationField.getFrom(), expr);
+              }
+            }
+          }
+        });
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     return delegate.deleteById(modelName, id);
   }
 
   @Override
   public int delete(String modelName, String filter) {
+    try {
+      Supplier<List<Map<String, Object>>> sp = () -> delegate.find(modelName, q -> q.setFilter(filter));
+      Entity entity = (Entity) sessionContext.getModel(modelName);
+      entity.getFields().parallelStream()
+        .forEach(field -> {
+          if (field instanceof RelationField relationField && relationField.isCascadeDelete()) {
+            List<Map<String, Object>> list = sp.get();
+            for (Map<String, Object> data : list) {
+              Object localVal = data.get(relationField.getLocalField());
+              if (localVal != null) {
+                Predicate expr = Expressions.field(relationField.getForeignField()).eq(localVal);
+                delete(relationField.getFrom(), expr);
+              }
+            }
+          }
+        });
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     return delegate.delete(modelName, filter);
   }
 
   @Override
   public int deleteAll(String modelName) {
+    try {
+      Entity entity = (Entity) sessionContext.getModel(modelName);
+      entity.getFields().parallelStream()
+        .forEach(field -> {
+          if (field instanceof RelationField relationField && relationField.isCascadeDelete()) {
+            deleteAll(relationField.getFrom());
+          }
+        });
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     return delegate.deleteAll(modelName);
   }
 
