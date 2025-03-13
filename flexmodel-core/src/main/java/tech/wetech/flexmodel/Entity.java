@@ -12,7 +12,7 @@ public class Entity extends AbstractModel<Entity> {
 
   private String comment;
   private List<TypedField<?, ?>> fields;
-  private List<Index> indexes = new ArrayList<>();
+  private List<Index> indexes;
 
   public Entity(String name) {
     this.name = name;
