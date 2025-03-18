@@ -8,13 +8,14 @@ import tech.wetech.flexmodel.Field;
 public class ModelField {
 
   private ModelClass modelClass;
+  private String variableName;
   private String fieldName;
   private String comment;
   private String typePackage;
   private String shortTypeName;
   private String fullTypeName;
   private boolean identity;
-  private boolean isBasicField;
+  private boolean basicField;
   private boolean relationField;
   private boolean enumField;
   private Field originalField;
@@ -25,6 +26,15 @@ public class ModelField {
 
   public ModelField setModelClass(ModelClass modelClass) {
     this.modelClass = modelClass;
+    return this;
+  }
+
+  public String getVariableName() {
+    return variableName;
+  }
+
+  public ModelField setVariableName(String fieldName) {
+    this.variableName = fieldName;
     return this;
   }
 
@@ -83,11 +93,11 @@ public class ModelField {
   }
 
   public boolean isBasicField() {
-    return isBasicField;
+    return basicField;
   }
 
   public ModelField setBasicField(boolean basicField) {
-    isBasicField = basicField;
+    this.basicField = basicField;
     return this;
   }
 

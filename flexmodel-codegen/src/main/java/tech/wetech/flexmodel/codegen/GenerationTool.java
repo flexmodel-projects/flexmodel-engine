@@ -173,71 +173,77 @@ public class GenerationTool {
 
       ModelField modelField = new ModelField()
         .setModelClass(modelClass)
-        .setFieldName(StringUtils.snakeToCamel(field.getName()))
+        .setVariableName(StringUtils.snakeToCamel(field.getName()))
+        .setFieldName(field.getName())
         .setOriginalField(field)
         .setComment(field.getComment());
 
-      if (field instanceof IDField idField) {
-        // id field
-        TypeInfo typeInfo = TYPE_MAPPING.get(idField.getGeneratedValue().getType());
+      switch (field) {
+        case IDField idField -> {
+          // id field
+          TypeInfo typeInfo = TYPE_MAPPING.get(idField.getGeneratedValue().getType());
 
-        modelField.setTypePackage(typeInfo.typePackage())
-          .setShortTypeName(typeInfo.shortTypeName())
-          .setFullTypeName(typeInfo.fullTypeName())
-          .setIdentity(true);
+          modelField.setTypePackage(typeInfo.typePackage())
+            .setShortTypeName(typeInfo.shortTypeName())
+            .setFullTypeName(typeInfo.fullTypeName())
+            .setIdentity(true);
 
-        modelClass.setIdField(modelField);
+          modelClass.setIdField(modelField);
 
-      } else if (field instanceof RelationField relationField) {
-        String ftName = StringUtils.capitalize(
-          StringUtils.snakeToCamel(
-            replaceString != null ?
-              relationField.getFrom().replaceAll(replaceString, "") :
-              relationField.getFrom())
-        );
-        // relation field
-        if (relationField.isMultiple()) {
-          modelField.setTypePackage("java.util")
-            .setFullTypeName("java.util.List")
-            .setShortTypeName("List<" + ftName + ">")
-            .setRelationField(true);
-        } else {
-          modelField.setTypePackage(null)
-            .setFullTypeName(modelField.getTypePackage() + "." + ftName)
-            .setShortTypeName(ftName)
-            .setRelationField(true);
-          modelClass.getRelationFields().add(modelField);
         }
+        case RelationField relationField -> {
+          String ftName = StringUtils.capitalize(
+            StringUtils.snakeToCamel(
+              replaceString != null ?
+                relationField.getFrom().replaceAll(replaceString, "") :
+                relationField.getFrom())
+          );
+          // relation field
+          if (relationField.isMultiple()) {
+            modelField.setTypePackage("java.util")
+              .setFullTypeName("java.util.List")
+              .setShortTypeName("List<" + ftName + ">")
+              .setRelationField(true);
+          } else {
+            modelField.setTypePackage(null)
+              .setFullTypeName(modelField.getTypePackage() + "." + ftName)
+              .setShortTypeName(ftName)
+              .setRelationField(true);
+            modelClass.getRelationFields().add(modelField);
+          }
 
-      } else if (field instanceof EnumField anEnumField) {
-        String ftName = StringUtils.capitalize(
-          StringUtils.snakeToCamel(
-            replaceString != null ?
-              anEnumField.getFrom().replaceAll(replaceString, "") :
-              anEnumField.getFrom())
-        );
-        if (anEnumField.isMultiple()) {
-          modelField.setTypePackage("java.util")
-            .setFullTypeName("java.util.Set")
-            .setShortTypeName("Set<" + ftName + ">")
-            .setEnumField(true);
-        } else {
-          modelField.setTypePackage(packageName + ".enumeration")
-            .setFullTypeName(modelField.getTypePackage() + "." + ftName)
-            .setShortTypeName(ftName)
-            .setEnumField(true);
         }
-        modelClass.getEnumFields().add(modelField);
-        modelClass.getImports().add(packageName + ".enumeration." + ftName);
-      } else {
-        // basic field
-        TypeInfo typeInfo = TYPE_MAPPING.get(field.getType());
-        modelField.setTypePackage(typeInfo.typePackage())
-          .setShortTypeName(typeInfo.shortTypeName())
-          .setFullTypeName(typeInfo.fullTypeName())
-          .setBasicField(true);
+        case EnumField anEnumField -> {
+          String ftName = StringUtils.capitalize(
+            StringUtils.snakeToCamel(
+              replaceString != null ?
+                anEnumField.getFrom().replaceAll(replaceString, "") :
+                anEnumField.getFrom())
+          );
+          if (anEnumField.isMultiple()) {
+            modelField.setTypePackage("java.util")
+              .setFullTypeName("java.util.Set")
+              .setShortTypeName("Set<" + ftName + ">")
+              .setEnumField(true);
+          } else {
+            modelField.setTypePackage(packageName + ".enumeration")
+              .setFullTypeName(modelField.getTypePackage() + "." + ftName)
+              .setShortTypeName(ftName)
+              .setEnumField(true);
+          }
+          modelClass.getEnumFields().add(modelField);
+          modelClass.getImports().add(packageName + ".enumeration." + ftName);
+        }
+        default -> {
+          // basic field
+          TypeInfo typeInfo = TYPE_MAPPING.get(field.getType());
+          modelField.setTypePackage(typeInfo.typePackage())
+            .setShortTypeName(typeInfo.shortTypeName())
+            .setFullTypeName(typeInfo.fullTypeName())
+            .setBasicField(true);
 
-        modelClass.getBasicFields().add(modelField);
+          modelClass.getBasicFields().add(modelField);
+        }
       }
 
       if (modelField.getTypePackage() != null) {

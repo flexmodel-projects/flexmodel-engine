@@ -6,10 +6,11 @@ import java.util.*;
  * @author cjbi
  */
 // 字段表达式
-public class FieldExpression<T> implements Expression {
+public class FilterExpression<T> implements Expression {
+
   private final String fieldName;
 
-  public FieldExpression(String fieldName) {
+  public FilterExpression(String fieldName) {
     this.fieldName = fieldName;
   }
 
@@ -77,4 +78,5 @@ public class FieldExpression<T> implements Expression {
   public Map<String, Object> toMap() {
     return Collections.singletonMap(fieldName, null);
   }
+
 }

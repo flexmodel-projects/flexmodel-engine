@@ -138,7 +138,7 @@ public class ModelClass implements Serializable {
 
   public ModelField getField(String name) {
     return allFields.stream()
-      .filter(f -> f.getFieldName().equals(name))
+      .filter(f -> f.getVariableName().equals(name))
       .findFirst()
       .orElse(null);
   }

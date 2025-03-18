@@ -148,7 +148,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       def key = "${it.schemaName}_${it.modelName}"
       out.println "type ${key} {"
       it.allFields.each {
-        out.println "  ${it.fieldName} : ${toGraphQLType(it, context)}"
+        out.println "  ${it.variableName} : ${toGraphQLType(it, context)}"
       }
       out.println "  _join: Query"
       out.println "  _join_mutation: Mutation"
@@ -168,7 +168,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "type ${key}_avg_fields {"
       it.allFields.each {
         if (!it.isRelationField()) {
-          out.println "  ${it.fieldName}: Float"
+          out.println "  ${it.variableName}: Float"
         }
       }
       out.println "}"
@@ -186,12 +186,12 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       it.allFields.each {
         if (!it.isRelationField() && !it.isEnumField()) {
           TypedField f = it.originalField as TypedField
-          out.println "  ${it.fieldName}: ${comparisonMapping[f.type]}"
+          out.println "  ${it.variableName}: ${comparisonMapping[f.type]}"
         } else if (it.isEnumField() && context.modelListClass.containsEnumClass((it.originalField as EnumField).from)) {
           EnumField enumField = it.originalField as EnumField
-          out.println "  ${it.fieldName}: ${schemaName}_${enumField.from}_comparison_exp"
+          out.println "  ${it.variableName}: ${schemaName}_${enumField.from}_comparison_exp"
         } else {
-          out.println "  ${it.fieldName}: String_comparison_exp"
+          out.println "  ${it.variableName}: String_comparison_exp"
         }
       }
       out.println "}"
@@ -200,7 +200,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "input ${key}_order_by {"
       it.allFields.each {
         if (!it.isRelationField()) {
-          out.println "  ${it.fieldName}: order_by"
+          out.println "  ${it.variableName}: order_by"
         }
       }
       out.println "}"
@@ -208,7 +208,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "input ${key}_insert_input {"
       it.allFields.each {
         if (!it.isRelationField()) {
-          out.println "  ${it.fieldName}: ${toGraphQLType(it, context)}"
+          out.println "  ${it.variableName}: ${toGraphQLType(it, context)}"
         }
       }
       out.println "}"
@@ -216,7 +216,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "input ${key}_set_input {"
       it.allFields.each {
         if (!it.isRelationField()) {
-          out.println "  ${it.fieldName}: ${toGraphQLType(it, context)}"
+          out.println "  ${it.variableName}: ${toGraphQLType(it, context)}"
         }
       }
       out.println "}"
@@ -227,7 +227,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "enum ${key}_select_field {"
       it.allFields.each {
         if (!it.isRelationField()) {
-          out.println "  ${it.fieldName}"
+          out.println "  ${it.variableName}"
         }
       }
       out.println "}"

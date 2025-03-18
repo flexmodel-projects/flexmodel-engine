@@ -15,8 +15,8 @@ public class Expressions {
     }
   };
 
-  public static <T> FieldExpression<T> field(String fieldName) {
-    return new FieldExpression<>(fieldName);
+  public static <T> FilterExpression<T> field(String fieldName) {
+    return new FilterExpression<>(fieldName);
   }
 
 }

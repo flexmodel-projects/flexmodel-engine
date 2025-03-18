@@ -16,16 +16,16 @@ public class ExpressionTest {
   @Test
   void test() {
     // 定义字段表达式
-    FieldExpression<String> username = new FieldExpression<>("username");
-    FieldExpression<String> remark = new FieldExpression<>("remark");
-    FieldExpression<Boolean> locked = new FieldExpression<>("locked");
-    FieldExpression<String> email = new FieldExpression<>("email");
-    FieldExpression<Integer> age = new FieldExpression<>("age");
-    FieldExpression<String> registrationDate = new FieldExpression<>("registrationDate");
-    FieldExpression<String> lastLogin = new FieldExpression<>("lastLogin");
-    FieldExpression<String> createdAt = new FieldExpression<>("createdAt");
-    FieldExpression<String> role = new FieldExpression<>("role");
-    FieldExpression<String> status = new FieldExpression<>("status");
+    FilterExpression<String> username = new FilterExpression<>("username");
+    FilterExpression<String> remark = new FilterExpression<>("remark");
+    FilterExpression<Boolean> locked = new FilterExpression<>("locked");
+    FilterExpression<String> email = new FilterExpression<>("email");
+    FilterExpression<Integer> age = new FilterExpression<>("age");
+    FilterExpression<String> registrationDate = new FilterExpression<>("registrationDate");
+    FilterExpression<String> lastLogin = new FilterExpression<>("lastLogin");
+    FilterExpression<String> createdAt = new FilterExpression<>("createdAt");
+    FilterExpression<String> role = new FilterExpression<>("role");
+    FilterExpression<String> status = new FilterExpression<>("status");
 
     // 构建条件
     Predicate condition = username.eq("john_doe")

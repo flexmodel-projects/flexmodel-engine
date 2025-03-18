@@ -52,7 +52,7 @@ class PojoGenerator extends AbstractGenerator {
         out.println "   */"
       }
       out.println "  @JsonProperty(\"${field.originalField.name}\")"
-      out.println "  private ${field.shortTypeName} ${field.fieldName};"
+      out.println "  private ${field.shortTypeName} ${field.variableName};"
     }
 
     // Write getter and setter methods
@@ -77,8 +77,8 @@ class PojoGenerator extends AbstractGenerator {
    */
   def generateGetter(PrintWriter out, field) {
     out.println ""
-    out.println "  public ${field.shortTypeName} get${field.fieldName.capitalize()}() {"
-    out.println "    return ${field.fieldName};"
+    out.println "  public ${field.shortTypeName} get${field.variableName.capitalize()}() {"
+    out.println "    return ${field.variableName};"
     out.println "  }"
   }
 
@@ -90,8 +90,8 @@ class PojoGenerator extends AbstractGenerator {
    */
   def generateSetter(PrintWriter out, field) {
     out.println ""
-    out.println "  public void set${field.fieldName.capitalize()}(${field.shortTypeName} ${field.fieldName}) {"
-    out.println "    this.${field.fieldName} = ${field.fieldName};"
+    out.println "  public void set${field.variableName.capitalize()}(${field.shortTypeName} ${field.variableName}) {"
+    out.println "    this.${field.variableName} = ${field.variableName};"
     out.println "  }"
   }
 
@@ -100,7 +100,7 @@ class PojoGenerator extends AbstractGenerator {
     out.println ""
     out.println "  @Override"
     out.println "  public String toString() {"
-    out.println "    return this.getClass().getSimpleName() + \"<\" + get${modelClass.idField.fieldName.capitalize()}() + \">\";"
+    out.println "    return this.getClass().getSimpleName() + \"<\" + get${modelClass.idField.variableName.capitalize()}() + \">\";"
     out.println "  }"
   }
 
@@ -108,8 +108,8 @@ class PojoGenerator extends AbstractGenerator {
     out.println ""
     out.println "  @Override"
     out.println "  public boolean equals(Object obj) {"
-    out.println "    if (this.get${modelClass.idField.fieldName.capitalize()}() != null && obj instanceof ${modelClass.shortClassName}) {"
-    out.println "      return this.get${modelClass.idField.fieldName.capitalize()}().equals(((${modelClass.shortClassName}) obj).get${modelClass.idField.fieldName.capitalize()}());"
+    out.println "    if (this.get${modelClass.idField.variableName.capitalize()}() != null && obj instanceof ${modelClass.shortClassName}) {"
+    out.println "      return this.get${modelClass.idField.variableName.capitalize()}().equals(((${modelClass.shortClassName}) obj).get${modelClass.idField.variableName.capitalize()}());"
     out.println "    }"
     out.println "    return super.equals(obj);"
     out.println "  }"
