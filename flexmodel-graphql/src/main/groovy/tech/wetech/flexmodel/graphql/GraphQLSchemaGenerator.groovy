@@ -23,6 +23,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     (ScalarType.BOOLEAN.getType()) : "Boolean",
     (ScalarType.DATETIME.getType()): "String",
     (ScalarType.DATE.getType())    : "String",
+    (ScalarType.TIME.getType())    : "String",
     (ScalarType.JSON.getType())    : "JSON",
   ]
 
