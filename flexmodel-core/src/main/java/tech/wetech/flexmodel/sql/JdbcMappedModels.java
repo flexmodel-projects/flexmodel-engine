@@ -225,7 +225,7 @@ public class JdbcMappedModels implements MappedModels {
               idField.setGeneratedValue(AUTO_INCREMENT);
             }
             ScalarType idType = ScalarType.fromType(jdbcCodeMap.getOrDefault(sqlColumn.getSqlTypeCode(), STRING.getType()));
-            idField.setGeneratedValue(idType == BIGINT || idType == INT || idType == DECIMAL ? BIGINT_NOT_GENERATED : STRING_NOT_GENERATED);
+            idField.setGeneratedValue(idType == LONG || idType == INT || idType == DECIMAL ? BIGINT_NOT_GENERATED : STRING_NOT_GENERATED);
             break;
           }
           default:
@@ -280,8 +280,8 @@ public class JdbcMappedModels implements MappedModels {
             }
             break;
           }
-          case BIGINT: {
-            BigintField bigintField = new BigintField(sqlColumn.getName());
+          case LONG: {
+            LongField bigintField = new LongField(sqlColumn.getName());
             field = bigintField;
             if (sqlColumn.getDefaultValue() != null && !sqlColumn.getDefaultValue().equals("NULL")) {
               try {

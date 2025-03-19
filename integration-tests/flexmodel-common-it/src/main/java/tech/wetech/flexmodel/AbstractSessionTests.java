@@ -72,14 +72,14 @@ public abstract class AbstractSessionTests {
       .addField(new EnumField("interest").setFrom(interestEnum.getName()).setMultiple(true))
       .addField(new IntField("age"))
       .addField(new DecimalField("height").setPrecision(3).setScale(2))
-      .addField(new BigintField("classId"))
+      .addField(new LongField("classId"))
     );
   }
 
   void createStudentDetailEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(AUTO_INCREMENT))
-      .addField(new BigintField("studentId"))
+      .addField(new LongField("studentId"))
       .addField(new TextField("description"))
     );
   }
@@ -487,7 +487,7 @@ public abstract class AbstractSessionTests {
       .addField(new IDField("id"))
       .addField(new StringField("c_name"))
       .addField(new DecimalField("c_score"))
-      .addField(new BigintField("teacher_id"))
+      .addField(new LongField("teacher_id"))
       .setComment("教师成绩表")
     );
     session.createField(
@@ -838,7 +838,7 @@ public abstract class AbstractSessionTests {
 
   private void createScoreEntity2(String scoreModelName) {
     session.createEntity(scoreModelName, sScore ->
-      sScore.addField(new BigintField("student_id"))
+      sScore.addField(new LongField("student_id"))
         .addField(new StringField("course_name"))
         .addField(new DecimalField("score"))
     );

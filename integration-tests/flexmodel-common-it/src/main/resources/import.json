@@ -14,7 +14,7 @@
         },
         {
           "name": "type",
-          "type": "STRING",
+          "type": "String",
           "length": 255,
           "unique": false,
           "nullable": true,
@@ -29,14 +29,14 @@
         },
         {
           "name": "createdAt",
-          "type": "DATETIME",
+          "type": "DateTime",
           "unique": false,
           "nullable": true,
           "modelName": "Datasource"
         },
         {
           "name": "updatedAt",
-          "type": "DATETIME",
+          "type": "DateTime",
           "unique": false,
           "nullable": true,
           "modelName": "Datasource"
@@ -58,7 +58,7 @@
         },
         {
           "name": "name",
-          "type": "STRING",
+          "type": "String",
           "length": 255,
           "unique": false,
           "nullable": false,
@@ -72,7 +72,7 @@
         },
         {
           "name": "parentId",
-          "type": "STRING",
+          "type": "String",
           "length": 255,
           "unique": false,
           "nullable": true,
@@ -80,7 +80,7 @@
         },
         {
           "name": "type",
-          "type": "STRING",
+          "type": "String",
           "length": 255,
           "unique": false,
           "nullable": false,
@@ -95,7 +95,7 @@
         },
         {
           "name": "method",
-          "type": "STRING",
+          "type": "String",
           "length": 255,
           "unique": false,
           "nullable": true,
@@ -103,7 +103,7 @@
         },
         {
           "name": "path",
-          "type": "STRING",
+          "type": "String",
           "length": 255,
           "unique": false,
           "nullable": true,
@@ -111,7 +111,7 @@
         },
         {
           "name": "createdAt",
-          "type": "DATETIME",
+          "type": "DateTime",
           "unique": false,
           "nullable": false,
           "modelName": "ApiInfo",
@@ -124,7 +124,7 @@
         },
         {
           "name": "updatedAt",
-          "type": "DATETIME",
+          "type": "DateTime",
           "unique": false,
           "nullable": false,
           "modelName": "ApiInfo",
@@ -159,7 +159,7 @@
         },
         {
           "name": "level",
-          "type": "STRING",
+          "type": "String",
           "length": 255,
           "unique": false,
           "nullable": false,
@@ -173,7 +173,7 @@
         },
         {
           "name": "uri",
-          "type": "TEXT",
+          "type": "Text",
           "unique": false,
           "nullable": false,
           "modelName": "ApiLog",
@@ -199,7 +199,7 @@
         },
         {
           "name": "createdAt",
-          "type": "DATETIME",
+          "type": "DateTime",
           "unique": false,
           "nullable": false,
           "modelName": "ApiLog",
@@ -219,7 +219,7 @@
       "fields": [
         {
           "name": "createdAt",
-          "type": "DATETIME",
+          "type": "DateTime",
           "unique": false,
           "nullable": false,
           "modelName": "IdentityProvider",
@@ -253,7 +253,7 @@
         },
         {
           "name": "updatedAt",
-          "type": "DATETIME",
+          "type": "DateTime",
           "unique": false,
           "nullable": false,
           "modelName": "IdentityProvider",

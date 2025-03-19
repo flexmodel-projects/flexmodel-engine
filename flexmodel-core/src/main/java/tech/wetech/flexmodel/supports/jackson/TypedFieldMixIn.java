@@ -11,18 +11,18 @@ import tech.wetech.flexmodel.*;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = IDField.class, name = "ID"),
-  @JsonSubTypes.Type(value = StringField.class, name = "STRING"),
-  @JsonSubTypes.Type(value = TextField.class, name = "TEXT"),
-  @JsonSubTypes.Type(value = DecimalField.class, name = "DECIMAL"),
-  @JsonSubTypes.Type(value = IntField.class, name = "INT"),
-  @JsonSubTypes.Type(value = BigintField.class, name = "BIGINT"),
-  @JsonSubTypes.Type(value = BooleanField.class, name = "BOOLEAN"),
-  @JsonSubTypes.Type(value = DatetimeField.class, name = "DATETIME"),
-  @JsonSubTypes.Type(value = DateField.class, name = "DATE"),
-  @JsonSubTypes.Type(value = JsonField.class, name = "JSON"),
-  @JsonSubTypes.Type(value = RelationField.class, name = "RELATION"),
-  @JsonSubTypes.Type(value = EnumField.class, name = "ENUM"),
+  @JsonSubTypes.Type(value = IDField.class, name = ScalarType.ID_TYPE),
+  @JsonSubTypes.Type(value = StringField.class, name = ScalarType.STRING_TYPE),
+  @JsonSubTypes.Type(value = TextField.class, name = ScalarType.TEXT_TYPE),
+  @JsonSubTypes.Type(value = IntField.class, name = ScalarType.INT_TYPE),
+  @JsonSubTypes.Type(value = LongField.class, name = ScalarType.LONG_TYPE),
+  @JsonSubTypes.Type(value = DecimalField.class, name = ScalarType.DECIMAL_TYPE),
+  @JsonSubTypes.Type(value = DateField.class, name = ScalarType.DATE_TYPE),
+  @JsonSubTypes.Type(value = DatetimeField.class, name = ScalarType.DATETIME_TYPE),
+  @JsonSubTypes.Type(value = BooleanField.class, name = ScalarType.BOOLEAN_TYPE),
+  @JsonSubTypes.Type(value = JsonField.class, name = ScalarType.JSON_TYPE),
+  @JsonSubTypes.Type(value = RelationField.class, name = ScalarType.RELATION_TYPE),
+  @JsonSubTypes.Type(value = EnumField.class, name = ScalarType.ENUM_TYPE),
 })
 public abstract class TypedFieldMixIn {
 

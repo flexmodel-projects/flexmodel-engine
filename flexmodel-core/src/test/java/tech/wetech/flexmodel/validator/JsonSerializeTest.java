@@ -14,7 +14,7 @@ public class JsonSerializeTest {
   void test() {
     Entity entity = new Entity("students");
     // 主键
-    BigintField idField = new BigintField("id");
+    LongField idField = new LongField("id");
     idField.setComment("Primary Key");
     entity.addField(new IDField("id").setComment("Primary Key"));
     entity.setComment("学生表");
@@ -24,7 +24,7 @@ public class JsonSerializeTest {
     name.setNullable(false);
     name.setLength(10);
     entity.addField(name);
-    BigintField age = new BigintField("age");
+    LongField age = new LongField("age");
     age.setComment("年龄");
     entity.addField(age);
     // 备注

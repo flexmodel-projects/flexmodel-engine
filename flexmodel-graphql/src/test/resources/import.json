@@ -14,7 +14,7 @@
         },
         {
           "name": "type",
-          "type": "STRING",
+          "type": "String",
           "length": 255,
           "unique": false,
           "nullable": true,
@@ -29,21 +29,21 @@
         },
         {
           "name": "createdAt",
-          "type": "DATETIME",
+          "type": "DateTime",
           "unique": false,
           "nullable": true,
           "modelName": "Datasource"
         },
         {
           "name": "updatedAt",
-          "type": "DATETIME",
+          "type": "DateTime",
           "unique": false,
           "nullable": true,
           "modelName": "Datasource"
         },
         {
           "name": "enabled",
-          "type": "BOOLEAN",
+          "type": "Boolean",
           "unique": false,
           "comment": "",
           "nullable": false,
@@ -69,7 +69,7 @@
         {
           "name": "name",
           "comment": "名称",
-          "type": "STRING",
+          "type": "String",
           "length": 255,
           "unique": false,
           "nullable": false,
@@ -77,7 +77,7 @@
         },
         {
           "name": "parentId",
-          "type": "STRING",
+          "type": "String",
           "length": 255,
           "unique": false,
           "nullable": true,
@@ -85,7 +85,7 @@
         },
         {
           "name": "type",
-          "type": "STRING",
+          "type": "String",
           "length": 255,
           "unique": false,
           "nullable": false,
@@ -94,7 +94,7 @@
         },
         {
           "name": "method",
-          "type": "STRING",
+          "type": "String",
           "length": 255,
           "unique": false,
           "nullable": true,
@@ -102,7 +102,7 @@
         },
         {
           "name": "path",
-          "type": "STRING",
+          "type": "String",
           "length": 255,
           "unique": false,
           "nullable": true,
@@ -110,14 +110,14 @@
         },
         {
           "name": "createdAt",
-          "type": "DATETIME",
+          "type": "DateTime",
           "unique": false,
           "nullable": false,
           "modelName": "ApiInfo"
         },
         {
           "name": "updatedAt",
-          "type": "DATETIME",
+          "type": "DateTime",
           "unique": false,
           "nullable": false,
           "modelName": "ApiInfo"
@@ -146,7 +146,7 @@
         },
         {
           "name": "level",
-          "type": "STRING",
+          "type": "String",
           "length": 255,
           "unique": false,
           "nullable": false,
@@ -154,7 +154,7 @@
         },
         {
           "name": "uri",
-          "type": "TEXT",
+          "type": "Text",
           "unique": false,
           "nullable": false,
           "modelName": "ApiLog"
@@ -168,7 +168,7 @@
         },
         {
           "name": "createdAt",
-          "type": "DATETIME",
+          "type": "DateTime",
           "unique": false,
           "nullable": false,
           "modelName": "ApiLog"
@@ -202,7 +202,7 @@
         },
         {
           "name": "createdAt",
-          "type": "DATETIME",
+          "type": "DateTime",
           "unique": false,
           "nullable": false,
           "modelName": "IdentityProvider"
@@ -216,7 +216,7 @@
         },
         {
           "name": "updatedAt",
-          "type": "DATETIME",
+          "type": "DateTime",
           "unique": false,
           "nullable": false,
           "modelName": "IdentityProvider"
@@ -240,7 +240,7 @@
         {
           "name": "key",
           "comment": "名称",
-          "type": "STRING",
+          "type": "String",
           "length": 255,
           "unique": false,
           "nullable": false,
@@ -248,7 +248,7 @@
         },
         {
           "name": "value",
-          "type": "TEXT",
+          "type": "Text",
           "length": 255,
           "unique": false,
           "nullable": true,
@@ -256,14 +256,14 @@
         },
         {
           "name": "createdAt",
-          "type": "DATETIME",
+          "type": "DateTime",
           "unique": false,
           "nullable": false,
           "modelName": "ApiInfo"
         },
         {
           "name": "updatedAt",
-          "type": "DATETIME",
+          "type": "DateTime",
           "unique": false,
           "nullable": false,
           "modelName": "Config"
@@ -297,7 +297,7 @@
         },
         {
           "name": "teacherName",
-          "type": "STRING",
+          "type": "String",
           "modelName": "Teacher",
           "unique": false,
           "nullable": true,
@@ -305,7 +305,7 @@
         },
         {
           "name": "subject",
-          "type": "STRING",
+          "type": "String",
           "modelName": "Teacher",
           "unique": false,
           "nullable": true,
@@ -328,7 +328,7 @@
         },
         {
           "name": "studentName",
-          "type": "STRING",
+          "type": "String",
           "modelName": "Student",
           "unique": false,
           "nullable": true,
@@ -336,7 +336,7 @@
         },
         {
           "name": "gender",
-          "type": "ENUM",
+          "type": "Enum",
           "from": "UserGender",
           "multiple": false,
           "modelName": "Student",
@@ -345,7 +345,7 @@
         },
         {
           "name": "interest",
-          "type": "ENUM",
+          "type": "Enum",
           "from": "User_interest",
           "multiple": true,
           "modelName": "Student",
@@ -354,21 +354,21 @@
         },
         {
           "name": "age",
-          "type": "INT",
+          "type": "Int",
           "modelName": "Student",
           "unique": false,
           "nullable": true
         },
         {
           "name": "classId",
-          "type": "BIGINT",
+          "type": "Long",
           "modelName": "Student",
           "unique": false,
           "nullable": true
         },
         {
           "name": "studentDetail",
-          "type": "RELATION",
+          "type": "Relation",
           "modelName": "Student",
           "unique": false,
           "nullable": true,
@@ -394,14 +394,14 @@
         },
         {
           "name": "studentId",
-          "type": "BIGINT",
+          "type": "Long",
           "modelName": "StudentDetail",
           "unique": false,
           "nullable": true
         },
         {
           "name": "description",
-          "type": "TEXT",
+          "type": "Text",
           "modelName": "StudentDetail",
           "unique": false,
           "nullable": true
@@ -423,7 +423,7 @@
         },
         {
           "name": "classCode",
-          "type": "STRING",
+          "type": "String",
           "modelName": "Classes",
           "unique": false,
           "nullable": true,
@@ -431,14 +431,14 @@
         },
         {
           "name": "className",
-          "type": "STRING",
+          "type": "String",
           "modelName": "Classes",
           "unique": false,
           "nullable": true,
           "length": 255
         },
         {
-          "type": "RELATION",
+          "type": "Relation",
           "name": "students",
           "modelName": "Classes",
           "unique": false,
@@ -465,7 +465,7 @@
         },
         {
           "name": "courseName",
-          "type": "STRING",
+          "type": "String",
           "modelName": "Course",
           "unique": false,
           "nullable": true,
@@ -473,7 +473,7 @@
         },
         {
           "name": "students",
-          "type": "RELATION",
+          "type": "Relation",
           "modelName": "Course",
           "unique": false,
           "nullable": true,

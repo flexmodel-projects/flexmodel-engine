@@ -46,7 +46,7 @@ public class SqlContext extends AbstractSessionContext {
     this.typeHandlerMap.put(ScalarType.TEXT.getType(), new TextSqlTypeHandler());
     this.typeHandlerMap.put(ScalarType.DECIMAL.getType(), new DecimalSqlTypeHandler());
     this.typeHandlerMap.put(ScalarType.INT.getType(), new IntSqlTypeHandler());
-    this.typeHandlerMap.put(ScalarType.BIGINT.getType(), new BigintSqlTypeHandler());
+    this.typeHandlerMap.put(ScalarType.LONG.getType(), new BigintSqlTypeHandler());
     this.typeHandlerMap.put(ScalarType.BOOLEAN.getType(), new BooleanSqlTypeHandler());
     if (sqlDialect.supportsJSR310()) {
       this.typeHandlerMap.put(ScalarType.DATETIME.getType(), new DatetimeSqlTypeHandler());

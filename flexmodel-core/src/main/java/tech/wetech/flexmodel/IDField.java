@@ -1,7 +1,7 @@
 package tech.wetech.flexmodel;
 
 import static tech.wetech.flexmodel.IDField.GeneratedValue.AUTO_INCREMENT;
-import static tech.wetech.flexmodel.ScalarType.BIGINT;
+import static tech.wetech.flexmodel.ScalarType.LONG;
 import static tech.wetech.flexmodel.ScalarType.STRING;
 
 /**
@@ -30,7 +30,7 @@ public class IDField extends TypedField<Object, IDField> {
     /**
      * 自增ID
      */
-    AUTO_INCREMENT(BIGINT.getType()),
+    AUTO_INCREMENT(LONG.getType()),
     /**
      * UUID
      */
@@ -42,7 +42,7 @@ public class IDField extends TypedField<Object, IDField> {
     /**
      * 长整型不自动生成
      */
-    BIGINT_NOT_GENERATED(BIGINT.getType()),
+    BIGINT_NOT_GENERATED(LONG.getType()),
     /**
      * 字符串不自动生成
      */
