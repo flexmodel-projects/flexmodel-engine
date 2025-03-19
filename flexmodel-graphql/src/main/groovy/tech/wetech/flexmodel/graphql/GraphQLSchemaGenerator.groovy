@@ -37,6 +37,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     (ScalarType.BOOLEAN.getType()) : "Boolean_comparison_exp",
     (ScalarType.DATETIME.getType()): "Date_comparison_exp",
     (ScalarType.DATE.getType())    : "DateTime_comparison_exp",
+    (ScalarType.TIME.getType())    : "DateTime_comparison_exp",
     (ScalarType.JSON.getType())    : "JSON_comparison_exp",
   ]
 
@@ -240,8 +241,9 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "directive @transform(get: String!) on FIELD"
     out.println ""
     out.println "scalar JSON"
-    out.println "scalar Date"
     out.println "scalar DateTime"
+    out.println "scalar Date"
+    out.println "scalar Time"
     out.println ""
     out.println "\"Boolean expression to compare fields of type \\\"ID\\\". All fields are combined with logical 'AND.'\""
     out.println "input ID_comparison_exp {"
@@ -333,6 +335,19 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "  _in: [DateTime!]"
     out.println "  _nin: [DateTime!]"
     out.println "  _between: [DateTime!]"
+    out.println "}"
+    out.println ""
+    out.println "\"Boolean expression to compare fields of type \\\"Time\\\". All fields are combined with logical 'AND.'\""
+    out.println "input Time_comparison_exp {"
+    out.println "  _eq: Time"
+    out.println "  _ne: Time"
+    out.println "  _gt: Time"
+    out.println "  _lt: Time"
+    out.println "  _gte: Time"
+    out.println "  _lte: Time"
+    out.println "  _in: [Time!]"
+    out.println "  _nin: [Time!]"
+    out.println "  _between: [Time!]"
     out.println "}"
     out.println ""
     context.modelListClass.enumList.each {
