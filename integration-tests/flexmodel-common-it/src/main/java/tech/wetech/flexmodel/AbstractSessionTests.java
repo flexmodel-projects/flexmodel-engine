@@ -394,7 +394,7 @@ public abstract class AbstractSessionTests {
       // 创建时间
       .addField(new DatetimeField("createDatetime").setComment("创建日期时间"))
       // 扩展信息
-      .addField(new JsonField("extra").setComment("扩展信息"))
+      .addField(new JSONField("extra").setComment("扩展信息"))
       // 创建索引
       .addIndex(index -> index.addField("name", Direction.DESC).addField("id"))
       .setComment("教师表")
@@ -830,7 +830,7 @@ public abstract class AbstractSessionTests {
     birthday.setComment("出生日期");
     session.createField(birthday);
     // json
-    JsonField interests = new JsonField("interests");
+    JSONField interests = new JSONField("interests");
     interests.setModelName(entityName);
     interests.setComment("兴趣爱好");
     session.createField(interests);

@@ -21,7 +21,7 @@ public class Models {
       .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
       .addField(new StringField("classCode"))
       .addField(new StringField("className"))
-      .addField(new JsonField("description"))
+      .addField(new JSONField("description"))
     );
   }
 
@@ -46,7 +46,7 @@ public class Models {
       .addField(new EnumField("interest").setFrom(interestEnum.getName()).setMultiple(true))
       .addField(new IntField("age"))
       .addField(new IntField("classId"))
-      .addField(new JsonField("remark"))
+      .addField(new JSONField("remark"))
     );
   }
 

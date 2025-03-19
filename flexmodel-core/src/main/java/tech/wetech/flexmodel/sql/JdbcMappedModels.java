@@ -329,7 +329,7 @@ public class JdbcMappedModels implements MappedModels {
             break;
           }
           case JSON: {
-            JsonField jsonField = new JsonField(sqlColumn.getName());
+            JSONField jsonField = new JSONField(sqlColumn.getName());
             field = jsonField;
             if (sqlColumn.getDefaultValue() != null) {
               try {

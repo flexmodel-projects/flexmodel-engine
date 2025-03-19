@@ -47,7 +47,7 @@ public class JsonSerializeTest {
     createDatetime.setNullable(false);
     entity.addField(createDatetime);
     // 扩展信息
-    JsonField extra = new JsonField("extra");
+    JSONField extra = new JSONField("extra");
     extra.setComment("扩展信息");
     entity.addField(extra);
     // 邮箱

@@ -20,7 +20,7 @@ import tech.wetech.flexmodel.*;
   @JsonSubTypes.Type(value = DateField.class, name = ScalarType.DATE_TYPE),
   @JsonSubTypes.Type(value = DatetimeField.class, name = ScalarType.DATETIME_TYPE),
   @JsonSubTypes.Type(value = BooleanField.class, name = ScalarType.BOOLEAN_TYPE),
-  @JsonSubTypes.Type(value = JsonField.class, name = ScalarType.JSON_TYPE),
+  @JsonSubTypes.Type(value = JSONField.class, name = ScalarType.JSON_TYPE),
   @JsonSubTypes.Type(value = RelationField.class, name = ScalarType.RELATION_TYPE),
   @JsonSubTypes.Type(value = EnumField.class, name = ScalarType.ENUM_TYPE),
 })

@@ -5,9 +5,9 @@ import java.io.Serializable;
 /**
  * @author cjbi
  */
-public class JsonField extends TypedField<Serializable, JsonField> {
+public class JSONField extends TypedField<Serializable, JSONField> {
 
-  public JsonField(String name) {
+  public JSONField(String name) {
     super(name, ScalarType.JSON.getType());
   }
 

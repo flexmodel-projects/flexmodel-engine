@@ -280,7 +280,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
             aSqlColumn.setDefaultValue(field.getDefaultValue().toString());
           }
         }
-        case JsonField jsonField -> {
+        case JSONField jsonField -> {
           if (field.getDefaultValue() != null) {
             aSqlColumn.setDefaultValue(sqlContext.getJsonObjectConverter().toJsonString(jsonField.getDefaultValue()));
           }
