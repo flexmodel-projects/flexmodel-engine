@@ -273,7 +273,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
             aSqlColumn.setDefaultValue(field.getDefaultValue().toString());
           }
         }
-        case DecimalField decimalField -> {
+        case FloatField decimalField -> {
           aSqlColumn.setPrecision(decimalField.getPrecision());
           aSqlColumn.setScale(decimalField.getScale());
           if (field.getDefaultValue() != null) {

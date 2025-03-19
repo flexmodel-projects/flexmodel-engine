@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatterBuilder;
 /**
  * @author cjbi
  */
-public class DatetimeTypeHandler implements TypeHandler<LocalDateTime> {
+public class DateTimeTypeHandler implements TypeHandler<LocalDateTime> {
   @Override
   public LocalDateTime convertParameter(tech.wetech.flexmodel.Field field, Object value) {
     if (value == null) {

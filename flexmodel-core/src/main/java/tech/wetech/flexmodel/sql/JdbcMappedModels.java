@@ -11,6 +11,7 @@ import java.sql.*;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -225,7 +226,7 @@ public class JdbcMappedModels implements MappedModels {
               idField.setGeneratedValue(AUTO_INCREMENT);
             }
             ScalarType idType = ScalarType.fromType(jdbcCodeMap.getOrDefault(sqlColumn.getSqlTypeCode(), STRING.getType()));
-            idField.setGeneratedValue(idType == LONG || idType == INT || idType == DECIMAL ? BIGINT_NOT_GENERATED : STRING_NOT_GENERATED);
+            idField.setGeneratedValue(idType == LONG || idType == INT || idType == FLOAT ? BIGINT_NOT_GENERATED : STRING_NOT_GENERATED);
             break;
           }
           default:
@@ -254,8 +255,8 @@ public class JdbcMappedModels implements MappedModels {
             }
             break;
           }
-          case DECIMAL: {
-            DecimalField decimalField = new DecimalField(sqlColumn.getName());
+          case FLOAT: {
+            FloatField decimalField = new FloatField(sqlColumn.getName());
             field = decimalField;
             decimalField.setPrecision(sqlColumn.getPrecision());
             decimalField.setScale(sqlColumn.getScale());
@@ -305,11 +306,23 @@ public class JdbcMappedModels implements MappedModels {
             break;
           }
           case DATETIME: {
-            DatetimeField datetimeField = new DatetimeField(sqlColumn.getName());
+            DateTimeField datetimeField = new DateTimeField(sqlColumn.getName());
             field = datetimeField;
             if (sqlColumn.getDefaultValue() != null) {
               try {
                 datetimeField.setDefaultValue(LocalDateTime.parse(sqlColumn.getDefaultValue()));
+              } catch (Exception e) {
+                log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
+              }
+            }
+            break;
+          }
+          case TIME: {
+            TimeField timeField = new TimeField(sqlColumn.getName());
+            field = timeField;
+            if (sqlColumn.getDefaultValue() != null) {
+              try {
+                timeField.setDefaultValue(LocalTime.parse(sqlColumn.getDefaultValue()));
               } catch (Exception e) {
                 log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
               }

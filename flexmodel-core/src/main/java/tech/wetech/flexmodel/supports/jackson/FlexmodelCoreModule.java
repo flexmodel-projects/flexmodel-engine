@@ -29,18 +29,20 @@ public class FlexmodelCoreModule extends SimpleModule {
     setMixInAnnotation(IDField.class, TypedFieldMixIn.class);
     setMixInAnnotation(StringField.class, TypedFieldMixIn.class);
     setMixInAnnotation(TextField.class, TypedFieldMixIn.class);
-    setMixInAnnotation(DecimalField.class, TypedFieldMixIn.class);
+    setMixInAnnotation(FloatField.class, TypedFieldMixIn.class);
     setMixInAnnotation(IntField.class, TypedFieldMixIn.class);
     setMixInAnnotation(LongField.class, TypedFieldMixIn.class);
     setMixInAnnotation(BooleanField.class, TypedFieldMixIn.class);
-    setMixInAnnotation(DatetimeField.class, TypedFieldMixIn.class);
+    setMixInAnnotation(DateTimeField.class, TypedFieldMixIn.class);
     setMixInAnnotation(DateField.class, TypedFieldMixIn.class);
+    setMixInAnnotation(TimeField.class, TypedFieldMixIn.class);
     setMixInAnnotation(JSONField.class, TypedFieldMixIn.class);
     setMixInAnnotation(RelationField.class, TypedFieldMixIn.class);
     setMixInAnnotation(EnumField.class, TypedFieldMixIn.class);
     // Index
     setMixInAnnotation(Index.class, IndexMixIn.class);
 
+    // Date类型序列化
     addSerializer(Date.class, new JsonSerializer<>() {
       @Override
       public void serialize(Date date, JsonGenerator g, SerializerProvider provider) throws IOException {

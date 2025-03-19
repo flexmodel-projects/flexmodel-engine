@@ -3,7 +3,7 @@ package tech.wetech.flexmodel;
 /**
  * @author cjbi
  */
-public class DecimalField extends TypedField<Number, DecimalField> {
+public class FloatField extends TypedField<Number, FloatField> {
 
   /**
    * 数据长度
@@ -14,15 +14,15 @@ public class DecimalField extends TypedField<Number, DecimalField> {
    */
   private int scale = 2;
 
-  public DecimalField(String name) {
-    super(name, ScalarType.DECIMAL.getType());
+  public FloatField(String name) {
+    super(name, ScalarType.FLOAT.getType());
   }
 
   public int getPrecision() {
     return precision;
   }
 
-  public DecimalField setPrecision(int precision) {
+  public FloatField setPrecision(int precision) {
     this.precision = precision;
     return this;
   }
@@ -31,7 +31,7 @@ public class DecimalField extends TypedField<Number, DecimalField> {
     return scale;
   }
 
-  public DecimalField setScale(int scale) {
+  public FloatField setScale(int scale) {
     this.scale = scale;
     return this;
   }
@@ -39,7 +39,7 @@ public class DecimalField extends TypedField<Number, DecimalField> {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof DecimalField that)) return false;
+    if (!(o instanceof FloatField that)) return false;
     if (!super.equals(o)) return false;
     if (precision != that.precision) return false;
     return scale == that.scale;

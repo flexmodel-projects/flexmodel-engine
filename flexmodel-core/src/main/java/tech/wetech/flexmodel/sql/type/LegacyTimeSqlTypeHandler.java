@@ -1,30 +1,28 @@
 package tech.wetech.flexmodel.sql.type;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
+import java.sql.*;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 /**
  * @author cjbi
  */
 @SuppressWarnings("all")
-public class LegacyDatetimeSqlTypeHandler implements SqlTypeHandler {
+public class LegacyTimeSqlTypeHandler implements SqlTypeHandler {
   @Override
   public int getJdbcTypeCode() {
-    return Types.TIMESTAMP;
+    return Types.TIME;
   }
 
   @Override
-  public Timestamp convertParameter(tech.wetech.flexmodel.Field field, Object value) {
+  public Time convertParameter(tech.wetech.flexmodel.Field field, Object value) {
     if (value == null) {
       return null;
     }
-    if (value instanceof LocalDateTime localDateTime) {
-      return Timestamp.valueOf(localDateTime);
+    if (value instanceof LocalTime localTime) {
+      return Time.valueOf(localTime);
     }
-    return Timestamp.valueOf(value.toString());
+    return Time.valueOf(value.toString());
   }
 
   @Override

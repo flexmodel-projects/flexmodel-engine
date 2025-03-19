@@ -5,11 +5,11 @@ import java.time.LocalDateTime;
 /**
  * @author cjbi
  */
-public class DatetimeField extends TypedField<LocalDateTime, DatetimeField> {
+public class DateTimeField extends TypedField<LocalDateTime, DateTimeField> {
 
   private GeneratedValue generatedValue;
 
-  public DatetimeField(String name) {
+  public DateTimeField(String name) {
     super(name, ScalarType.DATETIME.getType());
   }
 
@@ -17,7 +17,7 @@ public class DatetimeField extends TypedField<LocalDateTime, DatetimeField> {
     return generatedValue;
   }
 
-  public DatetimeField setGeneratedValue(GeneratedValue generatedValue) {
+  public DateTimeField setGeneratedValue(GeneratedValue generatedValue) {
     this.generatedValue = generatedValue;
     return this;
   }

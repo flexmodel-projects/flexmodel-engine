@@ -44,16 +44,17 @@ public class SqlContext extends AbstractSessionContext {
 
     this.typeHandlerMap.put(ScalarType.STRING.getType(), new StringSqlTypeHandler());
     this.typeHandlerMap.put(ScalarType.TEXT.getType(), new TextSqlTypeHandler());
-    this.typeHandlerMap.put(ScalarType.DECIMAL.getType(), new DecimalSqlTypeHandler());
+    this.typeHandlerMap.put(ScalarType.FLOAT.getType(), new DecimalSqlTypeHandler());
     this.typeHandlerMap.put(ScalarType.INT.getType(), new IntSqlTypeHandler());
     this.typeHandlerMap.put(ScalarType.LONG.getType(), new BigintSqlTypeHandler());
     this.typeHandlerMap.put(ScalarType.BOOLEAN.getType(), new BooleanSqlTypeHandler());
     if (sqlDialect.supportsJSR310()) {
-      this.typeHandlerMap.put(ScalarType.DATETIME.getType(), new DatetimeSqlTypeHandler());
+      this.typeHandlerMap.put(ScalarType.DATETIME.getType(), new DateTimeSqlTypeHandler());
       this.typeHandlerMap.put(ScalarType.DATE.getType(), new DateSqlTypeHandler());
     } else {
-      this.typeHandlerMap.put(ScalarType.DATETIME.getType(), new LegacyDatetimeSqlTypeHandler());
+      this.typeHandlerMap.put(ScalarType.DATETIME.getType(), new LegacyDateTimeSqlTypeHandler());
       this.typeHandlerMap.put(ScalarType.DATE.getType(), new LegacyDateSqlTypeHandler());
+      this.typeHandlerMap.put(ScalarType.TIME.getType(), new LegacyTimeSqlTypeHandler());
     }
     this.typeHandlerMap.put(ScalarType.JSON.getType(), new JsonSqlTypeHandler(jsonObjectConverter));
     this.typeHandlerMap.put(ScalarType.ENUM.getType(), new EnumSqlTypeHandler());

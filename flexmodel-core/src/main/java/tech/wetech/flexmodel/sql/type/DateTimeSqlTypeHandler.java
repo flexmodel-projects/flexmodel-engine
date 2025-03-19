@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel.sql.type;
 
-import tech.wetech.flexmodel.mapping.DatetimeTypeHandler;
+import tech.wetech.flexmodel.mapping.DateTimeTypeHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 /**
  * @author cjbi
  */
-public class DatetimeSqlTypeHandler extends DatetimeTypeHandler implements SqlTypeHandler<LocalDateTime> {
+public class DateTimeSqlTypeHandler extends DateTimeTypeHandler implements SqlTypeHandler<LocalDateTime> {
 
   @Override
   public int getJdbcTypeCode() {

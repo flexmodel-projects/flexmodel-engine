@@ -71,7 +71,7 @@ public abstract class AbstractSessionTests {
       .addField(new EnumField("gender").setFrom(genderEnum.getName()))
       .addField(new EnumField("interest").setFrom(interestEnum.getName()).setMultiple(true))
       .addField(new IntField("age"))
-      .addField(new DecimalField("height").setPrecision(3).setScale(2))
+      .addField(new FloatField("height").setPrecision(3).setScale(2))
       .addField(new LongField("classId"))
     );
   }
@@ -392,7 +392,7 @@ public abstract class AbstractSessionTests {
       // 是否禁用
       .addField(new BooleanField("isLocked").setNullable(false).setDefaultValue(false).setComment("是否禁用"))
       // 创建时间
-      .addField(new DatetimeField("createDatetime").setComment("创建日期时间"))
+      .addField(new DateTimeField("createDatetime").setComment("创建日期时间"))
       // 扩展信息
       .addField(new JSONField("extra").setComment("扩展信息"))
       // 创建索引
@@ -486,7 +486,7 @@ public abstract class AbstractSessionTests {
     session.createEntity(teacherCourseEntity, sScore -> sScore
       .addField(new IDField("id"))
       .addField(new StringField("c_name"))
-      .addField(new DecimalField("c_score"))
+      .addField(new FloatField("c_score"))
       .addField(new LongField("teacher_id"))
       .setComment("教师成绩表")
     );
@@ -820,7 +820,7 @@ public abstract class AbstractSessionTests {
     deleted.setDefaultValue(false);
     session.createField(deleted);
     // datetime
-    DatetimeField createDatetime = new DatetimeField("createDatetime");
+    DateTimeField createDatetime = new DateTimeField("createDatetime");
     createDatetime.setModelName(entityName);
     createDatetime.setComment("创建日期时间");
     session.createField(createDatetime);
@@ -840,7 +840,7 @@ public abstract class AbstractSessionTests {
     session.createEntity(scoreModelName, sScore ->
       sScore.addField(new LongField("student_id"))
         .addField(new StringField("course_name"))
-        .addField(new DecimalField("score"))
+        .addField(new FloatField("score"))
     );
   }
 

@@ -46,7 +46,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
       // 仅支持新增修改默认值
       Object generatedValue = switch (field) {
         case IDField idField -> generateValue(idField, value, isUpdate);
-        case DatetimeField datetimeField -> generateValue(datetimeField, value, isUpdate);
+        case DateTimeField datetimeField -> generateValue(datetimeField, value, isUpdate);
         case DateField dateField -> generateValue(dateField, value, isUpdate);
         default -> value != null ? value : convertParameter(field, field.getDefaultValue());
       };
@@ -68,13 +68,13 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
     return null;
   }
 
-  private Object generateValue(DatetimeField field, Object value, boolean isUpdate) {
+  private Object generateValue(DateTimeField field, Object value, boolean isUpdate) {
     if (field.getGeneratedValue() != null && value == null) {
-      if (field.getGeneratedValue() == DatetimeField.GeneratedValue.NOW_ON_CREATE && !isUpdate) {
+      if (field.getGeneratedValue() == DateTimeField.GeneratedValue.NOW_ON_CREATE && !isUpdate) {
         return LocalDateTime.now();
-      } else if (field.getGeneratedValue() == DatetimeField.GeneratedValue.NOW_ON_UPDATE && isUpdate) {
+      } else if (field.getGeneratedValue() == DateTimeField.GeneratedValue.NOW_ON_UPDATE && isUpdate) {
         return LocalDateTime.now();
-      } else if (field.getGeneratedValue() == DatetimeField.GeneratedValue.NOW_ON_CREATE_AND_UPDATE) {
+      } else if (field.getGeneratedValue() == DateTimeField.GeneratedValue.NOW_ON_CREATE_AND_UPDATE) {
         return LocalDateTime.now();
       }
     }

@@ -7,12 +7,13 @@ public enum ScalarType {
   ID(ScalarType.ID_TYPE),
   STRING(ScalarType.STRING_TYPE),
   TEXT(ScalarType.TEXT_TYPE),
-  DECIMAL(ScalarType.DECIMAL_TYPE),
+  FLOAT(ScalarType.FLOAT_TYPE),
   INT(ScalarType.INT_TYPE),
   LONG(ScalarType.LONG_TYPE),
   BOOLEAN(ScalarType.BOOLEAN_TYPE),
   DATETIME(ScalarType.DATETIME_TYPE),
   DATE(ScalarType.DATE_TYPE),
+  TIME(ScalarType.TIME_TYPE),
   JSON(ScalarType.JSON_TYPE),
   ENUM(ScalarType.ENUM_TYPE),
   RELATION(ScalarType.RELATION_TYPE);
@@ -22,12 +23,13 @@ public enum ScalarType {
   public static final String ID_TYPE = "ID";
   public static final String STRING_TYPE = "String";
   public static final String TEXT_TYPE = "Text";
-  public static final String DECIMAL_TYPE = "Decimal";
+  public static final String FLOAT_TYPE = "Float";
   public static final String INT_TYPE = "Int";
   public static final String LONG_TYPE = "Long";
   public static final String BOOLEAN_TYPE = "Boolean";
   public static final String DATETIME_TYPE = "DateTime";
   public static final String DATE_TYPE = "Date";
+  public static final String TIME_TYPE = "Time";
   public static final String JSON_TYPE = "JSON";
   public static final String ENUM_TYPE = "Enum";
   public static final String RELATION_TYPE = "Relation";

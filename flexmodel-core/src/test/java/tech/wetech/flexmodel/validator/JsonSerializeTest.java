@@ -42,7 +42,7 @@ public class JsonSerializeTest {
     isLocked.setComment("是否禁用");
     entity.addField(isLocked);
     // 创建时间
-    DatetimeField createDatetime = new DatetimeField("createDatetime");
+    DateTimeField createDatetime = new DateTimeField("createDatetime");
     createDatetime.setComment("创建日期时间");
     createDatetime.setNullable(false);
     entity.addField(createDatetime);
