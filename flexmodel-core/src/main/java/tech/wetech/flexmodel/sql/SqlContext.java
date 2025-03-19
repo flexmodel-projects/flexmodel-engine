@@ -51,6 +51,7 @@ public class SqlContext extends AbstractSessionContext {
     if (sqlDialect.supportsJSR310()) {
       this.typeHandlerMap.put(ScalarType.DATETIME.getType(), new DateTimeSqlTypeHandler());
       this.typeHandlerMap.put(ScalarType.DATE.getType(), new DateSqlTypeHandler());
+      this.typeHandlerMap.put(ScalarType.TIME.getType(), new TimeSqlTypeHandler());
     } else {
       this.typeHandlerMap.put(ScalarType.DATETIME.getType(), new LegacyDateTimeSqlTypeHandler());
       this.typeHandlerMap.put(ScalarType.DATE.getType(), new LegacyDateSqlTypeHandler());
