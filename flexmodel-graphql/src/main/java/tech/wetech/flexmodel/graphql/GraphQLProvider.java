@@ -104,6 +104,7 @@ public class GraphQLProvider {
       .scalar(ExtendedScalars.Json)
       .scalar(ExtendedScalars.DateTime)
       .scalar(ExtendedScalars.Date)
+      .scalar(ExtendedScalars.Time)
       .build();
     SchemaGenerator schemaGenerator = new SchemaGenerator();
     GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeDefinitionRegistry, runtimeWiring);
