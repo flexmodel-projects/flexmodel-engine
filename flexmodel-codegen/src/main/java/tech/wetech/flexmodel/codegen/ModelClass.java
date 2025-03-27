@@ -31,8 +31,7 @@ public class ModelClass implements Serializable {
 
   public ModelClass() {
     // default imports
-    imports.add("com.fasterxml.jackson.annotation.JsonRootName");
-    imports.add("com.fasterxml.jackson.annotation.JsonProperty");
+    imports.add("tech.wetech.flexmodel.annotation.*");
   }
 
   public String getPackageName() {

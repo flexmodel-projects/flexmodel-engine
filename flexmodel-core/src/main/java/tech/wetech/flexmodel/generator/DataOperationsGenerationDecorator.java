@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.generator;
 
 import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.reflect.ReflectionUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -96,7 +97,8 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
 
   @Override
   @SuppressWarnings("all")
-  public int insert(String modelName, Map<String, Object> record, Consumer<Object> idConsumer) {
+  public int insert(String modelName, Object obj, Consumer<Object> idConsumer) {
+    Map<String, Object> record = ReflectionUtils.toMap(sessionContext.getJsonObjectConverter(), obj);
     String schemaName = sessionContext.getSchemaName();
     MappedModels mappedModels = sessionContext.getMappedModels();
     AtomicReference<Object> atomicId = new AtomicReference<>();
@@ -110,7 +112,8 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
-  private void insertRelationRecord(String modelName, Map<String, Object> record, Object id) {
+  private void insertRelationRecord(String modelName, Object objR, Object id) {
+    Map<String, Object> record = ReflectionUtils.toMap(sessionContext.getJsonObjectConverter(), objR);
     Entity entity = (Entity) sessionContext.getModel(modelName);
     record.forEach((key, value) -> {
       if (value != null) {
@@ -135,12 +138,14 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
   }
 
   @Override
-  public int update(String modelName, Map<String, Object> record, String filter) {
+  public int update(String modelName, Object obj, String filter) {
+    Map<String, Object> record = ReflectionUtils.toMap(sessionContext.getJsonObjectConverter(), obj);
     return super.update(modelName, generateValue(modelName, record, true), filter);
   }
 
   @Override
-  public int updateById(String modelName, Map<String, Object> record, Object id) {
+  public int updateById(String modelName, Object obj, Object id) {
+    Map<String, Object> record = ReflectionUtils.toMap(sessionContext.getJsonObjectConverter(), obj);
     return super.updateById(modelName, generateValue(modelName, record, true), id);
   }
 }

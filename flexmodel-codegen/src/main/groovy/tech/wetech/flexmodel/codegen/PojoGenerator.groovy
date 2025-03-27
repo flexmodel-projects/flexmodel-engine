@@ -40,7 +40,7 @@ class PojoGenerator extends AbstractGenerator {
     out.println " */"
 
     // Write class declaration
-    out.println "@JsonRootName(\"${modelClass.originalModel.name}\")"
+    out.println "@ModelName(\"${modelClass.originalModel.name}\")"
     out.println "public class ${className} {"
 
     // Write field declarations
@@ -51,7 +51,10 @@ class PojoGenerator extends AbstractGenerator {
         out.println "   * ${field.comment}"
         out.println "   */"
       }
-      out.println "  @JsonProperty(\"${field.originalField.name}\")"
+      if (field.isRelationField()) {
+        out.println "  @ModelRelation"
+      }
+      out.println "  @ModelField(\"${field.originalField.name}\")"
       out.println "  private ${field.shortTypeName} ${field.variableName};"
     }
 

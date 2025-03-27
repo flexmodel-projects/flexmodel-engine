@@ -2,7 +2,6 @@ package tech.wetech.flexmodel.mongodb;
 
 import tech.wetech.flexmodel.AbstractSession;
 
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -22,7 +21,7 @@ public class MongoSession extends AbstractSession {
   }
 
   @Override
-  public int insert(String modelName, Map<String, Object> record, Consumer<Object> idConsumer) {
+  public int insert(String modelName, Object record, Consumer<Object> idConsumer) {
     return super.insert(modelName, record, idConsumer);
   }
 

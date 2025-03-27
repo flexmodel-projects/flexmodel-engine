@@ -6,6 +6,7 @@ import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.reflect.ReflectionUtils;
 import tech.wetech.flexmodel.sql.StringHelper;
 
 import java.util.ArrayList;
@@ -34,7 +35,8 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   }
 
   @Override
-  public int insert(String modelName, Map<String, Object> record, Consumer<Object> idConsumer) {
+  public int insert(String modelName, Object objR, Consumer<Object> idConsumer) {
+    Map<String, Object> record = ReflectionUtils.toMap(mongoContext.getJsonObjectConverter(), objR);
     Entity entity = (Entity) mongoContext.getModel(modelName);
     IDField idField = entity.findIdField().orElseThrow();
     if (!record.containsKey(idField.getName()) && idField.getGeneratedValue() == AUTO_INCREMENT) {
@@ -60,7 +62,8 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   }
 
   @Override
-  public int updateById(String modelName, Map<String, Object> record, Object id) {
+  public int updateById(String modelName, Object objR, Object id) {
+    Map<String, Object> record = ReflectionUtils.toMap(mongoContext.getJsonObjectConverter(), objR);
     String collectionName = getCollectionName(modelName);
     Entity entity = (Entity) mongoContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
@@ -69,7 +72,8 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   }
 
   @Override
-  public int update(String modelName, Map<String, Object> record, String filter) {
+  public int update(String modelName, Object objR, String filter) {
+    Map<String, Object> record = ReflectionUtils.toMap(mongoContext.getJsonObjectConverter(), objR);
     String collectionName = getCollectionName(modelName);
     String mongoCondition = getMongoCondition(filter);
     Document mongoFilter = Document.parse(mongoCondition);
@@ -129,7 +133,8 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   }
 
   @Override
-  public <T> List<T> findByNativeQuery(String statement, Map<String, Object> params, Class<T> resultType) {
+  public <T> List<T> findByNativeQuery(String statement, Object obj, Class<T> resultType) {
+    Map<String, Object> params = ReflectionUtils.toMap(mongoContext.getJsonObjectConverter(), obj);
     String json = StringHelper.simpleRenderTemplate(statement, params);
     Document result = mongoDatabase.runCommand(Document.parse(json));
     List<?> list = (List<?>) ((Map<?, ?>) result.get("cursor")).get("firstBatch");
@@ -137,7 +142,8 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   }
 
   @Override
-  public <T> List<T> findByNativeQueryModel(String modelName, Map<String, Object> params, Class<T> resultType) {
+  public <T> List<T> findByNativeQueryModel(String modelName, Object obj, Class<T> resultType) {
+    Map<String, Object> params = ReflectionUtils.toMap(mongoContext.getJsonObjectConverter(), obj);
     NativeQueryModel model = (NativeQueryModel) mongoContext.getModel(modelName);
     return findByNativeQuery(model.getStatement(), params, resultType);
   }

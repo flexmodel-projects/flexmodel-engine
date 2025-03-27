@@ -22,7 +22,7 @@ public interface DataOperations {
    * @param id        Auto increment name
    * @return Number of affected rows
    */
-  int insert(String modelName, Map<String, Object> record, Consumer<Object> id);
+  int insert(String modelName, Object record, Consumer<Object> id);
 
   /**
    * Find a record by ID
@@ -35,9 +35,9 @@ public interface DataOperations {
 
   <T> List<T> find(String modelName, Query query, Class<T> resultType);
 
-  <T> List<T> findByNativeQuery(String statement, Map<String, Object> params, Class<T> resultType);
+  <T> List<T> findByNativeQuery(String statement, Object params, Class<T> resultType);
 
-  <T> List<T> findByNativeQueryModel(String modelName, Map<String, Object> params, Class<T> resultType);
+  <T> List<T> findByNativeQueryModel(String modelName, Object params, Class<T> resultType);
 
   /**
    * Count records based on conditions
@@ -56,7 +56,7 @@ public interface DataOperations {
    * @param id        ID
    * @return Number of affected rows
    */
-  int updateById(String modelName, Map<String, Object> record, Object id);
+  int updateById(String modelName, Object record, Object id);
 
   /**
    * Update records based on conditions
@@ -66,7 +66,7 @@ public interface DataOperations {
    * @param filter    Filter
    * @return Number of affected rows
    */
-  int update(String modelName, Map<String, Object> record, String filter);
+  int update(String modelName, Object record, String filter);
 
   /**
    * Delete a record by ID
@@ -94,7 +94,7 @@ public interface DataOperations {
    */
   int deleteAll(String modelName);
 
-  default int insert(String modelName, Map<String, Object> record) {
+  default int insert(String modelName, Object record) {
     return insert(modelName, record, id -> {
     });
   }
@@ -106,9 +106,10 @@ public interface DataOperations {
    * @param records   Records
    * @return Number of affected rows
    */
-  default int insertAll(String modelName, List<Map<String, Object>> records) {
+  @SuppressWarnings("all")
+  default int insertAll(String modelName, List records) {
     int rows = -1;
-    for (Map<String, Object> record : records) {
+    for (Object record : records) {
       rows += insert(modelName, record);
     }
     return rows;
@@ -240,7 +241,7 @@ public interface DataOperations {
    * @param predicate predicate
    * @return Number of affected rows
    */
-  default int update(String modelName, Map<String, Object> record, Predicate predicate) {
+  default int update(String modelName, Object record, Predicate predicate) {
     return update(modelName, record, predicate.toJsonString());
   }
 

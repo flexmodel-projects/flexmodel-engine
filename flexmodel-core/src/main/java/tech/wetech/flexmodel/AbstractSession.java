@@ -3,7 +3,6 @@ package tech.wetech.flexmodel;
 import tech.wetech.flexmodel.generator.DataOperationsGenerationDecorator;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -110,17 +109,17 @@ public abstract class AbstractSession implements Session {
   }
 
   @Override
-  public int insert(String modelName, Map<String, Object> record, Consumer<Object> id) {
+  public int insert(String modelName, Object record, Consumer<Object> id) {
     return dataOperationsDelegate.insert(modelName, record, id);
   }
 
   @Override
-  public int updateById(String modelName, Map<String, Object> record, Object id) {
+  public int updateById(String modelName, Object record, Object id) {
     return dataOperationsDelegate.updateById(modelName, record, id);
   }
 
   @Override
-  public int update(String modelName, Map<String, Object> record, String filter) {
+  public int update(String modelName, Object record, String filter) {
     return dataOperationsDelegate.update(modelName, record, filter);
   }
 
@@ -150,12 +149,12 @@ public abstract class AbstractSession implements Session {
   }
 
   @Override
-  public <T> List<T> findByNativeQuery(String statement, Map<String, Object> params, Class<T> resultType) {
+  public <T> List<T> findByNativeQuery(String statement, Object params, Class<T> resultType) {
     return dataOperationsDelegate.findByNativeQuery(statement, params, resultType);
   }
 
   @Override
-  public <T> List<T> findByNativeQueryModel(String modelName, Map<String, Object> params, Class<T> resultType) {
+  public <T> List<T> findByNativeQueryModel(String modelName, Object params, Class<T> resultType) {
     return dataOperationsDelegate.findByNativeQueryModel(modelName, params, resultType);
   }
 

@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.sql;
 
 import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.reflect.ReflectionUtils;
 import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 import tech.wetech.flexmodel.sql.type.SqlResultHandler;
 import tech.wetech.flexmodel.sql.type.SqlTypeHandler;
@@ -33,7 +34,8 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   }
 
   @Override
-  public int insert(String modelName, Map<String, Object> record, Consumer<Object> id) {
+  public int insert(String modelName, Object objR, Consumer<Object> id) {
+    Map<String, Object> record = ReflectionUtils.toMap(sqlContext.getJsonObjectConverter(), objR);
     String sql = getInsertSqlString(modelName, record);
     Entity entity = (Entity) sqlContext.getModel(modelName);
     Optional<IDField> idFieldOptional = entity.findIdField();
@@ -69,7 +71,8 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   }
 
   @Override
-  public int updateById(String modelName, Map<String, Object> record, Object id) {
+  public int updateById(String modelName, Object objR, Object id) {
+    Map<String, Object> record = ReflectionUtils.toMap(sqlContext.getJsonObjectConverter(), objR);
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
     Entity entity = (Entity) sqlContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
@@ -96,7 +99,8 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   }
 
   @Override
-  public int update(String modelName, Map<String, Object> record, String filter) {
+  public int update(String modelName, Object objR, String filter) {
+    Map<String, Object> record = ReflectionUtils.toMap(sqlContext.getJsonObjectConverter(), objR);
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
     Entity entity = (Entity) sqlContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
@@ -154,12 +158,13 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   }
 
   @Override
-  public <T> List<T> findByNativeQuery(String statement, Map<String, Object> params, Class<T> resultType) {
+  public <T> List<T> findByNativeQuery(String statement, Object objR, Class<T> resultType) {
+    Map<String, Object> params = ReflectionUtils.toMap(sqlContext.getJsonObjectConverter(), objR);
     return sqlExecutor.queryForList(StringHelper.replacePlaceholder(statement), params, new SqlResultHandler<>(resultType));
   }
 
   @Override
-  public <T> List<T> findByNativeQueryModel(String modelName, Map<String, Object> params, Class<T> resultType) {
+  public <T> List<T> findByNativeQueryModel(String modelName, Object params, Class<T> resultType) {
     NativeQueryModel model = (NativeQueryModel) sqlContext.getModel(modelName);
     String statement = model.getStatement();
     return findByNativeQuery(statement, params, resultType);

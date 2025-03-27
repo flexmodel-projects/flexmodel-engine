@@ -24,7 +24,7 @@ public class AbstractDataOperationsDecorator implements DataOperations {
   }
 
   @Override
-  public int insert(String modelName, Map<String, Object> record, Consumer<Object> idConsumer) {
+  public int insert(String modelName, Object record, Consumer<Object> idConsumer) {
     AtomicReference<Object> atomicId = new AtomicReference<>();
     int rows = delegate.insert(modelName, record, atomicId::set);
     Object id = atomicId.get();
@@ -43,12 +43,12 @@ public class AbstractDataOperationsDecorator implements DataOperations {
   }
 
   @Override
-  public <T> List<T> findByNativeQuery(String statement, Map<String, Object> params, Class<T> resultType) {
+  public <T> List<T> findByNativeQuery(String statement, Object params, Class<T> resultType) {
     return delegate.findByNativeQuery(statement, params, resultType);
   }
 
   @Override
-  public <T> List<T> findByNativeQueryModel(String modelName, Map<String, Object> params, Class<T> resultType) {
+  public <T> List<T> findByNativeQueryModel(String modelName, Object params, Class<T> resultType) {
     return delegate.findByNativeQueryModel(modelName, params, resultType);
   }
 
@@ -58,12 +58,12 @@ public class AbstractDataOperationsDecorator implements DataOperations {
   }
 
   @Override
-  public int updateById(String modelName, Map<String, Object> record, Object id) {
+  public int updateById(String modelName, Object record, Object id) {
     return delegate.updateById(modelName, record, id);
   }
 
   @Override
-  public int update(String modelName, Map<String, Object> record, String filter) {
+  public int update(String modelName, Object record, String filter) {
     return delegate.update(modelName, record, filter);
   }
 
