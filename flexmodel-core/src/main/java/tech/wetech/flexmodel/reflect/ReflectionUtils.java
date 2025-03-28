@@ -52,6 +52,21 @@ public class ReflectionUtils {
       });
       return converter.convertValue(result, cls);
     }
+    if (obj.getClass().getAnnotation(ModelName.class) != null) {
+      Class<?> objClass = obj.getClass();
+      Map<String, String> bindFields = new HashMap<>();
+      for (Field field : objClass.getDeclaredFields()) {
+        ModelField modelFieldAnnotation = field.getAnnotation(ModelField.class);
+        bindFields.put(field.getName(), modelFieldAnnotation != null ? modelFieldAnnotation.value() : field.getName());
+      }
+      Map<String, Object> originValue = converter.convertValue(obj, Map.class);
+      Map<String, Object> result = new HashMap<>();
+      originValue.forEach((k, v) -> {
+        String fieldName = bindFields.get(k);
+        result.put(fieldName, v);
+      });
+      return converter.convertValue(result, cls);
+    }
     return converter.convertValue(obj, cls);
   }
 
