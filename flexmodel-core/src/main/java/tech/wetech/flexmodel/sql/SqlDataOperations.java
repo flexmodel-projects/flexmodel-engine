@@ -35,7 +35,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
 
   @Override
   public int insert(String modelName, Object objR, Consumer<Object> id) {
-    Map<String, Object> record = ReflectionUtils.toMap(sqlContext.getJsonObjectConverter(), objR);
+    Map<String, Object> record = ReflectionUtils.toClassBean(sqlContext.getJsonObjectConverter(), objR, Map.class);
     String sql = getInsertSqlString(modelName, record);
     Entity entity = (Entity) sqlContext.getModel(modelName);
     Optional<IDField> idFieldOptional = entity.findIdField();
@@ -72,7 +72,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
 
   @Override
   public int updateById(String modelName, Object objR, Object id) {
-    Map<String, Object> record = ReflectionUtils.toMap(sqlContext.getJsonObjectConverter(), objR);
+    Map<String, Object> record = ReflectionUtils.toClassBean(sqlContext.getJsonObjectConverter(), objR, Map.class);
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
     Entity entity = (Entity) sqlContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
@@ -100,7 +100,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
 
   @Override
   public int update(String modelName, Object objR, String filter) {
-    Map<String, Object> record = ReflectionUtils.toMap(sqlContext.getJsonObjectConverter(), objR);
+    Map<String, Object> record = ReflectionUtils.toClassBean(sqlContext.getJsonObjectConverter(), objR, Map.class);
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
     Entity entity = (Entity) sqlContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
@@ -143,7 +143,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
     if (nestedQuery && dataMap != null) {
       QueryHelper.nestedQuery(List.of(dataMap), this::findMapList, (Model) sqlContext.getModel(modelName), null, sqlContext, sqlContext.getNestedQueryMaxDepth());
     }
-    return sqlContext.getJsonObjectConverter().convertValue(dataMap, resultType);
+    return ReflectionUtils.toClassBean(sqlContext.getJsonObjectConverter(), dataMap, resultType);
   }
 
   @Override
@@ -154,13 +154,14 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
     if (query.isNestedQueryEnabled()) {
       QueryHelper.nestedQuery(mapList, this::findMapList, (Model) sqlContext.getModel(modelName), query, sqlContext, sqlContext.getNestedQueryMaxDepth());
     }
-    return sqlContext.getJsonObjectConverter().convertValueList(mapList, resultType);
+    return ReflectionUtils.toClassBeanList(sqlContext.getJsonObjectConverter(), mapList, resultType);
   }
 
   @Override
   public <T> List<T> findByNativeQuery(String statement, Object objR, Class<T> resultType) {
-    Map<String, Object> params = ReflectionUtils.toMap(sqlContext.getJsonObjectConverter(), objR);
-    return sqlExecutor.queryForList(StringHelper.replacePlaceholder(statement), params, new SqlResultHandler<>(resultType));
+    Map<String, Object> params = ReflectionUtils.toClassBean(sqlContext.getJsonObjectConverter(), objR, Map.class);
+    List<Map<String, Object>> list = sqlExecutor.queryForList(StringHelper.replacePlaceholder(statement), params);
+    return ReflectionUtils.toClassBeanList(sqlContext.getJsonObjectConverter(), list, resultType);
   }
 
   @Override

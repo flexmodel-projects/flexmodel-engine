@@ -98,7 +98,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
   @Override
   @SuppressWarnings("all")
   public int insert(String modelName, Object obj, Consumer<Object> idConsumer) {
-    Map<String, Object> record = ReflectionUtils.toMap(sessionContext.getJsonObjectConverter(), obj);
+    Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), obj, Map.class);;
     String schemaName = sessionContext.getSchemaName();
     MappedModels mappedModels = sessionContext.getMappedModels();
     AtomicReference<Object> atomicId = new AtomicReference<>();
@@ -113,7 +113,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
 
   @SuppressWarnings({"rawtypes", "unchecked"})
   private void insertRelationRecord(String modelName, Object objR, Object id) {
-    Map<String, Object> record = ReflectionUtils.toMap(sessionContext.getJsonObjectConverter(), objR);
+    Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
     Entity entity = (Entity) sessionContext.getModel(modelName);
     record.forEach((key, value) -> {
       if (value != null) {
@@ -139,13 +139,13 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
 
   @Override
   public int update(String modelName, Object obj, String filter) {
-    Map<String, Object> record = ReflectionUtils.toMap(sessionContext.getJsonObjectConverter(), obj);
+    Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), obj, Map.class);
     return super.update(modelName, generateValue(modelName, record, true), filter);
   }
 
   @Override
   public int updateById(String modelName, Object obj, Object id) {
-    Map<String, Object> record = ReflectionUtils.toMap(sessionContext.getJsonObjectConverter(), obj);
+    Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), obj, Map.class);
     return super.updateById(modelName, generateValue(modelName, record, true), id);
   }
 }
