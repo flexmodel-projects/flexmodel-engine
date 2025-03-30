@@ -262,6 +262,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
       aSqlColumn.setName(field.getName());
 
       aSqlColumn.setSqlTypeCode(sqlContext.getTypeHandler(field.getType()).getJdbcTypeCode());
+      // fixme support large Objects
       aSqlColumn.setNullable(field.isNullable());
       aSqlColumn.setComment(field.getComment());
       aSqlColumn.setTableName(toPhysicalTableString(field.getModelName()));
