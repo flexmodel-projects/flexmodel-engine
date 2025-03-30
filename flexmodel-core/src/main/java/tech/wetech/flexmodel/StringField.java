@@ -10,6 +10,8 @@ public class StringField extends TypedField<String, StringField> {
    */
   private Integer length = 255;
 
+  private boolean largeObject;
+
   public StringField(String name) {
     super(name, ScalarType.STRING.getType());
   }
@@ -28,8 +30,16 @@ public class StringField extends TypedField<String, StringField> {
     if (this == o) return true;
     if (!(o instanceof StringField that)) return false;
     if (!super.equals(o)) return false;
+    return getLength() != null ? getLength().equals(that.getLength()) : that.getLength() == null;
+  }
 
-      return getLength() != null ? getLength().equals(that.getLength()) : that.getLength() == null;
+  public boolean isLargeObject() {
+    return largeObject;
+  }
+
+  public StringField setLargeObject(boolean largeObject) {
+    this.largeObject = largeObject;
+    return this;
   }
 
   @Override

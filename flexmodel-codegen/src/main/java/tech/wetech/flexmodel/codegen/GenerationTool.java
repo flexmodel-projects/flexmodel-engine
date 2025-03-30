@@ -32,7 +32,6 @@ public class GenerationTool {
     TYPE_MAPPING.put(ID.getType(), null);
     TYPE_MAPPING.put(RELATION.getType(), null);
     TYPE_MAPPING.put(STRING.getType(), new TypeInfo(null, "String", "String"));
-    TYPE_MAPPING.put(TEXT.getType(), new TypeInfo(null, "String", "String"));
     TYPE_MAPPING.put(FLOAT.getType(), new TypeInfo(null, "Double", "Double"));
     TYPE_MAPPING.put(INT.getType(), new TypeInfo(null, "Integer", "Integer"));
     TYPE_MAPPING.put(LONG.getType(), new TypeInfo(null, "Long", "Long"));

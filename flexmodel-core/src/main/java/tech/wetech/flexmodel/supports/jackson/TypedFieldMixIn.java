@@ -13,7 +13,6 @@ import tech.wetech.flexmodel.*;
 @JsonSubTypes({
   @JsonSubTypes.Type(value = IDField.class, name = ScalarType.ID_TYPE),
   @JsonSubTypes.Type(value = StringField.class, name = ScalarType.STRING_TYPE),
-  @JsonSubTypes.Type(value = TextField.class, name = ScalarType.TEXT_TYPE),
   @JsonSubTypes.Type(value = IntField.class, name = ScalarType.INT_TYPE),
   @JsonSubTypes.Type(value = LongField.class, name = ScalarType.LONG_TYPE),
   @JsonSubTypes.Type(value = FloatField.class, name = ScalarType.FLOAT_TYPE),

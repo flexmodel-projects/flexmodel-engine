@@ -43,7 +43,6 @@ public class SqlContext extends AbstractSessionContext {
     this.conditionCalculator = new DefaultSqlExpressionCalculator(sqlDialect);
 
     this.typeHandlerMap.put(ScalarType.STRING.getType(), new StringSqlTypeHandler());
-    this.typeHandlerMap.put(ScalarType.TEXT.getType(), new TextSqlTypeHandler());
     this.typeHandlerMap.put(ScalarType.FLOAT.getType(), new DecimalSqlTypeHandler());
     this.typeHandlerMap.put(ScalarType.INT.getType(), new IntSqlTypeHandler());
     this.typeHandlerMap.put(ScalarType.LONG.getType(), new BigintSqlTypeHandler());

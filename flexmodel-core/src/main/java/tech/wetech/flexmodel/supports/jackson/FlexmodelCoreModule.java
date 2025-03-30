@@ -27,7 +27,6 @@ public class FlexmodelCoreModule extends SimpleModule {
     setMixInAnnotation(TypedField.class, TypedFieldMixIn.class);
     setMixInAnnotation(IDField.class, TypedFieldMixIn.class);
     setMixInAnnotation(StringField.class, TypedFieldMixIn.class);
-    setMixInAnnotation(TextField.class, TypedFieldMixIn.class);
     setMixInAnnotation(FloatField.class, TypedFieldMixIn.class);
     setMixInAnnotation(IntField.class, TypedFieldMixIn.class);
     setMixInAnnotation(LongField.class, TypedFieldMixIn.class);

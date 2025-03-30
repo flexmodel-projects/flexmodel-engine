@@ -54,7 +54,7 @@ public class Models {
     return session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(AUTO_INCREMENT))
       .addField(new LongField("studentId"))
-      .addField(new TextField("description"))
+      .addField(new StringField("description"))
     );
   }
 

@@ -6,7 +6,6 @@ package tech.wetech.flexmodel;
 public enum ScalarType {
   ID(ScalarType.ID_TYPE),
   STRING(ScalarType.STRING_TYPE),
-  TEXT(ScalarType.TEXT_TYPE),
   FLOAT(ScalarType.FLOAT_TYPE),
   INT(ScalarType.INT_TYPE),
   LONG(ScalarType.LONG_TYPE),
@@ -22,7 +21,6 @@ public enum ScalarType {
 
   public static final String ID_TYPE = "ID";
   public static final String STRING_TYPE = "String";
-  public static final String TEXT_TYPE = "Text";
   public static final String FLOAT_TYPE = "Float";
   public static final String INT_TYPE = "Int";
   public static final String LONG_TYPE = "Long";

@@ -12,16 +12,16 @@ import java.util.TreeMap;
  * if available and an unmarked default type otherwise.
  * Eg, setting
  * <pre>
- * 	names.put( type,        "Text" );
+ * 	names.put( type,        "TEXT" );
  * 	names.put( type,   255, "VARCHAR($l)" );
  * 	names.put( type, 65534, "LONGVARCHAR($l)" );
  * </pre>
  * will give you back the following:
  * <pre>
- *  names.get( type )         // --> "Text" (default)
+ *  names.get( type )         // --> "TEXT" (default)
  *  names.get( type,    100 ) // --> "VARCHAR(100)" (100 is in [0:255])
  *  names.get( type,   1000 ) // --> "LONGVARCHAR(1000)" (1000 is in [256:65534])
- *  names.get( type, 100000 ) // --> "Text" (default)
+ *  names.get( type, 100000 ) // --> "TEXT" (default)
  * </pre>
  * On the other hand, simply putting
  * <pre>

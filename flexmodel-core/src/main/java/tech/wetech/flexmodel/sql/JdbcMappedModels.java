@@ -243,18 +243,6 @@ public class JdbcMappedModels implements MappedModels {
             stringField.setLength(sqlColumn.getLength());
             break;
           }
-          case TEXT: {
-            TextField textField = new TextField(sqlColumn.getName());
-            field = textField;
-            if (sqlColumn.getDefaultValue() != null) {
-              try {
-                textField.setDefaultValue(sqlColumn.getDefaultValue());
-              } catch (Exception e) {
-                log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
-              }
-            }
-            break;
-          }
           case FLOAT: {
             FloatField decimalField = new FloatField(sqlColumn.getName());
             field = decimalField;

@@ -80,7 +80,7 @@ public abstract class AbstractSessionTests {
     session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setGeneratedValue(AUTO_INCREMENT))
       .addField(new LongField("studentId"))
-      .addField(new TextField("description"))
+      .addField(new StringField("description"))
     );
   }
 
@@ -386,7 +386,7 @@ public abstract class AbstractSessionTests {
       // 年龄
       .addField(new IntField("age").setComment("年龄"))
       // 备注
-      .addField(new TextField("description").setComment("备注"))
+      .addField(new StringField("description").setComment("备注"))
       // 生日
       .addField(new DateField("birthday").setComment("生日"))
       // 是否禁用
@@ -805,7 +805,7 @@ public abstract class AbstractSessionTests {
     name.setLength(10);
     session.createField(name);
     // text
-    TextField description = new TextField("description").setComment("备注");
+    StringField description = new StringField("description").setComment("备注");
     description.setModelName(entityName);
     session.createField(description);
     // number
@@ -880,7 +880,7 @@ public abstract class AbstractSessionTests {
     Assertions.assertEquals(4, ((Entity) session.getModel(classesEntityName)).getFields().size());
     session.modifyField(new StringField("classCode").setModelName(classesEntityName).setLength(100));
     Assertions.assertEquals(4, ((Entity) session.getModel(classesEntityName)).getFields().size());
-    session.modifyField(new TextField("className").setModelName(classesEntityName));
+    session.modifyField(new StringField("className").setModelName(classesEntityName));
     Assertions.assertEquals(4, ((Entity) session.getModel(classesEntityName)).getFields().size());
   }
 

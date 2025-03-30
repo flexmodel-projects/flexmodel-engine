@@ -22,7 +22,6 @@ public class MongoContext extends AbstractSessionContext {
     this.conditionCalculator = new DefaultMongoExpressionCalculator();
 
     this.typeHandlerMap.put(ScalarType.STRING.getType(), new StringTypeHandler());
-    this.typeHandlerMap.put(ScalarType.TEXT.getType(), new TextTypeHandler());
     this.typeHandlerMap.put(ScalarType.FLOAT.getType(), new DecimalTypeHandler());
     this.typeHandlerMap.put(ScalarType.INT.getType(), new IntTypeHandler());
     this.typeHandlerMap.put(ScalarType.LONG.getType(), new BigintTypeHandler());

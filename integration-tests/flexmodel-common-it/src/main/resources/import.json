@@ -173,7 +173,7 @@
         },
         {
           "name": "uri",
-          "type": "Text",
+          "type": "String",
           "unique": false,
           "nullable": false,
           "modelName": "ApiLog",

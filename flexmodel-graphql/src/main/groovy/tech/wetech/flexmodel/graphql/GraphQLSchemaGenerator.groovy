@@ -16,7 +16,6 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
   def typeMapping = [
     (ScalarType.ID.getType())      : "ID",
     (ScalarType.STRING.getType())  : "String",
-    (ScalarType.TEXT.getType())    : "String",
     (ScalarType.FLOAT.getType())   : "Float",
     (ScalarType.INT.getType())     : "Int",
     (ScalarType.LONG.getType())    : "Int",
@@ -30,7 +29,6 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
   def comparisonMapping = [
     (ScalarType.ID.getType())      : "Int_comparison_exp",
     (ScalarType.STRING.getType())  : "String_comparison_exp",
-    (ScalarType.TEXT.getType())    : "String_comparison_exp",
     (ScalarType.FLOAT.getType())   : "Float_comparison_exp",
     (ScalarType.INT.getType())     : "Int_comparison_exp",
     (ScalarType.LONG.getType())    : "Int_comparison_exp",

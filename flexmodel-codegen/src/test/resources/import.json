@@ -101,7 +101,7 @@
           "defaultValue": null
         },
         {
-          "type": "Text",
+          "type": "String",
           "name": "flow_model",
           "modelName": "flow_definition",
           "comment": null,
@@ -219,7 +219,7 @@
         },
         {
           "name": "uri",
-          "type": "Text",
+          "type": "String",
           "unique": false,
           "nullable": false,
           "modelName": "fs_api_log"
@@ -341,7 +341,7 @@
         },
         {
           "name": "description",
-          "type": "Text",
+          "type": "String",
           "modelName": "StudentDetail",
           "unique": false,
           "nullable": true

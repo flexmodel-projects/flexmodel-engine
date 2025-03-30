@@ -28,7 +28,7 @@ public class JsonSerializeTest {
     age.setComment("年龄");
     entity.addField(age);
     // 备注
-    TextField description = new TextField("description");
+    StringField description = new StringField("description");
     description.setComment("备注");
     entity.addField(description);
     // 生日

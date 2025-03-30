@@ -152,7 +152,7 @@
         },
         {
           "name": "uri",
-          "type": "Text",
+          "type": "String",
           "unique": false,
           "nullable": false,
           "modelName": "ApiLog"
@@ -330,7 +330,7 @@
         },
         {
           "name": "description",
-          "type": "Text",
+          "type": "String",
           "modelName": "StudentDetail",
           "unique": false,
           "nullable": true
