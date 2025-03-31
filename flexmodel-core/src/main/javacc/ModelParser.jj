@@ -17,7 +17,7 @@ public class ModelParser {
     public static class Model implements ASTNode {
         public String name;
         public List fields = new ArrayList();
-        public List annotations = new ArrayList(); // 模型级注解
+        public List annotations = new ArrayList();
         public Model(String name) { this.name = name; }
         public void addField(Field f) { fields.add(f); }
         public void addAnnotation(Annotation ann) { annotations.add(ann); }
@@ -26,7 +26,7 @@ public class ModelParser {
         }
     }
 
-    // Field 对象，表示模型中的一个字段，包含名称、可选标记、类型及字段级注解列表
+    // Field 对象，表示模型中的一个字段，包含名称、可选标记、类型及字段级注解
     public static class Field implements ASTNode {
         public String name;
         public boolean optional;
@@ -43,12 +43,12 @@ public class ModelParser {
         }
     }
 
-    // Annotation 对象，保存注解名称和参数（键值对）
+    // Annotation 对象，保存注解名称和参数（键值对），参数类型为 Object
     public static class Annotation implements ASTNode {
         public String name;
         public Map parameters = new HashMap();
         public Annotation(String name) { this.name = name; }
-        public void addParameter(String key, String value) {
+        public void addParameter(String key, Object value) {
             parameters.put(key, value);
         }
         public String toString() {
@@ -60,23 +60,18 @@ public class ModelParser {
     public static class Enumeration implements ASTNode {
         public String name;
         public List elements = new ArrayList();
-        public Enumeration(String name) {
-            this.name = name;
-        }
-        public void addElement(String value) {
-            elements.add(value);
-        }
+        public Enumeration(String name) { this.name = name; }
+        public void addElement(String value) { elements.add(value); }
         public String toString(){
             return "Enumeration(" + name + ", elements=" + elements + ")";
         }
     }
 
     public static void main(String[] args) throws ParseException {
-        // 从标准输入解析，生成 AST
         ModelParser parser = new ModelParser(System.in);
-        java.util.List ast = parser.CompilationUnit();
+        List ast = parser.CompilationUnit();
         System.out.println("Parsing successful.");
-        for(Object node : ast) {
+        for (Object node : ast) {
             System.out.println(node);
         }
     }
@@ -111,7 +106,7 @@ TOKEN : { < FALSE: "false" > }
 TOKEN : { < IDENTIFIER: (["a"-"z", "A"-"Z", "_"]) (["a"-"z", "A"-"Z", "0"-"9", "_"])* > }
 
 /* 入口产生式，返回 AST 节点列表 */
-java.util.List CompilationUnit() : { java.util.List astList = new ArrayList(); Object node; }
+List CompilationUnit() : { List astList = new ArrayList(); Object node; }
 {
     (
         node = ModelDeclaration() { astList.add(node); }
@@ -136,7 +131,7 @@ void ModelBody(Model model) : {}
     ( ModelMember(model) ( <COMMA> )? )*
 }
 
-/* ModelMember 可以是字段定义或者模型级注解 */
+/* ModelMember 可以是字段定义或模型级注解 */
 void ModelMember(Model model) : {}
 {
     FieldMember(model) | ModelAnnotation(model)
@@ -190,7 +185,7 @@ void AnnotationArguments(Annotation ann) : {}
 }
 
 /* 解析单个注解参数，支持键值对或默认参数 */
-void AnnotationArgument(Annotation ann) : { String value; Token t; }
+void AnnotationArgument(Annotation ann) : { Object value; Token t; }
 {
     (
       t = <IDENTIFIER> <COLON> value = AnnotationValue() { ann.addParameter(t.image, value); }
@@ -198,66 +193,49 @@ void AnnotationArgument(Annotation ann) : { String value; Token t; }
     )
 }
 
-/* 解析注解值，支持字符串、整型、布尔字面量、数组字面量或标识符；
-   对于字符串字面量，去除首尾双引号 */
-String AnnotationValue() : { Token t; String s; }
+/* 解析注解值，返回 Object 类型，支持字符串、整型、布尔字面量、数组字面量或标识符 */
+Object AnnotationValue() : { Token t; Object s; }
 {
     t = <STRING_LITERAL> { return t.image.substring(1, t.image.length()-1); }
   | t = <INTEGER_LITERAL> { return t.image; }
   | t = <TRUE> { return t.image; }
   | t = <FALSE> { return t.image; }
-  | { s = ArrayLiteral(); return s; }
-  | { s = Identifier(); return s; }
+  | s = ArrayLiteral() { return s; }
+  | s = Identifier() { return s; }
 }
 
-/* 新增：解析数组字面量，返回整个数组的字符串表示 */
-String ArrayLiteral() : { StringBuffer sb = new StringBuffer(); }
+/* 解析数组字面量，返回 List 对象 */
+Object ArrayLiteral() : { List list = new ArrayList(); Object elem; }
 {
     <LBRACKET>
-    ArrayElements(sb)
+    ( elem = ArrayElement() { list.add(elem); } ( <COMMA> elem = ArrayElement() { list.add(elem); } )* ( <COMMA> )? )?
     <RBRACKET>
-    { return sb.toString(); }
+    { return list; }
 }
 
-/* 解析数组元素列表，允许空数组 */
-void ArrayElements(StringBuffer sb) : {}
+/* 解析单个数组元素，支持内联注解参数 */
+Object ArrayElement() : { Map inline = null; String id; }
 {
-    ( ArrayElement(sb) ( <COMMA> ArrayElement(sb) )* )
-  |
-    { /* 空数组，不做任何处理 */ }
-}
-
-
-/* 解析单个数组元素，支持内联参数，如：studentName(sort:"desc") */
-void ArrayElement(StringBuffer sb) : {}
-{
+    id = Identifier()
+    ( <LPAREN> { inline = InlineAnnotation(); } <RPAREN> )?
     {
-      String id = Identifier();
-      sb.append(id);
+       if (inline == null) return id;
+       else { Map m = new HashMap(); m.put(id, inline); return m; }
     }
-    ( <LPAREN> { String inline = InlineAnnotationArguments(); sb.append("(" + inline + ")"); } <RPAREN> )?
 }
 
-/* 解析内联注解参数列表，返回字符串表示 */
-String InlineAnnotationArguments() : { StringBuffer sb = new StringBuffer(); }
+/* 解析内联注解参数列表，返回 Map */
+Map InlineAnnotation() : { Map m = new HashMap(); }
 {
-   InlineAnnotationArgument(sb)
-   ( <COMMA> InlineAnnotationArgument(sb) )*
-   { return sb.toString(); }
+    InlineAnnotationPair(m)
+    ( <COMMA> InlineAnnotationPair(m) )*
+    { return m; }
 }
 
 /* 解析单个内联注解参数 */
-void InlineAnnotationArgument(StringBuffer sb) : {}
+void InlineAnnotationPair(Map m) : { String key; Object value; }
 {
-    {
-       String key = Identifier();
-       sb.append(key);
-    }
-    <COLON>
-    {
-       String val = AnnotationValue();
-       sb.append(":" + val);
-    }
+    key = Identifier() <COLON> value = AnnotationValue() { m.put(key, value); }
 }
 
 /* 解析枚举定义，返回 Enumeration 对象 */
