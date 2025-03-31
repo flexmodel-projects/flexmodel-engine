@@ -47,4 +47,33 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>javacc-maven-plugin</artifactId>
+        <version>2.6</version>
+        <executions>
+          <execution>
+            <id>javacc</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <!-- 指定 .jj 文件所在目录 -->
+          <sourceDirectory>${project.basedir}/src/main/javacc</sourceDirectory>
+          <!-- 生成代码的目标目录 -->
+          <outputDirectory>${project.build.directory}/generated-sources/javacc</outputDirectory>
+          <!-- 包括所有 .jj 文件 -->
+          <includes>
+            <include>**/*.jj</include>
+          </includes>
+          <grammarEncoding>UTF-8</grammarEncoding>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
