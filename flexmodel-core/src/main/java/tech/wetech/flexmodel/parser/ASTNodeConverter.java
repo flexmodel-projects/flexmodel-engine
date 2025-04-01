@@ -296,9 +296,30 @@ public class ASTNodeConverter {
       case IntField intField -> addDefaultAnnotation(sdlField, intField.getDefaultValue());
       case LongField longField -> addDefaultAnnotation(sdlField, longField.getDefaultValue());
       case BooleanField booleanField -> addDefaultAnnotation(sdlField, booleanField.getDefaultValue());
-      case DateTimeField dateTimeField -> addDefaultAnnotation(sdlField, dateTimeField.getDefaultValue());
-      case DateField dateField -> addDefaultAnnotation(sdlField, dateField.getDefaultValue());
-      case TimeField timeField -> addDefaultAnnotation(sdlField, timeField.getDefaultValue());
+      case DateTimeField dateTimeField -> {
+        if (dateTimeField.getGeneratedValue() != null) {
+          ModelParser.Annotation anno = new ModelParser.Annotation("generatedValue");
+          anno.parameters.put("value", dateTimeField.getGeneratedValue().name());
+          sdlField.annotations.add(anno);
+        }
+        addDefaultAnnotation(sdlField, dateTimeField.getDefaultValue());
+      }
+      case DateField dateField -> {
+        if (dateField.getGeneratedValue() != null) {
+          ModelParser.Annotation anno = new ModelParser.Annotation("generatedValue");
+          anno.parameters.put("value", dateField.getGeneratedValue().name());
+          sdlField.annotations.add(anno);
+        }
+        addDefaultAnnotation(sdlField, dateField.getDefaultValue());
+      }
+      case TimeField timeField -> {
+        if (timeField.getGeneratedValue() != null) {
+          ModelParser.Annotation anno = new ModelParser.Annotation("generatedValue");
+          anno.parameters.put("value", timeField.getGeneratedValue().name());
+          sdlField.annotations.add(anno);
+        }
+        addDefaultAnnotation(sdlField, timeField.getDefaultValue());
+      }
       case JSONField jsonField -> addDefaultAnnotation(sdlField, jsonField.getDefaultValue());
       case RelationField relationField -> {
         ModelParser.Annotation relationAnno = new ModelParser.Annotation("relation");
