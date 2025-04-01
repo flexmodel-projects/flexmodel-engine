@@ -65,7 +65,8 @@ public class GenerationTool {
             models.addAll(describe.getSchema());
             data.addAll(describe.getData());
           } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Parse file error: " + importScript);
+            throw new RuntimeException(e);
           }
         } else if (importScript.endsWith(".sdl")) {
           try {
@@ -76,7 +77,8 @@ public class GenerationTool {
               models.add(ASTNodeConverter.toSchemaObject(astNode));
             }
           } catch (IOException | ParseException e) {
-            e.printStackTrace();
+            System.out.println("Parse file error: " + importScript);
+            throw new RuntimeException(e);
           }
         } else {
           System.out.println("Unsupported script file type: " + importScript);

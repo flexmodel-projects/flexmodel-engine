@@ -308,8 +308,10 @@ public class ASTNodeConverter {
           String.valueOf(relationField.isCascadeDelete()));
         sdlField.annotations.add(relationAnno);
       }
-      case EnumField enumField ->
-        sdlField.name = enumField.isMultiple() ? enumField.getName() + "[]" : enumField.getName();
+      case EnumField enumField -> {
+        // todo
+      }
+
       default -> {
       }
     }

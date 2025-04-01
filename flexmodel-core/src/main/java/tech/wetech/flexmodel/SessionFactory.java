@@ -70,7 +70,7 @@ public class SessionFactory {
     }
   }
 
-  public void loadSdlString(String schemaName, String sdlString) throws ParseException {
+  public void loadSDLString(String schemaName, String sdlString) throws ParseException {
     ModelParser parser = new ModelParser(new StringReader(sdlString));
     List<ModelParser.ASTNode> ast = parser.CompilationUnit();
     List<SchemaObject> schema = new ArrayList<>();
@@ -82,7 +82,7 @@ public class SessionFactory {
     }
   }
 
-  public void loadJsonString(String schemaName, String jsonString) {
+  public void loadJSONString(String schemaName, String jsonString) {
     ImportDescribe describe = jsonObjectConverter.parseToObject(jsonString, ImportDescribe.class);
     try (Session session = createFailsafeSession(schemaName)) {
       processModels(describe.getSchema(), session);
@@ -98,9 +98,9 @@ public class SessionFactory {
       }
       String scriptString = new String(is.readAllBytes());
       if (scriptName.endsWith(".json")) {
-        loadJsonString(schemaName, scriptString);
+        loadJSONString(schemaName, scriptString);
       } else if (scriptName.endsWith(".sdl")) {
-        loadSdlString(schemaName, scriptString);
+        loadSDLString(schemaName, scriptString);
       } else {
         // unsupported script type
         log.warn("Unsupported script type: {}", scriptName);
