@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * @author cjbi
  */
-public interface Model extends Serializable, TypeWrapper {
+public interface Model extends Serializable, SchemaObject {
 
   Map<String, Object> getAdditionalProperties();
 

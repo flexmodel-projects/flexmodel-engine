@@ -39,22 +39,22 @@ public abstract class AbstractSession implements Session {
   }
 
   @Override
-  public List<TypeWrapper> syncModels() {
+  public List<SchemaObject> syncModels() {
     return schemaOperationsDelegate.syncModels();
   }
 
   @Override
-  public List<TypeWrapper> syncModels(Set<String> modelNames) {
+  public List<SchemaObject> syncModels(Set<String> modelNames) {
     return schemaOperationsDelegate.syncModels(modelNames);
   }
 
   @Override
-  public List<TypeWrapper> getAllModels() {
+  public List<SchemaObject> getAllModels() {
     return schemaOperationsDelegate.getAllModels();
   }
 
   @Override
-  public TypeWrapper getModel(String modelName) {
+  public SchemaObject getModel(String modelName) {
     return schemaOperationsDelegate.getModel(modelName);
   }
 

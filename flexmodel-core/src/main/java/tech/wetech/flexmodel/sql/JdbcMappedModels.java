@@ -134,17 +134,17 @@ public class JdbcMappedModels implements MappedModels {
   }
 
   @Override
-  public List<TypeWrapper> sync(AbstractSessionContext context) {
+  public List<SchemaObject> sync(AbstractSessionContext context) {
     return sync(context, null);
   }
 
   @Override
-  public List<TypeWrapper> sync(AbstractSessionContext context, Set<String> includes) {
+  public List<SchemaObject> sync(AbstractSessionContext context, Set<String> includes) {
     SqlContext sqlContext = (SqlContext) context;
     List<Entity> entities = convert(sqlContext.getSqlMetadata().getTables(includes), sqlContext);
-    Map<String, TypeWrapper> metaMap = lookup(sqlContext.getSchemaName()).stream().collect(Collectors.toMap(TypeWrapper::getName, wrapper -> wrapper));
+    Map<String, SchemaObject> metaMap = lookup(sqlContext.getSchemaName()).stream().collect(Collectors.toMap(SchemaObject::getName, wrapper -> wrapper));
     for (Entity entity : entities) {
-      TypeWrapper model = getIgnoreCase(entity.getName(), metaMap);
+      SchemaObject model = getIgnoreCase(entity.getName(), metaMap);
       if (model == null) {
         this.persist(sqlContext.getSchemaName(), entity);
         metaMap.put(entity.getName(), entity);
@@ -372,7 +372,7 @@ public class JdbcMappedModels implements MappedModels {
   }
 
   @Override
-  public List<TypeWrapper> lookup(String schemaName) {
+  public List<SchemaObject> lookup(String schemaName) {
 
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
@@ -380,16 +380,16 @@ public class JdbcMappedModels implements MappedModels {
                                " \nfrom " + sqlDialect.quoteIdentifier(STORED_TABLES) +
                                " \nwhere " + sqlDialect.quoteIdentifier("schema_name") + "=:schemaName";
       List<Map<String, Object>> mapList = sqlExecutor.queryForList(sqlSelectString, Map.of("schemaName", schemaName));
-      List<TypeWrapper> result = new ArrayList<>();
+      List<SchemaObject> result = new ArrayList<>();
       for (Map<String, Object> data : mapList) {
         Object content = data.get("content");
         try {
           switch (content) {
-            case String contentStr -> result.add(jsonObjectConverter.parseToObject(contentStr, TypeWrapper.class));
+            case String contentStr -> result.add(jsonObjectConverter.parseToObject(contentStr, SchemaObject.class));
             case Blob blob ->
-              result.add(jsonObjectConverter.parseToObject(Arrays.toString(blob.getBinaryStream().readAllBytes()), TypeWrapper.class));
+              result.add(jsonObjectConverter.parseToObject(Arrays.toString(blob.getBinaryStream().readAllBytes()), SchemaObject.class));
             case byte[] bytes ->
-              result.add(jsonObjectConverter.parseToObject(Arrays.toString(bytes), TypeWrapper.class));
+              result.add(jsonObjectConverter.parseToObject(Arrays.toString(bytes), SchemaObject.class));
             case null, default -> {
               assert content != null;
               throw new RuntimeException("get model error, unknown data type:" + content.getClass());
@@ -430,14 +430,14 @@ public class JdbcMappedModels implements MappedModels {
   }
 
   @Override
-  public void persist(String schemaName, TypeWrapper wrapper) {
+  public void persist(String schemaName, SchemaObject object) {
     try (Connection connection = dataSource.getConnection()) {
-      String content = jsonObjectConverter.toJsonString(wrapper);
+      String content = jsonObjectConverter.toJsonString(object);
       log.trace("Persist:\n{}", content);
       connection.setAutoCommit(false);
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
-      TypeWrapper older;
-      if ((older = this.getModel(schemaName, wrapper.getName())) != null) {
+      SchemaObject older;
+      if ((older = this.getModel(schemaName, object.getName())) != null) {
         String oldContent = jsonObjectConverter.toJsonString(older);
         if (!oldContent.equals(content)) {
           String updateString = "update " + sqlDialect.quoteIdentifier(STORED_TABLES) + "set " + sqlDialect.quoteIdentifier("content") + "=:content" +
@@ -445,7 +445,7 @@ public class JdbcMappedModels implements MappedModels {
           sqlExecutor.update(
             updateString,
             Map.of("schemaName", schemaName,
-              "modelName", wrapper.getName(),
+              "modelName", object.getName(),
               "content", content));
         }
       } else {
@@ -453,8 +453,8 @@ public class JdbcMappedModels implements MappedModels {
                                  " values (:schemaName, :modelName, :modelType, :content)\n";
         sqlExecutor.update(sqlInsertString,
           Map.of("schemaName", schemaName,
-            "modelName", wrapper.getName(),
-            "modelType", wrapper.getType(),
+            "modelName", object.getName(),
+            "modelType", object.getType(),
             "content", content
           ));
       }
@@ -470,7 +470,7 @@ public class JdbcMappedModels implements MappedModels {
   }
 
   @Override
-  public TypeWrapper getModel(String schemaName, String modelName) {
+  public SchemaObject getModel(String schemaName, String modelName) {
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
       String sqlSelectString = "select " + sqlDialect.quoteIdentifier("content") +
@@ -478,7 +478,7 @@ public class JdbcMappedModels implements MappedModels {
                                " \nwhere " + sqlDialect.quoteIdentifier("schema_name") + "=:schemaName and " + sqlDialect.quoteIdentifier("model_name") + "=:modelName";
       String content = sqlExecutor.queryForScalar(sqlSelectString,
         Map.of("schemaName", schemaName, "modelName", modelName), String.class);
-      return jsonObjectConverter.parseToObject(content, TypeWrapper.class);
+      return jsonObjectConverter.parseToObject(content, SchemaObject.class);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

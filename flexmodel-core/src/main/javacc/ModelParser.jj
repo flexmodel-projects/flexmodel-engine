@@ -16,12 +16,12 @@ public class ModelParser {
     // Model 对象，包含模型名称、字段列表和模型级注解
     public static class Model implements ASTNode {
         public String name;
-        public List fields = new ArrayList();
-        public List annotations = new ArrayList();
+        public List<Field> fields = new ArrayList<>();
+        public List<Annotation> annotations = new ArrayList<>();
         public Model(String name) { this.name = name; }
         public void addField(Field f) { fields.add(f); }
         public void addAnnotation(Annotation ann) { annotations.add(ann); }
-        public String toString(){
+        public String toString() {
             return "Model(" + name + ", fields=" + fields + ", annotations=" + annotations + ")";
         }
     }
@@ -31,7 +31,7 @@ public class ModelParser {
         public String name;
         public boolean optional;
         public String type;
-        public List annotations = new ArrayList();
+        public List<Annotation> annotations = new ArrayList<>();
         public Field(String name, boolean optional, String type){
             this.name = name;
             this.optional = optional;
@@ -46,7 +46,7 @@ public class ModelParser {
     // Annotation 对象，保存注解名称和参数（键值对），参数类型为 Object
     public static class Annotation implements ASTNode {
         public String name;
-        public Map parameters = new HashMap();
+        public Map<String, Object> parameters = new HashMap<>();
         public Annotation(String name) { this.name = name; }
         public void addParameter(String key, Object value) {
             parameters.put(key, value);
@@ -59,7 +59,7 @@ public class ModelParser {
     // Enumeration 对象，保存枚举名称和枚举值列表
     public static class Enumeration implements ASTNode {
         public String name;
-        public List elements = new ArrayList();
+        public List<String> elements = new ArrayList();
         public Enumeration(String name) { this.name = name; }
         public void addElement(String value) { elements.add(value); }
         public String toString(){

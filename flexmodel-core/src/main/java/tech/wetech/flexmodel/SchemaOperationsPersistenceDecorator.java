@@ -22,22 +22,22 @@ class SchemaOperationsPersistenceDecorator implements SchemaOperations {
   }
 
   @Override
-  public List<TypeWrapper> syncModels() {
+  public List<SchemaObject> syncModels() {
     return delegate.syncModels();
   }
 
   @Override
-  public List<TypeWrapper> syncModels(Set<String> modelNames) {
+  public List<SchemaObject> syncModels(Set<String> modelNames) {
     return delegate.syncModels(modelNames);
   }
 
   @Override
-  public List<TypeWrapper> getAllModels() {
+  public List<SchemaObject> getAllModels() {
     return delegate.getAllModels();
   }
 
   @Override
-  public TypeWrapper getModel(String modelName) {
+  public SchemaObject getModel(String modelName) {
     return delegate.getModel(modelName);
   }
 

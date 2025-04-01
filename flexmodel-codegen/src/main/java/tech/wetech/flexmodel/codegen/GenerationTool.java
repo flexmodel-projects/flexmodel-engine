@@ -45,7 +45,7 @@ public class GenerationTool {
   public static void run(Configuration configuration) {
     Configuration.Schema schema = configuration.getSchema();
     JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
-    List<TypeWrapper> models = new ArrayList<>();
+    List<SchemaObject> models = new ArrayList<>();
     List<ImportDescribe.ImportData> data = new ArrayList<>();
     // read from script
     String importScript = configuration.getSchema().getImportScript();
@@ -74,7 +74,7 @@ public class GenerationTool {
 
     Map<String, ModelClass> modelClassMap = new HashMap<>();
     Map<String, EnumClass> enumClassMap = new HashMap<>();
-    for (TypeWrapper model : models) {
+    for (SchemaObject model : models) {
       if (model instanceof Entity) {
         modelClassMap.put(model.getName(), buildModelClass(configuration.getTarget().getReplaceString(), packageName, schema.getName(), (Entity) model));
       } else if (model instanceof Enum) {
@@ -86,7 +86,7 @@ public class GenerationTool {
     DaoGenerator daoGenerator = new DaoGenerator();
     PojoGenerator pojoGenerator = new PojoGenerator();
     DSLGenerator dslGenerator = new DSLGenerator();
-    for (TypeWrapper model : models) {
+    for (SchemaObject model : models) {
       if (model instanceof Entity) {
         GenerationContext context = new GenerationContext();
         ModelClass modelClass = modelClassMap.get(model.getName());
@@ -105,7 +105,7 @@ public class GenerationTool {
     multipleModelClass.setSchemaName(schema.getName());
     multipleModelClass.setPackageName(packageName);
     multipleModelGenerationContext.setModelListClass(multipleModelClass);
-    for (TypeWrapper model : models) {
+    for (SchemaObject model : models) {
       if (model instanceof Entity) {
         ModelClass modelClass = modelClassMap.get(model.getName());
         multipleModelClass.getModelList().add(modelClass);

@@ -31,22 +31,22 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   }
 
   @Override
-  public List<TypeWrapper> syncModels() {
+  public List<SchemaObject> syncModels() {
     return mongoContext.getMappedModels().sync(mongoContext);
   }
 
   @Override
-  public List<TypeWrapper> syncModels(Set<String> modelNames) {
+  public List<SchemaObject> syncModels(Set<String> modelNames) {
     return mongoContext.getMappedModels().sync(mongoContext, modelNames);
   }
 
   @Override
-  public List<TypeWrapper> getAllModels() {
+  public List<SchemaObject> getAllModels() {
     return mappedModels.lookup(mongoContext.getSchemaName());
   }
 
   @Override
-  public TypeWrapper getModel(String modelName) {
+  public SchemaObject getModel(String modelName) {
     return mappedModels.getModel(schemaName, modelName);
   }
 

@@ -10,14 +10,14 @@ import java.util.Map;
  */
 public class ImportDescribe implements Serializable {
 
-  private List<TypeWrapper> schema = new ArrayList<>();
+  private List<SchemaObject> schema = new ArrayList<>();
   private List<ImportData> data = new ArrayList<>();
 
-  public List<TypeWrapper> getSchema() {
+  public List<SchemaObject> getSchema() {
     return schema;
   }
 
-  public void setSchema(List<TypeWrapper> schema) {
+  public void setSchema(List<SchemaObject> schema) {
     this.schema = schema;
   }
 

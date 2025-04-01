@@ -21,28 +21,28 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   }
 
   @Override
-  public List<TypeWrapper> syncModels() {
+  public List<SchemaObject> syncModels() {
     return sqlContext.getMappedModels().sync(sqlContext);
   }
 
   @Override
-  public List<TypeWrapper> syncModels(Set<String> modelNames) {
+  public List<SchemaObject> syncModels(Set<String> modelNames) {
     return sqlContext.getMappedModels().sync(sqlContext, modelNames);
   }
 
   @Override
-  public List<TypeWrapper> getAllModels() {
+  public List<SchemaObject> getAllModels() {
     return sqlContext.getMappedModels().lookup(sqlContext.getSchemaName());
   }
 
   @Override
-  public TypeWrapper getModel(String modelName) {
+  public SchemaObject getModel(String modelName) {
     return sqlContext.getModel(modelName);
   }
 
   @Override
   public void dropModel(String modelName) {
-    TypeWrapper model = getModel(modelName);
+    SchemaObject model = getModel(modelName);
     if (model instanceof Entity entity) {
       dropTable(toSqlTable(entity));
     }

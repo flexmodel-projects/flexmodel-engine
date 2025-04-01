@@ -9,11 +9,15 @@ import tech.wetech.flexmodel.cache.ConcurrentHashMapCache;
 import tech.wetech.flexmodel.mongodb.MongoContext;
 import tech.wetech.flexmodel.mongodb.MongoDataSourceProvider;
 import tech.wetech.flexmodel.mongodb.MongoSession;
+import tech.wetech.flexmodel.parser.SchemaObjectConverter;
+import tech.wetech.flexmodel.parser.impl.ModelParser;
+import tech.wetech.flexmodel.parser.impl.ParseException;
 import tech.wetech.flexmodel.sql.*;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.sql.Connection;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -66,8 +70,20 @@ public class SessionFactory {
     }
   }
 
-  public void loadScriptString(String schemaName, String scriptString) {
-    ImportDescribe describe = jsonObjectConverter.parseToObject(scriptString, ImportDescribe.class);
+  public void loadSdlString(String schemaName, String sdlString) throws ParseException {
+    ModelParser parser = new ModelParser(new StringReader(sdlString));
+    List<ModelParser.ASTNode> ast = parser.CompilationUnit();
+    List<SchemaObject> schema = new ArrayList<>();
+    for (ModelParser.ASTNode obj : ast) {
+      schema.add(SchemaObjectConverter.toSchemaObject(obj));
+    }
+    try (Session session = createFailsafeSession(schemaName)) {
+      processModels(schema, session);
+    }
+  }
+
+  public void loadJsonString(String schemaName, String jsonString) {
+    ImportDescribe describe = jsonObjectConverter.parseToObject(jsonString, ImportDescribe.class);
     try (Session session = createFailsafeSession(schemaName)) {
       processModels(describe.getSchema(), session);
       processImportData(describe.getData(), session);
@@ -80,10 +96,19 @@ public class SessionFactory {
         log.warn("Script file not found: {}", scriptName);
         return;
       }
-      String scriptJSON = new String(is.readAllBytes());
-      loadScriptString(schemaName, scriptJSON);
+      String scriptString = new String(is.readAllBytes());
+      if (scriptName.endsWith(".json")) {
+        loadJsonString(schemaName, scriptString);
+      } else if (scriptName.endsWith(".sdl")) {
+        loadSdlString(schemaName, scriptString);
+      } else {
+        // unsupported script type
+        log.warn("Unsupported script type: {}", scriptName);
+      }
     } catch (IOException e) {
       log.error("Failed to read import script: {}", e.getMessage(), e);
+    } catch (ParseException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -91,10 +116,10 @@ public class SessionFactory {
     loadScript(schemaName, scriptName, this.getClass().getClassLoader());
   }
 
-  private void processModels(List<TypeWrapper> models, Session session) {
-    Map<String, TypeWrapper> wrapperMap = session.getAllModels().stream().collect(Collectors.toMap(TypeWrapper::getName, m -> m));
-    for (TypeWrapper model : models) {
-      TypeWrapper older = wrapperMap.get(model.getName());
+  private void processModels(List<SchemaObject> models, Session session) {
+    Map<String, SchemaObject> wrapperMap = session.getAllModels().stream().collect(Collectors.toMap(SchemaObject::getName, m -> m));
+    for (SchemaObject model : models) {
+      SchemaObject older = wrapperMap.get(model.getName());
       if (Objects.equals(jsonObjectConverter.toJsonString(older), jsonObjectConverter.toJsonString(model))) {
         continue;
       }
@@ -159,7 +184,7 @@ public class SessionFactory {
     return dataSourceProviders.keySet();
   }
 
-  public List<TypeWrapper> getModels(String schemaName) {
+  public List<SchemaObject> getModels(String schemaName) {
     return mappedModels.lookup(schemaName);
   }
 

@@ -2,7 +2,7 @@ package tech.wetech.flexmodel.cache;
 
 import tech.wetech.flexmodel.AbstractSessionContext;
 import tech.wetech.flexmodel.MappedModels;
-import tech.wetech.flexmodel.TypeWrapper;
+import tech.wetech.flexmodel.SchemaObject;
 
 import java.util.List;
 import java.util.Set;
@@ -21,19 +21,19 @@ public class CachingMappedModels implements MappedModels {
   }
 
   @Override
-  public List<TypeWrapper> sync(AbstractSessionContext context) {
+  public List<SchemaObject> sync(AbstractSessionContext context) {
     cache.invalidateAll();
     return delegate.sync(context);
   }
 
   @Override
-  public List<TypeWrapper> sync(AbstractSessionContext sqlContext, Set<String> includes) {
+  public List<SchemaObject> sync(AbstractSessionContext sqlContext, Set<String> includes) {
     cache.invalidateAll();
     return delegate.sync(sqlContext, includes);
   }
 
   @Override
-  public List<TypeWrapper> lookup(String schemaName) {
+  public List<SchemaObject> lookup(String schemaName) {
     return delegate.lookup(schemaName);
   }
 
@@ -50,14 +50,14 @@ public class CachingMappedModels implements MappedModels {
   }
 
   @Override
-  public void persist(String schemaName, TypeWrapper wrapper) {
-    cache.put(schemaName + ":" + wrapper.getName(), wrapper);
-    delegate.persist(schemaName, wrapper);
+  public void persist(String schemaName, SchemaObject object) {
+    cache.put(schemaName + ":" + object.getName(), object);
+    delegate.persist(schemaName, object);
   }
 
   @Override
-  public TypeWrapper getModel(String schemaName, String modelName) {
-    return (TypeWrapper) cache.retrieve(schemaName + ":" + modelName, () -> delegate.getModel(schemaName, modelName));
+  public SchemaObject getModel(String schemaName, String modelName) {
+    return (SchemaObject) cache.retrieve(schemaName + ":" + modelName, () -> delegate.getModel(schemaName, modelName));
   }
 
   public Cache getCache() {

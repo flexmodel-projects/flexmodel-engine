@@ -986,7 +986,7 @@ public abstract class AbstractSessionTests {
         .build();
       sessionFactory.addDataSourceProvider(dataSourceProvider);
       Session newSession = sessionFactory.createSession(identifier);
-      List<TypeWrapper> models = newSession.syncModels();
+      List<SchemaObject> models = newSession.syncModels();
       Assertions.assertFalse(models.isEmpty());
       Entity studentDetailEntity = (Entity) models.stream().filter(m -> m.getName().equals(studentDetailEntityName)).findFirst().get();
       Assertions.assertFalse(studentDetailEntity.getFields().isEmpty());

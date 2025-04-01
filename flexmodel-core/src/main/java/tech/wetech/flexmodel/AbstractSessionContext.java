@@ -48,7 +48,7 @@ public abstract class AbstractSessionContext {
     }
   }
 
-  public TypeWrapper getModel(String name) {
+  public SchemaObject getModel(String name) {
     Model model = aliasModelMap.get(name);
     if (model != null) {
       return model;

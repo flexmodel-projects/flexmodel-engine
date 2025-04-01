@@ -14,16 +14,16 @@ public interface SchemaOperations {
   /**
    * 同步模型变更
    */
-  List<TypeWrapper> syncModels();
+  List<SchemaObject> syncModels();
 
-  List<TypeWrapper> syncModels(Set<String> modelNames);
+  List<SchemaObject> syncModels(Set<String> modelNames);
 
   /**
    * 获取所有模型
    *
    * @return 模型列表
    */
-  List<TypeWrapper> getAllModels();
+  List<SchemaObject> getAllModels();
 
   /**
    * 获取模型
@@ -31,7 +31,7 @@ public interface SchemaOperations {
    * @param modelName 模型名称
    * @return 实体
    */
-  TypeWrapper getModel(String modelName);
+  SchemaObject getModel(String modelName);
 
   /**
    * 删除模型

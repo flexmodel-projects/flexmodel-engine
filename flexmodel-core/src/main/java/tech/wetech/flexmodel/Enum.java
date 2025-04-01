@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * @author cjbi
  */
-public class Enum implements TypeWrapper {
+public class Enum implements SchemaObject {
 
     private String name;
     private String comment;

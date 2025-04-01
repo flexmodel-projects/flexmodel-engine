@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * @author cjbi
  */
-public interface TypeWrapper extends Serializable {
+public interface SchemaObject extends Serializable {
 
     /**
      * 名称
