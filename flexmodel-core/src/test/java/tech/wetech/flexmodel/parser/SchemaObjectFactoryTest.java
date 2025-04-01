@@ -22,9 +22,14 @@ public class SchemaObjectFactoryTest {
     List<ModelParser.ASTNode> list = modelParser.CompilationUnit();
     List<SchemaObject> objectList = new ArrayList<>();
     for (ModelParser.ASTNode astNode : list) {
-      objectList.add(SchemaObjectConverter.toSchemaObject(astNode));
+      objectList.add(ASTNodeConverter.toSchemaObject(astNode));
     }
     System.out.println(new JacksonObjectConverter().toJsonString(objectList));
+    List<ModelParser.ASTNode> astNodeList = new ArrayList<>();
+    for (SchemaObject schemaObject : objectList) {
+      astNodeList.add(ASTNodeConverter.fromSchemaObject(schemaObject));
+    }
+    System.out.println(astNodeList);
   }
 
 }

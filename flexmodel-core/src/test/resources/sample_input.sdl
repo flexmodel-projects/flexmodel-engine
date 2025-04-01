@@ -16,7 +16,7 @@ model Student {
   classId: Long,
   studentClass: Classes @relation(localField: "classId", foreignField: "id"),
   studentDetail: StudentDetail @relation(localField: "id", foreignField: "studentId", cascadeDelete: true),
-  @index(name:"IDX_studentName", unique: false, fields: [classId, studentName(sort: "desc")]),
+  @index(name:"IDX_studentName", unique: false, fields: [classId, studentName: (sort: "desc")]),
 }
 
 // 学生详情

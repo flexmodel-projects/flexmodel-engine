@@ -9,7 +9,7 @@ import tech.wetech.flexmodel.cache.ConcurrentHashMapCache;
 import tech.wetech.flexmodel.mongodb.MongoContext;
 import tech.wetech.flexmodel.mongodb.MongoDataSourceProvider;
 import tech.wetech.flexmodel.mongodb.MongoSession;
-import tech.wetech.flexmodel.parser.SchemaObjectConverter;
+import tech.wetech.flexmodel.parser.ASTNodeConverter;
 import tech.wetech.flexmodel.parser.impl.ModelParser;
 import tech.wetech.flexmodel.parser.impl.ParseException;
 import tech.wetech.flexmodel.sql.*;
@@ -75,7 +75,7 @@ public class SessionFactory {
     List<ModelParser.ASTNode> ast = parser.CompilationUnit();
     List<SchemaObject> schema = new ArrayList<>();
     for (ModelParser.ASTNode obj : ast) {
-      schema.add(SchemaObjectConverter.toSchemaObject(obj));
+      schema.add(ASTNodeConverter.toSchemaObject(obj));
     }
     try (Session session = createFailsafeSession(schemaName)) {
       processModels(schema, session);

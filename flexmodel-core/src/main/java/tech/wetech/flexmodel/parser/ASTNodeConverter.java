@@ -7,15 +7,12 @@ import tech.wetech.flexmodel.parser.impl.ModelParser;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author cjbi
  */
-public class SchemaObjectConverter {
+public class ASTNodeConverter {
 
   public static SchemaObject toSchemaObject(ModelParser.ASTNode astNode) {
     switch (astNode) {
@@ -210,6 +207,159 @@ public class SchemaObjectConverter {
     Enum anEnum = new Enum(sdlEnum.name);
     anEnum.setElements(sdlEnum.elements);
     return anEnum;
+  }
+
+  public static ModelParser.ASTNode fromSchemaObject(SchemaObject schemaObject) {
+    if (schemaObject instanceof Entity) {
+      return fromSchemaEntity((Entity) schemaObject);
+    } else if (schemaObject instanceof Enum) {
+      return fromSchemaEnum((Enum) schemaObject);
+    }
+    return null;
+  }
+
+  public static ModelParser.Model fromSchemaEntity(Entity entity) {
+    ModelParser.Model model = new ModelParser.Model(entity.getName());
+
+    // 添加字段
+    for (TypedField<?, ?> field : entity.getFields()) {
+      model.fields.add(fromSchemaField(field));
+    }
+
+    // 处理实体级别注解
+    if (entity.getComment() != null) {
+      ModelParser.Annotation commentAnno = new ModelParser.Annotation("comment");
+      commentAnno.parameters.put("value", entity.getComment());
+      model.annotations.add(commentAnno);
+    }
+
+    // 处理索引
+    for (Index index : entity.getIndexes()) {
+      ModelParser.Annotation indexAnno = new ModelParser.Annotation("index");
+      indexAnno.parameters.put("unique", String.valueOf(index.isUnique()));
+
+      List<Object> fields = new ArrayList<>();
+      for (Index.Field indexField : index.getFields()) {
+        if (indexField.direction() == Direction.ASC) { // 默认方向可省略
+          fields.add(indexField.fieldName());
+        } else {
+          Map<String, Object> fieldMap = new HashMap<>();
+          Map<String, String> value = new HashMap<>();
+          value.put("sort", indexField.direction().toString().toLowerCase());
+          fieldMap.put(indexField.fieldName(), value);
+          fields.add(fieldMap);
+        }
+      }
+      indexAnno.parameters.put("fields", fields);
+      model.annotations.add(indexAnno);
+    }
+
+    return model;
+  }
+
+  public static ModelParser.Field fromSchemaField(TypedField<?, ?> field) {
+    ModelParser.Field sdlField = new ModelParser.Field(field.getName(), field.isNullable(), getCorrespondingType(field));
+
+    // 处理字段注解
+    if (field.getComment() != null) {
+      ModelParser.Annotation commentAnno = new ModelParser.Annotation("comment");
+      commentAnno.parameters.put("value", field.getComment());
+      sdlField.annotations.add(commentAnno);
+    }
+
+    if (field.isUnique()) {
+      sdlField.annotations.add(new ModelParser.Annotation("unique"));
+    }
+
+    // 类型特定处理
+    switch (field) {
+      case IDField idField -> {
+        if (idField.getGeneratedValue() != null) {
+          ModelParser.Annotation anno = new ModelParser.Annotation("generatedValue");
+          anno.parameters.put("value", idField.getGeneratedValue().name());
+          sdlField.annotations.add(anno);
+        }
+      }
+      case StringField stringField -> {
+        if (stringField.getLength() > 0) {
+          ModelParser.Annotation anno = new ModelParser.Annotation("length");
+          anno.parameters.put("value", String.valueOf(stringField.getLength()));
+          sdlField.annotations.add(anno);
+        }
+        addDefaultAnnotation(sdlField, stringField.getDefaultValue());
+      }
+      case FloatField floatField -> {
+        addNumericAnnotations(sdlField, floatField.getPrecision(), floatField.getScale());
+        addDefaultAnnotation(sdlField, floatField.getDefaultValue());
+      }
+      case IntField intField -> addDefaultAnnotation(sdlField, intField.getDefaultValue());
+      case LongField longField -> addDefaultAnnotation(sdlField, longField.getDefaultValue());
+      case BooleanField booleanField -> addDefaultAnnotation(sdlField, booleanField.getDefaultValue());
+      case DateTimeField dateTimeField -> addDefaultAnnotation(sdlField, dateTimeField.getDefaultValue());
+      case DateField dateField -> addDefaultAnnotation(sdlField, dateField.getDefaultValue());
+      case TimeField timeField -> addDefaultAnnotation(sdlField, timeField.getDefaultValue());
+      case JSONField jsonField -> addDefaultAnnotation(sdlField, jsonField.getDefaultValue());
+      case RelationField relationField -> {
+        ModelParser.Annotation relationAnno = new ModelParser.Annotation("relation");
+        relationAnno.parameters.put("localField", relationField.getLocalField());
+        relationAnno.parameters.put("foreignField", relationField.getForeignField());
+        relationAnno.parameters.put("cascadeDelete",
+          String.valueOf(relationField.isCascadeDelete()));
+        sdlField.annotations.add(relationAnno);
+      }
+      case EnumField enumField ->
+        sdlField.name = enumField.isMultiple() ? enumField.getName() + "[]" : enumField.getName();
+      default -> {
+      }
+    }
+
+    // 处理额外属性
+    if (!field.getAdditionalProperties().isEmpty()) {
+      ModelParser.Annotation additionalAnno = new ModelParser.Annotation("additional");
+      additionalAnno.parameters.putAll(field.getAdditionalProperties());
+      sdlField.annotations.add(additionalAnno);
+    }
+
+    return sdlField;
+  }
+
+  public static ModelParser.Enumeration fromSchemaEnum(Enum schemaEnum) {
+    ModelParser.Enumeration enumeration = new ModelParser.Enumeration(schemaEnum.getName());
+    enumeration.elements = new ArrayList<>(schemaEnum.getElements());
+    return enumeration;
+  }
+
+  // 辅助方法
+  private static String getCorrespondingType(TypedField<?, ?> field) {
+    if (field instanceof RelationField relationField) {
+      return relationField.isMultiple() ? relationField.getName() + "[]" : relationField.getName();
+    } else if (field instanceof EnumField enumField) {
+      return enumField.isMultiple() ? enumField.getName() + "[]" : enumField.getName();
+    } else {
+      return field.getType();
+    }
+  }
+
+  private static void addDefaultAnnotation(ModelParser.Field sdlField, Object defaultValue) {
+    if (defaultValue != null) {
+      ModelParser.Annotation anno = new ModelParser.Annotation("default");
+      anno.parameters.put("value", defaultValue.toString());
+      sdlField.annotations.add(anno);
+    }
+  }
+
+  private static void addNumericAnnotations(ModelParser.Field sdlField,
+                                            Integer precision, Integer scale) {
+    if (precision != null) {
+      ModelParser.Annotation anno = new ModelParser.Annotation("precision");
+      anno.parameters.put("value", precision.toString());
+      sdlField.annotations.add(anno);
+    }
+    if (scale != null) {
+      ModelParser.Annotation anno = new ModelParser.Annotation("scale");
+      anno.parameters.put("value", scale.toString());
+      sdlField.annotations.add(anno);
+    }
   }
 
 }
