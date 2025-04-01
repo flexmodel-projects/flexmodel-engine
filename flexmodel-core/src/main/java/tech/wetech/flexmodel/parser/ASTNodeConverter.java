@@ -138,6 +138,8 @@ public class ASTNodeConverter {
         for (ModelParser.Annotation annotation : sdlField.annotations) {
           if (annotation.name.equals("default")) {
             ((DateTimeField) field).setDefaultValue(LocalDateTime.parse((String) annotation.parameters.get("value")));
+          } else if (annotation.name.equals("generatedValue")) {
+            ((DateTimeField) field).setGeneratedValue(DateTimeField.GeneratedValue.valueOf((String) annotation.parameters.get("value")));
           }
         }
         yield field;
@@ -147,6 +149,8 @@ public class ASTNodeConverter {
         for (ModelParser.Annotation annotation : sdlField.annotations) {
           if (annotation.name.equals("default")) {
             ((DateField) field).setDefaultValue(LocalDate.parse((String) annotation.parameters.get("value")));
+          } else if (annotation.name.equals("generatedValue")) {
+            ((DateField) field).setGeneratedValue(DateField.GeneratedValue.valueOf((String) annotation.parameters.get("value")));
           }
         }
         yield field;
@@ -156,6 +160,8 @@ public class ASTNodeConverter {
         for (ModelParser.Annotation annotation : sdlField.annotations) {
           if (annotation.name.equals("default")) {
             ((TimeField) field).setDefaultValue(LocalTime.parse((String) annotation.parameters.get("value")));
+          } else if (annotation.name.equals("generatedValue")) {
+            ((TimeField) field).setGeneratedValue(TimeField.GeneratedValue.valueOf((String) annotation.parameters.get("value")));
           }
         }
         yield field;
