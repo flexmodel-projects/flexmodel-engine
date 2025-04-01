@@ -15,6 +15,12 @@ public class IDField extends TypedField<Object, IDField> {
 
   public IDField(String name) {
     super(name, ScalarType.ID.getType());
+    setNullable(false);
+  }
+
+  @Override
+  public boolean isNullable() {
+    return false;
   }
 
   public GeneratedValue getGeneratedValue() {

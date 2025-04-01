@@ -18,8 +18,6 @@ class EnumGenerator extends AbstractGenerator {
     // Write package statement
     out.println "package ${enumClass.packageName};"
     out.println ""
-    out.println "import com.fasterxml.jackson.annotation.JsonRootName;"
-    out.println ""
     // Write class-level comments
     out.println "/**"
     if (enumClass.comment) {
@@ -29,7 +27,6 @@ class EnumGenerator extends AbstractGenerator {
     out.println " */"
 
     // Write class declaration
-    out.println "@JsonRootName(\"${enumClass.originalEnum.name}\")"
     out.println "public enum ${className} {"
     out.print "    "
     // Write field declarations

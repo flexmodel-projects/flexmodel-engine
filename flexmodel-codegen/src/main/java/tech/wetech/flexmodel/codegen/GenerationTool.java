@@ -2,8 +2,12 @@ package tech.wetech.flexmodel.codegen;
 
 import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.parser.ASTNodeConverter;
+import tech.wetech.flexmodel.parser.impl.ModelParser;
+import tech.wetech.flexmodel.parser.impl.ParseException;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -48,18 +52,35 @@ public class GenerationTool {
     List<SchemaObject> models = new ArrayList<>();
     List<ImportDescribe.ImportData> data = new ArrayList<>();
     // read from script
-    String importScript = configuration.getSchema().getImportScript();
-    File scriptFile = Path.of(configuration.getTarget().getBaseDir(), importScript).toFile();
-    System.out.println("Import Script File Path: " + scriptFile.getAbsolutePath());
-    if (scriptFile.exists()) {
-      System.out.println("Script file is exists, import Script File: " + scriptFile);
-      try {
-        String content = Files.readString(scriptFile.toPath());
-        ImportDescribe describe = jsonObjectConverter.parseToObject(content, ImportDescribe.class);
-        models.addAll(describe.getSchema());
-        data.addAll(describe.getData());
-      } catch (IOException e) {
-        e.printStackTrace();
+    String[] importScripts = configuration.getSchema().getImportScript().split(",");
+    for (String importScript : importScripts) {
+      File scriptFile = Path.of(configuration.getTarget().getBaseDir(), importScript).toFile();
+      System.out.println("Import Script File Path: " + scriptFile.getAbsolutePath());
+      if (scriptFile.exists()) {
+        System.out.println("Script file is exists, import Script File: " + scriptFile);
+        if (importScript.endsWith(".json")) {
+          try {
+            String content = Files.readString(scriptFile.toPath());
+            ImportDescribe describe = jsonObjectConverter.parseToObject(content, ImportDescribe.class);
+            models.addAll(describe.getSchema());
+            data.addAll(describe.getData());
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        } else if (importScript.endsWith(".sdl")) {
+          try {
+            String content = Files.readString(scriptFile.toPath());
+            ModelParser modelParser = new ModelParser(new ByteArrayInputStream(content.getBytes()));
+            List<ModelParser.ASTNode> list = modelParser.CompilationUnit();
+            for (ModelParser.ASTNode astNode : list) {
+              models.add(ASTNodeConverter.toSchemaObject(astNode));
+            }
+          } catch (IOException | ParseException e) {
+            e.printStackTrace();
+          }
+        } else {
+          System.out.println("Unsupported script file type: " + importScript);
+        }
       }
     }
 

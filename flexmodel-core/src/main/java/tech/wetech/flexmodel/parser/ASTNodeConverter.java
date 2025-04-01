@@ -174,18 +174,19 @@ public class ASTNodeConverter {
           .filter(f -> f.name.equals("relation")).findFirst()
           .orElse(null);
         boolean isRelationField = relationAnno != null;
-        String realName = sdlField.name.replace("[]", "");
-        boolean multiple = sdlField.name.endsWith("[]");
+        String from = sdlField.type.replace("[]", "");
+        boolean multiple = sdlField.type.endsWith("[]");
         if (isRelationField) {
-          RelationField relationField = new RelationField(realName);
+          RelationField relationField = new RelationField(sdlField.name);
           relationField.setMultiple(multiple);
+          relationField.setFrom(from);
           relationField.setLocalField((String) relationAnno.parameters.get("localField"));
           relationField.setForeignField((String) relationAnno.parameters.get("foreignField"));
           relationField.setCascadeDelete(Boolean.parseBoolean(Objects.toString(relationAnno.parameters.get("cascadeDelete"))));
           field = relationField;
         } else {
-          field = new EnumField(realName);
-          ((EnumField) field).setFrom(realName);
+          field = new EnumField(sdlField.name);
+          ((EnumField) field).setFrom(from);
           ((EnumField) field).setMultiple(multiple);
         }
         yield field;
@@ -332,9 +333,9 @@ public class ASTNodeConverter {
   // 辅助方法
   private static String getCorrespondingType(TypedField<?, ?> field) {
     if (field instanceof RelationField relationField) {
-      return relationField.isMultiple() ? relationField.getName() + "[]" : relationField.getName();
+      return relationField.isMultiple() ? relationField.getFrom() + "[]" : relationField.getFrom();
     } else if (field instanceof EnumField enumField) {
-      return enumField.isMultiple() ? enumField.getName() + "[]" : enumField.getName();
+      return enumField.isMultiple() ? enumField.getFrom() + "[]" : enumField.getFrom();
     } else {
       return field.getType();
     }

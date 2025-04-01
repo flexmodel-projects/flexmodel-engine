@@ -1,0 +1,63 @@
+model flow_definition {
+  id : ID @generatedValue("BIGINT_NOT_GENERATED"),
+  last_modified_by? : Long,
+  caller? : String @length("255"),
+  flow_name? : String @length("255"),
+  flow_title? : String @length("255"),
+  status? : String @length("3"),
+  process_name? : String @length("255"),
+  create_time? : DateTime,
+  created_by? : Long,
+  update_time? : DateTime,
+  flow_model? : String @length("255"),
+  process_key? : String @length("255"),
+  tenant_id : String @length("255"),
+  flow_key? : String @length("255"),
+}
+model fs_datasource {
+  name : ID @generatedValue("STRING_NOT_GENERATED"),
+  type? : String @length("255"),
+  config? : JSON,
+  createdAt? : DateTime,
+  updatedAt? : DateTime,
+  enabled : Boolean @comment("") @default("true"),
+}
+model fs_api_log {
+  id : ID @generatedValue("ULID"),
+  level : LogLevel,
+  uri : String @length("255"),
+  data : JSON,
+  createdAt : DateTime,
+  @index(unique: "false", fields: [level]),
+}
+model Student {
+  id : ID @generatedValue("BIGINT_NOT_GENERATED"),
+  studentName? : String @length("255"),
+  gender? : UserGender,
+  interest? : User_interest[],
+  age? : Int,
+  classId? : Long,
+  studentDetail? : StudentDetail @relation(localField: "id", foreignField: "studentId", cascadeDelete: "true"),
+}
+model StudentDetail {
+  id : ID @generatedValue("AUTO_INCREMENT"),
+  studentId? : Long,
+  description? : String @length("255"),
+}
+enum LogLevel {
+  DEBUG,
+  INFO,
+  WARN,
+  ERROR
+}
+enum UserGender {
+  UNKNOWN,
+  MALE,
+  FEMALE
+}
+enum User_interest {
+  chang,
+  tiao,
+  rap,
+  daLanQiu
+}

@@ -30,7 +30,7 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println "import tech.wetech.flexmodel.BuildItem;"
     out.println "import tech.wetech.flexmodel.Entity;"
     out.println "import tech.wetech.flexmodel.Enum;"
-    out.println "import tech.wetech.flexmodel.TypeWrapper;"
+    out.println "import tech.wetech.flexmodel.SchemaObject;"
     out.println "import tech.wetech.flexmodel.ImportDescribe;"
     modelListClass.modelList.each {
       out.println "import ${rootPackage}.dsl.${it.shortClassName}DSL;"
@@ -64,7 +64,7 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println "  }"
     out.println ""
     out.println "  @Override"
-    out.println "  public List<TypeWrapper> getSchema() {"
+    out.println "  public List<SchemaObject> getSchema() {"
     out.println "    JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();"
     modelListClass.modelList.each { model ->
       out.println "    Entity ${model.variableName} = jsonObjectConverter.parseToObject(\"\"\""
@@ -76,7 +76,7 @@ class SchemaGenerator extends AbstractModelListGenerator {
       out.println "    ${jsonObjectConverter.toJsonString(model.originalEnum)}"
       out.println "    \"\"\", Enum.class);"
     }
-    out.println "    List<TypeWrapper> list = new ArrayList<>();"
+    out.println "    List<SchemaObject> list = new ArrayList<>();"
     modelListClass.modelList.each { model ->
       out.println "    list.add(${model.variableName});"
     }
