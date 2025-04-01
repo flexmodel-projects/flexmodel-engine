@@ -56,7 +56,6 @@ public class GenerationTool {
       try {
         String content = Files.readString(scriptFile.toPath());
         ImportDescribe describe = jsonObjectConverter.parseToObject(content, ImportDescribe.class);
-        Map<String, Object> map = jsonObjectConverter.parseToMap(content);
         models.addAll(describe.getSchema());
         data.addAll(describe.getData());
       } catch (IOException e) {
