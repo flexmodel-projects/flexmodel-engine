@@ -73,7 +73,7 @@ public class ModelParser {
     // Annotation 对象，保存注解名称和参数（键值对），参数类型为 Object
     public static class Annotation implements ASTNode {
         public String name;
-        public Map<String, Object> parameters = new HashMap<>();
+        public Map<String, Object> parameters = new LinkedHashMap<>();
         public Annotation(String name) { this.name = name; }
         public void addParameter(String key, Object value) {
             parameters.put(key, value);
@@ -331,12 +331,12 @@ Object ArrayElement() : { Map inline = null; String id; }
     ( <LPAREN> { inline = InlineAnnotation(); } <RPAREN> )?
     {
        if (inline == null) return id;
-       else { Map m = new HashMap(); m.put(id, inline); return m; }
+       else { Map m = new LinkedHashMap(); m.put(id, inline); return m; }
     }
 }
 
 /* 解析内联注解参数列表，返回 Map */
-Map InlineAnnotation() : { Map m = new HashMap(); }
+Map InlineAnnotation() : { Map m = new LinkedHashMap(); }
 {
     InlineAnnotationPair(m)
     ( <COMMA> InlineAnnotationPair(m) )*

@@ -41,7 +41,8 @@ public class ASTNodeConverter {
       }
       // 处理索引语法
       if (mAnno.name.equals("index")) {
-        Index index = new Index(entity.getName(), mAnno.name);
+        Index index = new Index(entity.getName());
+        index.setName((String) mAnno.parameters.get("name"));
         if (mAnno.parameters.containsKey("unique")) {
           boolean unique = Boolean.parseBoolean((String) mAnno.parameters.get("unique"));
           index.setUnique(unique);
@@ -243,6 +244,7 @@ public class ASTNodeConverter {
     // 处理索引
     for (Index index : entity.getIndexes()) {
       ModelParser.Annotation indexAnno = new ModelParser.Annotation("index");
+      indexAnno.parameters.put("name", index.getName());
       indexAnno.parameters.put("unique", String.valueOf(index.isUnique()));
 
       List<Object> fields = new ArrayList<>();
