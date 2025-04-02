@@ -1,8 +1,6 @@
 package tech.wetech.flexmodel.codegen
 
 
-import tech.wetech.flexmodel.JsonObjectConverter
-import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter
 
 /**
  * @author cjbi
@@ -20,12 +18,9 @@ class SchemaGenerator extends AbstractModelListGenerator {
     String rootPackage = context.getVariable("rootPackage");
     def modelListClass = context.modelListClass
     def className = modelListClass.schemaName.capitalize()
-    JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
 
     out.println "package ${context.modelListClass.packageName};"
     out.println ""
-    out.println "import tech.wetech.flexmodel.JsonObjectConverter;"
-    out.println "import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;"
     out.println "import tech.wetech.flexmodel.codegen.ObjectUtils;"
     out.println "import tech.wetech.flexmodel.BuildItem;"
     out.println "import tech.wetech.flexmodel.Entity;"
@@ -65,24 +60,23 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println ""
     out.println "  @Override"
     out.println "  public List<SchemaObject> getSchema() {"
-    out.println "    JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();"
+    out.println "    List<SchemaObject> list = new ArrayList<>();"
+    out.println "    try {"
     modelListClass.modelList.each { model ->
-      out.println "    Entity ${model.variableName} = jsonObjectConverter.parseToObject(\"\"\""
-      out.println "    ${jsonObjectConverter.toJsonString(model.originalModel)}"
-      out.println "    \"\"\", Entity.class);"
+      out.println "      Entity ${model.variableName} = (Entity) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.originalModel)}\");"
     }
     modelListClass.enumList.each { model ->
-      out.println "    Enum ${model.variableName} = jsonObjectConverter.parseToObject(\"\"\""
-      out.println "    ${jsonObjectConverter.toJsonString(model.originalEnum)}"
-      out.println "    \"\"\", Enum.class);"
+      out.println "      Enum ${model.variableName} = (Enum) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.originalEnum)}\");"
     }
-    out.println "    List<SchemaObject> list = new ArrayList<>();"
     modelListClass.modelList.each { model ->
-      out.println "    list.add(${model.variableName});"
+      out.println "      list.add(${model.variableName});"
     }
     modelListClass.enumList.each { anEnum ->
-      out.println "    list.add(${anEnum.variableName});"
+      out.println "      list.add(${anEnum.variableName});"
     }
+    out.println "    } catch (Exception e) {"
+    out.println "      e.printStackTrace();"
+    out.println "    }"
     out.println "    return list;"
     out.println "  }"
     out.println ""

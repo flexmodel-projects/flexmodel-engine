@@ -36,7 +36,6 @@ public abstract class AbstractModel<SELF extends AbstractModel<SELF>> implements
     return self();
   }
 
-  @Override
   public Map<String, Object> getAdditionalProperties() {
     return additionalProperties;
   }
