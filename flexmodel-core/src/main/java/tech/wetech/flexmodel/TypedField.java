@@ -14,7 +14,7 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
   private String comment;
   private boolean unique;
   private boolean nullable = true;
-  private T defaultValue;
+  private Object defaultValue;
   private Map<String, Object> additionalProperties = new HashMap<>();
 
   public TypedField(String name, String type) {
@@ -54,7 +54,7 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
     return self();
   }
 
-  public T getDefaultValue() {
+  public Object getDefaultValue() {
     return defaultValue;
   }
 
@@ -62,6 +62,7 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
     this.defaultValue = defaultValue;
     return self();
   }
+
 
   public String getType() {
     return type;

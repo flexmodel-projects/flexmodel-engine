@@ -1,5 +1,5 @@
 model flow_definition {
-  id : ID @generatedValue("BIGINT_NOT_GENERATED"),
+  id : ID @default(autoIncrement()),
   last_modified_by? : Long,
   caller? : String @length("255"),
   flow_name? : String @length("255"),
@@ -15,15 +15,15 @@ model flow_definition {
   flow_key? : String @length("255"),
 }
 model fs_datasource {
-  name : ID @generatedValue("STRING_NOT_GENERATED"),
+  name : ID,
   type? : String @length("255"),
   config? : JSON,
-  createdAt? : DateTime,
-  updatedAt? : DateTime,
+  createdAt? : DateTime @default(now()),
+  updatedAt? : DateTime @default(now()),
   enabled : Boolean @comment("") @default("true"),
 }
 model fs_api_log {
-  id : ID @generatedValue("ULID"),
+  id : ID @default(ulid()),
   level : LogLevel,
   uri : String @length("255"),
   data : JSON,
@@ -31,16 +31,22 @@ model fs_api_log {
   @index(unique: "false", fields: [level]),
 }
 model Student {
-  id : ID @generatedValue("BIGINT_NOT_GENERATED"),
+  id : ID @default(uuid()),
   studentName? : String @length("255"),
   gender? : UserGender,
   interest? : User_interest[],
   age? : Int,
   classId? : Long,
-  studentDetail? : StudentDetail @relation(localField: "id", foreignField: "studentId", cascadeDelete: "true"),
+  studentClass: Classes @relation(localField: "classId", foreignField: "id"),
+  studentDetail: StudentDetail @relation(localField: "id", foreignField: "studentId", cascadeDelete: true),
+  createdAt? : DateTime @default(now()),
+  updatedAt? : DateTime @default(now()),
+  @index(name:"IDX_studentName", unique: false, fields: [classId, studentName: (sort: "desc")]),
+  @index(unique: "false", fields: [studentName]),
+  @index(unique: "false", fields: [classId]),
 }
 model StudentDetail {
-  id : ID @generatedValue("AUTO_INCREMENT"),
+  id : ID @default(autoIncrement()),
   studentId? : Long,
   description? : String @length("255"),
 }

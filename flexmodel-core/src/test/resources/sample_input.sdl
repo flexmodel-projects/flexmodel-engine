@@ -1,6 +1,6 @@
 // 班级
 model Classes {
-  id: ID @generatedValue("BIGINT_NOT_GENERATED"),
+  id: ID @default(uuid()),
   classCode: String @unique @length(255),
   className? : String  @default("A班级"),
   students: Student[] @relation(localField: "id", foreignField: "classId", cascadeDelete: true),
@@ -8,14 +8,16 @@ model Classes {
 
 // 学生
 model Student {
-  id: ID @generatedValue("BIGINT_NOT_GENERATED"),
-  studentName: String @length(255) @comment("学生名称"), // 学生名称
-  gender: UserGender,
-  interest: user_interest[],
-  age: Int,
-  classId: Long,
+  id : ID @default(uuid()),
+  studentName? : String @length("255"),
+  gender? : UserGender,
+  interest? : User_interest[],
+  age? : Int,
+  classId? : Long,
   studentClass: Classes @relation(localField: "classId", foreignField: "id"),
   studentDetail: StudentDetail @relation(localField: "id", foreignField: "studentId", cascadeDelete: true),
+  createdAt? : DateTime @default(now()),
+  updatedAt? : DateTime @default(now()),
   @index(name:"IDX_studentName", unique: false, fields: [classId, studentName: (sort: "desc")]),
   @index(unique: "false", fields: [studentName]),
   @index(unique: "false", fields: [classId]),
@@ -23,11 +25,9 @@ model Student {
 
 // 学生详情
 model StudentDetail {
-  id: ID @generatedValue("BIGINT_NOT_GENERATED"),
-  studentId: Long @unique,
-  // 详细信息
-  description: String @lob,
-  student: Student @relation(localField: "studentId", foreignField: "id"),
+  id : ID @default(autoIncrement()),
+  studentId? : Long,
+  description? : String @length("255"),
 }
 
 // 用户性别

@@ -61,10 +61,8 @@ public class ModelParser {
                 sb.append("?");
             }
             sb.append(" : ").append(type);
-            if (!annotations.isEmpty()) {
-                for (Annotation ann : annotations) {
-                    sb.append(" ").append(ann.toString());
-                }
+            for (Annotation ann : annotations) {
+                sb.append(" ").append(ann.toString());
             }
             return sb.toString();
         }
@@ -298,21 +296,28 @@ void AnnotationArguments(Annotation ann) : {}
 /* 解析单个注解参数，支持键值对或默认参数 */
 void AnnotationArgument(Annotation ann) : { Object value; Token t; }
 {
-    (
+    LOOKAHEAD(<IDENTIFIER> <COLON>)
       t = <IDENTIFIER> <COLON> value = AnnotationValue() { ann.addParameter(t.image, value); }
-    | value = AnnotationValue() { ann.addParameter("value", value); }
-    )
+  | value = AnnotationValue() { ann.addParameter("value", value); }
 }
 
 /* 解析注解值，返回 Object 类型，支持字符串、整型、布尔字面量、数组字面量或标识符 */
 Object AnnotationValue() : { Token t; Object s; }
 {
-    t = <STRING_LITERAL> { return t.image.substring(1, t.image.length()-1); }
+    LOOKAHEAD(<IDENTIFIER> <LPAREN>) s = FunctionCall() { return s; }
+  | t = <STRING_LITERAL> { return t.image.substring(1, t.image.length()-1); }
   | t = <INTEGER_LITERAL> { return t.image; }
   | t = <TRUE> { return t.image; }
   | t = <FALSE> { return t.image; }
   | s = ArrayLiteral() { return s; }
   | s = Identifier() { return s; }
+}
+
+/* 解析函数调用，返回字符串表示 */
+String FunctionCall() : { String idName; }
+{
+    idName = Identifier() <LPAREN><RPAREN>
+      { return idName + "()"; }
 }
 
 /* 解析数组字面量，返回 List 对象 */

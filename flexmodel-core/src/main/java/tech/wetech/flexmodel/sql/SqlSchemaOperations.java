@@ -288,7 +288,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
         }
         case BooleanField booleanField -> {
           if (field.getDefaultValue() != null) {
-            aSqlColumn.setDefaultValue(sqlContext.getSqlDialect().toBooleanValueString(booleanField.getDefaultValue()));
+            aSqlColumn.setDefaultValue(sqlContext.getSqlDialect().toBooleanValueString((Boolean) booleanField.getDefaultValue()));
           }
         }
         default -> {
