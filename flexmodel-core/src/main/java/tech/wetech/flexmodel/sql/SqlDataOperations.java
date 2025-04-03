@@ -233,7 +233,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
     if (query == null || query.getProjection() == null) {
       for (Field field : model.getFields()) {
         if (field instanceof IDField idField) {
-          sqlResultHandler.addSqlTypeHandler(field.getName(), typeHandlerMap.get(idField.getGeneratedValue().getType()), field);
+          sqlResultHandler.addSqlTypeHandler(field.getName(), typeHandlerMap.get(idField.getBaseType()), field);
         } else if (field instanceof TypedField<?, ?> typedField) {
           sqlResultHandler.addSqlTypeHandler(field.getName(), typeHandlerMap.get(typedField.getType()), field);
         } else if (field instanceof Query.QueryField) {

@@ -15,10 +15,10 @@ public class ModelParser {
 
     // 表示函数调用，如 now()
     public static class FunctionCall implements ASTNode {
-        public String call;
-        public FunctionCall(String call) { this.call = call; }
+        public String name;
+        public FunctionCall(String name) { this.name = name; }
         @Override
-        public String toString() { return call + "()"; }
+        public String toString() { return name + "()"; }
     }
 
     // Model 对象，包含模型名称、字段列表和模型级注解

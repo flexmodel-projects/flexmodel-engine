@@ -243,7 +243,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
       );
       associationColumn.setSqlTypeCode(
         sqlContext.getTypeHandler(((Entity) getModel(field.getModelName())).findIdField().orElseThrow()
-          .getGeneratedValue().getType()).getJdbcTypeCode()
+          .getBaseType()).getJdbcTypeCode()
       );
       return associationColumn;
     } else if (field instanceof IDField idField) {
@@ -252,8 +252,8 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
       idColumn.setName(field.getName());
       idColumn.setPrimaryKey(true);
       idColumn.setUnique(true);
-      idColumn.setSqlTypeCode(sqlContext.getTypeHandler(idField.getGeneratedValue().getType()).getJdbcTypeCode());
-      idColumn.setAutoIncrement(idField.getGeneratedValue() == IDField.GeneratedValue.AUTO_INCREMENT);
+      idColumn.setSqlTypeCode(sqlContext.getTypeHandler(idField.getBaseType()).getJdbcTypeCode());
+      idColumn.setAutoIncrement(idField.getDefaultValue() == GeneratedValue.AUTO_INCREMENT);
       idColumn.setComment(field.getComment());
       return idColumn;
     } else {

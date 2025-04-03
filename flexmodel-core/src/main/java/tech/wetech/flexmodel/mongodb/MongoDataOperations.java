@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static tech.wetech.flexmodel.IDField.GeneratedValue.AUTO_INCREMENT;
-
 /**
  * @author cjbi
  */
@@ -39,7 +37,7 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
     Map<String, Object> record = ReflectionUtils.toClassBean(mongoContext.getJsonObjectConverter(), objR, Map.class);
     Entity entity = (Entity) mongoContext.getModel(modelName);
     IDField idField = entity.findIdField().orElseThrow();
-    if (!record.containsKey(idField.getName()) && idField.getGeneratedValue() == AUTO_INCREMENT) {
+    if (!record.containsKey(idField.getName()) && idField.getDefaultValue() == GeneratedValue.AUTO_INCREMENT) {
       setId(modelName, record);
       idConsumer.accept(record.get(idField.getName()));
     }

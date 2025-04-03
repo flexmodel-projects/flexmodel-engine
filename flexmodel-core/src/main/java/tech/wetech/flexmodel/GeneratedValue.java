@@ -1,41 +1,35 @@
 package tech.wetech.flexmodel;
 
-import java.time.LocalDateTime;
-
 /**
  * @author cjbi
  */
-public class GeneratedValue<T> {
+public class GeneratedValue {
 
-  private final String name;
+  private String name;
 
-  public static final GeneratedValue<?> AUTO_INCREMENT = new GeneratedValue<>("autoIncrement");
-  public static final GeneratedValue<String> UUID = new GeneratedValue<>("uuid") {
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof GeneratedValue val) {
+      return this.name.equals(val.name);
+    }
+    return super.equals(obj);
+  }
 
-    @Override
-    public String generateValue() {
-      return java.util.UUID.randomUUID().toString();
-    }
-  };
-  public static final GeneratedValue<String> ULID = new GeneratedValue<>("ulid") {
-    @Override
-    public String generateValue() {
-      return tech.wetech.flexmodel.generator.ULID.random().toString();
-    }
-  };
-  public static final GeneratedValue<LocalDateTime> NOW = new GeneratedValue<>("now") {
-    @Override
-    public LocalDateTime generateValue() {
-      return LocalDateTime.now();
-    }
-  };
+  public static final GeneratedValue AUTO_INCREMENT = new GeneratedValue("autoIncrement");
+  public static final GeneratedValue UUID = new GeneratedValue("uuid");
+  public static final GeneratedValue ULID = new GeneratedValue("ulid");
+  public static final GeneratedValue NOW = new GeneratedValue("now");
 
   public GeneratedValue(String name) {
     this.name = name;
   }
 
-  public T generateValue() {
-    return null;
+  public GeneratedValue() {
+  }
+
+  public GeneratedValue setName(String name) {
+    this.name = name;
+    return this;
   }
 
   public String getName() {

@@ -203,7 +203,7 @@ public class GenerationTool {
       switch (field) {
         case IDField idField -> {
           // id field
-          TypeInfo typeInfo = TYPE_MAPPING.get(idField.getGeneratedValue().getType());
+          TypeInfo typeInfo = TYPE_MAPPING.get(idField.getBaseType());
 
           modelField.setTypePackage(typeInfo.typePackage())
             .setShortTypeName(typeInfo.shortTypeName())

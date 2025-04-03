@@ -15,8 +15,9 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static tech.wetech.flexmodel.IDField.GeneratedValue.*;
-import static tech.wetech.flexmodel.ScalarType.*;
+import static tech.wetech.flexmodel.GeneratedValue.AUTO_INCREMENT;
+import static tech.wetech.flexmodel.ScalarType.ID;
+import static tech.wetech.flexmodel.ScalarType.STRING;
 
 /**
  * @author cjbi
@@ -223,10 +224,8 @@ public class JdbcMappedModels implements MappedModels {
             IDField idField = new IDField(sqlColumn.getName());
             field = idField;
             if (sqlColumn.isAutoIncrement()) {
-              idField.setGeneratedValue(AUTO_INCREMENT);
+              idField.setDefaultValue(AUTO_INCREMENT);
             }
-            ScalarType idType = ScalarType.fromType(jdbcCodeMap.getOrDefault(sqlColumn.getSqlTypeCode(), STRING.getType()));
-            idField.setGeneratedValue(idType == LONG || idType == INT || idType == FLOAT ? BIGINT_NOT_GENERATED : STRING_NOT_GENERATED);
             break;
           }
           default:

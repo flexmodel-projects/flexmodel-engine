@@ -58,8 +58,12 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
     return defaultValue;
   }
 
-  public SELF setDefaultValue(T defaultValue) {
-    this.defaultValue = defaultValue;
+  public SELF setDefaultValue(Object defaultValue) {
+    if (defaultValue instanceof Map<?, ?> map && map.containsKey("name")) {
+      this.defaultValue = new GeneratedValue(map.get("name").toString());
+    } else {
+      this.defaultValue = defaultValue;
+    }
     return self();
   }
 

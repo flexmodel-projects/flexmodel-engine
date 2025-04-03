@@ -1,9 +1,11 @@
 package tech.wetech.flexmodel;
 
+import java.io.Serializable;
+
 /**
  * @author cjbi
  */
-public class EnumField extends TypedField<Object, EnumField> {
+public class EnumField extends TypedField<Serializable, EnumField> {
 
   /**
    * 多选

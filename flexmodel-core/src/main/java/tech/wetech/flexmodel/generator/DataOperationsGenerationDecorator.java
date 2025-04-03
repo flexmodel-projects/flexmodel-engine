@@ -5,6 +5,7 @@ import tech.wetech.flexmodel.reflect.ReflectionUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
   }
 
   private Object convertParameter(TypedField<?, ?> field, Object value) {
-    return sessionContext.getTypeHandlerMap().get(field instanceof IDField idField ? idField.getGeneratedValue().getType() : field.getType())
+    return sessionContext.getTypeHandlerMap().get(field instanceof IDField idField ? idField.getBaseType() : field.getType())
       .convertParameter(field, value);
   }
 
@@ -49,6 +50,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
         case IDField idField -> generateValue(idField, value, isUpdate);
         case DateTimeField datetimeField -> generateValue(datetimeField, value, isUpdate);
         case DateField dateField -> generateValue(dateField, value, isUpdate);
+        case TimeField timeField -> generateValue(timeField, value, isUpdate);
         default -> value != null ? value : convertParameter(field, field.getDefaultValue());
       };
       if (generatedValue != null) {
@@ -58,11 +60,20 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
     return newData;
   }
 
+  private Object generateValue(TimeField field, Object value, boolean isUpdate) {
+    if (field.getDefaultValue() != null && value == null) {
+      if (field.getDefaultValue() == GeneratedValue.NOW && !isUpdate) {
+        return LocalTime.now();
+      }
+    }
+    return value;
+  }
+
   private Object generateValue(IDField idField, Object value, boolean isUpdate) {
     if (!isUpdate && value == null) {
-      if (idField.getGeneratedValue() == IDField.GeneratedValue.ULID) {
+      if (idField.getDefaultValue() == GeneratedValue.ULID) {
         return ULID.random().toString();
-      } else if (idField.getGeneratedValue() == IDField.GeneratedValue.UUID) {
+      } else if (idField.getDefaultValue() == GeneratedValue.UUID) {
         return UUID.randomUUID().toString();
       }
     }
@@ -70,12 +81,8 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
   }
 
   private Object generateValue(DateTimeField field, Object value, boolean isUpdate) {
-    if (field.getGeneratedValue() != null && value == null) {
-      if (field.getGeneratedValue() == DateTimeField.GeneratedValue.NOW_ON_CREATE && !isUpdate) {
-        return LocalDateTime.now();
-      } else if (field.getGeneratedValue() == DateTimeField.GeneratedValue.NOW_ON_UPDATE && isUpdate) {
-        return LocalDateTime.now();
-      } else if (field.getGeneratedValue() == DateTimeField.GeneratedValue.NOW_ON_CREATE_AND_UPDATE) {
+    if (field.getDefaultValue() != null && value == null) {
+      if (field.getDefaultValue() == GeneratedValue.NOW && !isUpdate) {
         return LocalDateTime.now();
       }
     }
@@ -83,12 +90,8 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
   }
 
   private Object generateValue(DateField field, Object value, boolean isUpdate) {
-    if (field.getGeneratedValue() != null && value == null) {
-      if (field.getGeneratedValue() == DateField.GeneratedValue.NOW_ON_CREATE && !isUpdate) {
-        return LocalDate.now();
-      } else if (field.getGeneratedValue() == DateField.GeneratedValue.NOW_ON_UPDATE && isUpdate) {
-        return LocalDate.now();
-      } else if (field.getGeneratedValue() == DateField.GeneratedValue.NOW_ON_CREATE_AND_UPDATE) {
+    if (field.getDefaultValue() != null && value == null) {
+      if (field.getDefaultValue() == GeneratedValue.NOW && !isUpdate) {
         return LocalDate.now();
       }
     }
@@ -98,7 +101,8 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
   @Override
   @SuppressWarnings("all")
   public int insert(String modelName, Object obj, Consumer<Object> idConsumer) {
-    Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), obj, Map.class);;
+    Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), obj, Map.class);
+    ;
     String schemaName = sessionContext.getSchemaName();
     MappedModels mappedModels = sessionContext.getMappedModels();
     AtomicReference<Object> atomicId = new AtomicReference<>();

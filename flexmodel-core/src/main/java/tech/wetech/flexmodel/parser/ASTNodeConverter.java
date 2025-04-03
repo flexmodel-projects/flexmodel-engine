@@ -72,8 +72,13 @@ public class ASTNodeConverter {
         field = new IDField(sdlField.name);
         for (ModelParser.Annotation annotation : sdlField.annotations) {
           switch (annotation.name) {
-            case "generatedValue" ->
-              ((IDField) field).setGeneratedValue(IDField.GeneratedValue.valueOf((String) annotation.parameters.get("value")));
+            case "default" -> {
+              Object value = annotation.parameters.get("value");
+              if (value instanceof ModelParser.FunctionCall func) {
+                field.setDefaultValue(new GeneratedValue(func.name));
+              }
+              yield field;
+            }
             case "comment" -> field.setComment((String) annotation.parameters.get("value"));
             case "unique" -> field.setUnique(true);
           }
@@ -138,9 +143,12 @@ public class ASTNodeConverter {
         field = new DateTimeField(sdlField.name);
         for (ModelParser.Annotation annotation : sdlField.annotations) {
           if (annotation.name.equals("default")) {
-            ((DateTimeField) field).setDefaultValue(LocalDateTime.parse((String) annotation.parameters.get("value")));
-          } else if (annotation.name.equals("generatedValue")) {
-            ((DateTimeField) field).setGeneratedValue(DateTimeField.GeneratedValue.valueOf((String) annotation.parameters.get("value")));
+            Object value = annotation.parameters.get("value");
+            if (value instanceof ModelParser.FunctionCall func) {
+              field.setDefaultValue(new GeneratedValue(func.name));
+            } else {
+              ((DateTimeField) field).setDefaultValue(LocalDateTime.parse((String) annotation.parameters.get("value")));
+            }
           }
         }
         yield field;
@@ -149,9 +157,12 @@ public class ASTNodeConverter {
         field = new DateField(sdlField.name);
         for (ModelParser.Annotation annotation : sdlField.annotations) {
           if (annotation.name.equals("default")) {
-            ((DateField) field).setDefaultValue(LocalDate.parse((String) annotation.parameters.get("value")));
-          } else if (annotation.name.equals("generatedValue")) {
-            ((DateField) field).setGeneratedValue(DateField.GeneratedValue.valueOf((String) annotation.parameters.get("value")));
+            Object value = annotation.parameters.get("value");
+            if (value instanceof ModelParser.FunctionCall func) {
+              field.setDefaultValue(new GeneratedValue(func.name));
+            } else {
+              ((DateField) field).setDefaultValue(LocalDate.parse((String) annotation.parameters.get("value")));
+            }
           }
         }
         yield field;
@@ -160,9 +171,12 @@ public class ASTNodeConverter {
         field = new TimeField(sdlField.name);
         for (ModelParser.Annotation annotation : sdlField.annotations) {
           if (annotation.name.equals("default")) {
-            ((TimeField) field).setDefaultValue(LocalTime.parse((String) annotation.parameters.get("value")));
-          } else if (annotation.name.equals("generatedValue")) {
-            ((TimeField) field).setGeneratedValue(TimeField.GeneratedValue.valueOf((String) annotation.parameters.get("value")));
+            Object value = annotation.parameters.get("value");
+            if (value instanceof ModelParser.FunctionCall func) {
+              field.setDefaultValue(new GeneratedValue(func.name));
+            } else {
+              ((TimeField) field).setDefaultValue(LocalTime.parse((String) annotation.parameters.get("value")));
+            }
           }
         }
         yield field;
@@ -283,10 +297,12 @@ public class ASTNodeConverter {
     // 类型特定处理
     switch (field) {
       case IDField idField -> {
-        if (idField.getGeneratedValue() != null) {
-          ModelParser.Annotation anno = new ModelParser.Annotation("generatedValue");
-          anno.parameters.put("value", idField.getGeneratedValue().name());
-          sdlField.annotations.add(anno);
+        if (idField.getDefaultValue() != null) {
+          if (idField.getDefaultValue() instanceof GeneratedValue generatedValue) {
+            ModelParser.Annotation anno = new ModelParser.Annotation("default");
+            anno.parameters.put("value", new ModelParser.FunctionCall(generatedValue.getName()));
+            sdlField.annotations.add(anno);
+          }
         }
       }
       case StringField stringField -> {
@@ -304,30 +320,9 @@ public class ASTNodeConverter {
       case IntField intField -> addDefaultAnnotation(sdlField, intField.getDefaultValue());
       case LongField longField -> addDefaultAnnotation(sdlField, longField.getDefaultValue());
       case BooleanField booleanField -> addDefaultAnnotation(sdlField, booleanField.getDefaultValue());
-      case DateTimeField dateTimeField -> {
-        if (dateTimeField.getGeneratedValue() != null) {
-          ModelParser.Annotation anno = new ModelParser.Annotation("generatedValue");
-          anno.parameters.put("value", dateTimeField.getGeneratedValue().name());
-          sdlField.annotations.add(anno);
-        }
-        addDefaultAnnotation(sdlField, dateTimeField.getDefaultValue());
-      }
-      case DateField dateField -> {
-        if (dateField.getGeneratedValue() != null) {
-          ModelParser.Annotation anno = new ModelParser.Annotation("generatedValue");
-          anno.parameters.put("value", dateField.getGeneratedValue().name());
-          sdlField.annotations.add(anno);
-        }
-        addDefaultAnnotation(sdlField, dateField.getDefaultValue());
-      }
-      case TimeField timeField -> {
-        if (timeField.getGeneratedValue() != null) {
-          ModelParser.Annotation anno = new ModelParser.Annotation("generatedValue");
-          anno.parameters.put("value", timeField.getGeneratedValue().name());
-          sdlField.annotations.add(anno);
-        }
-        addDefaultAnnotation(sdlField, timeField.getDefaultValue());
-      }
+      case DateTimeField dateTimeField -> addDefaultAnnotation(sdlField, dateTimeField.getDefaultValue());
+      case DateField dateField -> addDefaultAnnotation(sdlField, dateField.getDefaultValue());
+      case TimeField timeField -> addDefaultAnnotation(sdlField, timeField.getDefaultValue());
       case JSONField jsonField -> addDefaultAnnotation(sdlField, jsonField.getDefaultValue());
       case RelationField relationField -> {
         ModelParser.Annotation relationAnno = new ModelParser.Annotation("relation");
@@ -375,7 +370,11 @@ public class ASTNodeConverter {
   private static void addDefaultAnnotation(ModelParser.Field sdlField, Object defaultValue) {
     if (defaultValue != null) {
       ModelParser.Annotation anno = new ModelParser.Annotation("default");
-      anno.parameters.put("value", defaultValue.toString());
+      if (defaultValue instanceof GeneratedValue generatedValue) {
+        anno.parameters.put("value", new ModelParser.FunctionCall(generatedValue.getName()));
+      } else {
+        anno.parameters.put("value", defaultValue.toString());
+      }
       sdlField.annotations.add(anno);
     }
   }

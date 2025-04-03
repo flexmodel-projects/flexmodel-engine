@@ -19,7 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import static tech.wetech.flexmodel.Direction.DESC;
-import static tech.wetech.flexmodel.IDField.GeneratedValue.*;
+import static tech.wetech.flexmodel.GeneratedValue.AUTO_INCREMENT;
+import static tech.wetech.flexmodel.GeneratedValue.UUID;
 import static tech.wetech.flexmodel.Projections.*;
 
 /**
@@ -45,7 +46,7 @@ public abstract class AbstractSessionTests {
 
   void createClassesEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
+      .addField(new IDField("id").setDefaultValue(AUTO_INCREMENT))
       .addField(new StringField("classCode"))
       .addField(new StringField("className"))
     );
@@ -66,7 +67,7 @@ public abstract class AbstractSessionTests {
         .setComment("兴趣")
     );
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
+      .addField(new IDField("id").setDefaultValue(AUTO_INCREMENT))
       .addField(new StringField("studentName"))
       .addField(new EnumField("gender").setFrom(genderEnum.getName()))
       .addField(new EnumField("interest").setFrom(interestEnum.getName()).setMultiple(true))
@@ -78,7 +79,7 @@ public abstract class AbstractSessionTests {
 
   void createStudentDetailEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setGeneratedValue(AUTO_INCREMENT))
+      .addField(new IDField("id").setDefaultValue(AUTO_INCREMENT))
       .addField(new LongField("studentId"))
       .addField(new StringField("description"))
     );
@@ -86,14 +87,14 @@ public abstract class AbstractSessionTests {
 
   void createCourseEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("courseNo").setGeneratedValue(STRING_NOT_GENERATED))
+      .addField(new IDField("courseNo").setDefaultValue(UUID))
       .addField(new StringField("courseName"))
     );
   }
 
   void createTeacherEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setGeneratedValue(BIGINT_NOT_GENERATED))
+      .addField(new IDField("id").setDefaultValue(AUTO_INCREMENT))
       .addField(new StringField("teacherName"))
       .addField(new StringField("subject"))
     );
@@ -380,7 +381,7 @@ public abstract class AbstractSessionTests {
   void createTeacherCollection2(String entityName) {
     session.createEntity(entityName, entity -> entity
       // 主键
-      .addField(new IDField("id").setGeneratedValue(IDField.GeneratedValue.AUTO_INCREMENT).setComment("Primary Key"))
+      .addField(new IDField("id").setDefaultValue(GeneratedValue.AUTO_INCREMENT).setComment("Primary Key"))
       // 姓名
       .addField(new StringField("name").setComment("姓名").setNullable(false).setLength(10))
       // 年龄
@@ -795,7 +796,7 @@ public abstract class AbstractSessionTests {
   void createStudentCollection2(String entityName) {
     Entity entity = session.createEntity(
       entityName, e -> e.setComment("学生")
-        .addField(new IDField("id").setGeneratedValue(IDField.GeneratedValue.AUTO_INCREMENT).setComment("Primary Key"))
+        .addField(new IDField("id").setDefaultValue(GeneratedValue.AUTO_INCREMENT).setComment("Primary Key"))
     );
     // string
     StringField name = new StringField("name");
