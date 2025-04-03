@@ -9,8 +9,7 @@
           "type": "ID",
           "unique": false,
           "nullable": true,
-          "modelName": "Datasource",
-          "generatedValue": "STRING_NOT_GENERATED"
+          "modelName": "Datasource"
         },
         {
           "name": "type",
@@ -63,7 +62,7 @@
           "unique": true,
           "nullable": true,
           "modelName": "ApiInfo",
-          "generatedValue": "ULID"
+          "defaultValue": { "name": "ulid" }
         },
         {
           "name": "name",
@@ -140,7 +139,7 @@
           "unique": false,
           "nullable": true,
           "modelName": "ApiLog",
-          "generatedValue": "ULID"
+          "defaultValue": { "name": "ulid" }
         },
         {
           "name": "level",
@@ -195,8 +194,7 @@
           "type": "ID",
           "unique": false,
           "nullable": true,
-          "modelName": "Datasource",
-          "generatedValue": "STRING_NOT_GENERATED"
+          "modelName": "Datasource"
         },
         {
           "name": "createdAt",
@@ -389,8 +387,7 @@
           "type": "ID",
           "modelName": "Course",
           "unique": false,
-          "nullable": true,
-          "generatedValue": "STRING_NOT_GENERATED"
+          "nullable": true
         },
         {
           "name": "courseName",

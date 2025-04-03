@@ -23,7 +23,7 @@ public class IDField extends TypedField<Serializable, IDField> {
 
   public String getBaseType(){
     if(getDefaultValue() instanceof GeneratedValue generatedValue) {
-      if(generatedValue == AUTO_INCREMENT) {
+      if(generatedValue.equals(AUTO_INCREMENT)) {
         return ScalarType.LONG.getType();
       } else {
         return ScalarType.STRING.getType();

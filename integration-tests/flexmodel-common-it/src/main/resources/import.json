@@ -9,8 +9,7 @@
           "type": "ID",
           "unique": false,
           "nullable": true,
-          "modelName": "Datasource",
-          "generatedValue": "STRING_NOT_GENERATED"
+          "modelName": "Datasource"
         },
         {
           "name": "type",
@@ -54,7 +53,7 @@
           "unique": false,
           "nullable": true,
           "modelName": "ApiInfo",
-          "generatedValue": "ULID"
+          "defaultValue": { "name": "ulid" }
         },
         {
           "name": "name",
@@ -155,7 +154,7 @@
           "unique": false,
           "nullable": true,
           "modelName": "ApiLog",
-          "generatedValue": "ULID"
+          "defaultValue": { "name": "ulid" }
         },
         {
           "name": "level",
@@ -248,8 +247,7 @@
           "type": "ID",
           "unique": false,
           "nullable": true,
-          "modelName": "Datasource",
-          "generatedValue": "STRING_NOT_GENERATED"
+          "modelName": "Datasource"
         },
         {
           "name": "updatedAt",

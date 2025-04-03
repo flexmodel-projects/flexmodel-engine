@@ -11,8 +11,9 @@
           "comment": null,
           "unique": false,
           "nullable": false,
-          "defaultValue": null,
-          "generatedValue": "BIGINT_NOT_GENERATED"
+          "defaultValue": {
+            "name": "autoIncrement"
+          }
         },
         {
           "type": "Long",
@@ -153,7 +154,9 @@
           "unique": false,
           "nullable": true,
           "modelName": "Datasource",
-          "generatedValue": "STRING_NOT_GENERATED"
+          "defaultValue": {
+            "name": "uuid"
+          }
         },
         {
           "name": "type",
@@ -206,7 +209,9 @@
           "unique": false,
           "nullable": true,
           "modelName": "fs_api_log",
-          "generatedValue": "ULID"
+          "defaultValue": {
+            "name": "ulid"
+          }
         },
         {
           "name": "level",
@@ -263,7 +268,9 @@
           "modelName": "Student",
           "unique": false,
           "nullable": true,
-          "generatedValue": "BIGINT_NOT_GENERATED"
+          "defaultValue": {
+            "name": "autoIncrement"
+          }
         },
         {
           "name": "studentName",
@@ -330,7 +337,9 @@
           "modelName": "StudentDetail",
           "unique": false,
           "nullable": true,
-          "generatedValue": "AUTO_INCREMENT"
+          "defaultValue": {
+            "name": "autoIncrement"
+          }
         },
         {
           "name": "studentId",

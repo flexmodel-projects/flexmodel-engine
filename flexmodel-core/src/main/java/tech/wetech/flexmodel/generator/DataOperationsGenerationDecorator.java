@@ -6,10 +6,7 @@ import tech.wetech.flexmodel.reflect.ReflectionUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -62,7 +59,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
 
   private Object generateValue(TimeField field, Object value, boolean isUpdate) {
     if (field.getDefaultValue() != null && value == null) {
-      if (field.getDefaultValue() == GeneratedValue.NOW && !isUpdate) {
+      if (field.getDefaultValue().equals(GeneratedValue.NOW) && !isUpdate) {
         return LocalTime.now();
       }
     }
@@ -71,9 +68,9 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
 
   private Object generateValue(IDField idField, Object value, boolean isUpdate) {
     if (!isUpdate && value == null) {
-      if (idField.getDefaultValue() == GeneratedValue.ULID) {
+      if (Objects.equals(idField.getDefaultValue(), GeneratedValue.ULID)) {
         return ULID.random().toString();
-      } else if (idField.getDefaultValue() == GeneratedValue.UUID) {
+      } else if (Objects.equals(idField.getDefaultValue(), GeneratedValue.UUID)) {
         return UUID.randomUUID().toString();
       }
     }
@@ -82,7 +79,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
 
   private Object generateValue(DateTimeField field, Object value, boolean isUpdate) {
     if (field.getDefaultValue() != null && value == null) {
-      if (field.getDefaultValue() == GeneratedValue.NOW && !isUpdate) {
+      if (field.getDefaultValue().equals(GeneratedValue.NOW) && !isUpdate) {
         return LocalDateTime.now();
       }
     }
@@ -91,7 +88,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
 
   private Object generateValue(DateField field, Object value, boolean isUpdate) {
     if (field.getDefaultValue() != null && value == null) {
-      if (field.getDefaultValue() == GeneratedValue.NOW && !isUpdate) {
+      if (field.getDefaultValue().equals(GeneratedValue.NOW) && !isUpdate) {
         return LocalDate.now();
       }
     }

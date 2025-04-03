@@ -7,6 +7,7 @@ import tech.wetech.flexmodel.*;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -253,7 +254,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
       idColumn.setPrimaryKey(true);
       idColumn.setUnique(true);
       idColumn.setSqlTypeCode(sqlContext.getTypeHandler(idField.getBaseType()).getJdbcTypeCode());
-      idColumn.setAutoIncrement(idField.getDefaultValue() == GeneratedValue.AUTO_INCREMENT);
+      idColumn.setAutoIncrement(Objects.equals(idField.getDefaultValue(), GeneratedValue.AUTO_INCREMENT));
       idColumn.setComment(field.getComment());
       return idColumn;
     } else {
@@ -270,29 +271,29 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
       switch (field) {
         case StringField stringField -> {
           aSqlColumn.setLength(stringField.getLength());
-          if (field.getDefaultValue() != null) {
+          if (field.getDefaultValue() != null && !(field.getDefaultValue() instanceof GeneratedValue)) {
             aSqlColumn.setDefaultValue(field.getDefaultValue().toString());
           }
         }
         case FloatField decimalField -> {
           aSqlColumn.setPrecision(decimalField.getPrecision());
           aSqlColumn.setScale(decimalField.getScale());
-          if (field.getDefaultValue() != null) {
+          if (field.getDefaultValue() != null && !(field.getDefaultValue() instanceof GeneratedValue)) {
             aSqlColumn.setDefaultValue(field.getDefaultValue().toString());
           }
         }
         case JSONField jsonField -> {
-          if (field.getDefaultValue() != null) {
+          if (field.getDefaultValue() != null && !(field.getDefaultValue() instanceof GeneratedValue)) {
             aSqlColumn.setDefaultValue(sqlContext.getJsonObjectConverter().toJsonString(jsonField.getDefaultValue()));
           }
         }
         case BooleanField booleanField -> {
-          if (field.getDefaultValue() != null) {
+          if (field.getDefaultValue() != null && !(field.getDefaultValue() instanceof GeneratedValue)) {
             aSqlColumn.setDefaultValue(sqlContext.getSqlDialect().toBooleanValueString((Boolean) booleanField.getDefaultValue()));
           }
         }
         default -> {
-          if (field.getDefaultValue() != null) {
+          if (field.getDefaultValue() != null && !(field.getDefaultValue() instanceof GeneratedValue)) {
             aSqlColumn.setDefaultValue(field.getDefaultValue().toString());
           }
         }

@@ -8,8 +8,7 @@
         "type": "ID",
         "unique": false,
         "nullable": true,
-        "modelName": "fs_datasource",
-        "generatedValue": "STRING_NOT_GENERATED"
+        "modelName": "fs_datasource"
       },
       {
         "name": "type",
@@ -33,7 +32,7 @@
         "unique": false,
         "nullable": true,
         "modelName": "fs_datasource",
-        "generatedValue": "NOW_ON_CREATE"
+        "defaultValue": { "name": "now" }
       },
       {
         "name": "updatedAt",
@@ -41,7 +40,7 @@
         "unique": false,
         "nullable": true,
         "modelName": "fs_datasource",
-        "generatedValue": "NOW_ON_CREATE_AND_UPDATE"
+        "defaultValue": { "name": "now" }
       },
       {
         "name": "enabled",
@@ -65,7 +64,7 @@
         "unique": true,
         "nullable": true,
         "modelName": "fs_api_definition",
-        "generatedValue": "ULID"
+        "defaultValue": { "name": "ulid" }
       },
       {
         "name": "name",
@@ -115,7 +114,7 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_api_definition",
-        "generatedValue": "NOW_ON_CREATE"
+        "defaultValue": { "name": "now" }
       },
       {
         "name": "updatedAt",
@@ -123,7 +122,7 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_api_definition",
-        "generatedValue": "NOW_ON_CREATE_AND_UPDATE"
+        "defaultValue": { "name": "now" }
       },
       {
         "name": "meta",
@@ -154,7 +153,7 @@
         "unique": false,
         "nullable": true,
         "modelName": "fs_api_log",
-        "generatedValue": "ULID"
+        "defaultValue": { "name": "ulid" }
       },
       {
         "name": "level",
@@ -186,7 +185,7 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_api_log",
-        "generatedValue": "NOW_ON_CREATE"
+        "defaultValue": { "name": "now" }
       }
     ],
     "indexes": [
@@ -212,8 +211,7 @@
         "type": "ID",
         "unique": false,
         "nullable": true,
-        "modelName": "fs_datasource",
-        "generatedValue": "STRING_NOT_GENERATED"
+        "modelName": "fs_datasource"
       },
       {
         "name": "createdAt",
@@ -221,7 +219,7 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_identity_provider",
-        "generatedValue": "NOW_ON_CREATE"
+        "defaultValue": { "name": "now" }
       },
       {
         "name": "provider",
@@ -236,7 +234,7 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_identity_provider",
-        "generatedValue": "NOW_ON_CREATE_AND_UPDATE"
+        "defaultValue": { "name": "now" }
       }
     ],
     "indexes": []
@@ -252,7 +250,7 @@
         "unique": true,
         "nullable": true,
         "modelName": "fs_config",
-        "generatedValue": "ULID"
+        "defaultValue": { "name": "ulid" }
       },
       {
         "name": "key",
@@ -276,7 +274,7 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_api_definition",
-        "generatedValue": "NOW_ON_CREATE"
+        "defaultValue": { "name": "now" }
       },
       {
         "name": "updatedAt",
@@ -284,7 +282,7 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_config",
-        "generatedValue": "NOW_ON_CREATE_AND_UPDATE"
+        "defaultValue": { "name": "now" }
       }
     ],
     "indexes": [
@@ -525,8 +523,7 @@
         "type": "ID",
         "modelName": "Course",
         "unique": false,
-        "nullable": true,
-        "generatedValue": "STRING_NOT_GENERATED"
+        "nullable": true
       },
       {
         "name": "courseName",

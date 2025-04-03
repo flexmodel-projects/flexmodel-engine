@@ -485,7 +485,7 @@ public abstract class AbstractSessionTests {
       """;
     List<Map<String, Object>> list = jsonObjectConverter.parseToMapList(mockData);
     session.createEntity(teacherCourseEntity, sScore -> sScore
-      .addField(new IDField("id"))
+      .addField(new IDField("id").setDefaultValue(GeneratedValue.AUTO_INCREMENT))
       .addField(new StringField("c_name"))
       .addField(new FloatField("c_score"))
       .addField(new LongField("teacher_id"))
@@ -1032,7 +1032,8 @@ public abstract class AbstractSessionTests {
         Assertions.assertNotNull(studentDetail.getStudent());
       }
     }
-    System.out.println(new JacksonObjectConverter().toJsonString(classesList));
+    // fixme 需要增加死循环检测
+//    System.out.println(new JacksonObjectConverter().toJsonString(classesList));
   }
 
 }

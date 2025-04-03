@@ -1,11 +1,19 @@
 package tech.wetech.flexmodel;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 /**
  * @author cjbi
  */
-public class GeneratedValue {
+public class GeneratedValue implements Serializable {
 
   private String name;
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name);
+  }
 
   @Override
   public boolean equals(Object obj) {
