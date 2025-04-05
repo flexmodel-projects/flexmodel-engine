@@ -41,7 +41,7 @@ public class LazyObjProxy {
 
       return (T) sessionContext.getJsonObjectConverter().convertValue(obj, subClazz);
     } catch (Throwable e) {
-      log.warn("Failed to create lazy class, message: {}", e.toString());
+      log.trace("Failed to create lazy class, message: {}", e.toString());
       return obj;
 //      throw new RuntimeException("Failed to create lazy user proxy", e);
     }
