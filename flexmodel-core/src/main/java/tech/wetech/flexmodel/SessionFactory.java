@@ -120,7 +120,7 @@ public class SessionFactory {
     Map<String, SchemaObject> wrapperMap = session.getAllModels().stream().collect(Collectors.toMap(SchemaObject::getName, m -> m));
     for (SchemaObject model : models) {
       SchemaObject older = wrapperMap.get(model.getName());
-      if (Objects.equals(jsonObjectConverter.toJsonString(older), jsonObjectConverter.toJsonString(model))) {
+      if (Objects.equals(older.getSdl(), model.getSdl())) {
         continue;
       }
       if (model instanceof Entity newer) {
