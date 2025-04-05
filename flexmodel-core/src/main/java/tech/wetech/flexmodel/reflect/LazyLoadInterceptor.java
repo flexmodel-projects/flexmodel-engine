@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.dsl.Expressions;
+import tech.wetech.flexmodel.mapping.TypeHandler;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -33,6 +34,25 @@ public class LazyLoadInterceptor {
     this.sessionContext = sessionContext;
   }
 
+  /**
+   * sqlite 不支持类型自动转换，类型不一致会导致查不到数据，所以这里进行类型转换
+   * @param modelName
+   * @param fieldName
+   * @param value
+   * @return
+   */
+  private Object castValueType(String modelName, String fieldName, Object value) {
+    Entity entity = (Entity) sessionContext.getModel(modelName);
+    TypedField<?, ?> field = entity.getField(fieldName);
+    if (field != null) {
+      TypeHandler<?> typeHandler = sessionContext.getTypeHandlerMap().get(field instanceof IDField idField ? idField.getBaseType() : field.getType());
+      if (typeHandler != null) {
+        return typeHandler.convertParameter(field, value);
+      }
+    }
+    return value;
+  }
+
   @RuntimeType
   public Object intercept(@This Object proxy, @Origin Class<?> clazz, @Origin Method method, @SuperCall Callable<?> superCall) throws Throwable {
     try {
@@ -51,6 +71,7 @@ public class LazyLoadInterceptor {
             try (Session session = sessionContext.getFactory().createSession(sessionContext.getSchemaName())) {
               ParameterizedType returnType = (ParameterizedType) method.getGenericReturnType();
               Class<?> returnGenericType = (Class<?>) returnType.getActualTypeArguments()[0];
+              localValue = castValueType(relationField.getFrom(), relationField.getForeignField(), localValue);
               List<?> list = session.find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(localValue), returnGenericType);
               invokeSetter(proxy, list, clazz, fieldName, method.getReturnType());
               return list;
@@ -60,6 +81,7 @@ public class LazyLoadInterceptor {
               return null;
             }
             try (Session session = sessionContext.getFactory().createSession(sessionContext.getSchemaName())) {
+              localValue = castValueType(relationField.getFrom(), relationField.getForeignField(), localValue);
               List<?> list = session.find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(localValue), method.getReturnType());
               if (list.isEmpty()) {
                 return null;
@@ -86,7 +108,6 @@ public class LazyLoadInterceptor {
       e.printStackTrace();
     }
   }
-
 
 
 }

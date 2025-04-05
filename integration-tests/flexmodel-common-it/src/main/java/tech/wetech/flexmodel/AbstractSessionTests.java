@@ -46,7 +46,7 @@ public abstract class AbstractSessionTests {
 
   void createClassesEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setDefaultValue(AUTO_INCREMENT))
+      .addField(new IDField("id").setDefaultValue(UUID))
       .addField(new StringField("classCode"))
       .addField(new StringField("className"))
     );
@@ -67,20 +67,20 @@ public abstract class AbstractSessionTests {
         .setComment("兴趣")
     );
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setDefaultValue(AUTO_INCREMENT))
+      .addField(new IDField("id"))
       .addField(new StringField("studentName"))
       .addField(new EnumField("gender").setFrom(genderEnum.getName()))
       .addField(new EnumField("interest").setFrom(interestEnum.getName()).setMultiple(true))
       .addField(new IntField("age"))
       .addField(new FloatField("height").setPrecision(3).setScale(2))
-      .addField(new LongField("classId"))
+      .addField(new StringField("classId"))
     );
   }
 
   void createStudentDetailEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
       .addField(new IDField("id").setDefaultValue(AUTO_INCREMENT))
-      .addField(new LongField("studentId"))
+      .addField(new StringField("studentId"))
       .addField(new StringField("description"))
     );
   }
@@ -94,7 +94,7 @@ public abstract class AbstractSessionTests {
 
   void createTeacherEntity(String entityName) {
     session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setDefaultValue(AUTO_INCREMENT))
+      .addField(new IDField("id").setDefaultValue(UUID))
       .addField(new StringField("teacherName"))
       .addField(new StringField("subject"))
     );
@@ -342,7 +342,7 @@ public abstract class AbstractSessionTests {
       .withJoin(joins -> joins
         .addLeftJoin(join -> join.setFrom(studentDetailEntityName))
       )
-      .withFilter(Expressions.field(studentEntityName + ".id").eq(1))
+      .withFilter(Expressions.field(studentEntityName + ".id").eq("1"))
     ).getFirst();
     Assertions.assertEquals("张三", oneToOne.get("studentName"));
     Assertions.assertEquals("张三的描述", oneToOne.get("description"));
@@ -358,7 +358,7 @@ public abstract class AbstractSessionTests {
           .setFrom(studentEntityName)
         )
       )
-      .withFilter(Expressions.field(classesEntityName + ".id").eq(1))
+      .withFilter(Expressions.field(classesEntityName + ".id").eq("1"))
     );
     Assertions.assertFalse(oneToMany.isEmpty());
     Assertions.assertEquals("一年级1班", oneToMany.getFirst().get("className"));

@@ -99,7 +99,6 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
   @SuppressWarnings("all")
   public int insert(String modelName, Object obj, Consumer<Object> idConsumer) {
     Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), obj, Map.class);
-    ;
     String schemaName = sessionContext.getSchemaName();
     MappedModels mappedModels = sessionContext.getMappedModels();
     AtomicReference<Object> atomicId = new AtomicReference<>();
