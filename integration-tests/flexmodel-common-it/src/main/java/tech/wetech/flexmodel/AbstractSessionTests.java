@@ -136,17 +136,17 @@ public abstract class AbstractSessionTests {
     String mockData = """
         [
           {
-            "id": 1,
+            "id": "1",
             "className": "一年级1班",
             "classCode": "C_001"
           },
           {
-            "id": 2,
+            "id": "2",
             "className": "一年级2班",
             "classCode": "C_002"
           },
           {
-            "id": 3,
+            "id": "3",
             "className": "二年级1班",
             "classCode": "C_003"
           }

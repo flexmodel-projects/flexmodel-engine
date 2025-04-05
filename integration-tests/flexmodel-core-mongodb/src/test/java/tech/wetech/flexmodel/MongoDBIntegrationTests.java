@@ -48,12 +48,12 @@ public class MongoDBIntegrationTests extends AbstractSessionTests {
       """
         {
             "find": "TestNativeQueryClasses",
-            "filter": { "id": ${id}, "className": "${className}"},
+            "filter": { "id": "${id}", "className": "${className}"},
             "sort": {"id": -1},
             "limit": 10
         }
         """,
-      Map.of("id", 3,
+      Map.of("id", "3",
         "className", "二年级1班"), Map.class);
     Assertions.assertFalse(list.isEmpty());
   }
@@ -67,12 +67,12 @@ public class MongoDBIntegrationTests extends AbstractSessionTests {
       """
         {
             "find": "TestNativeQueryModelClasses",
-            "filter": { "id": ${id}, "className": "${className}"},
+            "filter": { "id": "${id}", "className": "${className}"},
             "sort": {"id": -1},
             "limit": 10
         }
         """,
-      Map.of("id", 3,
+      Map.of("id", "3",
         "className", "二年级1班"), Map.class);
     Assertions.assertFalse(list.isEmpty());
   }
