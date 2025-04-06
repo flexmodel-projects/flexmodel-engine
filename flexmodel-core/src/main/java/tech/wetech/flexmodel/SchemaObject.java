@@ -24,7 +24,7 @@ public interface SchemaObject extends Serializable {
    */
   String getType();
 
-  default String getSdl() {
+  default String getIdl() {
     ModelParser.ASTNode astNode = ASTNodeConverter.fromSchemaObject(this);
     if (astNode == null) {
       return null;

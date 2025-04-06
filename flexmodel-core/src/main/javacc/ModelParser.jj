@@ -120,7 +120,6 @@ public class ModelParser {
             return sb.toString();
         }
 
-        // 辅助方法，将 List 转换为 sdl 数组字面量表示
         private String listToString(List<?> list) {
             StringBuilder sb = new StringBuilder();
             sb.append("[");
@@ -142,7 +141,6 @@ public class ModelParser {
             return sb.toString();
         }
 
-        // 辅助方法，将 Map 转换为 sdl 内联注解表示
         private String mapToString(Map<?, ?> map) {
           StringBuilder sb = new StringBuilder();
           boolean first = true;

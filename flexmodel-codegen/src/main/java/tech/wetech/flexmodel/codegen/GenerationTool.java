@@ -68,7 +68,7 @@ public class GenerationTool {
             System.out.println("Parse file error: " + importScript);
             throw new RuntimeException(e);
           }
-        } else if (importScript.endsWith(".sdl")) {
+        } else if (importScript.endsWith(".idl")) {
           try {
             String content = Files.readString(scriptFile.toPath());
             ModelParser modelParser = new ModelParser(new ByteArrayInputStream(content.getBytes()));
@@ -81,7 +81,7 @@ public class GenerationTool {
             throw new RuntimeException(e);
           }
         } else {
-          System.out.println("Unsupported script file type: " + importScript);
+          System.out.println("Unsupported script file type: " + importScript+", must be .json or .idl");
         }
       }
     }

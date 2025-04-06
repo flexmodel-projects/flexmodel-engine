@@ -70,8 +70,8 @@ public class SessionFactory {
     }
   }
 
-  public void loadSDLString(String schemaName, String sdlString) throws ParseException {
-    ModelParser parser = new ModelParser(new StringReader(sdlString));
+  public void loadIDLString(String schemaName, String idlString) throws ParseException {
+    ModelParser parser = new ModelParser(new StringReader(idlString));
     List<ModelParser.ASTNode> ast = parser.CompilationUnit();
     List<SchemaObject> schema = new ArrayList<>();
     for (ModelParser.ASTNode obj : ast) {
@@ -94,16 +94,16 @@ public class SessionFactory {
     try (InputStream is = classLoader.getResourceAsStream(scriptName)) {
       if (is == null) {
         log.warn("Script file not found: {}", scriptName);
-        return;
+        throw new RuntimeException("Script file not found: " + scriptName);
       }
       String scriptString = new String(is.readAllBytes());
       if (scriptName.endsWith(".json")) {
         loadJSONString(schemaName, scriptString);
-      } else if (scriptName.endsWith(".sdl")) {
-        loadSDLString(schemaName, scriptString);
+      } else if (scriptName.endsWith(".idl")) {
+        loadIDLString(schemaName, scriptString);
       } else {
         // unsupported script type
-        log.warn("Unsupported script type: {}", scriptName);
+        log.warn("Unsupported script type: {}, must be .json or .idl", scriptName);
       }
     } catch (IOException e) {
       log.error("Failed to read import script: {}", e.getMessage(), e);
@@ -120,7 +120,7 @@ public class SessionFactory {
     Map<String, SchemaObject> wrapperMap = session.getAllModels().stream().collect(Collectors.toMap(SchemaObject::getName, m -> m));
     for (SchemaObject model : models) {
       SchemaObject older = wrapperMap.get(model.getName());
-      if (older != null && Objects.equals(older.getSdl(), model.getSdl())) {
+      if (older != null && Objects.equals(older.getIdl(), model.getIdl())) {
         continue;
       }
       if (model instanceof Entity newer) {

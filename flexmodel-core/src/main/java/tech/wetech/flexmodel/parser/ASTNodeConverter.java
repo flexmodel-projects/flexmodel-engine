@@ -16,8 +16,8 @@ public class ASTNodeConverter {
 
   public static SchemaObject toSchemaObject(ModelParser.ASTNode astNode) {
     switch (astNode) {
-      case ModelParser.Model sdlModel -> {
-        return toSchemaEntity(sdlModel);
+      case ModelParser.Model idlModel -> {
+        return toSchemaEntity(idlModel);
       }
       case ModelParser.Enumeration enumeration -> {
         return toSchemaEnum(enumeration);
@@ -29,13 +29,13 @@ public class ASTNodeConverter {
   }
 
   @SuppressWarnings("unchecked")
-  public static Entity toSchemaEntity(ModelParser.Model sdlModel) {
-    Entity entity = new Entity(sdlModel.name);
-    for (ModelParser.Field field : sdlModel.fields) {
+  public static Entity toSchemaEntity(ModelParser.Model idlModel) {
+    Entity entity = new Entity(idlModel.name);
+    for (ModelParser.Field field : idlModel.fields) {
       entity.addField(toSchemaField(field));
     }
     // 处理模型级别的注解
-    for (ModelParser.Annotation mAnno : sdlModel.annotations) {
+    for (ModelParser.Annotation mAnno : idlModel.annotations) {
       if (mAnno.name.equals("comment")) {
         entity.setComment((String) mAnno.parameters.get("value"));
       }
@@ -66,11 +66,11 @@ public class ASTNodeConverter {
     return entity;
   }
 
-  public static TypedField<?, ?> toSchemaField(ModelParser.Field sdlField) {
-    TypedField<?, ?> field = switch (sdlField.type) {
+  public static TypedField<?, ?> toSchemaField(ModelParser.Field idlField) {
+    TypedField<?, ?> field = switch (idlField.type) {
       case ScalarType.ID_TYPE -> {
-        field = new IDField(sdlField.name);
-        for (ModelParser.Annotation annotation : sdlField.annotations) {
+        field = new IDField(idlField.name);
+        for (ModelParser.Annotation annotation : idlField.annotations) {
           switch (annotation.name) {
             case "default" -> {
               Object value = annotation.parameters.get("value");
@@ -86,9 +86,9 @@ public class ASTNodeConverter {
         yield field;
       }
       case ScalarType.STRING_TYPE -> {
-        field = new StringField(sdlField.name);
-        field.setNullable(sdlField.optional);
-        for (ModelParser.Annotation annotation : sdlField.annotations) {
+        field = new StringField(idlField.name);
+        field.setNullable(idlField.optional);
+        for (ModelParser.Annotation annotation : idlField.annotations) {
           if (annotation.name.equals("length")) {
             ((StringField) field).setLength(Integer.parseInt((String) annotation.parameters.get("value")));
           } else if (annotation.name.equals("default")) {
@@ -99,8 +99,8 @@ public class ASTNodeConverter {
         yield field;
       }
       case ScalarType.FLOAT_TYPE -> {
-        field = new FloatField(sdlField.name);
-        for (ModelParser.Annotation annotation : sdlField.annotations) {
+        field = new FloatField(idlField.name);
+        for (ModelParser.Annotation annotation : idlField.annotations) {
           switch (annotation.name) {
             case "precision" ->
               ((FloatField) field).setPrecision(Integer.parseInt((String) annotation.parameters.get("value")));
@@ -113,8 +113,8 @@ public class ASTNodeConverter {
         yield field;
       }
       case ScalarType.INT_TYPE -> {
-        field = new IntField(sdlField.name);
-        for (ModelParser.Annotation annotation : sdlField.annotations) {
+        field = new IntField(idlField.name);
+        for (ModelParser.Annotation annotation : idlField.annotations) {
           if (annotation.name.equals("default")) {
             ((IntField) field).setDefaultValue(Integer.valueOf((String) annotation.parameters.get("value")));
           }
@@ -122,8 +122,8 @@ public class ASTNodeConverter {
         yield field;
       }
       case ScalarType.LONG_TYPE -> {
-        field = new LongField(sdlField.name);
-        for (ModelParser.Annotation annotation : sdlField.annotations) {
+        field = new LongField(idlField.name);
+        for (ModelParser.Annotation annotation : idlField.annotations) {
           if (annotation.name.equals("default")) {
             ((LongField) field).setDefaultValue(Long.valueOf((String) annotation.parameters.get("value")));
           }
@@ -131,8 +131,8 @@ public class ASTNodeConverter {
         yield field;
       }
       case ScalarType.BOOLEAN_TYPE -> {
-        field = new BooleanField(sdlField.name);
-        for (ModelParser.Annotation annotation : sdlField.annotations) {
+        field = new BooleanField(idlField.name);
+        for (ModelParser.Annotation annotation : idlField.annotations) {
           if (annotation.name.equals("default")) {
             ((BooleanField) field).setDefaultValue(Boolean.valueOf((String) annotation.parameters.get("value")));
           }
@@ -140,8 +140,8 @@ public class ASTNodeConverter {
         yield field;
       }
       case ScalarType.DATETIME_TYPE -> {
-        field = new DateTimeField(sdlField.name);
-        for (ModelParser.Annotation annotation : sdlField.annotations) {
+        field = new DateTimeField(idlField.name);
+        for (ModelParser.Annotation annotation : idlField.annotations) {
           if (annotation.name.equals("default")) {
             Object value = annotation.parameters.get("value");
             if (value instanceof ModelParser.FunctionCall func) {
@@ -154,8 +154,8 @@ public class ASTNodeConverter {
         yield field;
       }
       case ScalarType.DATE_TYPE -> {
-        field = new DateField(sdlField.name);
-        for (ModelParser.Annotation annotation : sdlField.annotations) {
+        field = new DateField(idlField.name);
+        for (ModelParser.Annotation annotation : idlField.annotations) {
           if (annotation.name.equals("default")) {
             Object value = annotation.parameters.get("value");
             if (value instanceof ModelParser.FunctionCall func) {
@@ -168,8 +168,8 @@ public class ASTNodeConverter {
         yield field;
       }
       case ScalarType.TIME_TYPE -> {
-        field = new TimeField(sdlField.name);
-        for (ModelParser.Annotation annotation : sdlField.annotations) {
+        field = new TimeField(idlField.name);
+        for (ModelParser.Annotation annotation : idlField.annotations) {
           if (annotation.name.equals("default")) {
             Object value = annotation.parameters.get("value");
             if (value instanceof ModelParser.FunctionCall func) {
@@ -182,8 +182,8 @@ public class ASTNodeConverter {
         yield field;
       }
       case ScalarType.JSON_TYPE -> {
-        field = new JSONField(sdlField.name);
-        for (ModelParser.Annotation annotation : sdlField.annotations) {
+        field = new JSONField(idlField.name);
+        for (ModelParser.Annotation annotation : idlField.annotations) {
           if (annotation.name.equals("default")) {
             ((JSONField) field).setDefaultValue((String) annotation.parameters.get("value"));
           }
@@ -191,14 +191,14 @@ public class ASTNodeConverter {
         yield field;
       }
       default -> {
-        ModelParser.Annotation relationAnno = sdlField.annotations.stream()
+        ModelParser.Annotation relationAnno = idlField.annotations.stream()
           .filter(f -> f.name.equals("relation")).findFirst()
           .orElse(null);
         boolean isRelationField = relationAnno != null;
-        String from = sdlField.type.replace("[]", "");
-        boolean multiple = sdlField.type.endsWith("[]");
+        String from = idlField.type.replace("[]", "");
+        boolean multiple = idlField.type.endsWith("[]");
         if (isRelationField) {
-          RelationField relationField = new RelationField(sdlField.name);
+          RelationField relationField = new RelationField(idlField.name);
           relationField.setMultiple(multiple);
           relationField.setFrom(from);
           relationField.setLocalField((String) relationAnno.parameters.get("localField"));
@@ -206,7 +206,7 @@ public class ASTNodeConverter {
           relationField.setCascadeDelete(Boolean.parseBoolean(Objects.toString(relationAnno.parameters.get("cascadeDelete"))));
           field = relationField;
         } else {
-          field = new EnumField(sdlField.name);
+          field = new EnumField(idlField.name);
           ((EnumField) field).setFrom(from);
           ((EnumField) field).setMultiple(multiple);
         }
@@ -214,8 +214,8 @@ public class ASTNodeConverter {
       }
     };
     // 处理公共属性
-    field.setNullable(sdlField.optional);
-    for (ModelParser.Annotation annotation : sdlField.annotations) {
+    field.setNullable(idlField.optional);
+    for (ModelParser.Annotation annotation : idlField.annotations) {
       switch (annotation.name) {
         case "comment" -> field.setComment((String) annotation.parameters.get("value"));
         case "unique" -> field.setUnique(true);
@@ -225,9 +225,9 @@ public class ASTNodeConverter {
     return field;
   }
 
-  public static Enum toSchemaEnum(ModelParser.Enumeration sdlEnum) {
-    Enum anEnum = new Enum(sdlEnum.name);
-    anEnum.setElements(sdlEnum.elements);
+  public static Enum toSchemaEnum(ModelParser.Enumeration idlEnum) {
+    Enum anEnum = new Enum(idlEnum.name);
+    anEnum.setElements(idlEnum.elements);
     return anEnum;
   }
 
@@ -281,17 +281,17 @@ public class ASTNodeConverter {
   }
 
   public static ModelParser.Field fromSchemaField(TypedField<?, ?> field) {
-    ModelParser.Field sdlField = new ModelParser.Field(field.getName(), field.isNullable(), getCorrespondingType(field));
+    ModelParser.Field idlField = new ModelParser.Field(field.getName(), field.isNullable(), getCorrespondingType(field));
 
     // 处理字段注解
     if (field.getComment() != null) {
       ModelParser.Annotation commentAnno = new ModelParser.Annotation("comment");
       commentAnno.parameters.put("value", field.getComment());
-      sdlField.annotations.add(commentAnno);
+      idlField.annotations.add(commentAnno);
     }
 
     if (field.isUnique()) {
-      sdlField.annotations.add(new ModelParser.Annotation("unique"));
+      idlField.annotations.add(new ModelParser.Annotation("unique"));
     }
 
     // 类型特定处理
@@ -301,7 +301,7 @@ public class ASTNodeConverter {
           if (idField.getDefaultValue() instanceof GeneratedValue generatedValue) {
             ModelParser.Annotation anno = new ModelParser.Annotation("default");
             anno.parameters.put("value", new ModelParser.FunctionCall(generatedValue.getName()));
-            sdlField.annotations.add(anno);
+            idlField.annotations.add(anno);
           }
         }
       }
@@ -309,28 +309,28 @@ public class ASTNodeConverter {
         if (stringField.getLength() > 0) {
           ModelParser.Annotation anno = new ModelParser.Annotation("length");
           anno.parameters.put("value", String.valueOf(stringField.getLength()));
-          sdlField.annotations.add(anno);
+          idlField.annotations.add(anno);
         }
-        addDefaultAnnotation(sdlField, stringField.getDefaultValue());
+        addDefaultAnnotation(idlField, stringField.getDefaultValue());
       }
       case FloatField floatField -> {
-        addNumericAnnotations(sdlField, floatField.getPrecision(), floatField.getScale());
-        addDefaultAnnotation(sdlField, floatField.getDefaultValue());
+        addNumericAnnotations(idlField, floatField.getPrecision(), floatField.getScale());
+        addDefaultAnnotation(idlField, floatField.getDefaultValue());
       }
-      case IntField intField -> addDefaultAnnotation(sdlField, intField.getDefaultValue());
-      case LongField longField -> addDefaultAnnotation(sdlField, longField.getDefaultValue());
-      case BooleanField booleanField -> addDefaultAnnotation(sdlField, booleanField.getDefaultValue());
-      case DateTimeField dateTimeField -> addDefaultAnnotation(sdlField, dateTimeField.getDefaultValue());
-      case DateField dateField -> addDefaultAnnotation(sdlField, dateField.getDefaultValue());
-      case TimeField timeField -> addDefaultAnnotation(sdlField, timeField.getDefaultValue());
-      case JSONField jsonField -> addDefaultAnnotation(sdlField, jsonField.getDefaultValue());
+      case IntField intField -> addDefaultAnnotation(idlField, intField.getDefaultValue());
+      case LongField longField -> addDefaultAnnotation(idlField, longField.getDefaultValue());
+      case BooleanField booleanField -> addDefaultAnnotation(idlField, booleanField.getDefaultValue());
+      case DateTimeField dateTimeField -> addDefaultAnnotation(idlField, dateTimeField.getDefaultValue());
+      case DateField dateField -> addDefaultAnnotation(idlField, dateField.getDefaultValue());
+      case TimeField timeField -> addDefaultAnnotation(idlField, timeField.getDefaultValue());
+      case JSONField jsonField -> addDefaultAnnotation(idlField, jsonField.getDefaultValue());
       case RelationField relationField -> {
         ModelParser.Annotation relationAnno = new ModelParser.Annotation("relation");
         relationAnno.parameters.put("localField", relationField.getLocalField());
         relationAnno.parameters.put("foreignField", relationField.getForeignField());
         relationAnno.parameters.put("cascadeDelete",
           String.valueOf(relationField.isCascadeDelete()));
-        sdlField.annotations.add(relationAnno);
+        idlField.annotations.add(relationAnno);
       }
       case EnumField enumField -> {
         // todo
@@ -344,10 +344,10 @@ public class ASTNodeConverter {
     if (!field.getAdditionalProperties().isEmpty()) {
       ModelParser.Annotation additionalAnno = new ModelParser.Annotation("additional");
       additionalAnno.parameters.putAll(field.getAdditionalProperties());
-      sdlField.annotations.add(additionalAnno);
+      idlField.annotations.add(additionalAnno);
     }
 
-    return sdlField;
+    return idlField;
   }
 
   public static ModelParser.Enumeration fromSchemaEnum(Enum schemaEnum) {
@@ -367,7 +367,7 @@ public class ASTNodeConverter {
     }
   }
 
-  private static void addDefaultAnnotation(ModelParser.Field sdlField, Object defaultValue) {
+  private static void addDefaultAnnotation(ModelParser.Field idlField, Object defaultValue) {
     if (defaultValue != null) {
       ModelParser.Annotation anno = new ModelParser.Annotation("default");
       if (defaultValue instanceof GeneratedValue generatedValue) {
@@ -375,21 +375,21 @@ public class ASTNodeConverter {
       } else {
         anno.parameters.put("value", defaultValue.toString());
       }
-      sdlField.annotations.add(anno);
+      idlField.annotations.add(anno);
     }
   }
 
-  private static void addNumericAnnotations(ModelParser.Field sdlField,
+  private static void addNumericAnnotations(ModelParser.Field idlField,
                                             Integer precision, Integer scale) {
     if (precision != null) {
       ModelParser.Annotation anno = new ModelParser.Annotation("precision");
       anno.parameters.put("value", precision.toString());
-      sdlField.annotations.add(anno);
+      idlField.annotations.add(anno);
     }
     if (scale != null) {
       ModelParser.Annotation anno = new ModelParser.Annotation("scale");
       anno.parameters.put("value", scale.toString());
-      sdlField.annotations.add(anno);
+      idlField.annotations.add(anno);
     }
   }
 

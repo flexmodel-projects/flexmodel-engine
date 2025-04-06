@@ -19,7 +19,7 @@ public class ASTNodeConverterTest {
 
   @Test
   void test() throws ParseException {
-    InputStream is = this.getClass().getClassLoader().getResourceAsStream("sample_input.sdl");
+    InputStream is = this.getClass().getClassLoader().getResourceAsStream("sample_input.idl");
     ModelParser modelParser = new ModelParser(is);
     List<ModelParser.ASTNode> list = modelParser.CompilationUnit();
     List<SchemaObject> objectList = new ArrayList<>();
