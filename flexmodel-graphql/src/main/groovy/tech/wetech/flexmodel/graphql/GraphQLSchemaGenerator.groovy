@@ -1,5 +1,6 @@
 package tech.wetech.flexmodel.graphql
 
+
 import tech.wetech.flexmodel.EnumField
 import tech.wetech.flexmodel.RelationField
 import tech.wetech.flexmodel.ScalarType
@@ -7,6 +8,7 @@ import tech.wetech.flexmodel.TypedField
 import tech.wetech.flexmodel.codegen.AbstractModelListGenerator
 import tech.wetech.flexmodel.codegen.ModelField
 import tech.wetech.flexmodel.codegen.ModelListGenerationContext
+import tech.wetech.flexmodel.util.MessageUtil
 
 /**
  * @author cjbi
@@ -84,24 +86,24 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       def key = "${it.schemaName}_${it.modelName}"
       out.println ""
       out.println "  ${DataFetchers.FIND.keyFunc.apply(it.schemaName, it.modelName)}("
-      out.println "    \"filter the rows returned\""
+      out.println "    \"${MessageUtil.getString("gql.query.where.comment")}\""
       out.println "    where: ${key}_bool_exp"
-      out.println "    \"sort the rows by one or more fields\""
+      out.println "    \"${MessageUtil.getString("gql.query.order_by.comment")}\""
       out.println "    order_by: ${key}_order_by"
-      out.println "    \"Specify the max returned records per page (default to 30)\""
+      out.println "    \"${MessageUtil.getString("gql.query.size.comment")}\""
       out.println "    size: Int"
-      out.println "    \"The page (aka. offset) of the paginated list (default to 1)\""
+      out.println "    \"${MessageUtil.getString("gql.query.page.comment")}\""
       out.println "    page: Int"
       out.println "  ): [${key}!]!"
       out.println ""
       out.println "  ${DataFetchers.AGGREGATE.keyFunc.apply(it.schemaName, it.modelName)}("
-      out.println "    \"filter the rows returned\""
+      out.println "    \"${MessageUtil.getString("gql.query.where.comment")}\""
       out.println "    where: ${key}_bool_exp"
-      out.println "    \"sort the rows by one or more fields\""
+      out.println "    \"${MessageUtil.getString("gql.query.order_by.comment")}\""
       out.println "    order_by: ${key}_order_by"
-      out.println "    \"Specify the max returned records per page (default to 30)\""
+      out.println "    \"${MessageUtil.getString("gql.query.size.comment")}\""
       out.println "    size: Int"
-      out.println "    \"The page (aka. offset) of the paginated list (default to 1)\""
+      out.println "    \"${MessageUtil.getString("gql.query.page.comment")}\""
       out.println "    page: Int"
       out.println "  ): ${key}_aggregate!"
       out.println ""
@@ -116,9 +118,9 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     context.modelListClass.modelList.each {
       def key = "${it.schemaName}_${it.modelName}"
       out.println ""
-      out.println "  \"delete data from the table: ${key}\""
+      out.println "  \"${MessageUtil.getString("gql.mutation.delete.comment", key)}\""
       out.println "  ${DataFetchers.MUTATION_DELETE.keyFunc.apply(it.schemaName, it.modelName)}("
-      out.println "    \"filter the rows which have to be deleted\""
+      out.println "    \"${MessageUtil.getString("gql.mutation.delete.filter.comment")}\""
       out.println "    where: ${key}_bool_exp!"
       out.println "  ): mutation_response"
       if (it.idField) {
@@ -148,13 +150,13 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       def key = "${it.schemaName}_${it.modelName}"
       out.println "type ${key} {"
       it.allFields.each {
-        out.println "  ${it.variableName} : ${toGraphQLType(it, context)}"
+        out.println "  ${it.fieldName} : ${toGraphQLType(it, context)}"
       }
       out.println "  _join: Query"
       out.println "  _join_mutation: Mutation"
       out.println "}"
       out.println ""
-      "aggregated selection of \\\"${key}\\\""
+      "${MessageUtil.getString("gql.query.aggregate.comment", key)}"
       out.println "type ${key}_aggregate {"
       out.println "  _count(distinct: Boolean, field: ${key}_select_field): Int!"
       out.println "  _max: ${key}!"
@@ -168,7 +170,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "type ${key}_avg_fields {"
       it.allFields.each {
         if (!it.isRelationField()) {
-          out.println "  ${it.variableName}: Float"
+          out.println "  ${it.fieldName}: Float"
         }
       }
       out.println "}"
@@ -179,28 +181,28 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       def schemaName = it.schemaName
       def key = "${it.schemaName}_${it.modelName}"
       // gen input model
-      out.println "\"Boolean expression to filter rows from the table \\\"${key}\\\". All fields are combined with a logical 'AND'.\""
+      out.println "\"${MessageUtil.getString("gql.bool_expr.comment", key)}\""
       out.println "input ${key}_bool_exp {"
       out.println "  _and: [${key}_bool_exp!]"
       out.println "  _or: [${key}_bool_exp!]"
       it.allFields.each {
         if (!it.isRelationField() && !it.isEnumField()) {
           TypedField f = it.originalField as TypedField
-          out.println "  ${it.variableName}: ${comparisonMapping[f.type]}"
+          out.println "  ${it.fieldName}: ${comparisonMapping[f.type]}"
         } else if (it.isEnumField() && context.modelListClass.containsEnumClass((it.originalField as EnumField).from)) {
           EnumField enumField = it.originalField as EnumField
-          out.println "  ${it.variableName}: ${schemaName}_${enumField.from}_comparison_exp"
+          out.println "  ${it.fieldName}: ${schemaName}_${enumField.from}_comparison_exp"
         } else {
-          out.println "  ${it.variableName}: String_comparison_exp"
+          out.println "  ${it.fieldName}: String_comparison_exp"
         }
       }
       out.println "}"
       out.println ""
-      out.println "\"Ordering options when selecting data from \\\"${key}\\\".\"\n"
+      out.println "\"${MessageUtil.getString("gql.order_by.comment", key)}\""
       out.println "input ${key}_order_by {"
       it.allFields.each {
         if (!it.isRelationField()) {
-          out.println "  ${it.variableName}: order_by"
+          out.println "  ${it.fieldName}: order_by"
         }
       }
       out.println "}"
@@ -208,7 +210,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "input ${key}_insert_input {"
       it.allFields.each {
         if (!it.isRelationField()) {
-          out.println "  ${it.variableName}: ${toGraphQLType(it, context)}"
+          out.println "  ${it.fieldName}: ${toGraphQLType(it, context)}"
         }
       }
       out.println "}"
@@ -216,7 +218,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "input ${key}_set_input {"
       it.allFields.each {
         if (!it.isRelationField()) {
-          out.println "  ${it.variableName}: ${toGraphQLType(it, context)}"
+          out.println "  ${it.fieldName}: ${toGraphQLType(it, context)}"
         }
       }
       out.println "}"
@@ -227,15 +229,18 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "enum ${key}_select_field {"
       it.allFields.each {
         if (!it.isRelationField()) {
-          out.println "  ${it.variableName}"
+          out.println "  ${it.fieldName}"
         }
       }
       out.println "}"
     }
 
     out.println ""
+    out.println "\"${MessageUtil.getString("gql.directive.internal.comment")}\""
     out.println "directive @internal on VARIABLE_DEFINITION"
+    out.println "\"${MessageUtil.getString("gql.directive.export.comment")}\""
     out.println "directive @export(as: String) on FIELD"
+    out.println "\"${MessageUtil.getString("gql.directive.transform.comment")}\""
     out.println "directive @transform(get: String!) on FIELD"
     out.println ""
     out.println "scalar JSON"
@@ -243,7 +248,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "scalar Date"
     out.println "scalar Time"
     out.println ""
-    out.println "\"Boolean expression to compare fields of type \\\"ID\\\". All fields are combined with logical 'AND.'\""
+    out.println "\"${MessageUtil.getString("gql.comparison_exp.comment","ID")}\""
     out.println "input ID_comparison_exp {"
     out.println "  _eq: String"
     out.println "  _ne: String"
@@ -255,7 +260,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "  _ends_with: String"
     out.println "}"
     out.println ""
-    out.println "\"Boolean expression to compare fields of type \\\"Int\\\". All fields are combined with logical 'AND.'\""
+    out.println "\"${MessageUtil.getString("gql.comparison_exp.comment","Int")}\""
     out.println "input Int_comparison_exp {"
     out.println "  _eq: Int"
     out.println "  _ne: Int"
@@ -267,7 +272,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "  _nin: [Int!]"
     out.println "}"
     out.println ""
-    out.println "\"Boolean expression to compare fields of type \\\"Float\\\". All fields are combined with logical 'AND.'\""
+    out.println "\"${MessageUtil.getString("gql.comparison_exp.comment","Float")}\""
     out.println "input Float_comparison_exp {"
     out.println "  _eq: Float"
     out.println "  _ne: Float"
@@ -279,7 +284,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "  _nin: [Float!]"
     out.println "}"
     out.println ""
-    out.println "\"Boolean expression to compare fields of type \\\"String\\\". All fields are combined with logical 'AND.'\""
+    out.println "\"${MessageUtil.getString("gql.comparison_exp.comment","String")}\""
     out.println "input String_comparison_exp {"
     out.println "  _eq: String"
     out.println "  _ne: String"
@@ -291,7 +296,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "  _ends_with: String"
     out.println "}"
     out.println ""
-    out.println "\"Boolean expression to compare fields of type \\\"JSON\\\". All fields are combined with logical 'AND.'\""
+    out.println "\"${MessageUtil.getString("gql.comparison_exp.comment","JSON")}\""
     out.println "input JSON_comparison_exp {"
     out.println "  _eq: String"
     out.println "  _ne: String"
@@ -303,13 +308,13 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "  _ends_with: String"
     out.println "}"
     out.println ""
-    out.println "\"Boolean expression to compare fields of type \\\"Boolean\\\". All fields are combined with logical 'AND.'\""
+    out.println "\"${MessageUtil.getString("gql.comparison_exp.comment","Boolean")}\""
     out.println "input Boolean_comparison_exp {"
     out.println "  _eq: Boolean"
     out.println "  _ne: Boolean"
     out.println "}"
     out.println ""
-    out.println "\"Boolean expression to compare fields of type \\\"Date\\\". All fields are combined with logical 'AND.'\""
+    out.println "\"${MessageUtil.getString("gql.comparison_exp.comment","Date")}\""
     out.println "input Date_comparison_exp {"
     out.println "  _eq: Date"
     out.println "  _ne: Date"
@@ -322,7 +327,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "  _between: [Date!]"
     out.println "}"
     out.println ""
-    out.println "\"Boolean expression to compare fields of type \\\"DateTime\\\". All fields are combined with logical 'AND.'\""
+    out.println "\"${MessageUtil.getString("gql.comparison_exp.comment","DateTime")}\""
     out.println "input DateTime_comparison_exp {"
     out.println "  _eq: DateTime"
     out.println "  _ne: DateTime"
@@ -335,7 +340,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "  _between: [DateTime!]"
     out.println "}"
     out.println ""
-    out.println "\"Boolean expression to compare fields of type \\\"Time\\\". All fields are combined with logical 'AND.'\""
+    out.println "\"${MessageUtil.getString("gql.comparison_exp.comment","Time")}\""
     out.println "input Time_comparison_exp {"
     out.println "  _eq: Time"
     out.println "  _ne: Time"
@@ -350,7 +355,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println ""
     context.modelListClass.enumList.each {
       out.println ""
-      out.println "\"Boolean expression to compare fields of type \\\"DateTime\\\". All fields are combined with logical 'AND.'\""
+      out.println "\"${MessageUtil.getString("gql.comparison_exp.comment","Enum")}\""
       out.println "input ${it.schemaName}_${it.originalEnum.name}_comparison_exp {"
       out.println "  _eq: ${it.schemaName}_${it.originalEnum.name}"
       out.println "  _ne: ${it.schemaName}_${it.originalEnum.name}"
@@ -360,11 +365,11 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println ""
     }
     out.println ""
-    out.println "\"field ordering options\""
+    out.println "\"${MessageUtil.getString("gql.enum.order_by.comment")}\""
     out.println "enum order_by {"
-    out.println "    \"in ascending order, nulls last\""
+    out.println "    \"${MessageUtil.getString("gql.enum.order_by.asc.comment")}\""
     out.println "  asc"
-    out.println "    \"in descending order, nulls first\""
+    out.println "    \"${MessageUtil.getString("gql.enum.order_by.desc.comment")}\""
     out.println "  desc"
     out.println "}"
     out.println ""
@@ -377,7 +382,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "}"
     out.println ""
     out.println "type mutation_response {"
-    out.println "  \"data from the rows affected by the mutation\""
+    out.println "  \"${MessageUtil.getString("gql.mutation.response.affected_rows.comment")}\""
     out.println "  affected_rows: Int!"
     out.println "  _join: Query"
     out.println "  _join_mutation: Mutation"
