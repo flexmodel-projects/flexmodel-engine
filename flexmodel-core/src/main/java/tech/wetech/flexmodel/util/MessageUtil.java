@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
 public class MessageUtil {
 
   public static String getString(String key, Object... params) {
-    ResourceBundle resourceBundle = ResourceBundle.getBundle("i18n.message");
+    ResourceBundle resourceBundle = ResourceBundle.getBundle("message");
     return MessageFormat.format(resourceBundle.getString(key), params);
   }
 
