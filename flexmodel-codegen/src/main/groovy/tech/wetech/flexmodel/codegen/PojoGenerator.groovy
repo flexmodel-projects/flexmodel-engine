@@ -40,7 +40,7 @@ class PojoGenerator extends AbstractGenerator {
     out.println " */"
 
     // Write class declaration
-    out.println "@ModelName(\"${modelClass.originalModel.name}\")"
+    out.println "@ModelClass(\"${modelClass.originalModel.name}\")"
     out.println "public class ${className} {"
 
     // Write field declarations

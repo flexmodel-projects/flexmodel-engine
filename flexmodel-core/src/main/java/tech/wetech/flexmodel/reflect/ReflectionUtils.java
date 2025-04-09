@@ -1,8 +1,8 @@
 package tech.wetech.flexmodel.reflect;
 
 import tech.wetech.flexmodel.JsonObjectConverter;
+import tech.wetech.flexmodel.annotation.ModelClass;
 import tech.wetech.flexmodel.annotation.ModelField;
-import tech.wetech.flexmodel.annotation.ModelName;
 
 import java.beans.Introspector;
 import java.lang.reflect.Field;
@@ -38,7 +38,7 @@ public class ReflectionUtils {
     if (obj == null) {
       return null;
     }
-    if (cls.getAnnotation(ModelName.class) != null) {
+    if (cls.getAnnotation(ModelClass.class) != null) {
       Map<String, String> bindFields = new HashMap<>();
       for (Field field : cls.getDeclaredFields()) {
         ModelField modelFieldAnnotation = field.getAnnotation(ModelField.class);
@@ -52,7 +52,7 @@ public class ReflectionUtils {
       });
       return converter.convertValue(result, cls);
     }
-    if (obj.getClass().getAnnotation(ModelName.class) != null) {
+    if (obj.getClass().getAnnotation(ModelClass.class) != null) {
       Class<?> objClass = obj.getClass();
       Map<String, String> bindFields = new HashMap<>();
       for (Field field : objClass.getDeclaredFields()) {
