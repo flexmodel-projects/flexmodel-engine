@@ -48,8 +48,11 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       } else {
         return "${itt.modelClass.schemaName}_${rf.from}"
       }
-    } else if (itt.isIdentity() || itt.isBasicField()) {
+    } else if (itt.isBasicField()) {
       def f = itt.originalField as TypedField
+      if (itt.isIdentity()) {
+        return "ID"
+      }
       return "${typeMapping[f.type]}"
     } else if (itt.isEnumField() && context.modelListClass.containsEnumClass((itt.originalField as EnumField).from)) {
       def ef = itt.originalField as EnumField
