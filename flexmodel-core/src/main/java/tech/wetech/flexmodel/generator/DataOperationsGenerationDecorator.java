@@ -21,7 +21,7 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
   }
 
   private Object convertParameter(TypedField<?, ?> field, Object value) {
-    return sessionContext.getTypeHandlerMap().get(field instanceof IDField idField ? idField.getBaseType() : field.getType())
+    return sessionContext.getTypeHandlerMap().get(field.getType())
       .convertParameter(field, value);
   }
 
@@ -43,53 +43,31 @@ public class DataOperationsGenerationDecorator extends AbstractDataOperationsDec
       }
       Object value = newData.get(field.getName());
       // 仅支持新增修改默认值
-      Object generatedValue = switch (field) {
-        case IDField idField -> generateValue(idField, value, isUpdate);
-        case DateTimeField datetimeField -> generateValue(datetimeField, value, isUpdate);
-        case DateField dateField -> generateValue(dateField, value, isUpdate);
-        case TimeField timeField -> generateValue(timeField, value, isUpdate);
-        default -> value != null ? value : convertParameter(field, field.getDefaultValue());
-      };
-      if (generatedValue != null) {
-        newData.put(field.getName(), generatedValue);
+      if (field.getDefaultValue() != null && newData.containsKey(field.getName())) {
+        newData.put(field.getName(), generateValue(field, value, isUpdate));
       }
     }
     return newData;
   }
 
-  private Object generateValue(TimeField field, Object value, boolean isUpdate) {
-    if (field.getDefaultValue() != null && value == null) {
-      if (field.getDefaultValue().equals(GeneratedValue.NOW) && !isUpdate) {
-        return LocalTime.now();
-      }
-    }
-    return value;
-  }
-
-  private Object generateValue(IDField idField, Object value, boolean isUpdate) {
+  private Object generateValue(TypedField<?, ?> field, Object value, boolean isUpdate) {
     if (!isUpdate && value == null) {
-      if (Objects.equals(idField.getDefaultValue(), GeneratedValue.ULID)) {
+      if (Objects.equals(field.getDefaultValue(), GeneratedValue.ULID)) {
         return ULID.random().toString();
-      } else if (Objects.equals(idField.getDefaultValue(), GeneratedValue.UUID)) {
+      } else if (Objects.equals(field.getDefaultValue(), GeneratedValue.UUID)) {
         return UUID.randomUUID().toString();
-      }
-    }
-    return null;
-  }
-
-  private Object generateValue(DateTimeField field, Object value, boolean isUpdate) {
-    if (field.getDefaultValue() != null && value == null) {
-      if (field.getDefaultValue().equals(GeneratedValue.NOW) && !isUpdate) {
-        return LocalDateTime.now();
-      }
-    }
-    return value;
-  }
-
-  private Object generateValue(DateField field, Object value, boolean isUpdate) {
-    if (field.getDefaultValue() != null && value == null) {
-      if (field.getDefaultValue().equals(GeneratedValue.NOW) && !isUpdate) {
-        return LocalDate.now();
+      } else if (field.getDefaultValue().equals(GeneratedValue.NOW)) {
+        if (field instanceof DateTimeField) {
+          return LocalDateTime.now();
+        } else if (field instanceof DateField) {
+          return LocalDate.now();
+        } else if (field instanceof TimeField) {
+          return LocalTime.now();
+        }
+      } else if (field.getDefaultValue() instanceof GeneratedValue) {
+        // ignored
+      } else {
+        return convertParameter(field, field.getDefaultValue());
       }
     }
     return value;

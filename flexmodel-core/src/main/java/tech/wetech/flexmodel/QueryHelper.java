@@ -50,7 +50,7 @@ public class QueryHelper {
           RelationField relationField = entity.findRelationByModelName(join.getFrom())
             .orElseThrow();
           String localField = relationField.getLocalField() != null ?
-            relationField.getLocalField() : entity.findIdField().map(IDField::getName).orElseThrow();
+            relationField.getLocalField() : entity.findIdField().map(TypedField::getName).orElseThrow();
           join.setLocalField(localField);
           join.setForeignField(relationField.getForeignField());
         } else {

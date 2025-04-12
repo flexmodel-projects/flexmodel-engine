@@ -104,10 +104,9 @@ public class Entity extends AbstractModel<Entity> {
     indexes.remove(getIndex(indexName));
   }
 
-  public Optional<IDField> findIdField() {
+  public Optional<TypedField<?,?>> findIdField() {
     return fields.stream()
-      .filter(f -> f instanceof IDField)
-      .map(f -> (IDField) f)
+      .filter(TypedField::isIdentity)
       .findFirst();
   }
 

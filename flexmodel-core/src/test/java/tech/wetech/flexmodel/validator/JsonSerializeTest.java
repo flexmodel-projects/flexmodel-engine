@@ -16,7 +16,7 @@ public class JsonSerializeTest {
     // 主键
     LongField idField = new LongField("id");
     idField.setComment("Primary Key");
-    entity.addField(new IDField("id").setComment("Primary Key"));
+    entity.addField(new LongField("id").asIdentity().setComment("Primary Key"));
     entity.setComment("学生表");
     // 姓名
     StringField name = new StringField("name");

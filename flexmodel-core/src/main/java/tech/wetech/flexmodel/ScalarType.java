@@ -4,7 +4,6 @@ package tech.wetech.flexmodel;
  * @author cjbi
  */
 public enum ScalarType {
-  ID(ScalarType.ID_TYPE),
   STRING(ScalarType.STRING_TYPE),
   FLOAT(ScalarType.FLOAT_TYPE),
   INT(ScalarType.INT_TYPE),
@@ -19,7 +18,6 @@ public enum ScalarType {
 
   private final String type;
 
-  public static final String ID_TYPE = "ID";
   public static final String STRING_TYPE = "String";
   public static final String FLOAT_TYPE = "Float";
   public static final String INT_TYPE = "Int";

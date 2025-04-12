@@ -16,6 +16,7 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
   private boolean nullable = true;
   private Object defaultValue;
   private Map<String, Object> additionalProperties = new HashMap<>();
+  private boolean identity;
 
   public TypedField(String name, String type) {
     this.name = name;
@@ -131,6 +132,20 @@ public class TypedField<T, SELF extends TypedField<T, SELF>> implements Field {
 
   public String getConcreteType() {
     return type;
+  }
+
+  public boolean isIdentity() {
+    return identity;
+  }
+
+  public TypedField<T, SELF> asIdentity(){
+    this.identity = true;
+    return this;
+  }
+
+  public TypedField<T, SELF> setIdentity(boolean identity) {
+    this.identity = identity;
+    return this;
   }
 
   @SuppressWarnings("unchecked")

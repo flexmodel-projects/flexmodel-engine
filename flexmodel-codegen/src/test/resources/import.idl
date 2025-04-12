@@ -1,5 +1,5 @@
 model flow_definition {
-  id : ID @default(autoIncrement()),
+  id : Long @id @default(autoIncrement()),
   last_modified_by? : Long,
   caller? : String @length("255"),
   flow_name? : String @length("255"),
@@ -15,7 +15,7 @@ model flow_definition {
   flow_key? : String @length("255"),
 }
 model fs_datasource {
-  name : ID,
+  name : String @id,
   type? : String @length("255"),
   config? : JSON,
   createdAt? : DateTime @default(now()),
@@ -23,7 +23,7 @@ model fs_datasource {
   enabled : Boolean @comment("") @default("true"),
 }
 model fs_api_log {
-  id : ID @default(ulid()),
+  id : String @id @default(ulid()),
   level : LogLevel,
   uri : String @length("255"),
   data : JSON,
@@ -31,7 +31,7 @@ model fs_api_log {
   @index(unique: "false", fields: [level]),
 }
 model Student {
-  id : ID @default(uuid()),
+  id : String @id @default(uuid()),
   studentName? : String @length("255"),
   gender? : UserGender,
   interest? : User_interest[],
@@ -46,7 +46,7 @@ model Student {
   @index(unique: "false", fields: [classId]),
 }
 model StudentDetail {
-  id : ID @default(autoIncrement()),
+  id : Long @id @default(autoIncrement()),
   studentId? : Long,
   description? : String @length("255"),
 }

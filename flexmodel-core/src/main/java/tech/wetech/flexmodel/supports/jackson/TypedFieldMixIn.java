@@ -11,7 +11,6 @@ import tech.wetech.flexmodel.*;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = IDField.class, name = ScalarType.ID_TYPE),
   @JsonSubTypes.Type(value = StringField.class, name = ScalarType.STRING_TYPE),
   @JsonSubTypes.Type(value = IntField.class, name = ScalarType.INT_TYPE),
   @JsonSubTypes.Type(value = LongField.class, name = ScalarType.LONG_TYPE),

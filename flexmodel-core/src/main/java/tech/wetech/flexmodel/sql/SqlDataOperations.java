@@ -38,9 +38,9 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
     Map<String, Object> record = ReflectionUtils.toClassBean(sqlContext.getJsonObjectConverter(), objR, Map.class);
     String sql = getInsertSqlString(modelName, record);
     Entity entity = (Entity) sqlContext.getModel(modelName);
-    Optional<IDField> idFieldOptional = entity.findIdField();
+    Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
     if (idFieldOptional.isPresent()) {
-      IDField idField = idFieldOptional.get();
+      TypedField<?, ?> idField = idFieldOptional.get();
       if (record.get(idField.getName()) != null) {
         id.accept(record.get(idField.getName()));
         return sqlExecutor.update(sql, record);
@@ -232,9 +232,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
     SqlResultHandler<T> sqlResultHandler = new SqlResultHandler<>(resultType);
     if (query == null || query.getProjection() == null) {
       for (Field field : model.getFields()) {
-        if (field instanceof IDField idField) {
-          sqlResultHandler.addSqlTypeHandler(field.getName(), typeHandlerMap.get(idField.getBaseType()), field);
-        } else if (field instanceof TypedField<?, ?> typedField) {
+        if (field instanceof TypedField<?, ?> typedField) {
           sqlResultHandler.addSqlTypeHandler(field.getName(), typeHandlerMap.get(typedField.getType()), field);
         } else if (field instanceof Query.QueryField) {
           sqlResultHandler.addSqlTypeHandler(field.getName(), new UnknownSqlTypeHandler(), field);

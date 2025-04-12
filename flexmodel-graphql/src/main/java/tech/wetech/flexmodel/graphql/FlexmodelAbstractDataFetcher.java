@@ -55,7 +55,7 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
     List<RelationField> relationFields = new ArrayList<>();
     List<Map<String, Object>> list = session.find(entity.getName(), query -> query
       .withProjection(projection -> {
-        IDField idField = entity.findIdField().orElseThrow();
+        TypedField<?, ?> idField = entity.findIdField().orElseThrow();
         projection.addField(idField.getName(), Projections.field(entity.getName() + "." + idField.getName()));
         for (SelectedField selectedField : selectedFields) {
           TypedField<?, ?> flexModelField = targetEntity.getField(selectedField.getName());
@@ -71,14 +71,14 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
         return projection;
       })
       .withJoin(joins -> joins.addLeftJoin(join -> join.setFrom(targetEntity.getName())))
-      .withFilter(field(entity.getName() + "." + entity.findIdField().map(IDField::getName).orElseThrow()).eq(id))
+      .withFilter(field(entity.getName() + "." + entity.findIdField().map(TypedField::getName).orElseThrow()).eq(id))
     );
     List<Map<String, Object>> result = new ArrayList<>();
     for (Map<String, Object> map : list) {
       Map<String, Object> resultData = new HashMap<>(map);
       result.add(resultData);
       for (RelationField sencondaryRelationField : relationFields) {
-        Object secondaryId = map.get(entity.findIdField().map(IDField::getName).orElseThrow());
+        Object secondaryId = map.get(entity.findIdField().map(TypedField::getName).orElseThrow());
         List<Map<String, Object>> associationDataList = findRelationDataList(session, env, path, sencondaryRelationField.getFrom(), sencondaryRelationField, secondaryId);
         resultData.put(sencondaryRelationField.getName(), sencondaryRelationField.isMultiple() ?
           associationDataList : associationDataList.stream().findFirst().orElse(null));

@@ -45,7 +45,7 @@ public class LazyLoadInterceptor {
     Entity entity = (Entity) sessionContext.getModel(modelName);
     TypedField<?, ?> field = entity.getField(fieldName);
     if (field != null) {
-      TypeHandler<?> typeHandler = sessionContext.getTypeHandlerMap().get(field instanceof IDField idField ? idField.getBaseType() : field.getType());
+      TypeHandler<?> typeHandler = sessionContext.getTypeHandlerMap().get(field.getType());
       if (typeHandler != null) {
         return typeHandler.convertParameter(field, value);
       }

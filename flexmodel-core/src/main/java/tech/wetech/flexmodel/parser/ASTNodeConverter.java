@@ -68,31 +68,12 @@ public class ASTNodeConverter {
 
   public static TypedField<?, ?> toSchemaField(ModelParser.Field idlField) {
     TypedField<?, ?> field = switch (idlField.type) {
-      case ScalarType.ID_TYPE -> {
-        field = new IDField(idlField.name);
-        for (ModelParser.Annotation annotation : idlField.annotations) {
-          switch (annotation.name) {
-            case "default" -> {
-              Object value = annotation.parameters.get("value");
-              if (value instanceof ModelParser.FunctionCall func) {
-                field.setDefaultValue(new GeneratedValue(func.name));
-              }
-              yield field;
-            }
-            case "comment" -> field.setComment((String) annotation.parameters.get("value"));
-            case "unique" -> field.setUnique(true);
-          }
-        }
-        yield field;
-      }
       case ScalarType.STRING_TYPE -> {
         field = new StringField(idlField.name);
         field.setNullable(idlField.optional);
         for (ModelParser.Annotation annotation : idlField.annotations) {
           if (annotation.name.equals("length")) {
             ((StringField) field).setLength(Integer.parseInt((String) annotation.parameters.get("value")));
-          } else if (annotation.name.equals("default")) {
-            ((StringField) field).setDefaultValue((String) annotation.parameters.get("value"));
           }
         }
 
@@ -106,90 +87,17 @@ public class ASTNodeConverter {
               ((FloatField) field).setPrecision(Integer.parseInt((String) annotation.parameters.get("value")));
             case "scale" ->
               ((FloatField) field).setScale(Integer.parseInt((String) annotation.parameters.get("value")));
-            case "default" ->
-              ((FloatField) field).setDefaultValue(Double.valueOf((String) annotation.parameters.get("value")));
           }
         }
         yield field;
       }
-      case ScalarType.INT_TYPE -> {
-        field = new IntField(idlField.name);
-        for (ModelParser.Annotation annotation : idlField.annotations) {
-          if (annotation.name.equals("default")) {
-            ((IntField) field).setDefaultValue(Integer.valueOf((String) annotation.parameters.get("value")));
-          }
-        }
-        yield field;
-      }
-      case ScalarType.LONG_TYPE -> {
-        field = new LongField(idlField.name);
-        for (ModelParser.Annotation annotation : idlField.annotations) {
-          if (annotation.name.equals("default")) {
-            ((LongField) field).setDefaultValue(Long.valueOf((String) annotation.parameters.get("value")));
-          }
-        }
-        yield field;
-      }
-      case ScalarType.BOOLEAN_TYPE -> {
-        field = new BooleanField(idlField.name);
-        for (ModelParser.Annotation annotation : idlField.annotations) {
-          if (annotation.name.equals("default")) {
-            ((BooleanField) field).setDefaultValue(Boolean.valueOf((String) annotation.parameters.get("value")));
-          }
-        }
-        yield field;
-      }
-      case ScalarType.DATETIME_TYPE -> {
-        field = new DateTimeField(idlField.name);
-        for (ModelParser.Annotation annotation : idlField.annotations) {
-          if (annotation.name.equals("default")) {
-            Object value = annotation.parameters.get("value");
-            if (value instanceof ModelParser.FunctionCall func) {
-              field.setDefaultValue(new GeneratedValue(func.name));
-            } else {
-              ((DateTimeField) field).setDefaultValue(LocalDateTime.parse((String) annotation.parameters.get("value")));
-            }
-          }
-        }
-        yield field;
-      }
-      case ScalarType.DATE_TYPE -> {
-        field = new DateField(idlField.name);
-        for (ModelParser.Annotation annotation : idlField.annotations) {
-          if (annotation.name.equals("default")) {
-            Object value = annotation.parameters.get("value");
-            if (value instanceof ModelParser.FunctionCall func) {
-              field.setDefaultValue(new GeneratedValue(func.name));
-            } else {
-              ((DateField) field).setDefaultValue(LocalDate.parse((String) annotation.parameters.get("value")));
-            }
-          }
-        }
-        yield field;
-      }
-      case ScalarType.TIME_TYPE -> {
-        field = new TimeField(idlField.name);
-        for (ModelParser.Annotation annotation : idlField.annotations) {
-          if (annotation.name.equals("default")) {
-            Object value = annotation.parameters.get("value");
-            if (value instanceof ModelParser.FunctionCall func) {
-              field.setDefaultValue(new GeneratedValue(func.name));
-            } else {
-              ((TimeField) field).setDefaultValue(LocalTime.parse((String) annotation.parameters.get("value")));
-            }
-          }
-        }
-        yield field;
-      }
-      case ScalarType.JSON_TYPE -> {
-        field = new JSONField(idlField.name);
-        for (ModelParser.Annotation annotation : idlField.annotations) {
-          if (annotation.name.equals("default")) {
-            ((JSONField) field).setDefaultValue((String) annotation.parameters.get("value"));
-          }
-        }
-        yield field;
-      }
+      case ScalarType.INT_TYPE -> new IntField(idlField.name);
+      case ScalarType.LONG_TYPE -> new LongField(idlField.name);
+      case ScalarType.BOOLEAN_TYPE -> new BooleanField(idlField.name);
+      case ScalarType.DATETIME_TYPE -> new DateTimeField(idlField.name);
+      case ScalarType.DATE_TYPE -> new DateField(idlField.name);
+      case ScalarType.TIME_TYPE -> new TimeField(idlField.name);
+      case ScalarType.JSON_TYPE -> new JSONField(idlField.name);
       default -> {
         ModelParser.Annotation relationAnno = idlField.annotations.stream()
           .filter(f -> f.name.equals("relation")).findFirst()
@@ -220,6 +128,26 @@ public class ASTNodeConverter {
         case "comment" -> field.setComment((String) annotation.parameters.get("value"));
         case "unique" -> field.setUnique(true);
         case "additional" -> field.setAdditionalProperties(annotation.parameters);
+        case "id" -> field.setIdentity(true);
+        case "default" -> {
+          Object value = annotation.parameters.get("value");
+          if (value instanceof ModelParser.FunctionCall func) {
+            field.setDefaultValue(new GeneratedValue(func.name));
+          } else {
+            switch (field) {
+              case IntField intField -> intField.setDefaultValue(Integer.valueOf((String) annotation.parameters.get("value")));
+              case FloatField floatField -> floatField.setDefaultValue(Double.valueOf((String) annotation.parameters.get("value")));
+              case DateField dateField ->
+                dateField.setDefaultValue(LocalDate.parse((String) annotation.parameters.get("value")));
+              case DateTimeField dateTimeField ->
+                dateTimeField.setDefaultValue(LocalDateTime.parse((String) annotation.parameters.get("value")));
+              case TimeField dateTimeField ->
+                dateTimeField.setDefaultValue(LocalTime.parse((String) annotation.parameters.get("value")));
+              case BooleanField booleanField -> booleanField.setDefaultValue(Boolean.valueOf((String) annotation.parameters.get("value")));
+              default -> field.setDefaultValue(annotation.parameters.get("value"));
+            }
+          }
+        }
       }
     }
     return field;
@@ -294,17 +222,12 @@ public class ASTNodeConverter {
       idlField.annotations.add(new ModelParser.Annotation("unique"));
     }
 
+    if(field.isIdentity()) {
+      idlField.annotations.add(new ModelParser.Annotation("id"));
+    }
+
     // 类型特定处理
     switch (field) {
-      case IDField idField -> {
-        if (idField.getDefaultValue() != null) {
-          if (idField.getDefaultValue() instanceof GeneratedValue generatedValue) {
-            ModelParser.Annotation anno = new ModelParser.Annotation("default");
-            anno.parameters.put("value", new ModelParser.FunctionCall(generatedValue.getName()));
-            idlField.annotations.add(anno);
-          }
-        }
-      }
       case StringField stringField -> {
         if (stringField.getLength() > 0) {
           ModelParser.Annotation anno = new ModelParser.Annotation("length");

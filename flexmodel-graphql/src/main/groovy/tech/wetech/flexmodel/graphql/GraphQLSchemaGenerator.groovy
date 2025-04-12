@@ -15,7 +15,6 @@ import tech.wetech.flexmodel.codegen.ModelListGenerationContext
 class GraphQLSchemaGenerator extends AbstractModelListGenerator {
 
   def typeMapping = [
-    (ScalarType.ID.getType())      : "ID",
     (ScalarType.STRING.getType())  : "String",
     (ScalarType.FLOAT.getType())   : "Float",
     (ScalarType.INT.getType())     : "Int",
@@ -28,7 +27,6 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
   ]
 
   def comparisonMapping = [
-    (ScalarType.ID.getType())      : "Int_comparison_exp",
     (ScalarType.STRING.getType())  : "String_comparison_exp",
     (ScalarType.FLOAT.getType())   : "Float_comparison_exp",
     (ScalarType.INT.getType())     : "Int_comparison_exp",
@@ -259,18 +257,6 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "scalar DateTime"
     out.println "scalar Date"
     out.println "scalar Time"
-    out.println ""
-    out.println "\"${i18n.getString("gql.comparison_exp.comment", "ID")}\""
-    out.println "input ID_comparison_exp {"
-    out.println "  _eq: String"
-    out.println "  _ne: String"
-    out.println "  _in: [String!]"
-    out.println "  _nin: [String!]"
-    out.println "  _contains: String"
-    out.println "  _not_contains: String"
-    out.println "  _starts_with: String"
-    out.println "  _ends_with: String"
-    out.println "}"
     out.println ""
     out.println "\"${i18n.getString("gql.comparison_exp.comment", "Int")}\""
     out.println "input Int_comparison_exp {"

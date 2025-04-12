@@ -220,7 +220,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
         throw new RuntimeException(String.format("The field name %s already exists", field.getName()));
       }
       SqlColumn sqlColumn = toSqlColumn(field);
-      if (field instanceof IDField) {
+      if (field.isIdentity()) {
         primaryKey.addColumn(sqlColumn);
       }
       sqlTable.addColumn(sqlColumn);
@@ -244,17 +244,17 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
       );
       associationColumn.setSqlTypeCode(
         sqlContext.getTypeHandler(((Entity) getModel(field.getModelName())).findIdField().orElseThrow()
-          .getBaseType()).getJdbcTypeCode()
+          .getType()).getJdbcTypeCode()
       );
       return associationColumn;
-    } else if (field instanceof IDField idField) {
+    } else if (field.isIdentity()) {
       SqlColumn idColumn = new SqlColumn();
       idColumn.setTableName(toPhysicalTableString(field.getModelName()));
       idColumn.setName(field.getName());
       idColumn.setPrimaryKey(true);
       idColumn.setUnique(true);
-      idColumn.setSqlTypeCode(sqlContext.getTypeHandler(idField.getBaseType()).getJdbcTypeCode());
-      idColumn.setAutoIncrement(Objects.equals(idField.getDefaultValue(), GeneratedValue.AUTO_INCREMENT));
+      idColumn.setSqlTypeCode(sqlContext.getTypeHandler(field.getType()).getJdbcTypeCode());
+      idColumn.setAutoIncrement(Objects.equals(field.getDefaultValue(), GeneratedValue.AUTO_INCREMENT));
       idColumn.setComment(field.getComment());
       return idColumn;
     } else {

@@ -1,6 +1,6 @@
 // 班级
 model Classes {
-  id: ID @default(uuid()),
+  id: String @id @default(uuid()),
   classCode: String @unique @length(255),
   className? : String  @default("A班级"),
   students: Student[] @relation(localField: "id", foreignField: "classId", cascadeDelete: true),
@@ -8,7 +8,7 @@ model Classes {
 
 // 学生
 model Student {
-  id : ID @default(uuid()),
+  id : String @id @default(uuid()),
   studentName? : String @length("255"),
   gender? : UserGender,
   interest? : User_interest[],
@@ -25,7 +25,7 @@ model Student {
 
 // 学生详情
 model StudentDetail {
-  id : ID @default(autoIncrement()),
+  id : String @id @default(autoIncrement()),
   studentId? : Long,
   description? : String @length("255"),
 }

@@ -16,7 +16,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static tech.wetech.flexmodel.GeneratedValue.AUTO_INCREMENT;
-import static tech.wetech.flexmodel.ScalarType.ID;
 import static tech.wetech.flexmodel.ScalarType.STRING;
 
 /**
@@ -215,19 +214,10 @@ public class JdbcMappedModels implements MappedModels {
       Iterator<SqlColumn> colIte = table.getColumnIterator();
       while (colIte.hasNext()) {
         SqlColumn sqlColumn = colIte.next();
-        ScalarType fieldType = sqlColumn.isPrimaryKey() ? ID
-          : ScalarType.fromType(jdbcCodeMap.getOrDefault(sqlColumn.getSqlTypeCode(), STRING.getType()));
+        ScalarType fieldType = ScalarType.fromType(jdbcCodeMap.getOrDefault(sqlColumn.getSqlTypeCode(), STRING.getType()));
         assert fieldType != null;
         TypedField<?, ?> field;
         switch (fieldType) {
-          case ID: {
-            IDField idField = new IDField(sqlColumn.getName());
-            field = idField;
-            if (sqlColumn.isAutoIncrement()) {
-              idField.setDefaultValue(AUTO_INCREMENT);
-            }
-            break;
-          }
           default:
           case STRING: {
             StringField stringField = new StringField(sqlColumn.getName());
@@ -340,6 +330,10 @@ public class JdbcMappedModels implements MappedModels {
             }
             break;
           }
+        }
+        field.setIdentity(sqlColumn.isPrimaryKey());
+        if (sqlColumn.isAutoIncrement()) {
+          field.setDefaultValue(AUTO_INCREMENT);
         }
         field.setModelName(sqlColumn.getTableName());
         field.setComment(sqlColumn.getComment());

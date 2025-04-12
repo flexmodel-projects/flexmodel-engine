@@ -16,7 +16,7 @@ public class Models {
 
   public static Entity createClassesEntity(Session session, String entityName) {
     return session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setDefaultValue(GeneratedValue.AUTO_INCREMENT))
+      .addField(new LongField("id").asIdentity().setDefaultValue(GeneratedValue.AUTO_INCREMENT))
       .addField(new StringField("classCode"))
       .addField(new StringField("className"))
       .addField(new JSONField("description"))
@@ -38,7 +38,7 @@ public class Models {
         .setComment("兴趣")
     );
     return session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setDefaultValue(GeneratedValue.AUTO_INCREMENT))
+      .addField(new LongField("id").asIdentity().setDefaultValue(GeneratedValue.AUTO_INCREMENT))
       .addField(new StringField("studentName"))
       .addField(new EnumField("gender").setFrom(genderEnum.getName()))
       .addField(new EnumField("interest").setFrom(interestEnum.getName()).setMultiple(true))
@@ -50,7 +50,7 @@ public class Models {
 
   public static Entity createStudentDetailEntity(Session session, String entityName) {
     return session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setDefaultValue(GeneratedValue.AUTO_INCREMENT))
+      .addField(new LongField("id").asIdentity().setDefaultValue(GeneratedValue.AUTO_INCREMENT))
       .addField(new LongField("studentId"))
       .addField(new StringField("description"))
     );
@@ -58,14 +58,14 @@ public class Models {
 
   public static Entity createCourseEntity(Session session, String entityName) {
     return session.createEntity(entityName, entity -> entity
-      .addField(new IDField("courseNo").setDefaultValue(GeneratedValue.UUID))
+      .addField(new StringField("courseNo").asIdentity().setDefaultValue(GeneratedValue.UUID))
       .addField(new StringField("courseName"))
     );
   }
 
   public static Entity createTeacherEntity(Session session, String entityName) {
     return session.createEntity(entityName, entity -> entity
-      .addField(new IDField("id").setDefaultValue(GeneratedValue.AUTO_INCREMENT))
+      .addField(new LongField("id").asIdentity().setDefaultValue(GeneratedValue.AUTO_INCREMENT))
       .addField(new StringField("teacherName"))
       .addField(new StringField("subject"))
     );

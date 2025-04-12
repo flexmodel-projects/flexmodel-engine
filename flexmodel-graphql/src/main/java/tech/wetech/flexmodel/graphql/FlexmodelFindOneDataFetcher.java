@@ -31,7 +31,7 @@ public class FlexmodelFindOneDataFetcher extends FlexmodelAbstractDataFetcher<Ma
     final String filter = where != null ? jsonObjectConverter.toJsonString(where) : null;
     try (Session session = sessionFactory.createSession(schemaName)) {
       Entity entity = (Entity) session.getModel(modelName);
-      IDField idField = entity.findIdField().orElseThrow();
+      TypedField<?, ?> idField = entity.findIdField().orElseThrow();
 
       List<RelationField> relationFields = new ArrayList<>();
       List<Map<String, Object>> list = session.find(entity.getName(), query -> query
@@ -58,7 +58,7 @@ public class FlexmodelFindOneDataFetcher extends FlexmodelAbstractDataFetcher<Ma
       }
       Map<String, Object> resultData = new HashMap<>(list.stream().findFirst().orElseThrow());
       for (RelationField sencondaryRelationField : relationFields) {
-        Object secondaryId = resultData.get(entity.findIdField().map(IDField::getName).orElseThrow());
+        Object secondaryId = resultData.get(entity.findIdField().map(TypedField::getName).orElseThrow());
         List<Map<String, Object>> relationDataList = findRelationDataList(session, env, null, sencondaryRelationField.getFrom(), sencondaryRelationField, secondaryId);
         resultData.put(sencondaryRelationField.getName(), sencondaryRelationField.isMultiple() ? relationDataList : relationDataList.stream().findFirst().orElse(null));
       }

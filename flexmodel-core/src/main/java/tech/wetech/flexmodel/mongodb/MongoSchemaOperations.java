@@ -84,7 +84,7 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
 
   @Override
   public TypedField<?, ?> createField(TypedField<?, ?> field) {
-    if (field instanceof IDField) {
+    if (field.isIdentity()) {
       Index index = new Index(field.getModelName());
       index.setUnique(true);
       index.addField(field.getName());

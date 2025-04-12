@@ -6,7 +6,8 @@
       "fields": [
         {
           "name": "name",
-          "type": "ID",
+          "type": "String",
+          "identity": true,
           "unique": false,
           "nullable": true,
           "modelName": "Datasource"
@@ -58,7 +59,8 @@
       "fields": [
         {
           "name": "id",
-          "type": "ID",
+          "type": "String",
+          "identity": true,
           "unique": true,
           "nullable": true,
           "modelName": "ApiInfo",
@@ -135,7 +137,8 @@
       "fields": [
         {
           "name": "id",
-          "type": "ID",
+          "type": "String",
+          "identity": true,
           "unique": false,
           "nullable": true,
           "modelName": "ApiLog",
@@ -191,7 +194,8 @@
       "fields": [
         {
           "name": "name",
-          "type": "ID",
+          "type": "String",
+          "identity": true,
           "unique": false,
           "nullable": true,
           "modelName": "Datasource"
@@ -226,11 +230,11 @@
       "fields": [
         {
           "name": "id",
-          "type": "ID",
+          "type": "String",
+          "identity": true,
           "modelName": "Teacher",
           "unique": false,
-          "nullable": true,
-          "generatedValue": "BIGINT_NOT_GENERATED"
+          "nullable": true
         },
         {
           "name": "teacherName",
@@ -257,11 +261,11 @@
       "fields": [
         {
           "name": "id",
-          "type": "ID",
+          "type": "String",
+          "identity": true,
           "modelName": "Student",
           "unique": false,
-          "nullable": true,
-          "generatedValue": "BIGINT_NOT_GENERATED"
+          "nullable": true
         },
         {
           "name": "studentName",
@@ -313,11 +317,14 @@
       "fields": [
         {
           "name": "id",
-          "type": "ID",
+          "type": "Long",
+          "identity": true,
           "modelName": "StudentDetail",
           "unique": false,
           "nullable": true,
-          "generatedValue": "AUTO_INCREMENT"
+          "defaultValue": {
+            "name": "autoIncrement"
+          }
         },
         {
           "name": "studentId",
@@ -342,11 +349,11 @@
       "fields": [
         {
           "name": "id",
-          "type": "ID",
+          "type": "String",
+          "identity": true,
           "modelName": "Classes",
           "unique": false,
-          "nullable": true,
-          "generatedValue": "BIGINT_NOT_GENERATED"
+          "nullable": true
         },
         {
           "name": "classCode",
@@ -384,7 +391,8 @@
       "fields": [
         {
           "name": "courseNo",
-          "type": "ID",
+          "type": "String",
+          "identity": true,
           "modelName": "Course",
           "unique": false,
           "nullable": true

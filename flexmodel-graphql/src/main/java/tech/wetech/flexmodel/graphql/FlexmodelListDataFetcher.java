@@ -36,7 +36,7 @@ public class FlexmodelListDataFetcher extends FlexmodelAbstractDataFetcher<List<
       List<RelationField> relationFields = new ArrayList<>();
       List<Map<String, Object>> list = session.find(entity.getName(), query -> {
           query.withProjection(projection -> {
-            IDField idField = entity.findIdField().orElseThrow();
+            TypedField<?, ?> idField = entity.findIdField().orElseThrow();
             projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
             for (SelectedField selectedField : selectedFields) {
               TypedField<?, ?> flexModelField = entity.getField(selectedField.getName());
@@ -59,7 +59,7 @@ public class FlexmodelListDataFetcher extends FlexmodelAbstractDataFetcher<List<
         Map<String, Object> resultData = new HashMap<>(map);
         result.add(resultData);
         for (RelationField sencondaryRelationField : relationFields) {
-          Object secondaryId = map.get(entity.findIdField().map(IDField::getName).orElseThrow());
+          Object secondaryId = map.get(entity.findIdField().map(TypedField::getName).orElseThrow());
           List<Map<String, Object>> relationDataList = findRelationDataList(session, env, null, sencondaryRelationField.getFrom(), sencondaryRelationField, secondaryId);
           resultData.put(sencondaryRelationField.getName(),
             sencondaryRelationField.isMultiple() ? relationDataList : relationDataList.stream().findFirst().orElse(null));

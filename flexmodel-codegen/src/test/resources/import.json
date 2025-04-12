@@ -5,7 +5,8 @@
       "comment": null,
       "fields": [
         {
-          "type": "ID",
+          "type": "Long",
+          "identity": true,
           "name": "id",
           "modelName": "flow_definition",
           "comment": null,
@@ -150,7 +151,8 @@
       "fields": [
         {
           "name": "name",
-          "type": "ID",
+          "type": "String",
+          "identity": true,
           "unique": false,
           "nullable": true,
           "modelName": "Datasource",
@@ -205,7 +207,8 @@
       "fields": [
         {
           "name": "id",
-          "type": "ID",
+          "type": "String",
+          "identity": true,
           "unique": false,
           "nullable": true,
           "modelName": "fs_api_log",
@@ -264,7 +267,8 @@
       "fields": [
         {
           "name": "id",
-          "type": "ID",
+          "type": "Long",
+          "identity": true,
           "modelName": "Student",
           "unique": false,
           "nullable": true,
@@ -333,7 +337,8 @@
       "fields": [
         {
           "name": "id",
-          "type": "ID",
+          "type": "Long",
+          "identity": true,
           "modelName": "StudentDetail",
           "unique": false,
           "nullable": true,

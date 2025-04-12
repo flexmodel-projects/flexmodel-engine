@@ -6,7 +6,8 @@
       "fields": [
         {
           "name": "name",
-          "type": "ID",
+          "type": "String",
+          "identity": true,
           "unique": false,
           "nullable": true,
           "modelName": "Datasource"
@@ -49,7 +50,8 @@
       "fields": [
         {
           "name": "id",
-          "type": "ID",
+          "type": "String",
+          "identity": true,
           "unique": false,
           "nullable": true,
           "modelName": "ApiInfo",
@@ -150,7 +152,8 @@
       "fields": [
         {
           "name": "id",
-          "type": "ID",
+          "type": "String",
+          "identity": true,
           "unique": false,
           "nullable": true,
           "modelName": "ApiLog",
@@ -244,7 +247,8 @@
         },
         {
           "name": "name",
-          "type": "ID",
+          "type": "String",
+          "identity": true,
           "unique": false,
           "nullable": true,
           "modelName": "Datasource"

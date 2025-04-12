@@ -33,7 +33,6 @@ public class GenerationTool {
 
   static {
     TYPE_MAPPING = new HashMap<>();
-    TYPE_MAPPING.put(ID.getType(), null);
     TYPE_MAPPING.put(RELATION.getType(), null);
     TYPE_MAPPING.put(STRING.getType(), new TypeInfo(null, "String", "String"));
     TYPE_MAPPING.put(FLOAT.getType(), new TypeInfo(null, "Double", "Double"));
@@ -81,7 +80,7 @@ public class GenerationTool {
             throw new RuntimeException(e);
           }
         } else {
-          System.out.println("Unsupported script file type: " + importScript+", must be .json or .idl");
+          System.out.println("Unsupported script file type: " + importScript + ", must be .json or .idl");
         }
       }
     }
@@ -195,24 +194,13 @@ public class GenerationTool {
 
       ModelField modelField = new ModelField()
         .setModelClass(modelClass)
+        .setIdentity(field.isIdentity())
         .setVariableName(StringUtils.snakeToCamel(field.getName()))
         .setFieldName(field.getName())
         .setOriginalField(field)
         .setComment(field.getComment());
 
       switch (field) {
-        case IDField idField -> {
-          // id field
-          TypeInfo typeInfo = TYPE_MAPPING.get(idField.getBaseType());
-
-          modelField.setTypePackage(typeInfo.typePackage())
-            .setShortTypeName(typeInfo.shortTypeName())
-            .setFullTypeName(typeInfo.fullTypeName())
-            .setIdentity(true);
-
-          modelClass.setIdField(modelField);
-
-        }
         case RelationField relationField -> {
           String ftName = StringUtils.capitalize(
             StringUtils.snakeToCamel(
@@ -266,6 +254,11 @@ public class GenerationTool {
 
           modelClass.getBasicFields().add(modelField);
         }
+      }
+
+      if (modelField.isIdentity()) {
+        modelField.setIdentity(true);
+        modelClass.setIdField(modelField);
       }
 
       if (modelField.getTypePackage() != null) {
