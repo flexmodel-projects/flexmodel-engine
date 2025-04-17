@@ -232,7 +232,7 @@ public class GenerationTool {
       ModelClass modelClass = context.getModelClass();
       new PojoGenerator().generate(context, Path.of(targetDirectory, "entity", modelClass.getShortClassName() + ".java").toString());
       new DSLGenerator().generate(context, Path.of(targetDirectory, "dsl", modelClass.getShortClassName() + "DSL.java").toString());
-      new DaoGenerator().generate(context, Path.of(targetDirectory, "dao", modelClass.getShortClassName() + "DAO.java").toString());
+      new DAOGenerator().generate(context, Path.of(targetDirectory, "dao", modelClass.getShortClassName() + "DAO.java").toString());
     }
     while (context.nextEnum()) {
       EnumGenerator enumGenerator = new EnumGenerator();

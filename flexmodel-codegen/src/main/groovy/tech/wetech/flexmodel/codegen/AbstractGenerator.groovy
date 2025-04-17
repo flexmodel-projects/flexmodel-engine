@@ -19,7 +19,7 @@ abstract class AbstractGenerator implements Generator {
       file.createNewFile()
     }
     new File(targetFile).withPrintWriter { out ->
-      writer(out, context)
+      write(out, context)
     }
     return file
   }
@@ -31,6 +31,6 @@ abstract class AbstractGenerator implements Generator {
     return writer.toString()
   }
 
-  abstract def writer(PrintWriter out, GenerationContext context)
+  abstract def write(PrintWriter out, GenerationContext context)
 
 }

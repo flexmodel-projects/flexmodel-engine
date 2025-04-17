@@ -30,6 +30,12 @@ model fs_api_log {
   createdAt : DateTime,
   @index(unique: "false", fields: [level]),
 }
+model Classes {
+  id : Long @id @default(autoIncrement()),
+  classCode? : String @length("255"),
+  className? : String @length("255"),
+  students? : Student[] @relation(localField: "id", foreignField: "classId", cascadeDelete: "true"),
+}
 model Student {
   id : String @id @default(uuid()),
   studentName? : String @length("255"),

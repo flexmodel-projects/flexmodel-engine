@@ -20,7 +20,7 @@ import java.io.InputStream;
 class GraphQLSchemaGeneratorTest {
 
   @Test
-  void writer() throws IOException {
+  void write() throws IOException {
     String packageName = "com.example";
     String schemaName = "system";
     InputStream is = GraphQLSchemaGeneratorTest.class.getClassLoader().getResourceAsStream("import.json");

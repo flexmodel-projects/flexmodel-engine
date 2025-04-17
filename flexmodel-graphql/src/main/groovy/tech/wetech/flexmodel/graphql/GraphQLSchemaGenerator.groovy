@@ -67,7 +67,7 @@ class GraphQLSchemaGenerator extends AbstractGenerator {
   }
 
   @Override
-  def writer(PrintWriter out, GenerationContext context) {
+  def write(PrintWriter out, GenerationContext context) {
     out.println "schema {"
     out.println "  query: Query"
     out.println "  mutation: Mutation"

@@ -13,7 +13,7 @@ class SchemaGenerator extends AbstractGenerator {
    * @param context The generation context with model details.
    */
   @Override
-  def writer(PrintWriter out, GenerationContext context) {
+  def write(PrintWriter out, GenerationContext context) {
     String rootPackage = context.getVariable("rootPackage");
     def modelListClass = context.modelClassList
     def className = context.schemaName.capitalize()

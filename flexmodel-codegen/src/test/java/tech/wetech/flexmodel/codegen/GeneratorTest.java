@@ -25,7 +25,7 @@ class GeneratorTest {
     assert is != null;
     String content = new String(is.readAllBytes());
     ImportDescribe describe = new JacksonObjectConverter().parseToObject(content, ImportDescribe.class);
-    DaoGenerator daoGenerator = new DaoGenerator();
+    DAOGenerator daoGenerator = new DAOGenerator();
     GenerationContext generationContext = new GenerationContext();
     generationContext.getModelClassList().add(GenerationTool.buildModelClass(packageName, schemaName, (Entity) describe.getSchema().getFirst()));
     while (generationContext.nextModel()) {

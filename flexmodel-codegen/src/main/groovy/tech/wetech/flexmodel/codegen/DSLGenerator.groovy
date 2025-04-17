@@ -14,7 +14,7 @@ class DSLGenerator extends AbstractGenerator {
    * @param className The name of the class.
    * @param context The generation context with model details.
    */
-  def writer(PrintWriter out, GenerationContext context) {
+  def write(PrintWriter out, GenerationContext context) {
     def modelClass = context.modelClass
     def className = modelClass.shortClassName
     def fields = modelClass.allFields
