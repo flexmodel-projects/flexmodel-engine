@@ -1,5 +1,6 @@
 package tech.wetech.flexmodel.codegen;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import tech.wetech.flexmodel.Field;
 
 /**
@@ -7,6 +8,7 @@ import tech.wetech.flexmodel.Field;
  */
 public class ModelField {
 
+  @JsonBackReference
   private ModelClass modelClass;
   private String variableName;
   private String fieldName;

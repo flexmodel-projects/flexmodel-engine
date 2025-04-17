@@ -6,9 +6,8 @@ import tech.wetech.flexmodel.Entity;
 import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.ImportDescribe;
 import tech.wetech.flexmodel.SchemaObject;
+import tech.wetech.flexmodel.codegen.GenerationContext;
 import tech.wetech.flexmodel.codegen.GenerationTool;
-import tech.wetech.flexmodel.codegen.ModelListClass;
-import tech.wetech.flexmodel.codegen.ModelListGenerationContext;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.io.IOException;
@@ -21,7 +20,7 @@ import java.io.InputStream;
 class GraphQLSchemaGeneratorTest {
 
   @Test
-  void generate() throws IOException {
+  void writer() throws IOException {
     String packageName = "com.example";
     String schemaName = "system";
     InputStream is = GraphQLSchemaGeneratorTest.class.getClassLoader().getResourceAsStream("import.json");
@@ -29,18 +28,16 @@ class GraphQLSchemaGeneratorTest {
     String content = new String(is.readAllBytes());
     ImportDescribe describe = new JacksonObjectConverter().parseToObject(content, ImportDescribe.class);
     GraphQLSchemaGenerator daoGenerator = new GraphQLSchemaGenerator();
-    ModelListGenerationContext generationContext = new ModelListGenerationContext();
-    ModelListClass modelListClass = new ModelListClass();
-    modelListClass.setPackageName(packageName);
-    modelListClass.setSchemaName(schemaName);
+    GenerationContext generationContext = new GenerationContext();
+    generationContext.setPackageName(packageName);
+    generationContext.setSchemaName(schemaName);
     for (SchemaObject model : describe.getSchema()) {
       if (model instanceof Entity) {
-        modelListClass.getModelList().add(GenerationTool.buildModelClass(packageName, schemaName, (Entity) model));
+        generationContext.getModelClassList().add(GenerationTool.buildModelClass(packageName, schemaName, (Entity) model));
       } else if (model instanceof Enum anEnum) {
-        modelListClass.getEnumList().add(GenerationTool.buildEnumClass(packageName, schemaName, anEnum));
+        generationContext.getEnumClassList().add(GenerationTool.buildEnumClass(packageName, schemaName, anEnum));
       }
     }
-    generationContext.setModelListClass(modelListClass);
     String str = daoGenerator.generate(generationContext);
     Assertions.assertNotNull(str);
   }

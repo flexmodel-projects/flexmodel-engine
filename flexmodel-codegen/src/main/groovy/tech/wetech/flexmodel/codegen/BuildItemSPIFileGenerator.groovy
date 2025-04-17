@@ -6,11 +6,11 @@ import groovy.util.logging.Log
  * @author cjbi
  */
 @Log
-class BuildItemSPIFileGenerator extends AbstractModelListGenerator {
+class BuildItemSPIFileGenerator extends AbstractGenerator {
 
   @Override
-  def generate(PrintWriter out, ModelListGenerationContext context) {
-    context.modelListClass.each {
+  def writer(PrintWriter out, GenerationContext context) {
+    context.modelClassList.each {
       out.println "${it.packageName}.${it.schemaName.capitalize()}"
     }
   }

@@ -7,15 +7,14 @@ package tech.wetech.flexmodel.codegen
  * Author: cjbi
  */
 class DSLGenerator extends AbstractGenerator {
-
-  /**
+/**
    * Writes the Java class content to the GroovyPrintWriter.
    *
    * @param out Print writer to output the Java class code.
    * @param className The name of the class.
    * @param context The generation context with model details.
    */
-  def generate(PrintWriter out, GenerationContext context) {
+  def writer(PrintWriter out, GenerationContext context) {
     def modelClass = context.modelClass
     def className = modelClass.shortClassName
     def fields = modelClass.allFields

@@ -14,8 +14,12 @@ abstract class AbstractGenerator implements Generator {
   File generate(GenerationContext context, String targetFile) {
     log.info "Generating: $targetFile"
     def file = new File(targetFile)
+    if (!file.exists()) {
+      file.getParentFile().mkdirs()
+      file.createNewFile()
+    }
     new File(targetFile).withPrintWriter { out ->
-      generate(out, context)
+      writer(out, context)
     }
     return file
   }
@@ -23,10 +27,10 @@ abstract class AbstractGenerator implements Generator {
   @Override
   String generate(GenerationContext context) {
     def writer = new StringBuilderWriter()
-    generate(new GroovyPrintWriter(writer), context)
+    writer(new GroovyPrintWriter(writer), context)
     return writer.toString()
   }
 
-  abstract def generate(PrintWriter out, GenerationContext context)
+  abstract def writer(PrintWriter out, GenerationContext context)
 
 }

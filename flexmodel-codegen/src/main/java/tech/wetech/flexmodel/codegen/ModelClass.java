@@ -1,5 +1,6 @@
 package tech.wetech.flexmodel.codegen;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import tech.wetech.flexmodel.Model;
 
 import java.io.Serializable;
@@ -18,10 +19,10 @@ public class ModelClass implements Serializable {
   private String modelName;
   private final Set<String> imports = new HashSet<>();
   private String variableName;
-  private String lowerCaseName;
   private String shortClassName;
   private String fullClassName;
   private String comment;
+  @JsonManagedReference
   private ModelField idField;
   private final List<ModelField> basicFields = new ArrayList<>();
   private final List<ModelField> enumFields = new ArrayList<>();
@@ -71,15 +72,6 @@ public class ModelClass implements Serializable {
 
   public ModelClass setVariableName(String variableName) {
     this.variableName = variableName;
-    return this;
-  }
-
-  public String getLowerCaseName() {
-    return lowerCaseName;
-  }
-
-  public ModelClass setLowerCaseName(String lowerCaseName) {
-    this.lowerCaseName = lowerCaseName;
     return this;
   }
 

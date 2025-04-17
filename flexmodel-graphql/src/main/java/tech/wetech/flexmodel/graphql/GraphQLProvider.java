@@ -13,9 +13,8 @@ import tech.wetech.flexmodel.Entity;
 import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.SchemaObject;
 import tech.wetech.flexmodel.SessionFactory;
+import tech.wetech.flexmodel.codegen.GenerationContext;
 import tech.wetech.flexmodel.codegen.GenerationTool;
-import tech.wetech.flexmodel.codegen.ModelListClass;
-import tech.wetech.flexmodel.codegen.ModelListGenerationContext;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,9 +35,7 @@ public class GraphQLProvider {
 
   public void init() {
     GraphQLSchemaGenerator generator = new GraphQLSchemaGenerator();
-    ModelListGenerationContext context = new ModelListGenerationContext();
-    ModelListClass modelListClass = new ModelListClass();
-    context.setModelListClass(modelListClass);
+    GenerationContext context = new GenerationContext();
     Map<String, DataFetcher<?>> queryDataFetchers = new HashMap<>();
     Map<String, DataFetcher<?>> mutationDataFetchers = new HashMap<>();
 
@@ -53,11 +50,11 @@ public class GraphQLProvider {
       List<SchemaObject> models = sf.getModels(schemaName);
       for (SchemaObject model : models) {
         if (model instanceof Entity entity) {
-          modelListClass.getModelList().add(GenerationTool.buildModelClass("", schemaName, entity));
+          context.getModelClassList().add(GenerationTool.buildModelClass("", schemaName, entity));
           joinDataFetchers.put(schemaName + "_" + model.getName(), joinMap);
           joinDataFetchers.put(schemaName + "_" + model.getName() + "_aggregate", joinMap);
         } else if (model instanceof Enum andEnum) {
-          modelListClass.getEnumList().add(GenerationTool.buildEnumClass("", schemaName, andEnum));
+          context.getEnumClassList().add(GenerationTool.buildEnumClass("", schemaName, andEnum));
         } else {
           // todo 支持非实体类型
         }

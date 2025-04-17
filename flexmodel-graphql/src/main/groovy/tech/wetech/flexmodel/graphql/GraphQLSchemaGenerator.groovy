@@ -5,14 +5,14 @@ import tech.wetech.flexmodel.EnumField
 import tech.wetech.flexmodel.RelationField
 import tech.wetech.flexmodel.ScalarType
 import tech.wetech.flexmodel.TypedField
-import tech.wetech.flexmodel.codegen.AbstractModelListGenerator
+import tech.wetech.flexmodel.codegen.AbstractGenerator
+import tech.wetech.flexmodel.codegen.GenerationContext
 import tech.wetech.flexmodel.codegen.ModelField
-import tech.wetech.flexmodel.codegen.ModelListGenerationContext
 
 /**
  * @author cjbi
  */
-class GraphQLSchemaGenerator extends AbstractModelListGenerator {
+class GraphQLSchemaGenerator extends AbstractGenerator {
 
   def typeMapping = [
     (ScalarType.STRING.getType())  : "String",
@@ -40,7 +40,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
 
   I18nUtil i18n = new I18nUtil()
 
-  def toGraphQLType(ModelField itt, ModelListGenerationContext context) {
+  def toGraphQLType(ModelField itt, GenerationContext context) {
     if (itt.isRelationField()) {
       def rf = itt.originalField as RelationField
       if (rf.multiple) {
@@ -54,7 +54,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
         return "ID"
       }
       return "${typeMapping[f.type]}"
-    } else if (itt.isEnumField() && context.modelListClass.containsEnumClass((itt.originalField as EnumField).from)) {
+    } else if (itt.isEnumField() && context.containsEnumClass((itt.originalField as EnumField).from)) {
       def ef = itt.originalField as EnumField
       if (ef.multiple) {
         return "[${itt.modelClass.schemaName}_${ef.from}]"
@@ -67,13 +67,13 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
   }
 
   @Override
-  def generate(PrintWriter out, ModelListGenerationContext context) {
+  def writer(PrintWriter out, GenerationContext context) {
     out.println "schema {"
     out.println "  query: Query"
     out.println "  mutation: Mutation"
     out.println "}"
 
-    context.modelListClass.enumList.each {
+    context.enumClassList.each {
       out.println ""
       out.println "enum ${it.schemaName}_${it.originalEnum.name} {"
       it.elements.each {
@@ -85,7 +85,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     // gen query
     out.println "\"${i18n.getString("gql.query.comment")}\""
     out.println "type Query {"
-    context.modelListClass.modelList.each {
+    context.modelClassList.each {
       def key = "${it.schemaName}_${it.modelName}"
       out.println ""
       out.println " \"${i18n.getString("gql.query.find.comment", it.schemaName, it.modelName)}\""
@@ -123,7 +123,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println ""
     out.println "\"${i18n.getString("gql.mutation.comment")}\""
     out.println "type Mutation {"
-    context.modelListClass.modelList.each {
+    context.modelClassList.each {
       def key = "${it.schemaName}_${it.modelName}"
       out.println ""
       out.println "  \"${i18n.getString("gql.mutation.delete.comment", it.schemaName, it.modelName)}\""
@@ -158,7 +158,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     }
     out.println "}"
     out.println ""
-    context.modelListClass.modelList.each {
+    context.modelClassList.each {
       def key = "${it.schemaName}_${it.modelName}"
       out.println "  \"${i18n.getString("gql.type.model.comment", it.schemaName, it.modelName)}\""
       out.println "type ${key} {"
@@ -189,7 +189,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       out.println "}"
       out.println ""
     }
-    context.modelListClass.modelList.each {
+    context.modelClassList.each {
       out.println ""
       def schemaName = it.schemaName
       def key = "${it.schemaName}_${it.modelName}"
@@ -236,7 +236,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
       }
       out.println "}"
     }
-    context.modelListClass.modelList.each {
+    context.modelClassList.each {
       def key = "${it.schemaName}_${it.modelName}"
       out.println ""
       out.println "enum ${key}_select_field {"
@@ -354,7 +354,7 @@ class GraphQLSchemaGenerator extends AbstractModelListGenerator {
     out.println "  _between: [Time!]"
     out.println "}"
     out.println ""
-    context.modelListClass.enumList.each {
+    context.enumClassList.each {
       out.println ""
       out.println "\"${i18n.getString("gql.comparison_exp.comment", "Enum")}\""
       out.println "input ${it.schemaName}_${it.originalEnum.name}_comparison_exp {"

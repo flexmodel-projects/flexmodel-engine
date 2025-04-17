@@ -10,7 +10,7 @@ import groovy.util.logging.Log
 class EnumGenerator extends AbstractGenerator {
 
   @Override
-  def generate(PrintWriter out, GenerationContext context) {
+  def writer(PrintWriter out, GenerationContext context) {
     def enumClass = context.enumClass;
     def className = enumClass.shortClassName
     def elements = enumClass.elements

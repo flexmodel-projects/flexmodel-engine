@@ -12,7 +12,7 @@ import groovy.util.logging.Log
 class DaoGenerator extends AbstractGenerator {
 
   @Override
-  def generate(PrintWriter out, GenerationContext context) {
+  def writer(PrintWriter out, GenerationContext context) {
     def modelClass = context.modelClass
     String rootPackage = context.getVariable("rootPackage");
     def className = "${modelClass.shortClassName}DAO"

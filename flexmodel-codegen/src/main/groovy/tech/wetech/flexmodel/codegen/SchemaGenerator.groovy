@@ -1,11 +1,10 @@
 package tech.wetech.flexmodel.codegen
 
 
-
 /**
  * @author cjbi
  */
-class SchemaGenerator extends AbstractModelListGenerator {
+class SchemaGenerator extends AbstractGenerator {
 
   /**
    * Writes the Java class content to the GroovyPrintWriter.
@@ -14,12 +13,12 @@ class SchemaGenerator extends AbstractModelListGenerator {
    * @param context The generation context with model details.
    */
   @Override
-  def generate(PrintWriter out, ModelListGenerationContext context) {
+  def writer(PrintWriter out, GenerationContext context) {
     String rootPackage = context.getVariable("rootPackage");
-    def modelListClass = context.modelListClass
-    def className = modelListClass.schemaName.capitalize()
+    def modelListClass = context.modelClassList
+    def className = context.schemaName.capitalize()
 
-    out.println "package ${context.modelListClass.packageName};"
+    out.println "package ${context.packageName};"
     out.println ""
     out.println "import tech.wetech.flexmodel.codegen.ObjectUtils;"
     out.println "import tech.wetech.flexmodel.BuildItem;"
@@ -27,7 +26,7 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println "import tech.wetech.flexmodel.Enum;"
     out.println "import tech.wetech.flexmodel.SchemaObject;"
     out.println "import tech.wetech.flexmodel.ImportDescribe;"
-    modelListClass.modelList.each {
+    modelListClass.each {
       out.println "import ${rootPackage}.dsl.${it.shortClassName}DSL;"
     }
 
@@ -43,7 +42,7 @@ class SchemaGenerator extends AbstractModelListGenerator {
 
     out.println "public class ${className} implements BuildItem {"
 
-    modelListClass.modelList.each { model ->
+    modelListClass.each { model ->
       out.println ""
       if (model.comment) {
         out.println "  /**"
@@ -55,23 +54,23 @@ class SchemaGenerator extends AbstractModelListGenerator {
     out.println ""
     out.println "  @Override"
     out.println "  public String getSchemaName() {"
-    out.println "    return \"${context.modelListClass.schemaName}\";"
+    out.println "    return \"${context.schemaName}\";"
     out.println "  }"
     out.println ""
     out.println "  @Override"
     out.println "  public List<SchemaObject> getSchema() {"
     out.println "    List<SchemaObject> list = new ArrayList<>();"
     out.println "    try {"
-    modelListClass.modelList.each { model ->
+    modelListClass.each { model ->
       out.println "      Entity ${model.variableName} = (Entity) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.originalModel)}\");"
     }
-    modelListClass.enumList.each { model ->
+    context.enumClassList.each { model ->
       out.println "      Enum ${model.variableName} = (Enum) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.originalEnum)}\");"
     }
-    modelListClass.modelList.each { model ->
+    modelListClass.each { model ->
       out.println "      list.add(${model.variableName});"
     }
-    modelListClass.enumList.each { anEnum ->
+    context.enumClassList.each { anEnum ->
       out.println "      list.add(${anEnum.variableName});"
     }
     out.println "    } catch (Exception e) {"
