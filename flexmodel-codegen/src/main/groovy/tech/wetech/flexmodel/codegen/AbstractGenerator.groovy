@@ -27,7 +27,7 @@ abstract class AbstractGenerator implements Generator {
   @Override
   String generate(GenerationContext context) {
     def writer = new StringBuilderWriter()
-    writer(new GroovyPrintWriter(writer), context)
+    write(new GroovyPrintWriter(writer), context)
     return writer.toString()
   }
 

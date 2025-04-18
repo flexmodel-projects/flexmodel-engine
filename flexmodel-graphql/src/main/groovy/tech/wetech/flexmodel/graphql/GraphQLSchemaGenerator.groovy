@@ -202,7 +202,7 @@ class GraphQLSchemaGenerator extends AbstractGenerator {
         if (!it.isRelationField() && !it.isEnumField()) {
           TypedField f = it.originalField as TypedField
           out.println "  ${it.fieldName}: ${comparisonMapping[f.type]}"
-        } else if (it.isEnumField() && context.modelListClass.containsEnumClass((it.originalField as EnumField).from)) {
+        } else if (it.isEnumField() && context.containsEnumClass((it.originalField as EnumField).from)) {
           EnumField enumField = it.originalField as EnumField
           out.println "  ${it.fieldName}: ${schemaName}_${enumField.from}_comparison_exp"
         } else {

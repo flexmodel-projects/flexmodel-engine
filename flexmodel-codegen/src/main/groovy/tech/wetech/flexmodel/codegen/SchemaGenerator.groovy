@@ -15,7 +15,7 @@ class SchemaGenerator extends AbstractGenerator {
   @Override
   def write(PrintWriter out, GenerationContext context) {
     String rootPackage = context.getVariable("rootPackage");
-    def modelListClass = context.modelClassList
+    def modelClassList = context.modelClassList
     def className = context.schemaName.capitalize()
 
     out.println "package ${context.packageName};"
@@ -26,7 +26,7 @@ class SchemaGenerator extends AbstractGenerator {
     out.println "import tech.wetech.flexmodel.Enum;"
     out.println "import tech.wetech.flexmodel.SchemaObject;"
     out.println "import tech.wetech.flexmodel.ImportDescribe;"
-    modelListClass.each {
+    modelClassList.each {
       out.println "import ${rootPackage}.dsl.${it.shortClassName}DSL;"
     }
 
@@ -42,7 +42,7 @@ class SchemaGenerator extends AbstractGenerator {
 
     out.println "public class ${className} implements BuildItem {"
 
-    modelListClass.each { model ->
+    modelClassList.each { model ->
       out.println ""
       if (model.comment) {
         out.println "  /**"
@@ -61,13 +61,13 @@ class SchemaGenerator extends AbstractGenerator {
     out.println "  public List<SchemaObject> getSchema() {"
     out.println "    List<SchemaObject> list = new ArrayList<>();"
     out.println "    try {"
-    modelListClass.each { model ->
+    modelClassList.each { model ->
       out.println "      Entity ${model.variableName} = (Entity) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.originalModel)}\");"
     }
     context.enumClassList.each { model ->
       out.println "      Enum ${model.variableName} = (Enum) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.originalEnum)}\");"
     }
-    modelListClass.each { model ->
+    modelClassList.each { model ->
       out.println "      list.add(${model.variableName});"
     }
     context.enumClassList.each { anEnum ->

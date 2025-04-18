@@ -10,8 +10,6 @@ class BuildItemSPIFileGenerator extends AbstractGenerator {
 
   @Override
   def write(PrintWriter out, GenerationContext context) {
-    context.modelClassList.each {
-      out.println "${it.packageName}.${it.schemaName.capitalize()}"
-    }
+    out.println "${context.packageName}.${context.schemaName.capitalize()}"
   }
 }
