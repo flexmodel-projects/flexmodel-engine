@@ -5,7 +5,6 @@ import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.ImportDescribe;
 import tech.wetech.flexmodel.SchemaObject;
 
-import java.io.File;
 import java.util.*;
 
 /**
@@ -56,7 +55,7 @@ public class GenerationContext {
   }
 
   public String getPackageNameAsPath() {
-    return packageName.replaceAll("\\.", File.separator);
+    return packageName.replaceAll("\\.", "/");
   }
 
   public ModelClass getModelClass() {
