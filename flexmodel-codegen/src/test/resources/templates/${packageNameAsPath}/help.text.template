@@ -1,4 +1,0 @@
-model list:
-<%modelClassList.each{it->
-  println "it: $it"
-}%>
