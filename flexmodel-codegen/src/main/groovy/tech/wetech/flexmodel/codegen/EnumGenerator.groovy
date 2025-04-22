@@ -3,6 +3,8 @@ package tech.wetech.flexmodel.codegen
 
 import groovy.util.logging.Log
 
+import java.nio.file.Path
+
 /**
  * @author cjbi
  */
@@ -10,7 +12,12 @@ import groovy.util.logging.Log
 class EnumGenerator extends AbstractGenerator {
 
   @Override
-  def write(PrintWriter out, GenerationContext context) {
+  String getTargetFile(GenerationContext context, String targetDirectory) {
+    return Path.of(targetDirectory, "enumeration", context.enumClass.getShortClassName() + ".java").toString()
+  }
+
+  @Override
+  void writeEnum(PrintWriter out, GenerationContext context) {
     def enumClass = context.enumClass;
     def className = enumClass.shortClassName
     def elements = enumClass.elements

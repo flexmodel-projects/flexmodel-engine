@@ -1,10 +1,16 @@
 package tech.wetech.flexmodel.codegen
 
+import java.nio.file.Path
 
 /**
  * @author cjbi
  */
 class SchemaGenerator extends AbstractGenerator {
+
+  @Override
+  String getTargetFile(GenerationContext context, String targetDirectory) {
+    return Path.of(targetDirectory, StringUtils.capitalize(context.getSchemaName()) + ".java").toString()
+  }
 
   /**
    * Writes the Java class content to the GroovyPrintWriter.
@@ -13,7 +19,7 @@ class SchemaGenerator extends AbstractGenerator {
    * @param context The generation context with model details.
    */
   @Override
-  def write(PrintWriter out, GenerationContext context) {
+  void write(PrintWriter out, GenerationContext context) {
     String rootPackage = context.getVariable("rootPackage");
     def modelClassList = context.modelClassList
     def className = context.schemaName.capitalize()
@@ -62,10 +68,10 @@ class SchemaGenerator extends AbstractGenerator {
     out.println "    List<SchemaObject> list = new ArrayList<>();"
     out.println "    try {"
     modelClassList.each { model ->
-      out.println "      Entity ${model.variableName} = (Entity) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.originalModel)}\");"
+      out.println "      Entity ${model.variableName} = (Entity) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.original)}\");"
     }
     context.enumClassList.each { model ->
-      out.println "      Enum ${model.variableName} = (Enum) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.originalEnum)}\");"
+      out.println "      Enum ${model.variableName} = (Enum) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.original)}\");"
     }
     modelClassList.each { model ->
       out.println "      list.add(${model.variableName});"

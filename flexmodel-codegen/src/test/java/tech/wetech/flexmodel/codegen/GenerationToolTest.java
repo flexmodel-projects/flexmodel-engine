@@ -21,10 +21,10 @@ class GenerationToolTest extends AbstractIntegrationTest {
   @Test
   void test() throws Exception {
     Configuration configuration = new Configuration();
-    Configuration.Schema schemaConfig = new Configuration.Schema();
+    Schema schemaConfig = new Schema();
     schemaConfig.setName("system");
     configuration.setSchema(schemaConfig);
-    Configuration.Target target = new Configuration.Target();
+    Target target = new Target();
     target.setBaseDir("src/test/resources/");
     target.setDirectory("src/test/java");
     target.setPackageName("com.example");
@@ -34,28 +34,13 @@ class GenerationToolTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void testV2() throws Exception {
-    Configuration configuration = new Configuration();
-    Configuration.Schema schemaConfig = new Configuration.Schema();
-    schemaConfig.setName("system");
-    configuration.setSchema(schemaConfig);
-    Configuration.Target target = new Configuration.Target();
-    target.setBaseDir("src/test/resources/");
-    target.setDirectory("src/test/java");
-    target.setPackageName("com.example");
-    target.setReplaceString("fs_|fe_");
-    configuration.setTarget(target);
-    GenerationTool.runV2(configuration);
-  }
-
-  @Test
   void testIDL() throws ParseException {
     Configuration configuration = new Configuration();
-    Configuration.Schema schemaConfig = new Configuration.Schema();
+    Schema schemaConfig = new Schema();
     schemaConfig.setName("system_idl");
     schemaConfig.setImportScript("import.idl");
     configuration.setSchema(schemaConfig);
-    Configuration.Target target = new Configuration.Target();
+    Target target = new Target();
     target.setBaseDir("src/test/resources/");
     target.setDirectory("src/test/java");
     target.setPackageName("com.example_idl");
@@ -74,7 +59,7 @@ class GenerationToolTest extends AbstractIntegrationTest {
     ImportDescribe describe = new JacksonObjectConverter().parseToObject(content, ImportDescribe.class);
     GenerationContext generationContext = new GenerationContext();
     generationContext.setPackageName(packageName);
-    generationContext.getModelClassList().add(GenerationTool.buildModelClass(packageName, schemaName, (Entity) describe.getSchema().getFirst()));
+    generationContext.getModelClassList().add(ModelClass.buildModelClass(packageName, schemaName, (Entity) describe.getSchema().getFirst()));
     GStringTemplateEngine engine = new GStringTemplateEngine();
     URL resource = this.getClass().getClassLoader().getResource("templates/${packageNameAsPath}/${modelClass.modelName}.java.template");
     while (generationContext.nextModel()) {

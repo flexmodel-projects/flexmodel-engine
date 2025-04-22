@@ -1,5 +1,11 @@
 package tech.wetech.flexmodel.codegen;
 
+import tech.wetech.flexmodel.Entity;
+import tech.wetech.flexmodel.Enum;
+import tech.wetech.flexmodel.ImportDescribe;
+import tech.wetech.flexmodel.SchemaObject;
+
+import java.io.File;
 import java.util.*;
 
 /**
@@ -50,7 +56,7 @@ public class GenerationContext {
   }
 
   public String getPackageNameAsPath() {
-    return packageName.replaceAll("\\.", "/");
+    return packageName.replaceAll("\\.", File.separator);
   }
 
   public ModelClass getModelClass() {
@@ -117,12 +123,47 @@ public class GenerationContext {
 
   public boolean containsEnumClass(String name) {
     return enumClassList.stream()
-      .anyMatch(e -> e.getOriginalEnum().getName().equals(name));
+      .anyMatch(e -> e.getOriginal().getName().equals(name));
   }
 
   public boolean containsModelClass(String name) {
     return modelClassList.stream()
-      .anyMatch(e -> e.getOriginalModel().getName().equals(name));
+      .anyMatch(e -> e.getOriginal().getName().equals(name));
+  }
+
+  public static GenerationContext buildGenerationContext(Configuration configuration) {
+    ImportDescribe importDescribe = configuration.getImportDescribe();
+    List<SchemaObject> models = importDescribe.getSchema();
+    List<ImportDescribe.ImportData> data = importDescribe.getData();
+    Schema schema = configuration.getSchema();
+    String packageName = configuration.getTarget().getPackageName();
+    Map<String, ModelClass> modelClassMap = new HashMap<>();
+    Map<String, EnumClass> enumClassMap = new HashMap<>();
+    for (SchemaObject model : models) {
+      if (model instanceof Entity) {
+        modelClassMap.put(model.getName(), ModelClass.buildModelClass(configuration.getTarget().getReplaceString(), packageName, schema.getName(), (Entity) model));
+      } else if (model instanceof tech.wetech.flexmodel.Enum) {
+        enumClassMap.put(model.getName(), EnumClass.buildEnumClass(packageName, schema.getName(), (tech.wetech.flexmodel.Enum) model));
+      }
+    }
+
+    GenerationContext context = new GenerationContext();
+    context.setSchemaName(schema.getName());
+    context.setPackageName(packageName);
+    for (SchemaObject model : models) {
+      if (model instanceof Entity) {
+        ModelClass modelClass = modelClassMap.get(model.getName());
+        context.getModelClassList().add(modelClass);
+        context.getImports().add(modelClass.getFullClassName());
+      } else if (model instanceof Enum) {
+        EnumClass enumClass = enumClassMap.get(model.getName());
+        context.getEnumClassList().add(enumClass);
+        context.getImports().add(enumClass.getFullClassName());
+      }
+    }
+    context.putVariable("rootPackage", packageName);
+    context.putVariable("import_data", data);
+    return context;
   }
 
 }

@@ -1,6 +1,21 @@
 package tech.wetech.flexmodel.codegen;
 
+import tech.wetech.flexmodel.ImportDescribe;
+import tech.wetech.flexmodel.JsonObjectConverter;
+import tech.wetech.flexmodel.SchemaObject;
+import tech.wetech.flexmodel.parser.ASTNodeConverter;
+import tech.wetech.flexmodel.parser.impl.ModelParser;
+import tech.wetech.flexmodel.parser.impl.ParseException;
+import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 配置类，用于存储和处理代码生成的各种设置，包括数据库连接信息和生成策略。
@@ -28,67 +43,48 @@ public class Configuration implements Serializable {
     this.target = target;
   }
 
-  public static class Schema implements Serializable {
-    private String name;
-    private String importScript = "import.json";
-
-    public String getName() {
-      return name;
+  public ImportDescribe getImportDescribe() {
+    JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
+    List<SchemaObject> models = new ArrayList<>();
+    List<ImportDescribe.ImportData> data = new ArrayList<>();
+    // read from script
+    String[] importScripts = schema.getImportScript().split(",");
+    for (String importScript : importScripts) {
+      File scriptFile = Path.of(target.getBaseDir(), importScript).toFile();
+      System.out.println("Import Script File Path: " + scriptFile.getAbsolutePath());
+      if (scriptFile.exists()) {
+        System.out.println("Script file is exists, import Script File: " + scriptFile);
+        if (importScript.endsWith(".json")) {
+          try {
+            String content = Files.readString(scriptFile.toPath());
+            ImportDescribe describe = jsonObjectConverter.parseToObject(content, ImportDescribe.class);
+            models.addAll(describe.getSchema());
+            data.addAll(describe.getData());
+          } catch (IOException e) {
+            System.out.println("Parse file error: " + importScript);
+            throw new RuntimeException(e);
+          }
+        } else if (importScript.endsWith(".idl")) {
+          try {
+            String content = Files.readString(scriptFile.toPath());
+            ModelParser modelParser = new ModelParser(new ByteArrayInputStream(content.getBytes()));
+            List<ModelParser.ASTNode> list = modelParser.CompilationUnit();
+            for (ModelParser.ASTNode astNode : list) {
+              models.add(ASTNodeConverter.toSchemaObject(astNode));
+            }
+          } catch (IOException | ParseException e) {
+            System.out.println("Parse file error: " + importScript);
+            throw new RuntimeException(e);
+          }
+        } else {
+          System.out.println("Unsupported script file type: " + importScript + ", must be .json or .idl");
+        }
+      }
     }
-
-    public void setName(String name) {
-      this.name = name;
-    }
-
-    public String getImportScript() {
-      return importScript;
-    }
-
-    public Schema setImportScript(String importScript) {
-      this.importScript = importScript;
-      return this;
-    }
-
-  }
-
-  public static class Target implements Serializable {
-
-    private String packageName = "com.example";
-    private String replaceString;
-    private String directory;
-    private String baseDir;
-
-    public String getPackageName() {
-      return packageName;
-    }
-
-    public void setPackageName(String packageName) {
-      this.packageName = packageName;
-    }
-
-    public String getReplaceString() {
-      return replaceString;
-    }
-
-    public void setReplaceString(String replaceString) {
-      this.replaceString = replaceString;
-    }
-
-    public String getDirectory() {
-      return directory;
-    }
-
-    public void setDirectory(String directory) {
-      this.directory = directory;
-    }
-
-    public String getBaseDir() {
-      return baseDir;
-    }
-
-    public void setBaseDir(String baseDir) {
-      this.baseDir = baseDir;
-    }
+    ImportDescribe importDescribe = new ImportDescribe();
+    importDescribe.setSchema(models);
+    importDescribe.setData(data);
+    return importDescribe;
   }
 
 }

@@ -1,104 +1,131 @@
 package tech.wetech.flexmodel.codegen;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import tech.wetech.flexmodel.Model;
+import tech.wetech.flexmodel.*;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author cjbi
  */
-public class ModelClass implements Serializable {
+public class ModelClass extends AbstractClass<ModelClass> {
 
-  private String packageName;
-  private String schemaName;
-  private String modelName;
-  private final Set<String> imports = new HashSet<>();
-  private String variableName;
-  private String shortClassName;
-  private String fullClassName;
-  private String comment;
   @JsonManagedReference
   private ModelField idField;
   private final List<ModelField> basicFields = new ArrayList<>();
   private final List<ModelField> enumFields = new ArrayList<>();
   private final List<ModelField> relationFields = new ArrayList<>();
   private final List<ModelField> allFields = new ArrayList<>();
-  private Model originalModel;
+  private Model original;
 
   public ModelClass() {
+    super();
     // default imports
-    imports.add("tech.wetech.flexmodel.annotation.*");
+    getImports().add("tech.wetech.flexmodel.annotation.*");
   }
 
-  public String getPackageName() {
-    return packageName;
+  public static ModelClass buildModelClass(String packageName, String schemaName, Entity entity) {
+    return buildModelClass(null, packageName, schemaName, entity);
   }
 
-  public ModelClass setPackageName(String packageName) {
-    this.packageName = packageName;
-    return this;
+  public static ModelClass buildModelClass(String replaceString, String packageName, String schemaName, Entity entity) {
+    String cCamelName = StringUtils.snakeToCamel(replaceString != null ? entity.getName().replaceAll(replaceString, "") : entity.getName());
+    ModelClass modelClass = new ModelClass()
+      .setComment(entity.getComment())
+      .setVariableName(StringUtils.uncapitalize(cCamelName))
+      .setShortClassName(StringUtils.capitalize(cCamelName))
+      .setPackageName(packageName + ".entity")
+      .setSchemaName(schemaName)
+      .setName(entity.getName())
+      .setFullClassName(packageName + ".entity" + "." + StringUtils.capitalize(cCamelName))
+      .setOriginal(entity);
+
+    for (TypedField<?, ?> field : entity.getFields()) {
+
+      ModelField modelField = new ModelField()
+        .setModelClass(modelClass)
+        .setIdentity(field.isIdentity())
+        .setVariableName(StringUtils.snakeToCamel(field.getName()))
+        .setName(field.getName())
+        .setOriginal(field)
+        .setComment(field.getComment());
+
+      switch (field) {
+        case RelationField relationField -> {
+          String ftName = StringUtils.capitalize(
+            StringUtils.snakeToCamel(
+              replaceString != null ?
+                relationField.getFrom().replaceAll(replaceString, "") :
+                relationField.getFrom())
+          );
+          // relation field
+          if (relationField.isMultiple()) {
+            modelField.setTypePackage("java.util")
+              .setFullTypeName("java.util.List")
+              .setShortTypeName("List<" + ftName + ">")
+              .setRelationField(true);
+          } else {
+            modelField.setTypePackage(null)
+              .setFullTypeName(modelField.getTypePackage() + "." + ftName)
+              .setShortTypeName(ftName)
+              .setRelationField(true);
+            modelClass.getRelationFields().add(modelField);
+          }
+
+        }
+        case EnumField anEnumField -> {
+          String ftName = StringUtils.capitalize(
+            StringUtils.snakeToCamel(
+              replaceString != null ?
+                anEnumField.getFrom().replaceAll(replaceString, "") :
+                anEnumField.getFrom())
+          );
+          if (anEnumField.isMultiple()) {
+            modelField.setTypePackage("java.util")
+              .setFullTypeName("java.util.Set")
+              .setShortTypeName("Set<" + ftName + ">")
+              .setEnumField(true);
+          } else {
+            modelField.setTypePackage(packageName + ".enumeration")
+              .setFullTypeName(modelField.getTypePackage() + "." + ftName)
+              .setShortTypeName(ftName)
+              .setEnumField(true);
+          }
+          modelClass.getEnumFields().add(modelField);
+          modelClass.getImports().add(packageName + ".enumeration." + ftName);
+        }
+        default -> {
+          // basic field
+          JavaType typeInfo = JavaType.getTypeInfo(field.getType());
+          modelField.setTypePackage(typeInfo.getTypePackage())
+            .setShortTypeName(typeInfo.getShortTypeName())
+            .setFullTypeName(typeInfo.getFullTypeName())
+            .setBasicField(true);
+
+          modelClass.getBasicFields().add(modelField);
+        }
+      }
+
+      if (modelField.isIdentity()) {
+        modelField.setIdentity(true);
+        modelClass.setIdField(modelField);
+      }
+
+      if (modelField.getTypePackage() != null) {
+        modelClass.getImports().add(modelField.getFullTypeName());
+      }
+      modelClass.getAllFields().add(modelField);
+    }
+    return modelClass;
   }
 
-  public String getSchemaName() {
-    return schemaName;
+  public Model getOriginal() {
+    return original;
   }
 
-  public ModelClass setSchemaName(String schemaName) {
-    this.schemaName = schemaName;
-    return this;
-  }
-
-  public String getModelName() {
-    return modelName;
-  }
-
-  public ModelClass setModelName(String modelName) {
-    this.modelName = modelName;
-    return this;
-  }
-
-  public Set<String> getImports() {
-    return imports;
-  }
-
-  public String getVariableName() {
-    return variableName;
-  }
-
-  public ModelClass setVariableName(String variableName) {
-    this.variableName = variableName;
-    return this;
-  }
-
-  public String getShortClassName() {
-    return shortClassName;
-  }
-
-  public ModelClass setShortClassName(String shortClassName) {
-    this.shortClassName = shortClassName;
-    return this;
-  }
-
-  public String getFullClassName() {
-    return fullClassName;
-  }
-
-  public ModelClass setFullClassName(String fullClassName) {
-    this.fullClassName = fullClassName;
-    return this;
-  }
-
-  public String getComment() {
-    return comment;
-  }
-
-  public ModelClass setComment(String comment) {
-    this.comment = comment;
+  public ModelClass setOriginal(Model original) {
+    this.original = original;
     return this;
   }
 
@@ -134,12 +161,4 @@ public class ModelClass implements Serializable {
       .orElse(null);
   }
 
-  public Model getOriginalModel() {
-    return originalModel;
-  }
-
-  public ModelClass setOriginalModel(Model originalModel) {
-    this.originalModel = originalModel;
-    return this;
-  }
 }

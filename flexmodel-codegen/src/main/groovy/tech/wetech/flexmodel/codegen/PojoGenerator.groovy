@@ -1,4 +1,7 @@
 package tech.wetech.flexmodel.codegen
+
+import java.nio.file.Path
+
 /**
  * PojoGenerator Class
  * Generates Java POJOs based on the provided model definitions.
@@ -7,6 +10,11 @@ package tech.wetech.flexmodel.codegen
  */
 class PojoGenerator extends AbstractGenerator {
 
+  @Override
+  String getTargetFile(GenerationContext context, String targetDirectory) {
+    return Path.of(targetDirectory, "entity", context.modelClass.getShortClassName() + ".java").toString()
+  }
+
 /**
    * Writes the Java class content to the GroovyPrintWriter.
    *
@@ -14,7 +22,7 @@ class PojoGenerator extends AbstractGenerator {
    * @param className The name of the class.
    * @param context The generation context with model details.
    */
-  def write(PrintWriter out, GenerationContext context) {
+  void writeModel(PrintWriter out, GenerationContext context) {
     def modelClass = context.modelClass
     def className = modelClass.shortClassName
     def fields = modelClass.allFields
@@ -40,7 +48,7 @@ class PojoGenerator extends AbstractGenerator {
     out.println " */"
 
     // Write class declaration
-    out.println "@ModelClass(\"${modelClass.originalModel.name}\")"
+    out.println "@ModelClass(\"${modelClass.original.name}\")"
     out.println "public class ${className} {"
 
     // Write field declarations
@@ -54,7 +62,7 @@ class PojoGenerator extends AbstractGenerator {
       if (field.isRelationField()) {
         out.println "  @ModelRelation"
       }
-      out.println "  @ModelField(\"${field.originalField.name}\")"
+      out.println "  @ModelField(\"${field.original.name}\")"
       out.println "  private ${field.shortTypeName} ${field.variableName};"
     }
 

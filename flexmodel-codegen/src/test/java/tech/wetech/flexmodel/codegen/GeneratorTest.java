@@ -27,9 +27,9 @@ class GeneratorTest {
     ImportDescribe describe = new JacksonObjectConverter().parseToObject(content, ImportDescribe.class);
     DAOGenerator daoGenerator = new DAOGenerator();
     GenerationContext generationContext = new GenerationContext();
-    generationContext.getModelClassList().add(GenerationTool.buildModelClass(packageName, schemaName, (Entity) describe.getSchema().getFirst()));
+    generationContext.getModelClassList().add(ModelClass.buildModelClass(packageName, schemaName, (Entity) describe.getSchema().getFirst()));
     while (generationContext.nextModel()) {
-      String str = daoGenerator.generate(generationContext);
+      String str = daoGenerator.generate(generationContext).getFirst();
       Assertions.assertNotNull(str);
     }
   }
@@ -43,7 +43,7 @@ class GeneratorTest {
     String content = new String(is.readAllBytes());
     ImportDescribe describe = new JacksonObjectConverter().parseToObject(content, ImportDescribe.class);
     GenerationContext generationContext = new GenerationContext();
-    generationContext.getModelClassList().add(GenerationTool.buildModelClass(packageName, schemaName, (Entity) describe.getSchema().getFirst()));
+    generationContext.getModelClassList().add(ModelClass.buildModelClass(packageName, schemaName, (Entity) describe.getSchema().getFirst()));
     GStringTemplateEngine engine = new GStringTemplateEngine();
     URL resource = this.getClass().getClassLoader().getResource("templates/${packageName}/${modelClass.modelName}.java.template");
     while (generationContext.nextModel()) {

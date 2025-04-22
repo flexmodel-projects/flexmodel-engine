@@ -2,66 +2,31 @@ package tech.wetech.flexmodel.codegen;
 
 import tech.wetech.flexmodel.Enum;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author cjbi
  */
-public class EnumClass implements Serializable {
+public class EnumClass extends AbstractClass<EnumClass> {
 
-  private String schemaName;
-  private String packageName;
-  private String shortClassName;
-  private String fullClassName;
-  private String variableName;
   private List<String> elements;
-  private String comment;
-  private Enum originalEnum;
+  private Enum original;
 
-  public String getSchemaName() {
-    return schemaName;
-  }
+  public static EnumClass buildEnumClass(String packageName, String schemaName, Enum anEnum) {
+    String ftName = StringUtils.capitalize(StringUtils.snakeToCamel(anEnum.getName()));
 
-  public EnumClass setSchemaName(String schemaName) {
-    this.schemaName = schemaName;
-    return this;
-  }
+    EnumClass enumClass = new EnumClass()
+      .setSchemaName(schemaName)
+      .setPackageName(packageName + ".enumeration")
+      .setShortClassName(ftName)
+      .setName(anEnum.getName());
 
-  public String getPackageName() {
-    return packageName;
-  }
-
-  public EnumClass setPackageName(String packageName) {
-    this.packageName = packageName;
-    return this;
-  }
-
-  public String getShortClassName() {
-    return shortClassName;
-  }
-
-  public EnumClass setShortClassName(String shortClassName) {
-    this.shortClassName = shortClassName;
-    return this;
-  }
-
-  public String getFullClassName() {
-    return fullClassName;
-  }
-
-  public EnumClass setFullClassName(String fullClassName) {
-    this.fullClassName = fullClassName;
-    return this;
-  }
-
-  public String getVariableName() {
-    return variableName;
-  }
-
-  public EnumClass setVariableName(String variableName) {
-    this.variableName = variableName;
-    return this;
+    enumClass.setFullClassName(enumClass.getPackageName() + "." + ftName);
+    enumClass.setVariableName(StringUtils.uncapitalize(ftName));
+    enumClass.setElements(anEnum.getElements());
+    enumClass.setComment(anEnum.getComment());
+    enumClass.setOriginal(anEnum);
+    return enumClass;
   }
 
   public List<String> getElements() {
@@ -73,21 +38,12 @@ public class EnumClass implements Serializable {
     return this;
   }
 
-  public String getComment() {
-    return comment;
+  public Enum getOriginal() {
+    return original;
   }
 
-  public EnumClass setComment(String comment) {
-    this.comment = comment;
-    return this;
-  }
-
-  public Enum getOriginalEnum() {
-    return originalEnum;
-  }
-
-  public EnumClass setOriginalEnum(Enum originalEnum) {
-    this.originalEnum = originalEnum;
+  public EnumClass setOriginal(Enum original) {
+    this.original = original;
     return this;
   }
 }

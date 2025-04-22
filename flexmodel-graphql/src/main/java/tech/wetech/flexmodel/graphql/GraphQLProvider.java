@@ -13,8 +13,9 @@ import tech.wetech.flexmodel.Entity;
 import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.SchemaObject;
 import tech.wetech.flexmodel.SessionFactory;
+import tech.wetech.flexmodel.codegen.EnumClass;
 import tech.wetech.flexmodel.codegen.GenerationContext;
-import tech.wetech.flexmodel.codegen.GenerationTool;
+import tech.wetech.flexmodel.codegen.ModelClass;
 
 import java.util.HashMap;
 import java.util.List;
@@ -50,11 +51,11 @@ public class GraphQLProvider {
       List<SchemaObject> models = sf.getModels(schemaName);
       for (SchemaObject model : models) {
         if (model instanceof Entity entity) {
-          context.getModelClassList().add(GenerationTool.buildModelClass("", schemaName, entity));
+          context.getModelClassList().add(ModelClass.buildModelClass("", schemaName, entity));
           joinDataFetchers.put(schemaName + "_" + model.getName(), joinMap);
           joinDataFetchers.put(schemaName + "_" + model.getName() + "_aggregate", joinMap);
         } else if (model instanceof Enum andEnum) {
-          context.getEnumClassList().add(GenerationTool.buildEnumClass("", schemaName, andEnum));
+          context.getEnumClassList().add(EnumClass.buildEnumClass("", schemaName, andEnum));
         } else {
           // todo 支持非实体类型
         }
@@ -81,7 +82,7 @@ public class GraphQLProvider {
       }
     }
 
-    String schemaString = generator.generate(context);
+    String schemaString = generator.generate(context).getFirst();
 
     SchemaParser schemaParser = new SchemaParser();
     TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(schemaString);

@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel.codegen
 
+import java.nio.file.Path
+
 /**
  * PojoGenerator Class
  * Generates Java POJOs based on the provided model definitions.
@@ -7,6 +9,12 @@ package tech.wetech.flexmodel.codegen
  * Author: cjbi
  */
 class DSLGenerator extends AbstractGenerator {
+
+  @Override
+  String getTargetFile(GenerationContext context, String targetDirectory) {
+    return Path.of(targetDirectory, "dsl", context.modelClass.getShortClassName() + "DSL.java").toString()
+  }
+
 /**
    * Writes the Java class content to the GroovyPrintWriter.
    *
@@ -14,7 +22,7 @@ class DSLGenerator extends AbstractGenerator {
    * @param className The name of the class.
    * @param context The generation context with model details.
    */
-  def write(PrintWriter out, GenerationContext context) {
+  void writeModel(PrintWriter out, GenerationContext context) {
     def modelClass = context.modelClass
     def className = modelClass.shortClassName
     def fields = modelClass.allFields
@@ -54,7 +62,7 @@ class DSLGenerator extends AbstractGenerator {
         out.println "   * ${field.comment}"
         out.println "   */"
       }
-      out.println "  public final FilterExpression<${field.shortTypeName}> ${field.variableName} = new FilterExpression<>(\"${field.modelClass.modelName}.${field.originalField.name}\");"
+      out.println "  public final FilterExpression<${field.shortTypeName}> ${field.variableName} = new FilterExpression<>(\"${field.modelClass.original.name}.${field.original.name}\");"
     }
 
     out.println ""

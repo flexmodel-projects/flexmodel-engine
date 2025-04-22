@@ -11,7 +11,7 @@ public class ModelField {
   @JsonBackReference
   private ModelClass modelClass;
   private String variableName;
-  private String fieldName;
+  private String name;
   private String comment;
   private String typePackage;
   private String shortTypeName;
@@ -20,7 +20,7 @@ public class ModelField {
   private boolean basicField;
   private boolean relationField;
   private boolean enumField;
-  private Field originalField;
+  private Field original;
 
   public ModelClass getModelClass() {
     return modelClass;
@@ -40,12 +40,12 @@ public class ModelField {
     return this;
   }
 
-  public String getFieldName() {
-    return fieldName;
+  public String getName() {
+    return name;
   }
 
-  public ModelField setFieldName(String fieldName) {
-    this.fieldName = fieldName;
+  public ModelField setName(String name) {
+    this.name = name;
     return this;
   }
 
@@ -121,12 +121,12 @@ public class ModelField {
     return this;
   }
 
-  public Field getOriginalField() {
-    return originalField;
+  public Field getOriginal() {
+    return original;
   }
 
-  public ModelField setOriginalField(Field originalField) {
-    this.originalField = originalField;
+  public ModelField setOriginal(Field original) {
+    this.original = original;
     return this;
   }
 }

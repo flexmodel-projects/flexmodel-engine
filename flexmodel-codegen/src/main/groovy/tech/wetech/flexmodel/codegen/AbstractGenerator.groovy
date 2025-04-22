@@ -10,27 +10,86 @@ import org.apache.groovy.io.StringBuilderWriter
 @Log
 abstract class AbstractGenerator implements Generator {
 
-  @Override
-  File generate(GenerationContext context, String targetFile) {
-    log.info "Generating: $targetFile"
-    def file = new File(targetFile)
-    if (!file.exists()) {
-      file.getParentFile().mkdirs()
-      file.createNewFile()
-    }
-    new File(targetFile).withPrintWriter { out ->
-      write(out, context)
-    }
-    return file
+  /**
+   * 子类需实现该方法，返回输出文件路径
+   */
+  String getTargetFile(GenerationContext context, String targetDirectory) {
+    return null
   }
 
   @Override
-  String generate(GenerationContext context) {
+  List<File> generate(GenerationContext context, String dir) {
+    List<File> files = []
+    // 生成并写入主内容、模型和枚举
+    files += processAndWrite(context, dir, this.&write)
+    while (context.nextModel()) {
+      files += processAndWrite(context, dir, this.&writeModel)
+    }
+    while (context.nextEnum()) {
+      files += processAndWrite(context, dir, this.&writeEnum)
+    }
+    return files
+  }
+
+  @Override
+  List<String> generate(GenerationContext context) {
+    List<String> outputs = []
+    outputs << collect(context, this.&write)
+    while (context.nextModel()) {
+      outputs << collect(context, this.&writeModel)
+    }
+    while (context.nextEnum()) {
+      outputs << collect(context, this.&writeEnum)
+    }
+    // 过滤空字符串
+    return outputs.findAll { it }
+  }
+
+  /**
+   * 将生成内容写入文件并返回文件列表
+   */
+  private List<File> processAndWrite(GenerationContext context, String dir, Closure writerFunc) {
+    String content = collect(context, writerFunc)
+    if (!content) {
+      return []
+    }
+    String targetPath = getTargetFile(context, dir)
+    if (!targetPath) {
+      return []
+    }
+    File file = new File(targetPath)
+    file.parentFile?.mkdirs()
+    file.write(content)
+    return [file]
+  }
+
+  /**
+   * 执行写入逻辑，将输出拼接为字符串并返回
+   */
+  private String collect(GenerationContext context, Closure writerFunc) {
     def writer = new StringBuilderWriter()
-    write(new GroovyPrintWriter(writer), context)
+    writerFunc.call(new GroovyPrintWriter(writer), context)
     return writer.toString()
   }
 
-  abstract def write(PrintWriter out, GenerationContext context)
+  /**
+   * 子类可覆盖：用于写入通用内容
+   */
+  void write(PrintWriter out, GenerationContext context) {
+    // 默认空实现
+  }
 
+  /**
+   * 子类可覆盖：用于写入模型内容
+   */
+  void writeModel(PrintWriter out, GenerationContext context) {
+    // 默认空实现
+  }
+
+  /**
+   * 子类可覆盖：用于写入枚举内容
+   */
+  void writeEnum(PrintWriter out, GenerationContext context) {
+    // 默认空实现
+  }
 }

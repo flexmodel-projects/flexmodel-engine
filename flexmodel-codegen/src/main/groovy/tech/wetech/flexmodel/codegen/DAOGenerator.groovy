@@ -2,6 +2,8 @@ package tech.wetech.flexmodel.codegen
 
 import groovy.util.logging.Log
 
+import java.nio.file.Path
+
 /**
  * PojoGenerator Class
  * This class generates Java POJOs based on the model definitions.
@@ -12,7 +14,12 @@ import groovy.util.logging.Log
 class DAOGenerator extends AbstractGenerator {
 
   @Override
-  def write(PrintWriter out, GenerationContext context) {
+  String getTargetFile(GenerationContext context, String targetDirectory) {
+    return Path.of(targetDirectory, "dao", context.modelClass.getShortClassName() + "DAO.java").toString()
+  }
+
+  @Override
+  void writeModel(PrintWriter out, GenerationContext context) {
     def modelClass = context.modelClass
     String rootPackage = context.getVariable("rootPackage");
     def className = "${modelClass.shortClassName}DAO"
@@ -53,7 +60,7 @@ class DAOGenerator extends AbstractGenerator {
     out.println "  // Schema name used for the database operations"
     out.println "  private final String schemaName = \"${modelClass.schemaName}\";"
     out.println "  // Model name associated with the ${modelClass.shortClassName} data"
-    out.println "  private final String modelName = \"${modelClass.originalModel.name}\";"
+    out.println "  private final String modelName = \"${modelClass.original.name}\";"
     out.println ""
     out.println "  // Injected session factory for creating sessions with the database"
     out.println "  @Inject"
@@ -64,7 +71,7 @@ class DAOGenerator extends AbstractGenerator {
 
     if (modelClass.idField) {
       out.println "  // Field name used for identifying records"
-      out.println "  private final String idFieldName = \"${modelClass.idField.originalField.name}\";"
+      out.println "  private final String idFieldName = \"${modelClass.idField.original.name}\";"
       out.println ""
       out.println "  /**"
       out.println "   * Updates a {@link ${modelClass.shortClassName}} record identified by its ID."
