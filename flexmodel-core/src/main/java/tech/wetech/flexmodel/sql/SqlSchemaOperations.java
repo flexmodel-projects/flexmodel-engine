@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author cjbi
@@ -305,7 +306,10 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   private SqlIndex toSqlIndex(Index index) {
     String physicalTableName = toPhysicalTableString(index.getModelName());
     String physicalIndexName = index.getName() != null ? index.getName()
-      : "IDX_" + StringHelper.hashedName(System.currentTimeMillis() + index.getModelName());
+      : "IDX_" + StringHelper.hashedName(index.getModelName() + index.getFields().stream()
+      .map(Index.Field::fieldName)
+      .collect(Collectors.joining())
+    );
     index.setName(physicalIndexName);
     SqlIndex sqlIndex = new SqlIndex();
     sqlIndex.setName(physicalIndexName);

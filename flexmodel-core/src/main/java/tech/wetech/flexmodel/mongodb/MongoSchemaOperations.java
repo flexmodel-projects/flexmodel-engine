@@ -13,6 +13,7 @@ import tech.wetech.flexmodel.sql.StringHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author cjbi
@@ -115,20 +116,26 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
       );
     }
     IndexOptions indexOptions = new IndexOptions();
-    indexOptions.name(getPhysicalIndexName(index.getModelName(), index.getName()));
+    indexOptions.name(getPhysicalIndexName(index));
     indexOptions.unique(index.isUnique());
     mongoDatabase.getCollection(collectionName).createIndex(Indexes.compoundIndex(indexes), indexOptions);
     return index;
   }
 
-  private String getPhysicalIndexName(String modelName, String indexName) {
-    return indexName != null ? indexName : "IDX_" + StringHelper.hashedName(System.currentTimeMillis() + modelName);
+  private String getPhysicalIndexName(Index index) {
+    String modelName = index.getModelName();
+    String indexName = index.getName();
+
+    return indexName != null ? indexName : "IDX_" + StringHelper.hashedName(modelName + index.getFields().stream()
+      .map(Index.Field::fieldName)
+      .collect(Collectors.joining())
+    );
   }
 
   @Override
   public void dropIndex(String modelName, String indexName) {
     String collectionName = getCollectionName(modelName);
-    mongoDatabase.getCollection(collectionName).dropIndex(getPhysicalIndexName(modelName, indexName));
+    mongoDatabase.getCollection(collectionName).dropIndex(indexName);
   }
 
   @Override
