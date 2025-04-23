@@ -122,7 +122,7 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   }
 
   private String getPhysicalIndexName(String modelName, String indexName) {
-    return indexName != null ? indexName : "IDX_" + StringHelper.hashedName(modelName + System.currentTimeMillis());
+    return indexName != null ? indexName : "IDX_" + StringHelper.hashedName(System.currentTimeMillis() + modelName);
   }
 
   @Override

@@ -305,7 +305,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   private SqlIndex toSqlIndex(Index index) {
     String physicalTableName = toPhysicalTableString(index.getModelName());
     String physicalIndexName = index.getName() != null ? index.getName()
-      : "IDX_" + StringHelper.hashedName(index.getModelName() + System.currentTimeMillis());
+      : "IDX_" + StringHelper.hashedName(System.currentTimeMillis() + index.getModelName());
     index.setName(physicalIndexName);
     SqlIndex sqlIndex = new SqlIndex();
     sqlIndex.setName(physicalIndexName);

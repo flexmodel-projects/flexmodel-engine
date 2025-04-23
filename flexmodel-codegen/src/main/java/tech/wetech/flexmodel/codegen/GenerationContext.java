@@ -19,26 +19,25 @@ public class GenerationContext {
   private final List<ModelClass> modelClassList = new ArrayList<>();
   private final List<EnumClass> enumClassList = new ArrayList<>();
   protected Map<String, Object> variables = new HashMap<>();
-  private int modelIndex = 0;
-  private int enumIndex = 0;
+  private int eachIndex = 0;
 
   public boolean nextModel() {
-    if (modelClassList.size() > modelIndex) {
-      modelClass = modelClassList.get(modelIndex++);
+    if (modelClassList.size() > eachIndex) {
+      modelClass = modelClassList.get(eachIndex++);
       return true;
     } else {
-      modelIndex = 0;
+      eachIndex = 0;
       modelClass = null;
       return false;
     }
   }
 
   public boolean nextEnum() {
-    if (enumClassList.size() > enumIndex) {
-      enumClass = enumClassList.get(enumIndex++);
+    if (enumClassList.size() > eachIndex) {
+      enumClass = enumClassList.get(eachIndex++);
       return true;
     } else {
-      enumIndex = 0;
+      eachIndex = 0;
       enumClass = null;
       return false;
     }
