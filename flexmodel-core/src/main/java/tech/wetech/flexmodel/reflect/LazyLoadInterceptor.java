@@ -36,6 +36,7 @@ public class LazyLoadInterceptor {
 
   /**
    * sqlite 不支持类型自动转换，类型不一致会导致查不到数据，所以这里进行类型转换
+   *
    * @param modelName
    * @param fieldName
    * @param value
@@ -53,6 +54,36 @@ public class LazyLoadInterceptor {
     return value;
   }
 
+  /**
+   * 将下划线命名转换为小驼峰命名
+   *
+   * @param str 下划线格式的字符串
+   * @return 小驼峰格式的字符串
+   */
+  public static String underscoreToCamelCase(String str) {
+    if (str == null || str.isEmpty()) {
+      return str;
+    }
+
+    StringBuilder result = new StringBuilder();
+    boolean capitalizeNext = false;
+
+    for (char c : str.toCharArray()) {
+      if (c == '_') {
+        capitalizeNext = true;
+      } else {
+        if (capitalizeNext) {
+          result.append(Character.toUpperCase(c));
+          capitalizeNext = false;
+        } else {
+          result.append(Character.toLowerCase(c));
+        }
+      }
+    }
+
+    return result.toString();
+  }
+
   @RuntimeType
   public Object intercept(@This Object proxy, @Origin Class<?> clazz, @Origin Method method, @SuperCall Callable<?> superCall) throws Throwable {
     try {
@@ -64,6 +95,10 @@ public class LazyLoadInterceptor {
         if (field instanceof RelationField relationField) {
           log.debug("intercept: {}", method.getName());
           Object localValue = dataMap.get(relationField.getLocalField());
+          if (localValue == null) {
+            // 通过驼峰转换字段名
+            localValue = dataMap.get(underscoreToCamelCase(relationField.getLocalField()));
+          }
           if (relationField.isMultiple()) {
             if (localValue == null) {
               return List.of();
