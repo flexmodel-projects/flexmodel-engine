@@ -52,8 +52,8 @@ public class ReflectionUtils {
       });
       return converter.convertValue(result, cls);
     }
-    if (obj.getClass().getAnnotation(ModelClass.class) != null) {
-      Class<?> objClass = obj.getClass();
+    Class<?> objClass = findModelClass(obj.getClass());
+    if (objClass != null) {
       Map<String, String> bindFields = new HashMap<>();
       for (Field field : objClass.getDeclaredFields()) {
         ModelField modelFieldAnnotation = field.getAnnotation(ModelField.class);
@@ -68,6 +68,16 @@ public class ReflectionUtils {
       return converter.convertValue(result, cls);
     }
     return converter.convertValue(obj, cls);
+  }
+
+  public static Class<?> findModelClass(Class<?> objClass) {
+    if(objClass.getAnnotation(ModelClass.class) != null) {
+      return objClass;
+    }
+    if(objClass.getSuperclass() != null) {
+      return findModelClass(objClass.getSuperclass());
+    }
+    return null;
   }
 
   @SuppressWarnings("all")
