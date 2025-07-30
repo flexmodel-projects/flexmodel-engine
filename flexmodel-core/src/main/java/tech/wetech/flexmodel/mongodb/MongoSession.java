@@ -5,19 +5,20 @@ import tech.wetech.flexmodel.AbstractSession;
 import java.util.function.Consumer;
 
 /**
+ * MongoDB数据库的Session实现
+ * 负责MongoDB数据库的事务管理和连接管理
+ * 
  * @author cjbi
  */
 public class MongoSession extends AbstractSession {
 
   public MongoSession(MongoContext mongoContext) {
-    super(mongoContext,
-      new MongoDataOperations(mongoContext),
-      new MongoSchemaOperations(mongoContext));
+    super(mongoContext, new MongoDataOperations(mongoContext), new MongoSchemaOperations(mongoContext));
   }
 
   @Override
   public void startTransaction() {
-
+    // MongoDB事务管理（如果需要的话）
   }
 
   @Override
@@ -33,16 +34,16 @@ public class MongoSession extends AbstractSession {
 
   @Override
   public void commit() {
-
+    // MongoDB事务提交（如果需要的话）
   }
 
   @Override
   public void rollback() {
-
+    // MongoDB事务回滚（如果需要的话）
   }
 
   @Override
   public void close() {
-
+    // MongoDB连接关闭（如果需要的话）
   }
 }

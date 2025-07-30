@@ -9,15 +9,11 @@ import tech.wetech.flexmodel.cache.ConcurrentHashMapCache;
 import tech.wetech.flexmodel.mongodb.MongoContext;
 import tech.wetech.flexmodel.mongodb.MongoDataSourceProvider;
 import tech.wetech.flexmodel.mongodb.MongoSession;
-import tech.wetech.flexmodel.parser.ASTNodeConverter;
-import tech.wetech.flexmodel.parser.impl.ModelParser;
-import tech.wetech.flexmodel.parser.impl.ParseException;
 import tech.wetech.flexmodel.sql.*;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.sql.Connection;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -70,16 +66,18 @@ public class SessionFactory {
     }
   }
 
-  public void loadIDLString(String schemaName, String idlString) throws ParseException {
-    ModelParser parser = new ModelParser(new StringReader(idlString));
-    List<ModelParser.ASTNode> ast = parser.CompilationUnit();
-    List<SchemaObject> schema = new ArrayList<>();
-    for (ModelParser.ASTNode obj : ast) {
-      schema.add(ASTNodeConverter.toSchemaObject(obj));
-    }
-    try (Session session = createFailsafeSession(schemaName)) {
-      processModels(schema, session);
-    }
+  public void loadIDLString(String schemaName, String idlString) {
+    // TODO: 实现IDL解析功能
+    // ModelParser parser = new ModelParser(new StringReader(idlString));
+    // List<ModelParser.ASTNode> ast = parser.CompilationUnit();
+    // List<SchemaObject> schema = new ArrayList<>();
+    // for (ModelParser.ASTNode obj : ast) {
+    //   schema.add(ASTNodeConverter.toSchemaObject(obj));
+    // }
+    // try (Session session = createFailsafeSession(schemaName)) {
+    //   processModels(schema, session);
+    // }
+    throw new UnsupportedOperationException("IDL parsing not implemented yet");
   }
 
   public void loadJSONString(String schemaName, String jsonString) {
@@ -107,8 +105,6 @@ public class SessionFactory {
       }
     } catch (IOException e) {
       log.error("Failed to read import script: {}", e.getMessage(), e);
-    } catch (ParseException e) {
-      throw new RuntimeException(e);
     }
   }
 
