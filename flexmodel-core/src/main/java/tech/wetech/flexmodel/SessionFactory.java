@@ -9,6 +9,7 @@ import tech.wetech.flexmodel.cache.ConcurrentHashMapCache;
 import tech.wetech.flexmodel.mongodb.MongoContext;
 import tech.wetech.flexmodel.mongodb.MongoDataSourceProvider;
 import tech.wetech.flexmodel.mongodb.MongoSession;
+import tech.wetech.flexmodel.parser.ASTNodeConverter;
 import tech.wetech.flexmodel.sql.*;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
@@ -67,17 +68,44 @@ public class SessionFactory {
   }
 
   public void loadIDLString(String schemaName, String idlString) {
-    // TODO: 实现IDL解析功能
-    // ModelParser parser = new ModelParser(new StringReader(idlString));
-    // List<ModelParser.ASTNode> ast = parser.CompilationUnit();
-    // List<SchemaObject> schema = new ArrayList<>();
-    // for (ModelParser.ASTNode obj : ast) {
-    //   schema.add(ASTNodeConverter.toSchemaObject(obj));
-    // }
-    // try (Session session = createFailsafeSession(schemaName)) {
-    //   processModels(schema, session);
-    // }
-    throw new UnsupportedOperationException("IDL parsing not implemented yet");
+    try {
+      // 处理空字符串或只包含空白字符的字符串
+      if (idlString == null || idlString.trim().isEmpty()) {
+        log.info("Empty or null IDL string provided for schema: {}", schemaName);
+        return;
+      }
+
+      // 创建IDL解析器
+      tech.wetech.flexmodel.parser.impl.ModelParser parser =
+          new tech.wetech.flexmodel.parser.impl.ModelParser(new java.io.StringReader(idlString));
+
+      // 解析IDL字符串，获取AST节点列表
+      List<tech.wetech.flexmodel.parser.impl.ModelParser.ASTNode> ast = parser.CompilationUnit();
+
+      // 将AST节点转换为SchemaObject列表
+      List<SchemaObject> schema = new ArrayList<>();
+      for (tech.wetech.flexmodel.parser.impl.ModelParser.ASTNode obj : ast) {
+        SchemaObject schemaObject = ASTNodeConverter.toSchemaObject(obj);
+        if (schemaObject != null) {
+          schema.add(schemaObject);
+        } else {
+          log.warn("Failed to convert AST node to SchemaObject: {}", obj);
+        }
+      }
+
+      // 使用故障安全会话处理模型 - 使用默认数据源
+      try (Session session = createFailsafeSession(dataSourceProviders.keySet().iterator().next())) {
+        processModels(schema, session);
+      }
+
+      log.info("Successfully loaded {} models from IDL for schema: {}", schema.size(), schemaName);
+    } catch (tech.wetech.flexmodel.parser.impl.ParseException e) {
+      log.error("Failed to parse IDL string for schema {}: {}", schemaName, e.getMessage(), e);
+      throw new RuntimeException("IDL parsing failed: " + e.getMessage(), e);
+    } catch (Exception e) {
+      log.error("Failed to load IDL string for schema {}: {}", schemaName, e.getMessage(), e);
+      throw new RuntimeException("Failed to load IDL: " + e.getMessage(), e);
+    }
   }
 
   public void loadJSONString(String schemaName, String jsonString) {
