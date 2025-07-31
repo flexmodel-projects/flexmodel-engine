@@ -28,8 +28,8 @@ public class ASTNodeConverter {
   }
 
   @SuppressWarnings("unchecked")
-  public static Entity toSchemaEntity(ModelParser.Model idlModel) {
-    Entity entity = new Entity(idlModel.name);
+  public static EntityDefinition toSchemaEntity(ModelParser.Model idlModel) {
+    EntityDefinition entity = new EntityDefinition(idlModel.name);
     for (ModelParser.Field field : idlModel.fields) {
       entity.addField(toSchemaField(field));
     }
@@ -159,15 +159,15 @@ public class ASTNodeConverter {
   }
 
   public static ModelParser.ASTNode fromSchemaObject(SchemaObject schemaObject) {
-    if (schemaObject instanceof Entity) {
-      return fromSchemaEntity((Entity) schemaObject);
+    if (schemaObject instanceof EntityDefinition) {
+      return fromSchemaEntity((EntityDefinition) schemaObject);
     } else if (schemaObject instanceof EnumDefinition) {
       return fromSchemaEnum((EnumDefinition) schemaObject);
     }
     return null;
   }
 
-  public static ModelParser.Model fromSchemaEntity(Entity entity) {
+  public static ModelParser.Model fromSchemaEntity(EntityDefinition entity) {
     ModelParser.Model model = new ModelParser.Model(entity.getName());
 
     // 添加字段

@@ -69,14 +69,14 @@ public abstract class AbstractSession implements Session {
     }
 
     @Override
-    public Entity createEntity(Entity collection) {
+    public EntityDefinition createEntity(EntityDefinition collection) {
         inspect(() -> schemaOperations.createEntity(collection));
         sessionContext.getMappedModels().persist(schemaName, collection);
         return collection;
     }
 
     @Override
-    public NativeQueryModel createNativeQueryModel(NativeQueryModel model) {
+    public NativeQueryDefinition createNativeQueryModel(NativeQueryDefinition model) {
         schemaOperations.createNativeQueryModel(model);
         sessionContext.getMappedModels().persist(schemaName, model);
         return model;
@@ -92,7 +92,7 @@ public abstract class AbstractSession implements Session {
     @Override
     public TypedField<?, ?> createField(TypedField<?, ?> field) {
         inspect(() -> schemaOperations.createField(field));
-        Entity entity = (Entity) sessionContext.getModel(field.getModelName());
+        EntityDefinition entity = (EntityDefinition) sessionContext.getModel(field.getModelName());
         entity.addField(field);
         sessionContext.getMappedModels().persist(schemaName, entity);
         return field;
@@ -101,7 +101,7 @@ public abstract class AbstractSession implements Session {
     @Override
     public TypedField<?, ?> modifyField(TypedField<?, ?> field) {
         inspect(() -> schemaOperations.modifyField(field));
-        Entity entity = (Entity) sessionContext.getModel(field.getModelName());
+        EntityDefinition entity = (EntityDefinition) sessionContext.getModel(field.getModelName());
         entity.removeField(field.getName());
         entity.addField(field);
         sessionContext.getMappedModels().persist(schemaName, entity);
@@ -111,7 +111,7 @@ public abstract class AbstractSession implements Session {
     @Override
     public void dropField(String modelName, String fieldName) {
         inspect(() -> schemaOperations.dropField(modelName, fieldName));
-        Entity entity = (Entity) sessionContext.getModel(modelName);
+        EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
         entity.removeField(fieldName);
         // 移除相关索引
         for (Index index : entity.getIndexes()) {
@@ -125,7 +125,7 @@ public abstract class AbstractSession implements Session {
     @Override
     public Index createIndex(Index index) {
         inspect(() -> schemaOperations.createIndex(index));
-        Entity entity = (Entity) sessionContext.getModel(index.getModelName());
+        EntityDefinition entity = (EntityDefinition) sessionContext.getModel(index.getModelName());
         entity.addIndex(index);
         sessionContext.getMappedModels().persist(schemaName, entity);
         return index;
@@ -134,7 +134,7 @@ public abstract class AbstractSession implements Session {
     @Override
     public void dropIndex(String modelName, String indexName) {
         inspect(() -> schemaOperations.dropIndex(modelName, indexName));
-        Entity entity = (Entity) sessionContext.getModel(modelName);
+        EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
         entity.removeIndex(indexName);
         sessionContext.getMappedModels().persist(schemaName, entity);
     }
@@ -243,7 +243,7 @@ public abstract class AbstractSession implements Session {
      * 生成字段值（内联了DataOperationsGenerationDecorator的逻辑）
      */
     private Map<String, Object> generateValue(String modelName, Map<String, Object> data, boolean isUpdate) {
-        Entity entity = (Entity) sessionContext.getModel(modelName);
+        EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
         List<TypedField<?, ?>> fields = entity.getFields();
         Map<String, Object> newData = new HashMap<>();
 
@@ -303,7 +303,7 @@ public abstract class AbstractSession implements Session {
     @SuppressWarnings({"rawtypes", "unchecked"})
     private void insertRelationRecord(String modelName, Object objR, Object id) {
         Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
-        Entity entity = (Entity) sessionContext.getModel(modelName);
+        EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
 
         record.forEach((key, value) -> {
             if (value != null) {

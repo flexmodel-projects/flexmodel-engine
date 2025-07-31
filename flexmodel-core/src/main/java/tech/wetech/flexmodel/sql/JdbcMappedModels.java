@@ -141,9 +141,9 @@ public class JdbcMappedModels implements MappedModels {
   @Override
   public List<SchemaObject> sync(AbstractSessionContext context, Set<String> includes) {
     SqlContext sqlContext = (SqlContext) context;
-    List<Entity> entities = convert(sqlContext.getSqlMetadata().getTables(includes), sqlContext);
+    List<EntityDefinition> entities = convert(sqlContext.getSqlMetadata().getTables(includes), sqlContext);
     Map<String, SchemaObject> metaMap = lookup(sqlContext.getSchemaName()).stream().collect(Collectors.toMap(SchemaObject::getName, wrapper -> wrapper));
-    for (Entity entity : entities) {
+    for (EntityDefinition entity : entities) {
       SchemaObject model = getIgnoreCase(entity.getName(), metaMap);
       if (model == null) {
         this.persist(sqlContext.getSchemaName(), entity);
@@ -151,7 +151,7 @@ public class JdbcMappedModels implements MappedModels {
       }
     }
     Set<String> diff = new HashSet<>();
-    Map<String, Entity> entityMap = entities.stream().collect(Collectors.toMap(Model::getName, model -> model));
+    Map<String, EntityDefinition> entityMap = entities.stream().collect(Collectors.toMap(ModelDefinition::getName, model -> model));
     for (String key : metaMap.keySet()) {
       if (getIgnoreCase(key, entityMap) == null) {
         diff.add(key);
@@ -200,8 +200,8 @@ public class JdbcMappedModels implements MappedModels {
 
   }
 
-  private List<Entity> convert(List<SqlTable> tables, SqlContext sqlContext) {
-    List<Entity> modelList = new ArrayList<>();
+  private List<EntityDefinition> convert(List<SqlTable> tables, SqlContext sqlContext) {
+    List<EntityDefinition> modelList = new ArrayList<>();
     Map<Integer, String> jdbcCodeMap = new HashMap<>();
     sqlContext.getTypeHandlerMap().forEach((key, value) -> {
       if (!jdbcCodeMap.containsKey(value.getJdbcTypeCode())) {
@@ -209,7 +209,7 @@ public class JdbcMappedModels implements MappedModels {
       }
     });
     for (SqlTable table : tables) {
-      Entity entity = new Entity(table.getName());
+      EntityDefinition entity = new EntityDefinition(table.getName());
       entity.setComment(table.getComment());
       Iterator<SqlColumn> colIte = table.getColumnIterator();
       while (colIte.hasNext()) {

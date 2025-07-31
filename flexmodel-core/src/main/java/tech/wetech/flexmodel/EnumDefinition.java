@@ -72,8 +72,8 @@ public class EnumDefinition implements SchemaObject {
 
     @Override
     public boolean equals(Object obj) {
-        if (this.getName() != null && obj instanceof Entity) {
-            return this.getName().equals(((Entity) obj).getName());
+        if (this.getName() != null && obj instanceof EntityDefinition) {
+            return this.getName().equals(((EntityDefinition) obj).getName());
         }
         return false;
     }

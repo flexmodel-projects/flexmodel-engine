@@ -44,20 +44,20 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   @Override
   public void dropModel(String modelName) {
     SchemaObject model = getModel(modelName);
-    if (model instanceof Entity entity) {
+    if (model instanceof EntityDefinition entity) {
       dropTable(toSqlTable(entity));
     }
   }
 
   @Override
-  public Entity createEntity(Entity collection) {
+  public EntityDefinition createEntity(EntityDefinition collection) {
     SqlTable sqlTable = toSqlTable(collection);
     createTable(sqlTable);
     return collection;
   }
 
   @Override
-  public NativeQueryModel createNativeQueryModel(NativeQueryModel model) {
+  public NativeQueryDefinition createNativeQueryModel(NativeQueryDefinition model) {
     return model;
   }
 
@@ -205,7 +205,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
     }
   }
 
-  private SqlTable toSqlTable(Entity entity) {
+  private SqlTable toSqlTable(EntityDefinition entity) {
     String physicalTableName = toPhysicalTableString(entity.getName());
     SqlTable sqlTable = new SqlTable();
     sqlTable.setName(physicalTableName);
@@ -243,7 +243,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
         toPhysicalTableString(relationField.getFrom())
       );
       associationColumn.setSqlTypeCode(
-        sqlContext.getTypeHandler(((Entity) getModel(field.getModelName())).findIdField().orElseThrow()
+        sqlContext.getTypeHandler(((EntityDefinition) getModel(field.getModelName())).findIdField().orElseThrow()
           .getType()).getJdbcTypeCode()
       );
       return associationColumn;
@@ -329,7 +329,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   }
 
   private String toPhysicalTableString(String name) {
-    Entity model = (Entity) sqlContext.getModel(name);
+    EntityDefinition model = (EntityDefinition) sqlContext.getModel(name);
     if (model == null) {
       return name;
     }

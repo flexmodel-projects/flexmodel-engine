@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * @author cjbi
  */
-public interface Model extends Serializable, SchemaObject {
+public interface ModelDefinition extends Serializable, SchemaObject {
 
   List<? extends Field> getFields();
 

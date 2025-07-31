@@ -11,11 +11,11 @@ import java.util.regex.Pattern;
  *
  * @author cjbi
  */
-public class NativeQueryModel extends AbstractModel<NativeQueryModel> {
+public class NativeQueryDefinition extends AbstractModelDefinition<NativeQueryDefinition> {
 
   private String statement;
 
-  public NativeQueryModel(String name) {
+  public NativeQueryDefinition(String name) {
     this.name = name;
   }
 
@@ -23,7 +23,7 @@ public class NativeQueryModel extends AbstractModel<NativeQueryModel> {
     return statement;
   }
 
-  public NativeQueryModel setStatement(String statement) {
+  public NativeQueryDefinition setStatement(String statement) {
     this.statement = statement;
     return this;
   }
@@ -70,8 +70,8 @@ public class NativeQueryModel extends AbstractModel<NativeQueryModel> {
 
   @Override
   public boolean equals(Object obj) {
-    if (this.getName() != null && obj instanceof NativeQueryModel) {
-      return this.getName().equals(((NativeQueryModel) obj).getName());
+    if (this.getName() != null && obj instanceof NativeQueryDefinition) {
+      return this.getName().equals(((NativeQueryDefinition) obj).getName());
     }
     return false;
   }

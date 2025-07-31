@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * @author cjbi
  */
-public abstract class AbstractModel<SELF extends AbstractModel<SELF>> implements Model {
+public abstract class AbstractModelDefinition<SELF extends AbstractModelDefinition<SELF>> implements ModelDefinition {
 
   protected String name;
   protected Map<String, Object> additionalProperties = new HashMap<>();

@@ -28,8 +28,8 @@ class SchemaGenerator extends AbstractGenerator {
     out.println ""
     out.println "import tech.wetech.flexmodel.codegen.ObjectUtils;"
     out.println "import tech.wetech.flexmodel.BuildItem;"
-    out.println "import tech.wetech.flexmodel.Entity;"
-    out.println "import tech.wetech.flexmodel.Enum;"
+    out.println "import tech.wetech.flexmodel.EntityDefinition;"
+    out.println "import tech.wetech.flexmodel.EntityDefinition;"
     out.println "import tech.wetech.flexmodel.SchemaObject;"
     out.println "import tech.wetech.flexmodel.ImportDescribe;"
     modelClassList.each {
@@ -68,10 +68,10 @@ class SchemaGenerator extends AbstractGenerator {
     out.println "    List<SchemaObject> list = new ArrayList<>();"
     out.println "    try {"
     modelClassList.each { model ->
-      out.println "      Entity ${model.variableName} = (Entity) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.original)}\");"
+      out.println "      EntityDefinition ${model.variableName} = (EntityDefinition) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.original)}\");"
     }
     context.enumClassList.each { model ->
-      out.println "      Enum ${model.variableName} = (Enum) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.original)}\");"
+      out.println "      EntityDefinition ${model.variableName} = (EntityDefinition) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.original)}\");"
     }
     modelClassList.each { model ->
       out.println "      list.add(${model.variableName});"

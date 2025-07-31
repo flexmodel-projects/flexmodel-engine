@@ -57,7 +57,7 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   }
 
   @Override
-  public Entity createEntity(Entity collection) {
+  public EntityDefinition createEntity(EntityDefinition collection) {
     String collectionName = getCollectionName(collection.getName());
     mongoDatabase.createCollection(collectionName);
     for (Index index : collection.getIndexes()) {
@@ -73,7 +73,7 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   }
 
   @Override
-  public NativeQueryModel createNativeQueryModel(NativeQueryModel model) {
+  public NativeQueryDefinition createNativeQueryModel(NativeQueryDefinition model) {
     return model;
   }
 
@@ -149,7 +149,7 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   }
 
   private String getCollectionName(String modelName) {
-    Entity model = (Entity) mongoContext.getModel(modelName);
+    EntityDefinition model = (EntityDefinition) mongoContext.getModel(modelName);
     if (model == null) {
       return modelName;
     }

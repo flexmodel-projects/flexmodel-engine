@@ -8,13 +8,13 @@ import java.util.function.UnaryOperator;
 /**
  * @author cjbi
  */
-public class Entity extends AbstractModel<Entity> {
+public class EntityDefinition extends AbstractModelDefinition<EntityDefinition> {
 
   private String comment;
   private List<TypedField<?, ?>> fields = new ArrayList<>();
   private List<Index> indexes = new ArrayList<>();
 
-  public Entity(String name) {
+  public EntityDefinition(String name) {
     this.name = name;
   }
 
@@ -27,7 +27,7 @@ public class Entity extends AbstractModel<Entity> {
     return comment;
   }
 
-  public Entity setComment(String comment) {
+  public EntityDefinition setComment(String comment) {
     this.comment = comment;
     return this;
   }
@@ -37,7 +37,7 @@ public class Entity extends AbstractModel<Entity> {
     return fields;
   }
 
-  public Entity setFields(List<TypedField<?, ?>> fields) {
+  public EntityDefinition setFields(List<TypedField<?, ?>> fields) {
     this.fields = fields;
     return this;
   }
@@ -72,12 +72,12 @@ public class Entity extends AbstractModel<Entity> {
     return indexes;
   }
 
-  public Entity setIndexes(List<Index> indexes) {
+  public EntityDefinition setIndexes(List<Index> indexes) {
     this.indexes = indexes;
     return this;
   }
 
-  public Entity addField(TypedField<?, ?> field) {
+  public EntityDefinition addField(TypedField<?, ?> field) {
     field.setModelName(name);
     fields.add(field);
     return this;
@@ -87,13 +87,13 @@ public class Entity extends AbstractModel<Entity> {
     fields.remove((TypedField<?, ?>) getField(fieldName));
   }
 
-  public Entity addIndex(Index index) {
+  public EntityDefinition addIndex(Index index) {
     index.setModelName(name);
     indexes.add(index);
     return this;
   }
 
-  public Entity addIndex(UnaryOperator<Index> indexUnaryOperator) {
+  public EntityDefinition addIndex(UnaryOperator<Index> indexUnaryOperator) {
     Index index = new Index(name);
     indexUnaryOperator.apply(index);
     addIndex(index);
@@ -112,8 +112,8 @@ public class Entity extends AbstractModel<Entity> {
 
   @Override
   public boolean equals(Object obj) {
-    if (this.getName() != null && obj instanceof Entity) {
-      return this.getName().equals(((Entity) obj).getName());
+    if (this.getName() != null && obj instanceof EntityDefinition) {
+      return this.getName().equals(((EntityDefinition) obj).getName());
     }
     return false;
   }
@@ -124,8 +124,8 @@ public class Entity extends AbstractModel<Entity> {
   }
 
   @Override
-  public Entity clone() {
-    Entity entity = new Entity(name);
+  public EntityDefinition clone() {
+    EntityDefinition entity = new EntityDefinition(name);
     entity.setComment(comment);
     fields.forEach(entity::addField);
     indexes.forEach(entity::addIndex);

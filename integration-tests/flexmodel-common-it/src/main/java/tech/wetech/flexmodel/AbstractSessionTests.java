@@ -794,7 +794,7 @@ public abstract class AbstractSessionTests {
 
 
   void createStudentCollection2(String entityName) {
-    Entity entity = session.createEntity(
+    EntityDefinition entity = session.createEntity(
       entityName, e -> e.setComment("学生")
         .addField(new LongField("id").asIdentity().setDefaultValue(GeneratedValue.AUTO_INCREMENT).setComment("Primary Key"))
     );
@@ -878,11 +878,11 @@ public abstract class AbstractSessionTests {
     createClassesData(classesEntityName);
     createStudentData(studentEntityName);
     createTeacherData(teacherEntityName);
-    Assertions.assertEquals(4, ((Entity) session.getModel(classesEntityName)).getFields().size());
+    Assertions.assertEquals(4, ((EntityDefinition) session.getModel(classesEntityName)).getFields().size());
     session.modifyField(new StringField("classCode").setModelName(classesEntityName).setLength(100));
-    Assertions.assertEquals(4, ((Entity) session.getModel(classesEntityName)).getFields().size());
+    Assertions.assertEquals(4, ((EntityDefinition) session.getModel(classesEntityName)).getFields().size());
     session.modifyField(new StringField("className").setModelName(classesEntityName));
-    Assertions.assertEquals(4, ((Entity) session.getModel(classesEntityName)).getFields().size());
+    Assertions.assertEquals(4, ((EntityDefinition) session.getModel(classesEntityName)).getFields().size());
   }
 
   @Test
@@ -911,7 +911,7 @@ public abstract class AbstractSessionTests {
     session.dropField(entityName, "is_deleted");
     session.dropField(entityName, "createDatetime");
     session.dropField(entityName, "birthday");
-    Entity entity = (Entity) session.getModel(entityName);
+    EntityDefinition entity = (EntityDefinition) session.getModel(entityName);
     Assertions.assertNull(entity.getField("name"));
     Assertions.assertNull(entity.getField("description"));
     Assertions.assertNull(entity.getField("age"));
@@ -943,7 +943,7 @@ public abstract class AbstractSessionTests {
     multipleFiledIndex.setName("IDX_compound");
     session.createIndex(multipleFiledIndex);
     session.dropIndex(entityName, "IDX_compound");
-    Entity entity = (Entity) session.getModel(entityName);
+    EntityDefinition entity = (EntityDefinition) session.getModel(entityName);
     Assertions.assertNull(entity.getIndex("IDX_compound"));
     dropModel(entityName);
   }
@@ -989,7 +989,7 @@ public abstract class AbstractSessionTests {
       Session newSession = sessionFactory.createSession(identifier);
       List<SchemaObject> models = newSession.syncModels();
       Assertions.assertFalse(models.isEmpty());
-      Entity studentDetailEntity = (Entity) models.stream().filter(m -> m.getName().equals(studentDetailEntityName)).findFirst().get();
+      EntityDefinition studentDetailEntity = (EntityDefinition) models.stream().filter(m -> m.getName().equals(studentDetailEntityName)).findFirst().get();
       Assertions.assertFalse(studentDetailEntity.getFields().isEmpty());
       Assertions.assertTrue(studentDetailEntity.getIndexes().isEmpty());
     } else {

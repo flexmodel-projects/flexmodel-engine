@@ -3,7 +3,7 @@ package tech.wetech.flexmodel.supports.jackson;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import tech.wetech.flexmodel.Entity;
+import tech.wetech.flexmodel.EntityDefinition;
 import tech.wetech.flexmodel.RelationField;
 import tech.wetech.flexmodel.reflect.ProxyInterface;
 import tech.wetech.flexmodel.reflect.ReflectionUtils;
@@ -35,7 +35,7 @@ public class LazyObjectSerializer extends StdSerializer<ProxyInterface> {
 
   private Map<String, Object> invokeGetter(ProxyInterface value) {
     Class<?> aClass = value.originClass();
-    Entity entity = value.entityInfo();
+    EntityDefinition entity = value.entityInfo();
     Field[] declaredFields = aClass.getDeclaredFields();
     Map<String, Object> data = new HashMap<>();
     for (Field field : declaredFields) {

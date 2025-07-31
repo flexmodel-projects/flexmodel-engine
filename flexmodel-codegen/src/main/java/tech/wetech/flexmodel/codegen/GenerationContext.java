@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel.codegen;
 
-import tech.wetech.flexmodel.Entity;
+import tech.wetech.flexmodel.EntityDefinition;
 import tech.wetech.flexmodel.EnumDefinition;
 import tech.wetech.flexmodel.ImportDescribe;
 import tech.wetech.flexmodel.SchemaObject;
@@ -138,8 +138,8 @@ public class GenerationContext {
     Map<String, ModelClass> modelClassMap = new HashMap<>();
     Map<String, EnumClass> enumClassMap = new HashMap<>();
     for (SchemaObject model : models) {
-      if (model instanceof Entity) {
-        modelClassMap.put(model.getName(), ModelClass.buildModelClass(configuration.getTarget().getReplaceString(), packageName, schema.getName(), (Entity) model));
+      if (model instanceof EntityDefinition) {
+        modelClassMap.put(model.getName(), ModelClass.buildModelClass(configuration.getTarget().getReplaceString(), packageName, schema.getName(), (EntityDefinition) model));
       } else if (model instanceof EnumDefinition) {
         enumClassMap.put(model.getName(), EnumClass.buildEnumClass(packageName, schema.getName(), (EnumDefinition) model));
       }
@@ -149,7 +149,7 @@ public class GenerationContext {
     context.setSchemaName(schema.getName());
     context.setPackageName(packageName);
     for (SchemaObject model : models) {
-      if (model instanceof Entity) {
+      if (model instanceof EntityDefinition) {
         ModelClass modelClass = modelClassMap.get(model.getName());
         context.getModelClassList().add(modelClass);
         context.getImports().add(modelClass.getFullClassName());

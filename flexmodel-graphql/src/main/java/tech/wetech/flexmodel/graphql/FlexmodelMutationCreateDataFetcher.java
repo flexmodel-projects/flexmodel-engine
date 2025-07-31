@@ -1,7 +1,7 @@
 package tech.wetech.flexmodel.graphql;
 
 import graphql.schema.DataFetchingEnvironment;
-import tech.wetech.flexmodel.Entity;
+import tech.wetech.flexmodel.EntityDefinition;
 import tech.wetech.flexmodel.Session;
 import tech.wetech.flexmodel.SessionFactory;
 import tech.wetech.flexmodel.TypedField;
@@ -26,7 +26,7 @@ public class FlexmodelMutationCreateDataFetcher extends FlexmodelAbstractDataFet
     if (arguments.get("data") instanceof Map data) {
       Map<String, Object> result = new HashMap<>(data);
       try (Session session = sessionFactory.createSession(schemaName)) {
-        Entity entity = (Entity) session.getModel(modelName);
+        EntityDefinition entity = (EntityDefinition) session.getModel(modelName);
         session.insert(modelName, data, id -> {
           Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
           if (idFieldOptional.isPresent()) {

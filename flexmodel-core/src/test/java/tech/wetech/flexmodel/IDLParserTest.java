@@ -157,9 +157,9 @@ public class IDLParserTest {
         SchemaObject schemaObject = ASTNodeConverter.toSchemaObject(node);
 
         assertNotNull(schemaObject);
-        assertTrue(schemaObject instanceof Entity);
+        assertTrue(schemaObject instanceof EntityDefinition);
 
-        Entity entity = (Entity) schemaObject;
+        EntityDefinition entity = (EntityDefinition) schemaObject;
         assertEquals("User", entity.getName());
         assertEquals(3, entity.getFields().size());
 

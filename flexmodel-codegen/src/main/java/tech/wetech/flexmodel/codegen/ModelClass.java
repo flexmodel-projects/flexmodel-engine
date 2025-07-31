@@ -17,7 +17,7 @@ public class ModelClass extends AbstractClass<ModelClass> {
   private final List<ModelField> enumFields = new ArrayList<>();
   private final List<ModelField> relationFields = new ArrayList<>();
   private final List<ModelField> allFields = new ArrayList<>();
-  private Model original;
+  private ModelDefinition original;
 
   public ModelClass() {
     super();
@@ -25,11 +25,11 @@ public class ModelClass extends AbstractClass<ModelClass> {
     getImports().add("tech.wetech.flexmodel.annotation.*");
   }
 
-  public static ModelClass buildModelClass(String packageName, String schemaName, Entity entity) {
+  public static ModelClass buildModelClass(String packageName, String schemaName, EntityDefinition entity) {
     return buildModelClass(null, packageName, schemaName, entity);
   }
 
-  public static ModelClass buildModelClass(String replaceString, String packageName, String schemaName, Entity entity) {
+  public static ModelClass buildModelClass(String replaceString, String packageName, String schemaName, EntityDefinition entity) {
     String cCamelName = StringUtils.snakeToCamel(replaceString != null ? entity.getName().replaceAll(replaceString, "") : entity.getName());
     ModelClass modelClass = new ModelClass()
       .setComment(entity.getComment())
@@ -120,11 +120,11 @@ public class ModelClass extends AbstractClass<ModelClass> {
     return modelClass;
   }
 
-  public Model getOriginal() {
+  public ModelDefinition getOriginal() {
     return original;
   }
 
-  public ModelClass setOriginal(Model original) {
+  public ModelClass setOriginal(ModelDefinition original) {
     this.original = original;
     return this;
   }

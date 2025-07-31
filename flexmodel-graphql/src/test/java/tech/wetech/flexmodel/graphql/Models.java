@@ -13,7 +13,7 @@ public class Models {
 
   private static final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
 
-  public static Entity createClassesEntity(Session session, String entityName) {
+  public static EntityDefinition createClassesEntity(Session session, String entityName) {
     return session.createEntity(entityName, entity -> entity
       .addField(new LongField("id").asIdentity().setDefaultValue(GeneratedValue.AUTO_INCREMENT))
       .addField(new StringField("classCode"))
@@ -22,7 +22,7 @@ public class Models {
     );
   }
 
-  public static Entity createStudentEntity(Session session, String entityName) {
+  public static EntityDefinition createStudentEntity(Session session, String entityName) {
     EnumDefinition genderEnum = session.createEnum(entityName + "_gender", en ->
       en.addElement("UNKNOWN")
         .addElement("MALE")
@@ -47,7 +47,7 @@ public class Models {
     );
   }
 
-  public static Entity createStudentDetailEntity(Session session, String entityName) {
+  public static EntityDefinition createStudentDetailEntity(Session session, String entityName) {
     return session.createEntity(entityName, entity -> entity
       .addField(new LongField("id").asIdentity().setDefaultValue(GeneratedValue.AUTO_INCREMENT))
       .addField(new LongField("studentId"))
@@ -55,14 +55,14 @@ public class Models {
     );
   }
 
-  public static Entity createCourseEntity(Session session, String entityName) {
+  public static EntityDefinition createCourseEntity(Session session, String entityName) {
     return session.createEntity(entityName, entity -> entity
       .addField(new StringField("courseNo").asIdentity().setDefaultValue(GeneratedValue.UUID))
       .addField(new StringField("courseName"))
     );
   }
 
-  public static Entity createTeacherEntity(Session session, String entityName) {
+  public static EntityDefinition createTeacherEntity(Session session, String entityName) {
     return session.createEntity(entityName, entity -> entity
       .addField(new LongField("id").asIdentity().setDefaultValue(GeneratedValue.AUTO_INCREMENT))
       .addField(new StringField("teacherName"))

@@ -7,7 +7,7 @@ import net.bytebuddy.matcher.ElementMatchers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.AbstractSessionContext;
-import tech.wetech.flexmodel.Entity;
+import tech.wetech.flexmodel.EntityDefinition;
 import tech.wetech.flexmodel.RelationField;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class LazyObjProxy {
   @SuppressWarnings("unchecked")
   public static <T> T createProxy(T obj, String modelName, AbstractSessionContext sessionContext) {
     try {
-      Entity entity = (Entity) sessionContext.getModel(modelName);
+      EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
       Class<?> subClazz = new ByteBuddy()
         .subclass(obj.getClass())
         .implement(ProxyInterface.class)
@@ -55,7 +55,7 @@ public class LazyObjProxy {
     return result;
   }
 
-  private static String[] getLazyMethods(Entity entity) {
+  private static String[] getLazyMethods(EntityDefinition entity) {
     List<String> methodNames = new ArrayList<>();
     entity.getFields().forEach(field -> {
       if (field instanceof RelationField) {

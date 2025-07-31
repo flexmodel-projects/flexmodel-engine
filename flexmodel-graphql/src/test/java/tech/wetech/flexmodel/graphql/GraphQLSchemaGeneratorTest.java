@@ -2,7 +2,7 @@ package tech.wetech.flexmodel.graphql;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import tech.wetech.flexmodel.Entity;
+import tech.wetech.flexmodel.EntityDefinition;
 import tech.wetech.flexmodel.EnumDefinition;
 import tech.wetech.flexmodel.ImportDescribe;
 import tech.wetech.flexmodel.SchemaObject;
@@ -33,8 +33,8 @@ class GraphQLSchemaGeneratorTest {
     generationContext.setPackageName(packageName);
     generationContext.setSchemaName(schemaName);
     for (SchemaObject model : describe.getSchema()) {
-      if (model instanceof Entity) {
-        generationContext.getModelClassList().add(ModelClass.buildModelClass(packageName, schemaName, (Entity) model));
+      if (model instanceof EntityDefinition) {
+        generationContext.getModelClassList().add(ModelClass.buildModelClass(packageName, schemaName, (EntityDefinition) model));
       } else if (model instanceof EnumDefinition anEnum) {
         generationContext.getEnumClassList().add(EnumClass.buildEnumClass(packageName, schemaName, anEnum));
       }

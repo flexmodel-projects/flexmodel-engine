@@ -147,9 +147,9 @@ public class SessionFactory {
       if (older != null && Objects.equals(older.getIdl(), model.getIdl())) {
         continue;
       }
-      if (model instanceof Entity newer) {
+      if (model instanceof EntityDefinition newer) {
         try {
-          updateEntity(session, newer, (Entity) older);
+          updateEntity(session, newer, (EntityDefinition) older);
         } catch (Exception e) {
           log.warn("Error processing model: {}", e.getMessage(), e);
         }
@@ -172,7 +172,7 @@ public class SessionFactory {
     }
   }
 
-  private void updateEntity(Session session, Entity newer, Entity older) throws Exception {
+  private void updateEntity(Session session, EntityDefinition newer, EntityDefinition older) throws Exception {
     try {
       session.createEntity(newer.clone());
     } catch (Exception e) {
@@ -182,7 +182,7 @@ public class SessionFactory {
     }
   }
 
-  private void updateEntityFields(Session session, Entity newer, Entity older) {
+  private void updateEntityFields(Session session, EntityDefinition newer, EntityDefinition older) {
     newer.getFields().forEach(field -> {
       try {
         if (older.getField(field.getName()) == null) {

@@ -30,7 +30,7 @@ public abstract class BaseSqlStatement {
   private Pair<String, Map<String, Object>> buildQuerySql(String modelName, Query query, boolean prepared) {
     QueryHelper.validate(sqlContext, modelName, query);
     Map<String, Object> params = new HashMap<>();
-    Model model = (Model) sqlContext.getModel(modelName);
+    ModelDefinition model = (ModelDefinition) sqlContext.getModel(modelName);
     StringBuilder sqlBuilder = new StringBuilder("\nselect ");
     Map<String, String> projectionMap = new HashMap<>();
     appendProjection(modelName, query, model, projectionMap, sqlBuilder);
@@ -92,7 +92,7 @@ public abstract class BaseSqlStatement {
     }
   }
 
-  private void appendJoins(String modelName, Query query, Model model, StringBuilder sqlBuilder, Map<String, Object> params, boolean prepared) {
+  private void appendJoins(String modelName, Query query, ModelDefinition model, StringBuilder sqlBuilder, Map<String, Object> params, boolean prepared) {
     Query.Joins joins = query.getJoins();
     if (joins != null) {
       StringBuilder joinCause = new StringBuilder();
@@ -107,7 +107,7 @@ public abstract class BaseSqlStatement {
         String localField = joiner.getLocalField();
         String foreignField = joiner.getForeignField();
         RelationField relationField;
-        if (model instanceof Entity entity && (relationField = entity.findRelationByModelName(joiner.getFrom()).orElse(null)) != null) {
+        if (model instanceof EntityDefinition entity && (relationField = entity.findRelationByModelName(joiner.getFrom()).orElse(null)) != null) {
           foreignField = relationField.getForeignField();
           joinCause.append(joinTableName).append(" \n on \n").append(toFullColumnQuoteString(modelName, localField)).append("=").append(toFullColumnQuoteString(joiner.getAs(), foreignField));
 
@@ -135,7 +135,7 @@ public abstract class BaseSqlStatement {
     sqlBuilder.append("\nfrom ").append(physicalFromTableName);
   }
 
-  private void appendProjection(String modelName, Query query, Model model, Map<String, String> projectionMap, StringBuilder sqlBuilder) {
+  private void appendProjection(String modelName, Query query, ModelDefinition model, Map<String, String> projectionMap, StringBuilder sqlBuilder) {
     SqlDialect sqlDialect = sqlContext.getSqlDialect();
     Query.Projection projection = query.getProjection();
     Map<String, RelationField> relationFields = QueryHelper.findRelationFields(model, query);

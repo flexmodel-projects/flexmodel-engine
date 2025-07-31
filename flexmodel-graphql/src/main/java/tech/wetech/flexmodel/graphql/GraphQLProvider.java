@@ -9,7 +9,7 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
-import tech.wetech.flexmodel.Entity;
+import tech.wetech.flexmodel.EntityDefinition;
 import tech.wetech.flexmodel.EnumDefinition;
 import tech.wetech.flexmodel.SchemaObject;
 import tech.wetech.flexmodel.SessionFactory;
@@ -50,7 +50,7 @@ public class GraphQLProvider {
     for (String schemaName : sf.getSchemaNames()) {
       List<SchemaObject> models = sf.getModels(schemaName);
       for (SchemaObject model : models) {
-        if (model instanceof Entity entity) {
+        if (model instanceof EntityDefinition entity) {
           context.getModelClassList().add(ModelClass.buildModelClass("", schemaName, entity));
           joinDataFetchers.put(schemaName + "_" + model.getName(), joinMap);
           joinDataFetchers.put(schemaName + "_" + model.getName() + "_aggregate", joinMap);
@@ -65,7 +65,7 @@ public class GraphQLProvider {
     for (String schemaName : sf.getSchemaNames()) {
       List<SchemaObject> models = sf.getModels(schemaName);
       for (SchemaObject model : models) {
-        if (model instanceof Entity entity) {
+        if (model instanceof EntityDefinition entity) {
           for (DataFetchers fetchType : DataFetchers.values()) {
             if (fetchType.isQuery()) {
               queryDataFetchers.put(

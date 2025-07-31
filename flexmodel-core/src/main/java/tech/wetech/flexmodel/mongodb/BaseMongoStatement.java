@@ -42,7 +42,7 @@ abstract class BaseMongoStatement {
     }
   }
 
-  private void addJoins(List<Document> pipeline, Model model,
+  private void addJoins(List<Document> pipeline, ModelDefinition model,
                         PhysicalNamingStrategy physicalNamingStrategy, Query query) {
     if (query.getJoins() != null) {
       for (Query.Join join : query.getJoins().getJoins()) {
@@ -59,7 +59,7 @@ abstract class BaseMongoStatement {
     }
   }
 
-  private Document createLookupDocument(List<Document> pipeline, Model model, Query.Join join, String joinCollectionName) {
+  private Document createLookupDocument(List<Document> pipeline, ModelDefinition model, Query.Join join, String joinCollectionName) {
     Document lookup = new Document();
     lookup.append("from", joinCollectionName)
       .append("localField", join.getLocalField())
@@ -72,7 +72,7 @@ abstract class BaseMongoStatement {
     return lookup;
   }
 
-  private void addProjectionStage(List<Document> pipeline, Model model, Query query) {
+  private void addProjectionStage(List<Document> pipeline, ModelDefinition model, Query query) {
     Document project = new Document("_id", false);
     Map<String, RelationField> relationFields = QueryHelper.findRelationFields(model, query);
     boolean hasAggFunc = false;
@@ -187,7 +187,7 @@ abstract class BaseMongoStatement {
 
   protected List<Document> createPipeline(String modelName, Query query) {
     QueryHelper.validate(mongoContext, modelName, query);
-    Model model = (Model) mongoContext.getModel(modelName);
+    ModelDefinition model = (ModelDefinition) mongoContext.getModel(modelName);
     PhysicalNamingStrategy physicalNamingStrategy = mongoContext.getPhysicalNamingStrategy();
     List<Document> pipeline = new ArrayList<>();
     addMatchStage(pipeline, query);
@@ -198,7 +198,7 @@ abstract class BaseMongoStatement {
     return pipeline;
   }
 
-  private String getNameSimply(Model model, Query.QueryField queryField) {
+  private String getNameSimply(ModelDefinition model, Query.QueryField queryField) {
     String aliasName = queryField.getAliasName();
     String fieldName = queryField.getFieldName();
     if (model.getName().equals(aliasName)) {

@@ -46,7 +46,7 @@ public interface SchemaOperations {
    * @param collection
    * @return
    */
-  Entity createEntity(Entity collection);
+  EntityDefinition createEntity(EntityDefinition collection);
 
   /**
    * 创建本地查询
@@ -54,7 +54,7 @@ public interface SchemaOperations {
    * @param model
    * @return
    */
-  NativeQueryModel createNativeQueryModel(NativeQueryModel model);
+  NativeQueryDefinition createNativeQueryModel(NativeQueryDefinition model);
 
   /**
    * 创建枚举
@@ -127,14 +127,14 @@ public interface SchemaOperations {
    * @param entityUnaryOperator
    * @return
    */
-  default Entity createEntity(String modelName, UnaryOperator<Entity> entityUnaryOperator) {
-    Entity collection = new Entity(modelName);
+  default EntityDefinition createEntity(String modelName, UnaryOperator<EntityDefinition> entityUnaryOperator) {
+    EntityDefinition collection = new EntityDefinition(modelName);
     entityUnaryOperator.apply(collection);
     return createEntity(collection);
   }
 
-  default NativeQueryModel createNativeQueryModel(String modelName, UnaryOperator<NativeQueryModel> modelUnaryOperator) {
-    NativeQueryModel model = new NativeQueryModel(modelName);
+  default NativeQueryDefinition createNativeQueryModel(String modelName, UnaryOperator<NativeQueryDefinition> modelUnaryOperator) {
+    NativeQueryDefinition model = new NativeQueryDefinition(modelName);
     modelUnaryOperator.apply(model);
     return createNativeQueryModel(model);
   }

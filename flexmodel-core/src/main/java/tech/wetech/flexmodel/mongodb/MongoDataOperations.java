@@ -35,7 +35,7 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   @Override
   public int insert(String modelName, Object objR, Consumer<Object> idConsumer) {
     Map<String, Object> record = ReflectionUtils.toClassBean(mongoContext.getJsonObjectConverter(), objR, Map.class);
-    Entity entity = (Entity) mongoContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) mongoContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     if (!record.containsKey(idField.getName()) && idField.getDefaultValue().equals(GeneratedValue.AUTO_INCREMENT)) {
       setId(modelName, record);
@@ -54,7 +54,7 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
     } catch (Exception ignored) {
     }
     long sequenceNextVal = schemaOperations.getSequenceNextVal(sequenceName);
-    Entity entity = (Entity) schemaOperations.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) schemaOperations.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     record.put(idField.getName(), sequenceNextVal);
   }
@@ -63,7 +63,7 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   public int updateById(String modelName, Object objR, Object id) {
     Map<String, Object> record = ReflectionUtils.toClassBean(mongoContext.getJsonObjectConverter(), objR, Map.class);
     String collectionName = getCollectionName(modelName);
-    Entity entity = (Entity) mongoContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) mongoContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     UpdateResult result = mongoDatabase.getCollection(collectionName, Map.class).updateOne(Filters.eq(idField.getName(), id), new Document("$set", new Document(record)));
     return (int) result.getModifiedCount();
@@ -82,7 +82,7 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   @Override
   public int deleteById(String modelName, Object id) {
     String collectionName = getCollectionName(modelName);
-    Entity entity = (Entity) mongoContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) mongoContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     return (int) mongoDatabase.getCollection(collectionName)
       .deleteMany(Filters.eq(idField.getName(), id)).getDeletedCount();
@@ -108,14 +108,14 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   @SuppressWarnings({"rawtypes", "unchecked"})
   public <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery) {
     String collectionName = getCollectionName(modelName);
-    Entity entity = (Entity) mongoContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) mongoContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
 
     Map dataMap = mongoDatabase.getCollection(collectionName, Map.class)
       .find(Filters.eq(idField.getName(), id))
       .first();
     if (nestedQuery && dataMap != null) {
-      QueryHelper.nestedQuery(List.of(dataMap), this::findMapList, (Model) mongoContext.getModel(modelName),
+      QueryHelper.nestedQuery(List.of(dataMap), this::findMapList, (ModelDefinition) mongoContext.getModel(modelName),
         null, mongoContext, mongoContext.getNestedQueryMaxDepth());
     }
     return mongoContext.getJsonObjectConverter().convertValue(dataMap, resultType);
@@ -125,7 +125,7 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
     List<Map<String, Object>> mapList = findMapList(modelName, query);
     if (query.isNestedQueryEnabled()) {
-      QueryHelper.nestedQuery(mapList, this::findMapList, (Model) mongoContext.getModel(modelName), query, mongoContext, mongoContext.getNestedQueryMaxDepth());
+      QueryHelper.nestedQuery(mapList, this::findMapList, (ModelDefinition) mongoContext.getModel(modelName), query, mongoContext, mongoContext.getNestedQueryMaxDepth());
     }
     return mongoContext.getJsonObjectConverter().convertValueList(mapList, resultType);
   }
@@ -142,7 +142,7 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   @Override
   public <T> List<T> findByNativeQueryModel(String modelName, Object obj, Class<T> resultType) {
     Map<String, Object> params = ReflectionUtils.toClassBean(mongoContext.getJsonObjectConverter(), obj, Map.class);
-    NativeQueryModel model = (NativeQueryModel) mongoContext.getModel(modelName);
+    NativeQueryDefinition model = (NativeQueryDefinition) mongoContext.getModel(modelName);
     return findByNativeQuery(model.getStatement(), params, resultType);
   }
 

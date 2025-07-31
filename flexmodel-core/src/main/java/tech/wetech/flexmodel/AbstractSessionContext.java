@@ -21,7 +21,7 @@ public abstract class AbstractSessionContext {
   protected boolean failsafe = false;
   protected int nestedQueryMaxDepth = 5;
   protected final SessionFactory factory;
-  protected final Map<String, Model> aliasModelMap = new HashMap<>();
+  protected final Map<String, ModelDefinition> aliasModelMap = new HashMap<>();
 
   protected AbstractSessionContext(String schemaName, MappedModels mappedModels, JsonObjectConverter jsonObjectConverter, SessionFactory factory) {
     this.schemaName = schemaName;
@@ -42,14 +42,14 @@ public abstract class AbstractSessionContext {
     return schemaName;
   }
 
-  public void addAliasModelIfPresent(String alias, Model model) {
+  public void addAliasModelIfPresent(String alias, ModelDefinition model) {
     if (!aliasModelMap.containsKey(alias)) {
       aliasModelMap.put(alias, model);
     }
   }
 
   public SchemaObject getModel(String name) {
-    Model model = aliasModelMap.get(name);
+    ModelDefinition model = aliasModelMap.get(name);
     if (model != null) {
       return model;
     }
