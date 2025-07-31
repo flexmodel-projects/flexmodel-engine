@@ -12,7 +12,6 @@ import tech.wetech.flexmodel.sql.StringHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * @author cjbi
@@ -33,17 +32,15 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   }
 
   @Override
-  public int insert(String modelName, Object objR, Consumer<Object> idConsumer) {
+  public int insert(String modelName, Object objR) {
     Map<String, Object> record = ReflectionUtils.toClassBean(mongoContext.getJsonObjectConverter(), objR, Map.class);
     EntityDefinition entity = (EntityDefinition) mongoContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     if (!record.containsKey(idField.getName()) && idField.getDefaultValue().equals(GeneratedValue.AUTO_INCREMENT)) {
       setId(modelName, record);
-      idConsumer.accept(record.get(idField.getName()));
     }
     String collectionName = getCollectionName(modelName);
     InsertOneResult result = mongoDatabase.getCollection(collectionName, Map.class).insertOne(record);
-    idConsumer.accept(record.get(idField.getName()));
     return result.wasAcknowledged() ? 1 : 0;
   }
 

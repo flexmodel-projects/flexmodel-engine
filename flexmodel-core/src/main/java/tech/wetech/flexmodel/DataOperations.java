@@ -4,7 +4,6 @@ import tech.wetech.flexmodel.dsl.Predicate;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 /**
@@ -18,11 +17,10 @@ public interface DataOperations {
    * Insert a record
    *
    * @param modelName Model name
-   * @param record    Record
-   * @param id        Auto increment name
+   * @param record    Record (id should be included in the record map if needed)
    * @return Number of affected rows
    */
-  int insert(String modelName, Object record, Consumer<Object> id);
+  int insert(String modelName, Object record);
 
   /**
    * Find a record by ID
@@ -94,11 +92,15 @@ public interface DataOperations {
    */
   int deleteAll(String modelName);
 
-  default int insert(String modelName, Object record) {
-    return insert(modelName, record, id -> {
-    });
-  }
 
+
+  /**
+   * Insert multiple records
+   *
+   * @param modelName Model name
+   * @param records   Records
+   * @return Number of affected rows
+   */
   /**
    * Insert multiple records
    *
@@ -108,7 +110,7 @@ public interface DataOperations {
    */
   @SuppressWarnings("all")
   default int insertAll(String modelName, List records) {
-    int rows = -1;
+    int rows = 0;
     for (Object record : records) {
       rows += insert(modelName, record);
     }

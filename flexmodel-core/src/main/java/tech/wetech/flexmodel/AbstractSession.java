@@ -10,8 +10,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -157,14 +155,21 @@ public abstract class AbstractSession implements Session {
     // ==================== 数据操作 (内联了DataOperationsGenerationDecorator) ====================
 
     @Override
-    public int insert(String modelName, Object record, Consumer<Object> idConsumer) {
+    public int insert(String modelName, Object record) {
         Map<String, Object> data = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), record, Map.class);
         Map<String, Object> processedData = generateValue(modelName, data, false);
 
-        AtomicReference<Object> atomicId = new AtomicReference<>();
-        int rows = dataOperations.insert(modelName, processedData, atomicId::set);
-        Object id = atomicId.get();
-        idConsumer.accept(id);
+        int rows = dataOperations.insert(modelName, processedData);
+
+        // 获取生成的ID（如果有的话）
+        EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+        Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
+        Object id = null;
+        if (idFieldOptional.isPresent()) {
+            id = processedData.get(idFieldOptional.get().getName());
+            // 将生成的ID放回到原始的data map中
+            data.put(idFieldOptional.get().getName(), id);
+        }
 
         // 处理关联关系
         insertRelationRecord(modelName, data, id);

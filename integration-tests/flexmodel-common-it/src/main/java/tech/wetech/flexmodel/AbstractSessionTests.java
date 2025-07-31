@@ -1,8 +1,6 @@
 package tech.wetech.flexmodel;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import tech.wetech.flexmodel.dsl.Expressions;
 import tech.wetech.flexmodel.dto.TeacherDTO;
 import tech.wetech.flexmodel.entity.Classes;
@@ -13,10 +11,8 @@ import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static tech.wetech.flexmodel.Direction.DESC;
 import static tech.wetech.flexmodel.GeneratedValue.AUTO_INCREMENT;
@@ -26,11 +22,18 @@ import static tech.wetech.flexmodel.Projections.*;
 /**
  * @author cjbi
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractSessionTests {
 
   public static SessionFactory sessionFactory;
   public static Session session;
   private final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
+
+  // 用于生成唯一的实体名称，避免测试间冲突
+  private final AtomicInteger entityCounter = new AtomicInteger(1);
+
+  // 记录测试中创建的实体，用于清理
+  private final List<String> createdEntities = new ArrayList<>();
 
   protected static void initSession(DataSourceProvider dataSourceProvider) {
     sessionFactory = SessionFactory.builder()
@@ -39,9 +42,52 @@ public abstract class AbstractSessionTests {
     session = sessionFactory.createSession("default");
   }
 
+  @BeforeEach
+  void setUp() {
+    // 每个测试方法执行前的准备工作
+    createdEntities.clear();
+  }
+
+  @AfterEach
+  void tearDown() {
+    // 清理测试中创建的实体
+    for (String entityName : createdEntities) {
+      try {
+        session.dropModel(entityName);
+      } catch (Exception e) {
+        // 忽略清理时的异常，避免影响测试结果
+      }
+    }
+    createdEntities.clear();
+  }
+
   @AfterAll
   static void afterAll() {
+    // 清理静态资源
+    if (session != null) {
+      try {
+        // 如果Session有close方法则调用，否则忽略
+        if (session.getClass().getMethod("close") != null) {
+          session.close();
+        }
+      } catch (Exception e) {
+        // 忽略关闭时的异常
+      }
+    }
+  }
 
+  /**
+   * 生成唯一的实体名称，避免测试间冲突
+   */
+  protected String generateEntityName(String baseName) {
+    return baseName + "_" + entityCounter.getAndIncrement();
+  }
+
+  /**
+   * 记录创建的实体，用于测试后清理
+   */
+  protected void registerEntity(String entityName) {
+    createdEntities.add(entityName);
   }
 
   void createClassesEntity(String entityName) {
@@ -317,23 +363,45 @@ public abstract class AbstractSessionTests {
 
   @Test
   void testRelation() {
-    String classesEntityName = "TestRelationClasses";
-    String studentEntityName = "TestRelationStudent";
-    String studentDetailEntityName = "TestRelationStudentDetail";
-    String courseEntityName = "TestRelationCourse";
-    String teacherEntityName = "TestRelationTeacher";
+    // 使用唯一实体名称避免测试冲突
+    String classesEntityName = generateEntityName("TestRelationClasses");
+    String studentEntityName = generateEntityName("TestRelationStudent");
+    String studentDetailEntityName = generateEntityName("TestRelationStudentDetail");
+    String courseEntityName = generateEntityName("TestRelationCourse");
+    String teacherEntityName = generateEntityName("TestRelationTeacher");
+
+    // 创建实体并注册用于清理
     createClassesEntity(classesEntityName);
+    registerEntity(classesEntityName);
     createStudentEntity(studentEntityName);
+    registerEntity(studentEntityName);
     createStudentDetailEntity(studentDetailEntityName);
+    registerEntity(studentDetailEntityName);
     createCourseEntity(courseEntityName);
+    registerEntity(courseEntityName);
     createTeacherEntity(teacherEntityName);
+    registerEntity(teacherEntityName);
+
+    // 创建关联关系
     createAssociations(classesEntityName, studentEntityName, studentDetailEntityName, courseEntityName, teacherEntityName);
+
+    // 插入测试数据
     createCourseData(courseEntityName);
     createClassesData(classesEntityName);
     createStudentData(studentEntityName);
     createTeacherData(teacherEntityName);
 
-    // 1:1
+    // 测试1:1关系查询
+    testOneToOneRelation(studentEntityName, studentDetailEntityName);
+
+    // 测试1:n关系查询
+    testOneToManyRelation(classesEntityName, studentEntityName);
+  }
+
+  /**
+   * 测试1:1关系查询
+   */
+  private void testOneToOneRelation(String studentEntityName, String studentDetailEntityName) {
     Map<String, Object> oneToOne = session.find(studentEntityName, query -> query
       .withProjection(projection -> projection
         .addField("studentName", field("studentName"))
@@ -344,10 +412,17 @@ public abstract class AbstractSessionTests {
       )
       .withFilter(Expressions.field(studentEntityName + ".id").eq("1"))
     ).getFirst();
-    Assertions.assertEquals("张三", oneToOne.get("studentName"));
-    Assertions.assertEquals("张三的描述", oneToOne.get("description"));
 
-    // 1:n
+    // 详细的断言验证
+    Assertions.assertNotNull(oneToOne, "查询结果不应为空");
+    Assertions.assertEquals("张三", oneToOne.get("studentName"), "学生姓名应该匹配");
+    Assertions.assertEquals("张三的描述", oneToOne.get("description"), "学生描述应该匹配");
+  }
+
+  /**
+   * 测试1:n关系查询
+   */
+  private void testOneToManyRelation(String classesEntityName, String studentEntityName) {
     List<Map<String, Object>> oneToMany = session.find(classesEntityName, query -> query
       .withProjection(projection -> projection
         .addField("className", field("className"))
@@ -360,10 +435,14 @@ public abstract class AbstractSessionTests {
       )
       .withFilter(Expressions.field(classesEntityName + ".id").eq("1"))
     );
-    Assertions.assertFalse(oneToMany.isEmpty());
-    Assertions.assertEquals("一年级1班", oneToMany.getFirst().get("className"));
-    Assertions.assertEquals("张三", oneToMany.getFirst().get("studentName"));
 
+    // 详细的断言验证
+    Assertions.assertFalse(oneToMany.isEmpty(), "查询结果不应为空");
+    Assertions.assertTrue(oneToMany.size() >= 1, "应该至少有一条记录");
+
+    Map<String, Object> firstRecord = oneToMany.getFirst();
+    Assertions.assertEquals("一年级1班", firstRecord.get("className"), "班级名称应该匹配");
+    Assertions.assertEquals("张三", firstRecord.get("studentName"), "学生姓名应该匹配");
   }
 
   @Test
@@ -504,8 +583,24 @@ public abstract class AbstractSessionTests {
 
   @Test
   void testInsert() {
-    String entityName = "testInsert_teacher";
+    String entityName = generateEntityName("testInsert_teacher");
     createTeacherCollection2(entityName);
+    registerEntity(entityName);
+
+    // 测试插入基本数据
+    testInsertBasicRecord(entityName);
+
+    // 测试插入带扩展信息的数据
+    testInsertRecordWithExtra(entityName);
+
+    // 测试插入null值
+    testInsertRecordWithNull(entityName);
+  }
+
+  /**
+   * 测试插入基本记录
+   */
+  private void testInsertBasicRecord(String entityName) {
     Map<String, Object> record = new HashMap<>();
     record.put("name", "张三丰");
     record.put("age", 218);
@@ -513,27 +608,54 @@ public abstract class AbstractSessionTests {
     record.put("createDatetime", LocalDateTime.now());
     record.put("birthday", LocalDate.of(1247, 1, 1));
     record.put("isLocked", true);
-//    record.put("extra", """
-//      [{
-//         "foo": "bar"
-//      }]
-//      """);
-    Assertions.assertEquals(1, session.insert(entityName, record));
-    Map<String, Object> record2 = new HashMap<>();
-    record2.put("name", "李白");
-    record2.put("age", 61);
-    record2.put("description", "字太白，号青莲居士");
-    record2.put("createDatetime", LocalDateTime.now());
-    record2.put("birthday", LocalDate.of(701, 2, 28));
-    record2.put("extra", Map.of("foo", "bar"));
-    Assertions.assertEquals(1, session.insert(entityName, record2, Assertions::assertNotNull));
-    Map<String, Object> record3 = new HashMap<>();
-    record3.put("name", "杜甫");
-    record3.put("age", 58);
-    record3.put("description", "字子美，自号少陵野老，唐代伟大的现实主义诗人");
-    record3.put("birthday", LocalDate.of(712, 2, 12));
-    record3.put("extra", null);
-    Assertions.assertEquals(1, session.insert(entityName, record3, Assertions::assertNotNull));
+
+    int affectedRows = session.insert(entityName, record);
+    Assertions.assertEquals(1, affectedRows, "应该成功插入一条记录");
+
+    // 验证插入的数据
+    Map<String, Object> insertedRecord = session.findById(entityName, record.get("id"));
+    Assertions.assertNotNull(insertedRecord, "插入的记录应该能够被查询到");
+    Assertions.assertEquals("张三丰", insertedRecord.get("name"), "姓名应该匹配");
+    Assertions.assertEquals(218, insertedRecord.get("age"), "年龄应该匹配");
+  }
+
+  /**
+   * 测试插入带扩展信息的记录
+   */
+  private void testInsertRecordWithExtra(String entityName) {
+    Map<String, Object> record = new HashMap<>();
+    record.put("name", "李白");
+    record.put("age", 61);
+    record.put("description", "字太白，号青莲居士");
+    record.put("createDatetime", LocalDateTime.now());
+    record.put("birthday", LocalDate.of(701, 2, 28));
+    record.put("extra", Map.of("foo", "bar"));
+
+    int affectedRows = session.insert(entityName, record);
+    Assertions.assertEquals(1, affectedRows, "应该成功插入一条记录");
+
+    // 验证扩展信息
+    Map<String, Object> insertedRecord = session.findById(entityName, record.get("id"));
+    Assertions.assertNotNull(insertedRecord.get("extra"), "扩展信息不应为空");
+  }
+
+  /**
+   * 测试插入null值
+   */
+  private void testInsertRecordWithNull(String entityName) {
+    Map<String, Object> record = new HashMap<>();
+    record.put("name", "杜甫");
+    record.put("age", 58);
+    record.put("description", "字子美，自号少陵野老，唐代伟大的现实主义诗人");
+    record.put("birthday", LocalDate.of(712, 2, 12));
+    record.put("extra", null);
+
+    int affectedRows = session.insert(entityName, record);
+    Assertions.assertEquals(1, affectedRows, "应该成功插入一条记录");
+
+    // 验证null值处理
+    Map<String, Object> insertedRecord = session.findById(entityName, record.get("id"));
+    Assertions.assertNull(insertedRecord.get("extra"), "扩展信息应该为null");
   }
 
   @Test

@@ -8,7 +8,6 @@ import tech.wetech.flexmodel.sql.type.SqlTypeHandler;
 import tech.wetech.flexmodel.sql.type.UnknownSqlTypeHandler;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -34,7 +33,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   }
 
   @Override
-  public int insert(String modelName, Object objR, Consumer<Object> id) {
+  public int insert(String modelName, Object objR) {
     Map<String, Object> record = ReflectionUtils.toClassBean(sqlContext.getJsonObjectConverter(), objR, Map.class);
     String sql = getInsertSqlString(modelName, record);
     EntityDefinition entity = (EntityDefinition) sqlContext.getModel(modelName);
@@ -42,14 +41,17 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
     if (idFieldOptional.isPresent()) {
       TypedField<?, ?> idField = idFieldOptional.get();
       if (record.get(idField.getName()) != null) {
-        id.accept(record.get(idField.getName()));
+        // ID already provided in the record, just insert
         return sqlExecutor.update(sql, record);
       }
+      // Auto-generate ID and put it back into the record
       if (sqlDialect.useFirstGeneratedId()) {
-        return sqlExecutor.updateAndReturnFirstGeneratedKeys(sql, record, id::accept);
+        return sqlExecutor.updateAndReturnFirstGeneratedKeys(sql, record, generatedId ->
+          record.put(idField.getName(), generatedId));
       }
       return sqlExecutor.updateAndReturnGeneratedKeys(sql, record,
-        new String[]{sqlDialect.getGeneratedKeyName(idField.getName())}, keys -> id.accept(keys.getFirst()));
+        new String[]{sqlDialect.getGeneratedKeyName(idField.getName())}, keys ->
+          record.put(idField.getName(), keys.getFirst()));
     } else {
       return sqlExecutor.update(sql, record);
     }

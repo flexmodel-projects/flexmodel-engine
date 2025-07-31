@@ -2,7 +2,7 @@ package tech.wetech.flexmodel.mongodb;
 
 import tech.wetech.flexmodel.AbstractSession;
 
-import java.util.function.Consumer;
+
 
 /**
  * MongoDB数据库的Session实现
@@ -21,10 +21,7 @@ public class MongoSession extends AbstractSession {
     // MongoDB事务管理（如果需要的话）
   }
 
-  @Override
-  public int insert(String modelName, Object record, Consumer<Object> idConsumer) {
-    return super.insert(modelName, record, idConsumer);
-  }
+
 
   @Override
   public void dropModel(String modelName) {
