@@ -17,21 +17,21 @@ import java.util.function.Supplier;
 /**
  * 统一的Session实现，完全合并了所有装饰器和中间层功能
  * 消除了所有中间层和装饰器，直接实现Session接口
- * 
+ *
  * @author cjbi
  */
 public abstract class AbstractSession implements Session {
-    
+
     private static final Logger log = LoggerFactory.getLogger(AbstractSession.class);
-    
+
     private final String schemaName;
     private final SessionFactory factory;
     private final AbstractSessionContext sessionContext;
     private final DataOperations dataOperations;
     private final SchemaOperations schemaOperations;
-    
-    public AbstractSession(AbstractSessionContext sessionContext, 
-                          DataOperations dataOperations, 
+
+    public AbstractSession(AbstractSessionContext sessionContext,
+                          DataOperations dataOperations,
                           SchemaOperations schemaOperations) {
         this.sessionContext = sessionContext;
         this.schemaName = sessionContext.getSchemaName();
@@ -41,7 +41,7 @@ public abstract class AbstractSession implements Session {
     }
 
     // ==================== Schema操作 (内联了SchemaOperationsPersistenceDecorator) ====================
-    
+
     @Override
     public List<SchemaObject> syncModels() {
         return schemaOperations.syncModels();
@@ -83,7 +83,7 @@ public abstract class AbstractSession implements Session {
     }
 
     @Override
-    public Enum createEnum(Enum anEnum) {
+    public EnumDefinition createEnum(EnumDefinition anEnum) {
         schemaOperations.createEnum(anEnum);
         sessionContext.getMappedModels().persist(schemaName, anEnum);
         return anEnum;
@@ -155,17 +155,17 @@ public abstract class AbstractSession implements Session {
     }
 
     // ==================== 数据操作 (内联了DataOperationsGenerationDecorator) ====================
-    
+
     @Override
     public int insert(String modelName, Object record, Consumer<Object> idConsumer) {
         Map<String, Object> data = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), record, Map.class);
         Map<String, Object> processedData = generateValue(modelName, data, false);
-        
+
         AtomicReference<Object> atomicId = new AtomicReference<>();
         int rows = dataOperations.insert(modelName, processedData, atomicId::set);
         Object id = atomicId.get();
         idConsumer.accept(id);
-        
+
         // 处理关联关系
         insertRelationRecord(modelName, data, id);
         return rows;
@@ -238,7 +238,7 @@ public abstract class AbstractSession implements Session {
     }
 
     // ==================== 私有辅助方法 ====================
-    
+
     /**
      * 生成字段值（内联了DataOperationsGenerationDecorator的逻辑）
      */
@@ -246,7 +246,7 @@ public abstract class AbstractSession implements Session {
         Entity entity = (Entity) sessionContext.getModel(modelName);
         List<TypedField<?, ?>> fields = entity.getFields();
         Map<String, Object> newData = new HashMap<>();
-        
+
         // 类型转换
         data.forEach((key, value) -> {
             TypedField<?, ?> field = entity.getField(key);
@@ -254,7 +254,7 @@ public abstract class AbstractSession implements Session {
                 newData.put(field.getName(), convertParameter(field, value));
             }
         });
-        
+
         // 处理默认值和生成值
         for (TypedField<?, ?> field : fields) {
             if (field instanceof RelationField) {
@@ -265,15 +265,15 @@ public abstract class AbstractSession implements Session {
                 newData.put(field.getName(), generateFieldValue(field, value, isUpdate));
             }
         }
-        
+
         return newData;
     }
-    
+
     private Object convertParameter(TypedField<?, ?> field, Object value) {
         return sessionContext.getTypeHandlerMap().get(field.getType())
             .convertParameter(field, value);
     }
-    
+
     private Object generateFieldValue(TypedField<?, ?> field, Object value, boolean isUpdate) {
         if (!isUpdate && value == null) {
             if (Objects.equals(field.getDefaultValue(), GeneratedValue.ULID)) {
@@ -296,7 +296,7 @@ public abstract class AbstractSession implements Session {
         }
         return value;
     }
-    
+
     /**
      * 处理关联关系记录（内联了DataOperationsGenerationDecorator的逻辑）
      */
@@ -304,7 +304,7 @@ public abstract class AbstractSession implements Session {
     private void insertRelationRecord(String modelName, Object objR, Object id) {
         Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
         Entity entity = (Entity) sessionContext.getModel(modelName);
-        
+
         record.forEach((key, value) -> {
             if (value != null) {
                 if (entity.getField(key) instanceof RelationField relationField) {
@@ -326,7 +326,7 @@ public abstract class AbstractSession implements Session {
             }
         });
     }
-    
+
     /**
      * 故障安全模式检查（内联了SchemaOperationsPersistenceDecorator的逻辑）
      */
@@ -341,7 +341,7 @@ public abstract class AbstractSession implements Session {
             return orElse;
         }
     }
-    
+
     private void inspect(Runnable runnable) {
         try {
             runnable.run();

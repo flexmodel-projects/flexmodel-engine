@@ -1,6 +1,5 @@
 package tech.wetech.flexmodel.graphql;
 
-import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
@@ -24,13 +23,13 @@ public class Models {
   }
 
   public static Entity createStudentEntity(Session session, String entityName) {
-    Enum genderEnum = session.createEnum(entityName + "_gender", en ->
+    EnumDefinition genderEnum = session.createEnum(entityName + "_gender", en ->
       en.addElement("UNKNOWN")
         .addElement("MALE")
         .addElement("FEMALE")
         .setComment("性别")
     );
-    Enum interestEnum = session.createEnum(entityName + "_interest", en ->
+    EnumDefinition interestEnum = session.createEnum(entityName + "_interest", en ->
       en.addElement("chang")
         .addElement("tiao")
         .addElement("rap")

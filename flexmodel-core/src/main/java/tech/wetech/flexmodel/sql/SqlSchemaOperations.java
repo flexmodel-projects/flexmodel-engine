@@ -2,7 +2,6 @@ package tech.wetech.flexmodel.sql;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.*;
 
 import java.util.Iterator;
@@ -63,7 +62,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   }
 
   @Override
-  public Enum createEnum(Enum anEnum) {
+  public EnumDefinition createEnum(EnumDefinition anEnum) {
     return anEnum;
   }
 

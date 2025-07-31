@@ -153,7 +153,7 @@ public class SessionFactory {
         } catch (Exception e) {
           log.warn("Error processing model: {}", e.getMessage(), e);
         }
-      } else if (model instanceof Enum newer) {
+      } else if (model instanceof EnumDefinition newer) {
         try {
           updateEnum(session, newer);
         } catch (Exception e) {
@@ -163,7 +163,7 @@ public class SessionFactory {
     }
   }
 
-  private void updateEnum(Session session, Enum newer) {
+  private void updateEnum(Session session, EnumDefinition newer) {
     try {
       session.dropModel(newer.getName());
       session.createEnum(newer);

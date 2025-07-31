@@ -1,6 +1,5 @@
 package tech.wetech.flexmodel.parser;
 
-import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.parser.impl.ModelParser;
 
@@ -153,8 +152,8 @@ public class ASTNodeConverter {
     return field;
   }
 
-  public static Enum toSchemaEnum(ModelParser.Enumeration idlEnum) {
-    Enum anEnum = new Enum(idlEnum.name);
+  public static EnumDefinition toSchemaEnum(ModelParser.Enumeration idlEnum) {
+    EnumDefinition anEnum = new EnumDefinition(idlEnum.name);
     anEnum.setElements(idlEnum.elements);
     return anEnum;
   }
@@ -162,8 +161,8 @@ public class ASTNodeConverter {
   public static ModelParser.ASTNode fromSchemaObject(SchemaObject schemaObject) {
     if (schemaObject instanceof Entity) {
       return fromSchemaEntity((Entity) schemaObject);
-    } else if (schemaObject instanceof Enum) {
-      return fromSchemaEnum((Enum) schemaObject);
+    } else if (schemaObject instanceof EnumDefinition) {
+      return fromSchemaEnum((EnumDefinition) schemaObject);
     }
     return null;
   }
@@ -273,7 +272,7 @@ public class ASTNodeConverter {
     return idlField;
   }
 
-  public static ModelParser.Enumeration fromSchemaEnum(Enum schemaEnum) {
+  public static ModelParser.Enumeration fromSchemaEnum(EnumDefinition schemaEnum) {
     ModelParser.Enumeration enumeration = new ModelParser.Enumeration(schemaEnum.getName());
     enumeration.elements = new ArrayList<>(schemaEnum.getElements());
     return enumeration;

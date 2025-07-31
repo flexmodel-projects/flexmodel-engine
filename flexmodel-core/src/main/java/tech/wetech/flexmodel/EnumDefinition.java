@@ -8,18 +8,18 @@ import java.util.Map;
 /**
  * @author cjbi
  */
-public class Enum implements SchemaObject {
+public class EnumDefinition implements SchemaObject {
 
     private String name;
     private String comment;
     private List<String> elements = new ArrayList<>();
     protected Map<String, Object> additionalProperties = new HashMap<>();
 
-    public Enum(String name) {
+    public EnumDefinition(String name) {
         this.name = name;
     }
 
-    public Enum setName(String name) {
+    public EnumDefinition setName(String name) {
         this.name = name;
         return this;
     }
@@ -34,12 +34,12 @@ public class Enum implements SchemaObject {
         return "ENUM";
     }
 
-    public Enum setElements(List<String> elements) {
+    public EnumDefinition setElements(List<String> elements) {
         this.elements = elements;
         return this;
     }
 
-    public Enum addElement(String element) {
+    public EnumDefinition addElement(String element) {
         elements.add(element);
         return this;
     }
@@ -52,7 +52,7 @@ public class Enum implements SchemaObject {
         return comment;
     }
 
-    public Enum setComment(String comment) {
+    public EnumDefinition setComment(String comment) {
         this.comment = comment;
         return this;
     }
@@ -65,7 +65,7 @@ public class Enum implements SchemaObject {
         this.additionalProperties = additionalProperties;
     }
 
-    public Enum addAdditionalProperty(String name, Object value) {
+    public EnumDefinition addAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
         return this;
     }

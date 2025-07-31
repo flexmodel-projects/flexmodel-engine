@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.*;
 
 import java.io.IOException;
@@ -21,7 +20,7 @@ public class FlexmodelCoreModule extends SimpleModule {
     setMixInAnnotation(SchemaObject.class, ModelMixIn.class);
     setMixInAnnotation(Model.class, ModelMixIn.class);
     setMixInAnnotation(Entity.class, ModelMixIn.class);
-    setMixInAnnotation(Enum.class, ModelMixIn.class);
+    setMixInAnnotation(EnumDefinition.class, ModelMixIn.class);
     setMixInAnnotation(NativeQueryModel.class, ModelMixIn.class);
     // Field
     setMixInAnnotation(TypedField.class, TypedFieldMixIn.class);

@@ -1,7 +1,7 @@
 package tech.wetech.flexmodel.codegen;
 
 import tech.wetech.flexmodel.Entity;
-import tech.wetech.flexmodel.Enum;
+import tech.wetech.flexmodel.EnumDefinition;
 import tech.wetech.flexmodel.ImportDescribe;
 import tech.wetech.flexmodel.SchemaObject;
 
@@ -140,8 +140,8 @@ public class GenerationContext {
     for (SchemaObject model : models) {
       if (model instanceof Entity) {
         modelClassMap.put(model.getName(), ModelClass.buildModelClass(configuration.getTarget().getReplaceString(), packageName, schema.getName(), (Entity) model));
-      } else if (model instanceof tech.wetech.flexmodel.Enum) {
-        enumClassMap.put(model.getName(), EnumClass.buildEnumClass(packageName, schema.getName(), (tech.wetech.flexmodel.Enum) model));
+      } else if (model instanceof EnumDefinition) {
+        enumClassMap.put(model.getName(), EnumClass.buildEnumClass(packageName, schema.getName(), (EnumDefinition) model));
       }
     }
 
@@ -153,7 +153,7 @@ public class GenerationContext {
         ModelClass modelClass = modelClassMap.get(model.getName());
         context.getModelClassList().add(modelClass);
         context.getImports().add(modelClass.getFullClassName());
-      } else if (model instanceof Enum) {
+      } else if (model instanceof EnumDefinition) {
         EnumClass enumClass = enumClassMap.get(model.getName());
         context.getEnumClassList().add(enumClass);
         context.getImports().add(enumClass.getFullClassName());

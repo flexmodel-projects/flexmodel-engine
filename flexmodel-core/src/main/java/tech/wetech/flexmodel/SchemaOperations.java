@@ -62,7 +62,7 @@ public interface SchemaOperations {
    * @param anEnum
    * @return
    */
-  Enum createEnum(Enum anEnum);
+  EnumDefinition createEnum(EnumDefinition anEnum);
 
   /**
    * 创建字段
@@ -139,8 +139,8 @@ public interface SchemaOperations {
     return createNativeQueryModel(model);
   }
 
-  default Enum createEnum(String name, UnaryOperator<Enum> enumUnaryOperator) {
-    Enum anEnum = new Enum(name);
+  default EnumDefinition createEnum(String name, UnaryOperator<EnumDefinition> enumUnaryOperator) {
+    EnumDefinition anEnum = new EnumDefinition(name);
     enumUnaryOperator.apply(anEnum);
     return createEnum(anEnum);
   }

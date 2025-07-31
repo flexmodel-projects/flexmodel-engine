@@ -6,7 +6,6 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.*;
 import tech.wetech.flexmodel.sql.StringHelper;
 
@@ -79,7 +78,7 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   }
 
   @Override
-  public Enum createEnum(Enum anEnum) {
+  public EnumDefinition createEnum(EnumDefinition anEnum) {
     return anEnum;
   }
 

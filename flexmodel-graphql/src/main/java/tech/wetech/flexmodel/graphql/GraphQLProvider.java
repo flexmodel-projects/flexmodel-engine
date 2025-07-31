@@ -10,7 +10,7 @@ import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import tech.wetech.flexmodel.Entity;
-import tech.wetech.flexmodel.Enum;
+import tech.wetech.flexmodel.EnumDefinition;
 import tech.wetech.flexmodel.SchemaObject;
 import tech.wetech.flexmodel.SessionFactory;
 import tech.wetech.flexmodel.codegen.EnumClass;
@@ -54,7 +54,7 @@ public class GraphQLProvider {
           context.getModelClassList().add(ModelClass.buildModelClass("", schemaName, entity));
           joinDataFetchers.put(schemaName + "_" + model.getName(), joinMap);
           joinDataFetchers.put(schemaName + "_" + model.getName() + "_aggregate", joinMap);
-        } else if (model instanceof Enum andEnum) {
+        } else if (model instanceof EnumDefinition andEnum) {
           context.getEnumClassList().add(EnumClass.buildEnumClass("", schemaName, andEnum));
         } else {
           // todo 支持非实体类型
