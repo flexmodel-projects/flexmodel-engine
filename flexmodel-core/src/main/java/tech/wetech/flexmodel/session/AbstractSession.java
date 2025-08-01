@@ -362,4 +362,14 @@ public abstract class AbstractSession implements Session {
             log.warn("Schema error: {}", e.getMessage());
         }
     }
+
+  @Override
+  public DataOperations data() {
+    return dataOperations;
+  }
+
+  @Override
+  public SchemaOperations schema() {
+    return schemaOperations;
+  }
 }

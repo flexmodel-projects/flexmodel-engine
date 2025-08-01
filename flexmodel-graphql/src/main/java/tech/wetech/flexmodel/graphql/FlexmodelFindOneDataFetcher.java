@@ -13,7 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static tech.wetech.flexmodel.query.Projections.field;
+import static tech.wetech.flexmodel.query.QueryBuilder.field;
+
 
 /**
  * @author cjbi

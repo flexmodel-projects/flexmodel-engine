@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static tech.wetech.flexmodel.query.Projections.count;
 import static tech.wetech.flexmodel.query.QueryBuilder.*;
 
 /**

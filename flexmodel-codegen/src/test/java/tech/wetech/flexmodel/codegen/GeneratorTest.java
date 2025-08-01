@@ -22,10 +22,10 @@ class GeneratorTest {
     assert is != null;
     String content = new String(is.readAllBytes());
     ImportDescribe describe = new JacksonObjectConverter().parseToObject(content, ImportDescribe.class);
-    DSLGenerator dslGenerator = new DSLGenerator();
+    PojoGenerator generator = new PojoGenerator();
     GenerationContext generationContext = new GenerationContext();
     generationContext.getModelClassList().add(ModelClass.buildModelClass(packageName, schemaName, (EntityDefinition) describe.getSchema().getFirst()));
-    String str = dslGenerator.generate(generationContext).getFirst();
+    String str = generator.generate(generationContext).getFirst();
     Assertions.assertNotNull(str);
   }
 

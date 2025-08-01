@@ -14,8 +14,8 @@
 
 ### 2. 语法简洁性
 
-- **优先使用**：`QueryDSL.simple()` 进行简单查询
-- **复杂场景**：使用 `QueryDSL.query()` 进行复杂查询
+- **优先使用**：`QueryBuilder.create()` 进行简单查询
+- **复杂场景**：使用 `QueryBuilder.create()` 进行复杂查询
 - **避免**：直接使用原始的 `Query` 类构造方法
 
 ## 语法规范
@@ -25,55 +25,31 @@
 #### 简单查询（推荐）
 
 ```java
-// ✅ 正确：简单查询使用 simple()
-QueryDSL.simple()
-    .
-
-select("id","name","age")
-    .
-
-where(QueryDSL.where("age").
-
-gte(18))
-  .
-
-orderBy("name",Direction.ASC)
-    .
-
-limit(10)
-    .
-
-build();
+// ✅ 正确：简单查询使用 create()
+QueryBuilder.create()
+    .select("id","name","age")
+    .where(Expressions.field("age").gte(18))
+    .orderBy(orderBy -> orderBy.asc("name"))
+    .page(1, 10)
+    .build();
 ```
 
 #### 复杂查询
 
 ```java
-// ✅ 正确：复杂查询使用 query()
-QueryDSL.query()
-    .
-
-select(select ->select
-  .
-
-field("name")
-        .
-
-count("count","id")
+// ✅ 正确：复杂查询使用 create()
+QueryBuilder.create()
+    .select(select -> select
+        .field("name")
+        .count("count", "id")
     )
-      .
-
-innerJoin(join ->join.
-
-model("orders"))
-  .
-
-groupBy(groupBy ->groupBy.
-
-field("name"))
-  .
-
-build();
+    .innerJoin(join -> join
+        .model("orders")
+    )
+    .groupBy(groupBy -> groupBy
+        .field("name")
+    )
+    .build();
 ```
 
 ### 模型连接规范
@@ -117,10 +93,10 @@ on("id","class_id")
 #### 正确的条件构建
 
 ```java
-// ✅ 正确：使用 QueryDSL.where() 构建条件
-Predicate condition = QueryDSL.where("age").gte(18)
-    .and(QueryDSL.where("status").eq("active"))
-    .or(QueryDSL.where("vip").eq(true));
+// ✅ 正确：使用 Expressions.field() 构建条件
+Predicate condition = Expressions.field("age").gte(18)
+    .and(Expressions.field("status").eq("active"))
+    .or(Expressions.field("vip").eq(true));
 ```
 
 #### 错误的条件构建
@@ -170,74 +146,40 @@ Predicate condition = Expressions.field("age").gte(18)  // 不推荐
 ### 基础查询
 
 ```java
-QueryDSL.simple()
-    .
-
-select("id","name","email")
-    .
-
-where(QueryDSL.where("status").
-
-eq("active"))
-  .
-
-build();
+QueryBuilder.create()
+    .select("id","name","email")
+    .where(Expressions.field("status").eq("active"))
+    .build();
 ```
 
 ### 连接查询
 
 ```java
-QueryDSL.query()
-    .
-
-select(select ->select
-  .
-
-field("user_name","users.name")
-        .
-
-field("order_count","orders.id")
+QueryBuilder.create()
+    .select(select -> select
+        .field("user_name","users.name")
+        .field("order_count","orders.id")
     )
-      .
-
-leftJoin(join ->join
-  .
-
-model("orders")
-        .
-
-on("users.id","orders.user_id")
+    .leftJoin(join -> join
+        .model("orders")
+        .on("users.id","orders.user_id")
     )
-      .
-
-build();
+    .build();
 ```
 
 ### 聚合查询
 
 ```java
-QueryDSL.query()
-    .
-
-select(select ->select
-  .
-
-field("department")
-        .
-
-count("employee_count","employees.id")
-        .
-
-avg("avg_salary","employees.salary")
+QueryBuilder.create()
+    .select(select -> select
+        .field("department")
+        .count("employee_count","employees.id")
+        .avg("avg_salary","employees.salary")
     )
-      .
-
-groupBy(groupBy ->groupBy.
-
-field("department"))
-  .
-
-build();
+    .groupBy(groupBy -> groupBy
+        .field("department")
+    )
+    .build();
 ```
 
 ## 错误检查清单

@@ -10,8 +10,8 @@ import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.field.RelationField;
 import tech.wetech.flexmodel.model.field.TypedField;
 import tech.wetech.flexmodel.query.Direction;
-import tech.wetech.flexmodel.query.Projections;
 import tech.wetech.flexmodel.query.Query;
+import tech.wetech.flexmodel.query.QueryBuilder;
 import tech.wetech.flexmodel.session.Session;
 import tech.wetech.flexmodel.session.SessionFactory;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
@@ -64,7 +64,7 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
     List<Map<String, Object>> list = session.find(entity.getName(), query -> query
       .select(projection -> {
         TypedField<?, ?> idField = entity.findIdField().orElseThrow();
-        projection.addField(idField.getName(), Projections.field(entity.getName() + "." + idField.getName()));
+        projection.addField(idField.getName(), QueryBuilder.field(entity.getName() + "." + idField.getName()));
         for (SelectedField selectedField : selectedFields) {
           TypedField<?, ?> flexModelField = targetEntity.getField(selectedField.getName());
           if (flexModelField == null) {
@@ -74,7 +74,7 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
             relationFields.add(secondaryRelationField);
             continue;
           }
-          projection.addField(selectedField.getName(), Projections.field(targetEntity.getName() + "." + flexModelField.getName()));
+          projection.addField(selectedField.getName(), QueryBuilder.field(targetEntity.getName() + "." + flexModelField.getName()));
         }
         return projection;
       })
