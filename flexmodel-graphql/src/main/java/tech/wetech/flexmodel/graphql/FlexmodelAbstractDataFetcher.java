@@ -5,16 +5,16 @@ import graphql.execution.ValuesResolver;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
-import tech.wetech.flexmodel.core.JsonObjectConverter;
-import tech.wetech.flexmodel.core.model.EntityDefinition;
-import tech.wetech.flexmodel.core.model.field.RelationField;
-import tech.wetech.flexmodel.core.model.field.TypedField;
-import tech.wetech.flexmodel.core.query.Direction;
-import tech.wetech.flexmodel.core.query.Projections;
-import tech.wetech.flexmodel.core.query.Query;
-import tech.wetech.flexmodel.core.session.Session;
-import tech.wetech.flexmodel.core.session.SessionFactory;
-import tech.wetech.flexmodel.core.supports.jackson.JacksonObjectConverter;
+import tech.wetech.flexmodel.JsonObjectConverter;
+import tech.wetech.flexmodel.model.EntityDefinition;
+import tech.wetech.flexmodel.model.field.RelationField;
+import tech.wetech.flexmodel.model.field.TypedField;
+import tech.wetech.flexmodel.query.Direction;
+import tech.wetech.flexmodel.query.Projections;
+import tech.wetech.flexmodel.query.Query;
+import tech.wetech.flexmodel.session.Session;
+import tech.wetech.flexmodel.session.SessionFactory;
+import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static tech.wetech.flexmodel.core.query.expr.Expressions.field;
+import static tech.wetech.flexmodel.query.expr.Expressions.field;
 
 /**
  * @author cjbi

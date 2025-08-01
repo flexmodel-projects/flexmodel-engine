@@ -12,10 +12,10 @@ import graphql.schema.idl.TypeDefinitionRegistry;
 import tech.wetech.flexmodel.codegen.EnumClass;
 import tech.wetech.flexmodel.codegen.GenerationContext;
 import tech.wetech.flexmodel.codegen.ModelClass;
-import tech.wetech.flexmodel.core.model.EntityDefinition;
-import tech.wetech.flexmodel.core.model.EnumDefinition;
-import tech.wetech.flexmodel.core.model.SchemaObject;
-import tech.wetech.flexmodel.core.session.SessionFactory;
+import tech.wetech.flexmodel.model.EntityDefinition;
+import tech.wetech.flexmodel.model.EnumDefinition;
+import tech.wetech.flexmodel.model.SchemaObject;
+import tech.wetech.flexmodel.session.SessionFactory;
 
 import java.util.HashMap;
 import java.util.List;

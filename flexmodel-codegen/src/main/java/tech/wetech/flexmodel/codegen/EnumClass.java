@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel.codegen;
 
-import tech.wetech.flexmodel.core.model.EnumDefinition;
+import tech.wetech.flexmodel.model.EnumDefinition;
 
 import java.util.List;
 

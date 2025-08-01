@@ -1,7 +1,5 @@
 package tech.wetech.flexmodel.codegen;
 
-import tech.wetech.flexmodel.core.codegen.*;
-
 import java.io.File;
 
 /**

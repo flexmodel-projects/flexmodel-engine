@@ -2,16 +2,17 @@ package tech.wetech.flexmodel.graphql;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
-import tech.wetech.flexmodel.core.model.EntityDefinition;
-import tech.wetech.flexmodel.core.model.field.TypedField;
-import tech.wetech.flexmodel.core.session.Session;
-import tech.wetech.flexmodel.core.session.SessionFactory;
+import tech.wetech.flexmodel.model.EntityDefinition;
+import tech.wetech.flexmodel.model.field.TypedField;
+import tech.wetech.flexmodel.session.Session;
+import tech.wetech.flexmodel.session.SessionFactory;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static tech.wetech.flexmodel.core.query.Projections.*;
+import static tech.wetech.flexmodel.query.Projections.count;
+import static tech.wetech.flexmodel.query.QueryBuilder.*;
 
 /**
  * @author cjbi

@@ -1,7 +1,7 @@
 package tech.wetech.flexmodel.graphql;
 
 import graphql.schema.DataFetcher;
-import tech.wetech.flexmodel.core.session.SessionFactory;
+import tech.wetech.flexmodel.session.SessionFactory;
 
 import java.util.function.BiFunction;
 
