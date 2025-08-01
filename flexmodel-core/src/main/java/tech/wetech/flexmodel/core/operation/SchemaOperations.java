@@ -1,10 +1,6 @@
 package tech.wetech.flexmodel.core.operation;
 
-import tech.wetech.flexmodel.core.SchemaObject;
-import tech.wetech.flexmodel.core.model.EntityDefinition;
-import tech.wetech.flexmodel.core.model.EnumDefinition;
-import tech.wetech.flexmodel.core.model.IndexDefinition;
-import tech.wetech.flexmodel.core.model.NativeQueryDefinition;
+import tech.wetech.flexmodel.core.model.*;
 import tech.wetech.flexmodel.core.model.field.TypedField;
 
 import java.util.List;

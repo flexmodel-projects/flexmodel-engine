@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.core;
 
 
+import tech.wetech.flexmodel.core.model.SchemaObject;
 import tech.wetech.flexmodel.core.session.AbstractSessionContext;
 
 import java.util.List;

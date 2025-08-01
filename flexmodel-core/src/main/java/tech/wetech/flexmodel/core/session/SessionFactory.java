@@ -9,6 +9,7 @@ import tech.wetech.flexmodel.core.cache.CachingMappedModels;
 import tech.wetech.flexmodel.core.cache.ConcurrentHashMapCache;
 import tech.wetech.flexmodel.core.model.EntityDefinition;
 import tech.wetech.flexmodel.core.model.EnumDefinition;
+import tech.wetech.flexmodel.core.model.SchemaObject;
 import tech.wetech.flexmodel.core.mongodb.MongoContext;
 import tech.wetech.flexmodel.core.mongodb.MongoDataSourceProvider;
 import tech.wetech.flexmodel.core.mongodb.MongoSession;

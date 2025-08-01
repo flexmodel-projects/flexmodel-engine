@@ -2,6 +2,7 @@ package tech.wetech.flexmodel.core;
 
 import org.junit.jupiter.api.Test;
 import tech.wetech.flexmodel.core.model.EntityDefinition;
+import tech.wetech.flexmodel.core.model.SchemaObject;
 import tech.wetech.flexmodel.core.parser.ASTNodeConverter;
 import tech.wetech.flexmodel.core.parser.impl.ModelParser;
 

@@ -1,7 +1,5 @@
 package tech.wetech.flexmodel.core.model;
 
-import tech.wetech.flexmodel.core.SchemaObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -2,7 +2,7 @@ package tech.wetech.flexmodel.codegen;
 
 import tech.wetech.flexmodel.core.ImportDescribe;
 import tech.wetech.flexmodel.core.JsonObjectConverter;
-import tech.wetech.flexmodel.core.SchemaObject;
+import tech.wetech.flexmodel.core.model.SchemaObject;
 import tech.wetech.flexmodel.core.parser.ASTNodeConverter;
 import tech.wetech.flexmodel.core.parser.impl.ModelParser;
 import tech.wetech.flexmodel.core.parser.impl.ParseException;

@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel.core;
 
+import tech.wetech.flexmodel.core.model.SchemaObject;
+
 import java.util.List;
 
 /**

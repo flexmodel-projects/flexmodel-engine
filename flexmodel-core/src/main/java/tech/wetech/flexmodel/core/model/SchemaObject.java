@@ -1,4 +1,4 @@
-package tech.wetech.flexmodel.core;
+package tech.wetech.flexmodel.core.model;
 
 import tech.wetech.flexmodel.core.parser.ASTNodeConverter;
 import tech.wetech.flexmodel.core.parser.impl.ModelParser;

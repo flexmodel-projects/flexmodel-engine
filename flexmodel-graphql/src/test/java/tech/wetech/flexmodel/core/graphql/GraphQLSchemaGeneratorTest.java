@@ -6,9 +6,9 @@ import tech.wetech.flexmodel.codegen.EnumClass;
 import tech.wetech.flexmodel.codegen.GenerationContext;
 import tech.wetech.flexmodel.codegen.ModelClass;
 import tech.wetech.flexmodel.core.ImportDescribe;
-import tech.wetech.flexmodel.core.SchemaObject;
 import tech.wetech.flexmodel.core.model.EntityDefinition;
 import tech.wetech.flexmodel.core.model.EnumDefinition;
+import tech.wetech.flexmodel.core.model.SchemaObject;
 import tech.wetech.flexmodel.core.supports.jackson.JacksonObjectConverter;
 import tech.wetech.flexmodel.graphql.GraphQLSchemaGenerator;
 

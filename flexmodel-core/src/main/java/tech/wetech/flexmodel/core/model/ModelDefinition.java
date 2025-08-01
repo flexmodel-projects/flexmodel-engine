@@ -1,6 +1,5 @@
 package tech.wetech.flexmodel.core.model;
 
-import tech.wetech.flexmodel.core.SchemaObject;
 import tech.wetech.flexmodel.core.model.field.Field;
 
 import java.io.Serializable;

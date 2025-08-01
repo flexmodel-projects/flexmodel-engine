@@ -2,11 +2,7 @@ package tech.wetech.flexmodel.core.sql;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.wetech.flexmodel.core.SchemaObject;
-import tech.wetech.flexmodel.core.model.EntityDefinition;
-import tech.wetech.flexmodel.core.model.EnumDefinition;
-import tech.wetech.flexmodel.core.model.IndexDefinition;
-import tech.wetech.flexmodel.core.model.NativeQueryDefinition;
+import tech.wetech.flexmodel.core.model.*;
 import tech.wetech.flexmodel.core.model.field.*;
 import tech.wetech.flexmodel.core.operation.SchemaOperations;
 
