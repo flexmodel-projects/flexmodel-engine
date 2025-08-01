@@ -17,7 +17,6 @@ public class GenerationTool {
 
     new PojoGenerator().generate(context, targetDirectory);
     new DSLGenerator().generate(context, targetDirectory);
-    new DAOGenerator().generate(context, targetDirectory);
     new EnumGenerator().generate(context, targetDirectory);
     new SchemaGenerator().generate(context, targetDirectory);
     new BuildItemSPIFileGenerator().generate(context, configuration.getTarget().getBaseDir());
