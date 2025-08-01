@@ -6,7 +6,6 @@ import tech.wetech.flexmodel.Session;
 import tech.wetech.flexmodel.SessionFactory;
 import tech.wetech.flexmodel.TypedField;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,17 +23,11 @@ public class FlexmodelMutationCreateDataFetcher extends FlexmodelAbstractDataFet
   public Map<String, Object> get(DataFetchingEnvironment environment) throws Exception {
     Map<String, Object> arguments = getArguments(environment);
     if (arguments.get("data") instanceof Map data) {
-      Map<String, Object> result = new HashMap<>(data);
       try (Session session = sessionFactory.createSession(schemaName)) {
         EntityDefinition entity = (EntityDefinition) session.getModel(modelName);
-        session.insert(modelName, data, id -> {
-          Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
-          if (idFieldOptional.isPresent()) {
-            TypedField<?, ?> idField = idFieldOptional.get();
-            result.put(idField.getName(), id);
-          }
-        });
-        return result;
+        session.insert(modelName, data);
+        Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
+        return data;
       }
     }
     return null;
