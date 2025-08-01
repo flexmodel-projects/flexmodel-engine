@@ -1,10 +1,10 @@
 package tech.wetech.flexmodel.graphql;
 
 import graphql.schema.DataFetchingEnvironment;
-import tech.wetech.flexmodel.EntityDefinition;
-import tech.wetech.flexmodel.Session;
-import tech.wetech.flexmodel.SessionFactory;
-import tech.wetech.flexmodel.TypedField;
+import tech.wetech.flexmodel.core.model.EntityDefinition;
+import tech.wetech.flexmodel.core.model.field.TypedField;
+import tech.wetech.flexmodel.core.session.Session;
+import tech.wetech.flexmodel.core.session.SessionFactory;
 
 import java.util.Map;
 import java.util.Optional;

@@ -5,8 +5,16 @@ import graphql.execution.ValuesResolver;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
-import tech.wetech.flexmodel.*;
-import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
+import tech.wetech.flexmodel.core.JsonObjectConverter;
+import tech.wetech.flexmodel.core.model.EntityDefinition;
+import tech.wetech.flexmodel.core.model.field.RelationField;
+import tech.wetech.flexmodel.core.model.field.TypedField;
+import tech.wetech.flexmodel.core.query.Direction;
+import tech.wetech.flexmodel.core.query.Projections;
+import tech.wetech.flexmodel.core.query.Query;
+import tech.wetech.flexmodel.core.session.Session;
+import tech.wetech.flexmodel.core.session.SessionFactory;
+import tech.wetech.flexmodel.core.supports.jackson.JacksonObjectConverter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static tech.wetech.flexmodel.dsl.Expressions.field;
+import static tech.wetech.flexmodel.core.query.expr.Expressions.field;
 
 /**
  * @author cjbi
@@ -54,7 +62,7 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
     List<SelectedField> selectedFields = env.getSelectionSet().getFields(path + "/*");
     List<RelationField> relationFields = new ArrayList<>();
     List<Map<String, Object>> list = session.find(entity.getName(), query -> query
-      .withProjection(projection -> {
+      .select(projection -> {
         TypedField<?, ?> idField = entity.findIdField().orElseThrow();
         projection.addField(idField.getName(), Projections.field(entity.getName() + "." + idField.getName()));
         for (SelectedField selectedField : selectedFields) {
@@ -70,8 +78,8 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
         }
         return projection;
       })
-      .withJoin(joins -> joins.addLeftJoin(join -> join.setFrom(targetEntity.getName())))
-      .withFilter(field(entity.getName() + "." + entity.findIdField().map(TypedField::getName).orElseThrow()).eq(id))
+      .leftJoin(joins -> joins.addLeftJoin(join -> join.setFrom(targetEntity.getName())))
+      .where(field(entity.getName() + "." + entity.findIdField().map(TypedField::getName).orElseThrow()).eq(id))
     );
     List<Map<String, Object>> result = new ArrayList<>();
     for (Map<String, Object> map : list) {
@@ -89,17 +97,17 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
 
   protected Query getQuery(Integer pageNumber, Integer pageSize, Map<String, String> orderBy, Map<String, Object> where, Query query) {
     if (pageSize != null && pageNumber != null) {
-      query.withPage(pageNumber, pageSize);
+      query.page(pageNumber, pageSize);
     }
     if (orderBy != null) {
-      query.withSort(sort -> {
+      query.orderBy(sort -> {
           orderBy.forEach((k, v) -> sort.addOrder(k, Direction.valueOf(v.toUpperCase())));
           return sort;
         }
       );
     }
     if (where != null) {
-      query.setFilter(jsonObjectConverter.toJsonString(where));
+      query.where(jsonObjectConverter.toJsonString(where));
     }
     return query;
   }

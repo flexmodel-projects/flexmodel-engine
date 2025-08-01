@@ -1,8 +1,8 @@
 package tech.wetech.flexmodel.graphql;
 
 import graphql.schema.DataFetchingEnvironment;
-import tech.wetech.flexmodel.Session;
-import tech.wetech.flexmodel.SessionFactory;
+import tech.wetech.flexmodel.core.session.Session;
+import tech.wetech.flexmodel.core.session.SessionFactory;
 
 import java.util.Map;
 

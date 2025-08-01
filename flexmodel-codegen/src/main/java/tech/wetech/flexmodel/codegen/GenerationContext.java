@@ -1,9 +1,9 @@
 package tech.wetech.flexmodel.codegen;
 
-import tech.wetech.flexmodel.EntityDefinition;
-import tech.wetech.flexmodel.EnumDefinition;
-import tech.wetech.flexmodel.ImportDescribe;
-import tech.wetech.flexmodel.SchemaObject;
+import tech.wetech.flexmodel.core.ImportDescribe;
+import tech.wetech.flexmodel.core.SchemaObject;
+import tech.wetech.flexmodel.core.model.EntityDefinition;
+import tech.wetech.flexmodel.core.model.EnumDefinition;
 
 import java.util.*;
 

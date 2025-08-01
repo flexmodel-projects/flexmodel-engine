@@ -2,16 +2,16 @@ package tech.wetech.flexmodel.graphql;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
-import tech.wetech.flexmodel.EntityDefinition;
-import tech.wetech.flexmodel.Session;
-import tech.wetech.flexmodel.SessionFactory;
-import tech.wetech.flexmodel.TypedField;
+import tech.wetech.flexmodel.core.model.EntityDefinition;
+import tech.wetech.flexmodel.core.model.field.TypedField;
+import tech.wetech.flexmodel.core.session.Session;
+import tech.wetech.flexmodel.core.session.SessionFactory;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static tech.wetech.flexmodel.Projections.*;
+import static tech.wetech.flexmodel.core.query.Projections.*;
 
 /**
  * @author cjbi
@@ -36,7 +36,7 @@ public class FlexmodelAggregateDataFetcher extends FlexmodelAbstractDataFetcher<
     try (Session session = sessionFactory.createSession(schemaName)) {
       EntityDefinition entity = (EntityDefinition) session.getModel(modelName);
       List<Map<String, Object>> list = session.find(entity.getName(), query -> {
-        query.withProjection(projection -> {
+        query.select(projection -> {
             for (SelectedField selectedField : selectedFields) {
               if (selectedField.getName().equals(AGG_COUNT)) {
                 Map<String, Object> args = selectedField.getArguments();

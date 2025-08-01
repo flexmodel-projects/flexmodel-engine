@@ -1,8 +1,8 @@
 package tech.wetech.flexmodel.codegen;
 
-import tech.wetech.flexmodel.ScalarType;
+import tech.wetech.flexmodel.core.model.field.ScalarType;
 
-import static tech.wetech.flexmodel.ScalarType.*;
+import static tech.wetech.flexmodel.core.model.field.ScalarType.*;
 
 /**
  * @author cjbi

@@ -9,13 +9,13 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
-import tech.wetech.flexmodel.EntityDefinition;
-import tech.wetech.flexmodel.EnumDefinition;
-import tech.wetech.flexmodel.SchemaObject;
-import tech.wetech.flexmodel.SessionFactory;
 import tech.wetech.flexmodel.codegen.EnumClass;
 import tech.wetech.flexmodel.codegen.GenerationContext;
 import tech.wetech.flexmodel.codegen.ModelClass;
+import tech.wetech.flexmodel.core.SchemaObject;
+import tech.wetech.flexmodel.core.model.EntityDefinition;
+import tech.wetech.flexmodel.core.model.EnumDefinition;
+import tech.wetech.flexmodel.core.session.SessionFactory;
 
 import java.util.HashMap;
 import java.util.List;

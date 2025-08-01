@@ -2,14 +2,18 @@ package tech.wetech.flexmodel.graphql;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
-import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.core.model.EntityDefinition;
+import tech.wetech.flexmodel.core.model.field.RelationField;
+import tech.wetech.flexmodel.core.model.field.TypedField;
+import tech.wetech.flexmodel.core.session.Session;
+import tech.wetech.flexmodel.core.session.SessionFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static tech.wetech.flexmodel.Projections.field;
+import static tech.wetech.flexmodel.core.query.Projections.field;
 
 /**
  * @author cjbi
@@ -35,7 +39,7 @@ public class FlexmodelListDataFetcher extends FlexmodelAbstractDataFetcher<List<
       EntityDefinition entity = (EntityDefinition) session.getModel(modelName);
       List<RelationField> relationFields = new ArrayList<>();
       List<Map<String, Object>> list = session.find(entity.getName(), query -> {
-          query.withProjection(projection -> {
+        query.select(projection -> {
             TypedField<?, ?> idField = entity.findIdField().orElseThrow();
             projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
             for (SelectedField selectedField : selectedFields) {

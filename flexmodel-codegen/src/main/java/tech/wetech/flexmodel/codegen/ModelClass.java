@@ -1,7 +1,11 @@
 package tech.wetech.flexmodel.codegen;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.core.model.EntityDefinition;
+import tech.wetech.flexmodel.core.model.ModelDefinition;
+import tech.wetech.flexmodel.core.model.field.EnumField;
+import tech.wetech.flexmodel.core.model.field.RelationField;
+import tech.wetech.flexmodel.core.model.field.TypedField;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,12 +1,12 @@
 package tech.wetech.flexmodel.codegen;
 
-import tech.wetech.flexmodel.ImportDescribe;
-import tech.wetech.flexmodel.JsonObjectConverter;
-import tech.wetech.flexmodel.SchemaObject;
-import tech.wetech.flexmodel.parser.ASTNodeConverter;
-import tech.wetech.flexmodel.parser.impl.ModelParser;
-import tech.wetech.flexmodel.parser.impl.ParseException;
-import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
+import tech.wetech.flexmodel.core.ImportDescribe;
+import tech.wetech.flexmodel.core.JsonObjectConverter;
+import tech.wetech.flexmodel.core.SchemaObject;
+import tech.wetech.flexmodel.core.parser.ASTNodeConverter;
+import tech.wetech.flexmodel.core.parser.impl.ModelParser;
+import tech.wetech.flexmodel.core.parser.impl.ParseException;
+import tech.wetech.flexmodel.core.supports.jackson.JacksonObjectConverter;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

@@ -1,7 +1,7 @@
 package tech.wetech.flexmodel.codegen;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import tech.wetech.flexmodel.Field;
+import tech.wetech.flexmodel.core.model.field.Field;
 
 /**
  * @author cjbi
