@@ -80,6 +80,14 @@ public interface Session extends SchemaOperations, DataOperations, Closeable {
     /**
      * 设置要查询的字段
      */
+    public DSLQueryBuilder select(UnaryOperator<Query.Projection> projection) {
+      query.select(projection);
+      return this;
+    }
+
+    /**
+     * 设置要查询的字段
+     */
     public DSLQueryBuilder select(String... fields) {
       query.select(projection -> {
         for (String field : fields) {
