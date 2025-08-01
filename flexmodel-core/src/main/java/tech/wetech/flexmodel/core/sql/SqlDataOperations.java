@@ -2,7 +2,7 @@ package tech.wetech.flexmodel.core.sql;
 
 import tech.wetech.flexmodel.core.ExpressionCalculator;
 import tech.wetech.flexmodel.core.ExpressionCalculatorException;
-import tech.wetech.flexmodel.core.MappedModels;
+import tech.wetech.flexmodel.core.ModelRepository;
 import tech.wetech.flexmodel.core.model.EntityDefinition;
 import tech.wetech.flexmodel.core.model.ModelDefinition;
 import tech.wetech.flexmodel.core.model.NativeQueryDefinition;
@@ -28,7 +28,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
 
   private final String schemaName;
   private final SqlExecutor sqlExecutor;
-  private final MappedModels mappedModels;
+  private final ModelRepository mappedModels;
   private final SqlDialect sqlDialect;
   private final ExpressionCalculator<SqlClauseResult> sqlExpressionCalculator;
   private final Map<String, SqlTypeHandler<?>> typeHandlerMap;

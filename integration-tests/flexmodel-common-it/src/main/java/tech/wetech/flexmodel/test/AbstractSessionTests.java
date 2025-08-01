@@ -122,7 +122,7 @@ public abstract class AbstractSessionTests {
   /**
    * 创建带投影的查询对象
    */
-  private Query createQueryWithProjection(String... fields) {
+  private Query createQueryWithSelect(String... fields) {
     return QueryBuilder.create()
       .select(fields)
       .build();

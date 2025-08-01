@@ -3,7 +3,7 @@ package tech.wetech.flexmodel.core.session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.core.JsonObjectConverter;
-import tech.wetech.flexmodel.core.MappedModels;
+import tech.wetech.flexmodel.core.ModelRepository;
 import tech.wetech.flexmodel.core.model.ModelDefinition;
 import tech.wetech.flexmodel.core.model.SchemaObject;
 import tech.wetech.flexmodel.core.naming.DefaultPhysicalNamingStrategy;
@@ -21,7 +21,7 @@ public abstract class AbstractSessionContext {
   protected final Logger log = LoggerFactory.getLogger(AbstractSessionContext.class);
 
   protected final String schemaName;
-  protected final MappedModels mappedModels;
+  protected final ModelRepository mappedModels;
   protected final JsonObjectConverter jsonObjectConverter;
   protected PhysicalNamingStrategy physicalNamingStrategy = new DefaultPhysicalNamingStrategy();
   protected boolean failsafe = false;
@@ -29,7 +29,7 @@ public abstract class AbstractSessionContext {
   protected final SessionFactory factory;
   protected final Map<String, ModelDefinition> aliasModelMap = new HashMap<>();
 
-  protected AbstractSessionContext(String schemaName, MappedModels mappedModels, JsonObjectConverter jsonObjectConverter, SessionFactory factory) {
+  protected AbstractSessionContext(String schemaName, ModelRepository mappedModels, JsonObjectConverter jsonObjectConverter, SessionFactory factory) {
     this.schemaName = schemaName;
     this.mappedModels = mappedModels;
     this.jsonObjectConverter = jsonObjectConverter;
@@ -59,10 +59,10 @@ public abstract class AbstractSessionContext {
     if (model != null) {
       return model;
     }
-    return this.getMappedModels().getModel(getSchemaName(), name);
+    return this.getMappedModels().find(getSchemaName(), name);
   }
 
-  public MappedModels getMappedModels() {
+  public ModelRepository getMappedModels() {
     return mappedModels;
   }
 

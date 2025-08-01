@@ -68,27 +68,27 @@ public abstract class AbstractSession implements Session {
     @Override
     public void dropModel(String modelName) {
         inspect(() -> schemaOperations.dropModel(modelName));
-        sessionContext.getMappedModels().remove(schemaName, modelName);
+      sessionContext.getMappedModels().delete(schemaName, modelName);
     }
 
     @Override
     public EntityDefinition createEntity(EntityDefinition collection) {
         inspect(() -> schemaOperations.createEntity(collection));
-        sessionContext.getMappedModels().persist(schemaName, collection);
+      sessionContext.getMappedModels().save(schemaName, collection);
         return collection;
     }
 
     @Override
     public NativeQueryDefinition createNativeQueryModel(NativeQueryDefinition model) {
         schemaOperations.createNativeQueryModel(model);
-        sessionContext.getMappedModels().persist(schemaName, model);
+      sessionContext.getMappedModels().save(schemaName, model);
         return model;
     }
 
     @Override
     public EnumDefinition createEnum(EnumDefinition anEnum) {
         schemaOperations.createEnum(anEnum);
-        sessionContext.getMappedModels().persist(schemaName, anEnum);
+      sessionContext.getMappedModels().save(schemaName, anEnum);
         return anEnum;
     }
 
@@ -97,7 +97,7 @@ public abstract class AbstractSession implements Session {
         inspect(() -> schemaOperations.createField(field));
         EntityDefinition entity = (EntityDefinition) sessionContext.getModel(field.getModelName());
         entity.addField(field);
-        sessionContext.getMappedModels().persist(schemaName, entity);
+      sessionContext.getMappedModels().save(schemaName, entity);
         return field;
     }
 
@@ -107,7 +107,7 @@ public abstract class AbstractSession implements Session {
         EntityDefinition entity = (EntityDefinition) sessionContext.getModel(field.getModelName());
         entity.removeField(field.getName());
         entity.addField(field);
-        sessionContext.getMappedModels().persist(schemaName, entity);
+      sessionContext.getMappedModels().save(schemaName, entity);
         return field;
     }
 
@@ -122,7 +122,7 @@ public abstract class AbstractSession implements Session {
                 entity.removeIndex(index.getName());
             }
         }
-        sessionContext.getMappedModels().persist(schemaName, entity);
+      sessionContext.getMappedModels().save(schemaName, entity);
     }
 
     @Override
@@ -130,7 +130,7 @@ public abstract class AbstractSession implements Session {
         inspect(() -> schemaOperations.createIndex(index));
         EntityDefinition entity = (EntityDefinition) sessionContext.getModel(index.getModelName());
         entity.addIndex(index);
-        sessionContext.getMappedModels().persist(schemaName, entity);
+      sessionContext.getMappedModels().save(schemaName, entity);
         return index;
     }
 
@@ -139,7 +139,7 @@ public abstract class AbstractSession implements Session {
         inspect(() -> schemaOperations.dropIndex(modelName, indexName));
         EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
         entity.removeIndex(indexName);
-        sessionContext.getMappedModels().persist(schemaName, entity);
+      sessionContext.getMappedModels().save(schemaName, entity);
     }
 
     @Override

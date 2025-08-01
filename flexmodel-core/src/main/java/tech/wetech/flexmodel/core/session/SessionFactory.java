@@ -5,8 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.core.*;
 import tech.wetech.flexmodel.core.cache.Cache;
-import tech.wetech.flexmodel.core.cache.CachingMappedModels;
+import tech.wetech.flexmodel.core.cache.CachingModelRepository;
 import tech.wetech.flexmodel.core.cache.ConcurrentHashMapCache;
+import tech.wetech.flexmodel.core.cache.InMemoryModelRepository;
 import tech.wetech.flexmodel.core.model.EntityDefinition;
 import tech.wetech.flexmodel.core.model.EnumDefinition;
 import tech.wetech.flexmodel.core.model.SchemaObject;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
  */
 public class SessionFactory {
 
-  private final MappedModels mappedModels;
+  private final ModelRepository mappedModels;
   private final Map<String, DataSourceProvider> dataSourceProviders = new HashMap<>();
   private final Cache cache;
   private final Logger log = LoggerFactory.getLogger(SessionFactory.class);
@@ -47,11 +48,11 @@ public class SessionFactory {
     processBuildItem();
   }
 
-  private MappedModels initializeMappedModels(DataSourceProvider dataSourceProvider) {
+  private ModelRepository initializeMappedModels(DataSourceProvider dataSourceProvider) {
     if (dataSourceProvider instanceof JdbcDataSourceProvider jdbcDataSourceProvider) {
-      return new CachingMappedModels(new JdbcMappedModels(jdbcDataSourceProvider.dataSource(), jsonObjectConverter), cache);
+      return new CachingModelRepository(new JdbcModelRepository(jdbcDataSourceProvider.dataSource(), jsonObjectConverter), cache);
     } else if (dataSourceProvider instanceof MongoDataSourceProvider) {
-      return new MapMappedModels();
+      return new InMemoryModelRepository();
     } else {
       throw new IllegalArgumentException("Unsupported DataSourceProvider");
     }
@@ -217,7 +218,7 @@ public class SessionFactory {
   }
 
   public List<SchemaObject> getModels(String schemaName) {
-    return mappedModels.lookup(schemaName);
+    return mappedModels.findAll(schemaName);
   }
 
   public Cache getCache() {

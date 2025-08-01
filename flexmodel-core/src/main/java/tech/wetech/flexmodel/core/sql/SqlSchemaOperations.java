@@ -25,17 +25,17 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
 
   @Override
   public List<SchemaObject> syncModels() {
-    return sqlContext.getMappedModels().sync(sqlContext);
+    return sqlContext.getMappedModels().syncFromDatabase(sqlContext);
   }
 
   @Override
   public List<SchemaObject> syncModels(Set<String> modelNames) {
-    return sqlContext.getMappedModels().sync(sqlContext, modelNames);
+    return sqlContext.getMappedModels().syncFromDatabase(sqlContext, modelNames);
   }
 
   @Override
   public List<SchemaObject> getAllModels() {
-    return sqlContext.getMappedModels().lookup(sqlContext.getSchemaName());
+    return sqlContext.getMappedModels().findAll(sqlContext.getSchemaName());
   }
 
   @Override

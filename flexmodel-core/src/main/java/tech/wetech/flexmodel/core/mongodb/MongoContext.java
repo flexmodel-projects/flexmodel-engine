@@ -3,7 +3,7 @@ package tech.wetech.flexmodel.core.mongodb;
 import com.mongodb.client.MongoDatabase;
 import tech.wetech.flexmodel.core.ExpressionCalculator;
 import tech.wetech.flexmodel.core.JsonObjectConverter;
-import tech.wetech.flexmodel.core.MappedModels;
+import tech.wetech.flexmodel.core.ModelRepository;
 import tech.wetech.flexmodel.core.model.field.ScalarType;
 import tech.wetech.flexmodel.core.session.AbstractSessionContext;
 import tech.wetech.flexmodel.core.session.SessionFactory;
@@ -21,7 +21,7 @@ public class MongoContext extends AbstractSessionContext {
   private ExpressionCalculator<String> conditionCalculator;
   private final Map<String, TypeHandler<?>> typeHandlerMap = new HashMap<>();
 
-  public MongoContext(String schemaName, MongoDatabase mongoDatabase, MappedModels mappedModels, JsonObjectConverter jsonObjectConverter, SessionFactory factory) {
+  public MongoContext(String schemaName, MongoDatabase mongoDatabase, ModelRepository mappedModels, JsonObjectConverter jsonObjectConverter, SessionFactory factory) {
     super(schemaName, mappedModels, jsonObjectConverter, factory);
     this.mongoDatabase = mongoDatabase;
     this.conditionCalculator = new DefaultMongoExpressionCalculator();

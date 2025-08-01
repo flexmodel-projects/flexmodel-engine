@@ -6,7 +6,7 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import tech.wetech.flexmodel.core.MappedModels;
+import tech.wetech.flexmodel.core.ModelRepository;
 import tech.wetech.flexmodel.core.model.*;
 import tech.wetech.flexmodel.core.model.field.TypedField;
 import tech.wetech.flexmodel.core.operation.SchemaOperations;
@@ -25,7 +25,7 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
 
   private final String schemaName;
   private final MongoDatabase mongoDatabase;
-  private final MappedModels mappedModels;
+  private final ModelRepository mappedModels;
 
   public MongoSchemaOperations(MongoContext mongoContext) {
     super(mongoContext);
@@ -36,22 +36,22 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
 
   @Override
   public List<SchemaObject> syncModels() {
-    return mongoContext.getMappedModels().sync(mongoContext);
+    return mongoContext.getMappedModels().syncFromDatabase(mongoContext);
   }
 
   @Override
   public List<SchemaObject> syncModels(Set<String> modelNames) {
-    return mongoContext.getMappedModels().sync(mongoContext, modelNames);
+    return mongoContext.getMappedModels().syncFromDatabase(mongoContext, modelNames);
   }
 
   @Override
   public List<SchemaObject> getAllModels() {
-    return mappedModels.lookup(mongoContext.getSchemaName());
+    return mappedModels.findAll(mongoContext.getSchemaName());
   }
 
   @Override
   public SchemaObject getModel(String modelName) {
-    return mappedModels.getModel(schemaName, modelName);
+    return mappedModels.find(schemaName, modelName);
   }
 
   @Override

@@ -3,7 +3,7 @@ package tech.wetech.flexmodel.core.sql;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.core.JsonObjectConverter;
-import tech.wetech.flexmodel.core.MappedModels;
+import tech.wetech.flexmodel.core.ModelRepository;
 import tech.wetech.flexmodel.core.model.EntityDefinition;
 import tech.wetech.flexmodel.core.model.IndexDefinition;
 import tech.wetech.flexmodel.core.model.ModelDefinition;
@@ -29,14 +29,14 @@ import static tech.wetech.flexmodel.core.model.field.ScalarType.STRING;
 /**
  * @author cjbi
  */
-public class JdbcMappedModels implements MappedModels {
+public class JdbcModelRepository implements ModelRepository {
   public static final String STORED_TABLES = "fe_models";
   private final DataSource dataSource;
   private final SqlDialect sqlDialect;
-  private final Logger log = LoggerFactory.getLogger(JdbcMappedModels.class);
+  private final Logger log = LoggerFactory.getLogger(JdbcModelRepository.class);
   private final JsonObjectConverter jsonObjectConverter;
 
-  public JdbcMappedModels(DataSource dataSource, JsonObjectConverter jsonObjectConverter) {
+  public JdbcModelRepository(DataSource dataSource, JsonObjectConverter jsonObjectConverter) {
     this.dataSource = dataSource;
     this.jsonObjectConverter = jsonObjectConverter;
     try (Connection connection = dataSource.getConnection()) {
@@ -142,19 +142,19 @@ public class JdbcMappedModels implements MappedModels {
   }
 
   @Override
-  public List<SchemaObject> sync(AbstractSessionContext context) {
-    return sync(context, null);
+  public List<SchemaObject> syncFromDatabase(AbstractSessionContext context) {
+    return syncFromDatabase(context, null);
   }
 
   @Override
-  public List<SchemaObject> sync(AbstractSessionContext context, Set<String> includes) {
+  public List<SchemaObject> syncFromDatabase(AbstractSessionContext context, Set<String> includes) {
     SqlContext sqlContext = (SqlContext) context;
     List<EntityDefinition> entities = convert(sqlContext.getSqlMetadata().getTables(includes), sqlContext);
-    Map<String, SchemaObject> metaMap = lookup(sqlContext.getSchemaName()).stream().collect(Collectors.toMap(SchemaObject::getName, wrapper -> wrapper));
+    Map<String, SchemaObject> metaMap = findAll(sqlContext.getSchemaName()).stream().collect(Collectors.toMap(SchemaObject::getName, wrapper -> wrapper));
     for (EntityDefinition entity : entities) {
       SchemaObject model = getIgnoreCase(entity.getName(), metaMap);
       if (model == null) {
-        this.persist(sqlContext.getSchemaName(), entity);
+        this.save(sqlContext.getSchemaName(), entity);
         metaMap.put(entity.getName(), entity);
       }
     }
@@ -373,7 +373,7 @@ public class JdbcMappedModels implements MappedModels {
   }
 
   @Override
-  public List<SchemaObject> lookup(String schemaName) {
+  public List<SchemaObject> findAll(String schemaName) {
 
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
@@ -408,7 +408,7 @@ public class JdbcMappedModels implements MappedModels {
   }
 
   @Override
-  public void removeAll(String schemaName) {
+  public void deleteAll(String schemaName) {
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
       String sqlDeleteString = "delete from " + sqlDialect.quoteIdentifier(STORED_TABLES) +
@@ -420,7 +420,7 @@ public class JdbcMappedModels implements MappedModels {
   }
 
   @Override
-  public void remove(String schemaName, String modelName) {
+  public void delete(String schemaName, String modelName) {
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
       String sqlDeleteString = getDeleteString();
@@ -431,14 +431,14 @@ public class JdbcMappedModels implements MappedModels {
   }
 
   @Override
-  public void persist(String schemaName, SchemaObject object) {
+  public void save(String schemaName, SchemaObject object) {
     try (Connection connection = dataSource.getConnection()) {
       String content = jsonObjectConverter.toJsonString(object);
       log.trace("Persist:\n{}", content);
       connection.setAutoCommit(false);
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
       SchemaObject older;
-      if ((older = this.getModel(schemaName, object.getName())) != null) {
+      if ((older = this.find(schemaName, object.getName())) != null) {
         String oldContent = jsonObjectConverter.toJsonString(older);
         if (!oldContent.equals(content)) {
           String updateString = "update " + sqlDialect.quoteIdentifier(STORED_TABLES) + "set " + sqlDialect.quoteIdentifier("content") + "=:content" +
@@ -471,7 +471,7 @@ public class JdbcMappedModels implements MappedModels {
   }
 
   @Override
-  public SchemaObject getModel(String schemaName, String modelName) {
+  public SchemaObject find(String schemaName, String modelName) {
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
       String sqlSelectString = "select " + sqlDialect.quoteIdentifier("content") +
