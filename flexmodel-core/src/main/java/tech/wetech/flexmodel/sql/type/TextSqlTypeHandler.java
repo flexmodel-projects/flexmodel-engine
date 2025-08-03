@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.sql.type;
 
-import tech.wetech.flexmodel.mapping.TextTypeHandler;
+import tech.wetech.flexmodel.model.field.Field;
+import tech.wetech.flexmodel.type.TextTypeHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,7 +18,7 @@ public class TextSqlTypeHandler extends TextTypeHandler implements SqlTypeHandle
   }
 
   @Override
-  public String getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
+  public String getNullableResult(ResultSet rs, String columnName, Field field) throws SQLException {
     return rs.getString(columnName);
   }
 }

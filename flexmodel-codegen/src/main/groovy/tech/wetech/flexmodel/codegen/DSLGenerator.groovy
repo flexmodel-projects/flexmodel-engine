@@ -16,12 +16,12 @@ class DSLGenerator extends AbstractGenerator {
   }
 
 /**
-   * Writes the Java class content to the GroovyPrintWriter.
-   *
-   * @param out Print writer to output the Java class code.
-   * @param className The name of the class.
-   * @param context The generation context with model details.
-   */
+ * Writes the Java class content to the GroovyPrintWriter.
+ *
+ * @param out Print writer to output the Java class code.
+ * @param className The name of the class.
+ * @param context The generation context with model details.
+ */
   void writeModel(PrintWriter out, GenerationContext context) {
     def modelClass = context.modelClass
     def className = modelClass.shortClassName
@@ -40,7 +40,7 @@ class DSLGenerator extends AbstractGenerator {
     }
 
     out.println ""
-    out.println "import tech.wetech.flexmodel.dsl.FilterExpression;"
+    out.println "import tech.wetech.flexmodel.query.expr.FilterExpression;"
     out.println ""
 
     // Write class-level comments

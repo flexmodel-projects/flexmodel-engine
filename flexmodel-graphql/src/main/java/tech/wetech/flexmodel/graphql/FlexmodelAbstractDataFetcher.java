@@ -5,7 +5,14 @@ import graphql.execution.ValuesResolver;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
-import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.JsonObjectConverter;
+import tech.wetech.flexmodel.model.EntityDefinition;
+import tech.wetech.flexmodel.model.field.RelationField;
+import tech.wetech.flexmodel.model.field.TypedField;
+import tech.wetech.flexmodel.query.Direction;
+import tech.wetech.flexmodel.query.Query;
+import tech.wetech.flexmodel.session.Session;
+import tech.wetech.flexmodel.session.SessionFactory;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.util.ArrayList;
@@ -14,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static tech.wetech.flexmodel.dsl.Expressions.field;
+import static tech.wetech.flexmodel.query.expr.Expressions.field;
 
 /**
  * @author cjbi
@@ -48,15 +55,16 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
   }
 
   protected List<Map<String, Object>> findRelationDataList(Session session, DataFetchingEnvironment env, String path, String modelName, RelationField relationField, Object id) {
-    Entity entity = (Entity) session.getModel(relationField.getModelName());
-    Entity targetEntity = (Entity) session.getModel(relationField.getFrom());
+    EntityDefinition entity = (EntityDefinition) session.schema().getModel(relationField.getModelName());
+    EntityDefinition targetEntity = (EntityDefinition) session.schema().getModel(relationField.getFrom());
     path = path == null ? relationField.getName() : path + "/" + relationField.getName();
     List<SelectedField> selectedFields = env.getSelectionSet().getFields(path + "/*");
     List<RelationField> relationFields = new ArrayList<>();
-    List<Map<String, Object>> list = session.find(entity.getName(), query -> query
-      .withProjection(projection -> {
+
+    List<Map<String, Object>> list = session.dsl()
+      .select(selector -> {
         TypedField<?, ?> idField = entity.findIdField().orElseThrow();
-        projection.addField(idField.getName(), Projections.field(entity.getName() + "." + idField.getName()));
+        selector.field(idField.getName(), Query.field(entity.getName() + "." + idField.getName()));
         for (SelectedField selectedField : selectedFields) {
           TypedField<?, ?> flexModelField = targetEntity.getField(selectedField.getName());
           if (flexModelField == null) {
@@ -66,13 +74,15 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
             relationFields.add(secondaryRelationField);
             continue;
           }
-          projection.addField(selectedField.getName(), Projections.field(targetEntity.getName() + "." + flexModelField.getName()));
+          selector.field(selectedField.getName(), Query.field(targetEntity.getName() + "." + flexModelField.getName()));
         }
-        return projection;
+        return selector;
       })
-      .withJoin(joins -> joins.addLeftJoin(join -> join.setFrom(targetEntity.getName())))
-      .withFilter(field(entity.getName() + "." + entity.findIdField().map(TypedField::getName).orElseThrow()).eq(id))
-    );
+      .from(entity.getName())
+      .leftJoin(joins -> joins.addLeftJoin(join -> join.setFrom(targetEntity.getName())))
+      .where(field(entity.getName() + "." + entity.findIdField().map(TypedField::getName).orElseThrow()).eq(id))
+      .execute();
+
     List<Map<String, Object>> result = new ArrayList<>();
     for (Map<String, Object> map : list) {
       Map<String, Object> resultData = new HashMap<>(map);
@@ -89,14 +99,12 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
 
   protected Query getQuery(Integer pageNumber, Integer pageSize, Map<String, String> orderBy, Map<String, Object> where, Query query) {
     if (pageSize != null && pageNumber != null) {
-      query.withPage(pageNumber, pageSize);
+      query.setPage(new Query.Page().setPageNumber(pageNumber).setPageSize(pageSize));
     }
     if (orderBy != null) {
-      query.withSort(sort -> {
-          orderBy.forEach((k, v) -> sort.addOrder(k, Direction.valueOf(v.toUpperCase())));
-          return sort;
-        }
-      );
+      Query.Sort sort = new Query.Sort();
+      orderBy.forEach((k, v) -> sort.addOrder(k, Direction.valueOf(v.toUpperCase())));
+      query.setSort(sort);
     }
     if (where != null) {
       query.setFilter(jsonObjectConverter.toJsonString(where));

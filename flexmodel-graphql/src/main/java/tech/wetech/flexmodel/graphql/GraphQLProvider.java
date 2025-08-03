@@ -9,13 +9,13 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
-import tech.wetech.flexmodel.Entity;
-import tech.wetech.flexmodel.Enum;
-import tech.wetech.flexmodel.SchemaObject;
-import tech.wetech.flexmodel.SessionFactory;
 import tech.wetech.flexmodel.codegen.EnumClass;
 import tech.wetech.flexmodel.codegen.GenerationContext;
 import tech.wetech.flexmodel.codegen.ModelClass;
+import tech.wetech.flexmodel.model.EntityDefinition;
+import tech.wetech.flexmodel.model.EnumDefinition;
+import tech.wetech.flexmodel.model.SchemaObject;
+import tech.wetech.flexmodel.session.SessionFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -50,11 +50,11 @@ public class GraphQLProvider {
     for (String schemaName : sf.getSchemaNames()) {
       List<SchemaObject> models = sf.getModels(schemaName);
       for (SchemaObject model : models) {
-        if (model instanceof Entity entity) {
+        if (model instanceof EntityDefinition entity) {
           context.getModelClassList().add(ModelClass.buildModelClass("", schemaName, entity));
           joinDataFetchers.put(schemaName + "_" + model.getName(), joinMap);
           joinDataFetchers.put(schemaName + "_" + model.getName() + "_aggregate", joinMap);
-        } else if (model instanceof Enum andEnum) {
+        } else if (model instanceof EnumDefinition andEnum) {
           context.getEnumClassList().add(EnumClass.buildEnumClass("", schemaName, andEnum));
         } else {
           // todo 支持非实体类型
@@ -65,7 +65,7 @@ public class GraphQLProvider {
     for (String schemaName : sf.getSchemaNames()) {
       List<SchemaObject> models = sf.getModels(schemaName);
       for (SchemaObject model : models) {
-        if (model instanceof Entity entity) {
+        if (model instanceof EntityDefinition entity) {
           for (DataFetchers fetchType : DataFetchers.values()) {
             if (fetchType.isQuery()) {
               queryDataFetchers.put(

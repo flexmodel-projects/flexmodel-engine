@@ -1,0 +1,168 @@
+# FlexModel DSL AI 规则配置
+version: "1.0.0"
+description: "FlexModel DSL语法规则和最佳实践指南"
+
+# 核心原则
+core_principles:
+  model_concept_first:
+    description: "优先使用模型概念而非表概念"
+    correct_usage: "model()"
+    incorrect_usage: "table()"
+    reason: "FlexModel基于模型概念，不是传统的关系型数据库表概念"
+
+  syntax_simplicity:
+    description: "优先使用简洁的DSL语法"
+    simple_queries: "QueryDSL.simple()"
+    complex_queries: "QueryDSL.query()"
+    avoid: "直接使用原始的Query类构造方法"
+
+# 语法模式
+syntax_patterns:
+  simple_query:
+    description: "简单查询模式"
+    template: "QueryDSL.simple().select(fields).where(condition).orderBy(field, direction).limit(size).build()"
+    example: "QueryDSL.simple().select(\"id\", \"name\", \"age\").where(QueryDSL.where(\"age\").gte(18)).orderBy(\"name\", Direction.ASC).limit(10).build()"
+    use_case: "单表查询、简单条件、基本排序分页"
+
+  complex_query:
+    description: "复杂查询模式"
+    template: "QueryDSL.query().select(select -> select.field(...)).innerJoin(join -> join.model(...)).groupBy(groupBy -> groupBy.field(...)).build()"
+    example: "QueryDSL.query().select(select -> select.field(\"name\").count(\"count\", \"id\")).innerJoin(join -> join.model(\"orders\")).groupBy(groupBy -> groupBy.field(\"name\")).build()"
+    use_case: "多表连接、聚合函数、复杂条件"
+
+  model_join:
+    description: "模型连接模式"
+    correct_template: ".leftJoin(join -> join.model(\"model_name\").as(\"alias\").on(\"local_field\", \"foreign_field\"))"
+    incorrect_template: ".leftJoin(join -> join.table(\"table_name\").as(\"alias\").on(\"local_field\", \"foreign_field\"))"
+    example: ".leftJoin(join -> join.model(\"students\").as(\"students\").on(\"id\", \"class_id\"))"
+
+  condition_expression:
+    description: "条件表达式模式"
+    correct_template: "QueryDSL.where(\"field\").operator(value).and(QueryDSL.where(\"field\").operator(value))"
+    incorrect_template: "Expressions.field(\"field\").operator(value).and(Expressions.field(\"field\").operator(value))"
+    example: "QueryDSL.where(\"age\").gte(18).and(QueryDSL.where(\"status\").eq(\"active\"))"
+
+# 常见错误
+common_errors:
+  concept_confusion:
+    error_type: "概念混淆"
+    description: "使用表概念而不是模型概念"
+    incorrect_code: "join.setFrom(\"users_table\")"
+    correct_code: "join.model(\"users\")"
+    fix_guidance: "将表名改为模型名，使用model()方法"
+
+  verbose_syntax:
+    error_type: "语法冗长"
+    description: "使用原始语法而不是优化的DSL语法"
+    incorrect_code: "new Query().withProjection(projection -> { projection.addField(\"id\", new Query.QueryField(\"id\")); return projection; })"
+    correct_code: "QueryDSL.simple().select(\"id\").build()"
+    fix_guidance: "使用QueryDSL.simple()或QueryDSL.query()替代原始Query类"
+
+  method_not_found:
+    error_type: "方法不存在"
+    description: "调用不存在的方法"
+    incorrect_code: "select.table(\"users\")"
+    correct_code: "select.field(\"user_id\", \"id\")"
+    fix_guidance: "检查方法名是否正确，SelectBuilder使用field()方法"
+
+# 最佳实践
+best_practices:
+  naming_conventions:
+    model_names:
+      description: "模型命名规范"
+      examples: [ "users", "orders", "products", "user_profiles" ]
+      guidance: "使用业务模型名称，避免使用表名"
+
+    field_aliases:
+      description: "字段别名规范"
+      examples: [ "user_id", "user_name", "user_email" ]
+      guidance: "使用有意义的别名，避免歧义"
+
+  query_complexity:
+    simple_query_criteria:
+      - "单表查询"
+      - "简单条件"
+      - "基本排序分页"
+      - "字段数量少于5个"
+
+    complex_query_criteria:
+      - "多表连接"
+      - "聚合函数"
+      - "复杂条件"
+      - "分组操作"
+
+  performance_optimization:
+    field_selection:
+      good: "只选择需要的字段"
+      bad: "选择所有字段（select(\"*\")）"
+      guidance: "明确指定需要的字段，避免选择不必要的字段"
+
+    pagination:
+      good: "合理设置分页大小（如20条）"
+      bad: "设置过大的分页大小"
+      guidance: "根据实际需求设置合理的分页大小"
+
+# 调试指导
+debugging_guidance:
+  compilation_errors:
+    check_method_names: "检查方法名是否正确（如model()而不是table()）"
+    check_imports: "确保导入了正确的类"
+    check_syntax: "检查语法是否正确"
+
+  runtime_errors:
+    check_model_names: "检查模型名称是否存在"
+    check_field_names: "检查字段名称是否正确"
+    check_conditions: "检查条件表达式是否正确"
+
+  logic_errors:
+    check_join_conditions: "检查连接条件是否正确"
+    check_aggregation: "检查聚合函数使用是否正确"
+    check_ordering: "检查排序字段是否存在"
+
+# 代码示例
+code_examples:
+  basic_crud:
+    select: "QueryDSL.simple().select(\"id\", \"name\", \"email\").where(QueryDSL.where(\"status\").eq(\"active\")).build()"
+    select_with_join: "QueryDSL.query().select(select -> select.field(\"user_name\", \"users.name\").field(\"order_count\", \"orders.id\")).leftJoin(join -> join.model(\"orders\").on(\"users.id\", \"orders.user_id\")).build()"
+    aggregation: "QueryDSL.query().select(select -> select.field(\"department\").count(\"employee_count\", \"employees.id\").avg(\"avg_salary\", \"employees.salary\")).groupBy(groupBy -> groupBy.field(\"department\")).build()"
+
+  complex_conditions:
+    multiple_conditions: "QueryDSL.where(\"age\").gte(18).and(QueryDSL.where(\"age\").lte(65)).and(QueryDSL.where(\"status\").eq(\"active\")).or(QueryDSL.where(\"vip\").eq(true))"
+    in_condition: "QueryDSL.where(\"department\").in(\"技术部\", \"产品部\", \"运营部\")"
+    like_condition: "QueryDSL.where(\"name\").contains(\"张\").or(QueryDSL.where(\"name\").contains(\"李\"))"
+
+# 迁移指南
+migration_guide:
+  from_original_syntax:
+    step1: "将new Query()替换为QueryDSL.simple()或QueryDSL.query()"
+    step2: "将withProjection()替换为select()"
+    step3: "将withFilter()替换为where()"
+    step4: "将withJoin()替换为innerJoin()或leftJoin()"
+    step5: "将withSort()替换为orderBy()"
+    step6: "将withPage()替换为page()或limit()"
+
+  concept_migration:
+    table_to_model: "将所有表名引用改为模型名"
+    field_references: "使用有意义的字段别名"
+    join_conditions: "基于业务关联关系设置连接条件"
+
+# AI 使用指导
+ai_guidance:
+  response_format:
+    - "始终使用模型概念（model()而不是table()）"
+    - "优先推荐QueryDSL.simple()进行简单查询"
+    - "复杂查询使用QueryDSL.query()"
+    - "提供完整的代码示例"
+    - "解释每个方法的作用"
+
+  error_prevention:
+    - "检查方法名是否正确"
+    - "验证模型名称是否存在"
+    - "确保语法结构完整"
+    - "提供错误修复建议"
+
+  code_quality:
+    - "使用有意义的变量名和别名"
+    - "保持代码简洁易读"
+    - "遵循最佳实践"
+    - "考虑性能优化"

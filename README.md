@@ -1,11 +1,11 @@
-# FlexModel Engine
+# Flexmodel Engine
 
 [![Java](https://img.shields.io/badge/Java-21+-orange.svg)](https://openjdk.java.net/)
 [![Maven](https://img.shields.io/badge/Maven-3.6+-blue.svg)](https://maven.apache.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](https://github.com/flexmodel-projects/flexmodel-engine)
 
-> FlexModel 是一个开源的、免费的统一数据访问层解决方案，专为下一代应用程序设计。它提供全面的数据建模、API管理和数据源集成功能，支持私有化部署。
+> Flexmodel 是一个开源的、免费的统一数据访问层解决方案，专为下一代应用程序设计。它提供全面的数据建模、API管理和数据源集成功能，支持私有化部署。
 
 ## 🚀 特性
 
@@ -43,7 +43,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    FlexModel Engine                         │
+│                    Flexmodel Engine                         │
 ├─────────────────────────────────────────────────────────────┤
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
 │  │   GraphQL   │  │ JSON Logic  │  │   CodeGen   │         │

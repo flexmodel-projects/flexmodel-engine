@@ -2,7 +2,8 @@ package tech.wetech.flexmodel.validator;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.model.EntityDefinition;
+import tech.wetech.flexmodel.model.field.*;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 /**
@@ -12,7 +13,7 @@ public class JsonSerializeTest {
 
   @Test
   void test() {
-    Entity entity = new Entity("students");
+    EntityDefinition entity = new EntityDefinition("students");
     // 主键
     LongField idField = new LongField("id");
     idField.setComment("Primary Key");
@@ -57,7 +58,7 @@ public class JsonSerializeTest {
     entity.addField(email);
 
     String json = new JacksonObjectConverter().toJsonString(entity);
-    Entity deSerializeEntity = new JacksonObjectConverter().parseToObject(json, Entity.class);
+    EntityDefinition deSerializeEntity = new JacksonObjectConverter().parseToObject(json, EntityDefinition.class);
     Assertions.assertNotNull(deSerializeEntity);
   }
 

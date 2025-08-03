@@ -1,7 +1,10 @@
 package tech.wetech.flexmodel.graphql;
 
-import tech.wetech.flexmodel.Enum;
-import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.JsonObjectConverter;
+import tech.wetech.flexmodel.model.EntityDefinition;
+import tech.wetech.flexmodel.model.EnumDefinition;
+import tech.wetech.flexmodel.model.field.*;
+import tech.wetech.flexmodel.session.Session;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.util.List;
@@ -14,8 +17,8 @@ public class Models {
 
   private static final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
 
-  public static Entity createClassesEntity(Session session, String entityName) {
-    return session.createEntity(entityName, entity -> entity
+  public static EntityDefinition createClassesEntity(Session session, String entityName) {
+    return session.schema().createEntity(entityName, entity -> entity
       .addField(new LongField("id").asIdentity().setDefaultValue(GeneratedValue.AUTO_INCREMENT))
       .addField(new StringField("classCode"))
       .addField(new StringField("className"))
@@ -23,21 +26,21 @@ public class Models {
     );
   }
 
-  public static Entity createStudentEntity(Session session, String entityName) {
-    Enum genderEnum = session.createEnum(entityName + "_gender", en ->
+  public static EntityDefinition createStudentEntity(Session session, String entityName) {
+    EnumDefinition genderEnum = session.schema().createEnum(entityName + "_gender", en ->
       en.addElement("UNKNOWN")
         .addElement("MALE")
         .addElement("FEMALE")
         .setComment("性别")
     );
-    Enum interestEnum = session.createEnum(entityName + "_interest", en ->
+    EnumDefinition interestEnum = session.schema().createEnum(entityName + "_interest", en ->
       en.addElement("chang")
         .addElement("tiao")
         .addElement("rap")
         .addElement("daLanQiu")
         .setComment("兴趣")
     );
-    return session.createEntity(entityName, entity -> entity
+    return session.schema().createEntity(entityName, entity -> entity
       .addField(new LongField("id").asIdentity().setDefaultValue(GeneratedValue.AUTO_INCREMENT))
       .addField(new StringField("studentName"))
       .addField(new EnumField("gender").setFrom(genderEnum.getName()))
@@ -48,23 +51,23 @@ public class Models {
     );
   }
 
-  public static Entity createStudentDetailEntity(Session session, String entityName) {
-    return session.createEntity(entityName, entity -> entity
+  public static EntityDefinition createStudentDetailEntity(Session session, String entityName) {
+    return session.schema().createEntity(entityName, entity -> entity
       .addField(new LongField("id").asIdentity().setDefaultValue(GeneratedValue.AUTO_INCREMENT))
       .addField(new LongField("studentId"))
       .addField(new StringField("description"))
     );
   }
 
-  public static Entity createCourseEntity(Session session, String entityName) {
-    return session.createEntity(entityName, entity -> entity
+  public static EntityDefinition createCourseEntity(Session session, String entityName) {
+    return session.schema().createEntity(entityName, entity -> entity
       .addField(new StringField("courseNo").asIdentity().setDefaultValue(GeneratedValue.UUID))
       .addField(new StringField("courseName"))
     );
   }
 
-  public static Entity createTeacherEntity(Session session, String entityName) {
-    return session.createEntity(entityName, entity -> entity
+  public static EntityDefinition createTeacherEntity(Session session, String entityName) {
+    return session.schema().createEntity(entityName, entity -> entity
       .addField(new LongField("id").asIdentity().setDefaultValue(GeneratedValue.AUTO_INCREMENT))
       .addField(new StringField("teacherName"))
       .addField(new StringField("subject"))
@@ -74,7 +77,7 @@ public class Models {
   public static void createAssociations(Session session, String classRoomEntityName, String studentEntityName,
                                         String studentDetailEntityName, String courseEntityName, String teacherEntityName) {
     // 班级:学生
-    session.createField(new RelationField("students")
+    session.schema().createField(new RelationField("students")
       .setModelName(classRoomEntityName)
       .setFrom(studentEntityName)
       .setForeignField("classId")
@@ -82,7 +85,7 @@ public class Models {
       .setCascadeDelete(true)
     );
     // 学生:学生明细 -> 1:1
-    session.createField(new RelationField("studentDetail")
+    session.schema().createField(new RelationField("studentDetail")
       .setModelName(studentEntityName)
       .setFrom(studentDetailEntityName)
       .setForeignField("studentId")
@@ -110,7 +113,7 @@ public class Models {
         ]
       """;
     List<Map<String, Object>> list = jsonObjectConverter.parseToObject(mockData, List.class);
-    session.insertAll(entityName, list);
+    session.data().insertAll(entityName, list);
   }
 
   public static void createStudentData(Session session, String entityName) {
@@ -190,7 +193,7 @@ public class Models {
       ]
       """;
     List<Map<String, Object>> list = jsonObjectConverter.parseToObject(mockData, List.class);
-    session.insertAll(entityName, list);
+    session.data().insertAll(entityName, list);
   }
 
   public static void createCourseData(Session session, String entityName) {
@@ -219,7 +222,7 @@ public class Models {
         ]
       """;
     List<Map<String, Object>> list = jsonObjectConverter.parseToObject(mockData, List.class);
-    session.insertAll(entityName, list);
+    session.data().insertAll(entityName, list);
   }
 
   public static void createTeacherData(Session session, String entityName) {
@@ -273,7 +276,7 @@ public class Models {
       ]
       """;
     List<Map<String, Object>> list = jsonObjectConverter.parseToObject(mockData, List.class);
-    session.insertAll(entityName, list);
+    session.data().insertAll(entityName, list);
   }
 
 }

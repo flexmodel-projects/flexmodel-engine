@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel.codegen;
 
-import tech.wetech.flexmodel.Enum;
+import tech.wetech.flexmodel.model.EnumDefinition;
 
 import java.util.List;
 
@@ -10,9 +10,9 @@ import java.util.List;
 public class EnumClass extends AbstractClass<EnumClass> {
 
   private List<String> elements;
-  private Enum original;
+  private EnumDefinition original;
 
-  public static EnumClass buildEnumClass(String packageName, String schemaName, Enum anEnum) {
+  public static EnumClass buildEnumClass(String packageName, String schemaName, EnumDefinition anEnum) {
     String ftName = StringUtils.capitalize(StringUtils.snakeToCamel(anEnum.getName()));
 
     EnumClass enumClass = new EnumClass()
@@ -38,11 +38,11 @@ public class EnumClass extends AbstractClass<EnumClass> {
     return this;
   }
 
-  public Enum getOriginal() {
+  public EnumDefinition getOriginal() {
     return original;
   }
 
-  public EnumClass setOriginal(Enum original) {
+  public EnumClass setOriginal(EnumDefinition original) {
     this.original = original;
     return this;
   }

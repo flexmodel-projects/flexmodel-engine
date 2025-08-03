@@ -1,36 +1,49 @@
 package tech.wetech.flexmodel;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import tech.wetech.flexmodel.dsl.Expressions;
-import tech.wetech.flexmodel.dto.TeacherDTO;
+import org.junit.jupiter.api.*;
 import tech.wetech.flexmodel.entity.Classes;
 import tech.wetech.flexmodel.entity.Student;
 import tech.wetech.flexmodel.entity.StudentDetail;
+import tech.wetech.flexmodel.model.EntityDefinition;
+import tech.wetech.flexmodel.model.EnumDefinition;
+import tech.wetech.flexmodel.model.IndexDefinition;
+import tech.wetech.flexmodel.model.SchemaObject;
+import tech.wetech.flexmodel.model.field.*;
+import tech.wetech.flexmodel.query.Direction;
+import tech.wetech.flexmodel.query.Query;
+import tech.wetech.flexmodel.query.expr.Expressions;
+import tech.wetech.flexmodel.query.expr.Predicate;
+import tech.wetech.flexmodel.session.Session;
+import tech.wetech.flexmodel.session.SessionFactory;
 import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import static tech.wetech.flexmodel.Direction.DESC;
-import static tech.wetech.flexmodel.GeneratedValue.AUTO_INCREMENT;
-import static tech.wetech.flexmodel.GeneratedValue.UUID;
-import static tech.wetech.flexmodel.Projections.*;
+import static tech.wetech.flexmodel.model.field.GeneratedValue.AUTO_INCREMENT;
+import static tech.wetech.flexmodel.model.field.GeneratedValue.UUID;
+import static tech.wetech.flexmodel.query.Direction.DESC;
+import static tech.wetech.flexmodel.query.Query.*;
+
 
 /**
  * @author cjbi
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractSessionTests {
 
   public static SessionFactory sessionFactory;
   public static Session session;
   private final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
+
+  // 用于生成唯一的实体名称，避免测试间冲突
+  private final AtomicInteger entityCounter = new AtomicInteger(1);
+
+  // 记录测试中创建的实体，用于清理
+  private final List<String> createdEntities = new ArrayList<>();
 
   protected static void initSession(DataSourceProvider dataSourceProvider) {
     sessionFactory = SessionFactory.builder()
@@ -39,13 +52,105 @@ public abstract class AbstractSessionTests {
     session = sessionFactory.createSession("default");
   }
 
+  @BeforeEach
+  void setUp() {
+    // 每个测试方法执行前的准备工作
+    createdEntities.clear();
+  }
+
+  @AfterEach
+  void tearDown() {
+    // 清理测试中创建的实体
+    for (String entityName : createdEntities) {
+      try {
+        session.schema().dropModel(entityName);
+      } catch (Exception e) {
+        // 忽略清理时的异常，避免影响测试结果
+      }
+    }
+    createdEntities.clear();
+  }
+
   @AfterAll
   static void afterAll() {
+    // 清理静态资源
+    if (session != null) {
+      try {
+        // 如果Session有close方法则调用，否则忽略
+        if (session.getClass().getMethod("close") != null) {
+          session.close();
+        }
+      } catch (Exception e) {
+        // 忽略关闭时的异常
+      }
+    }
+  }
 
+  /**
+   * 生成唯一的实体名称，避免测试间冲突
+   */
+  protected String generateEntityName(String baseName) {
+    return baseName + "_" + entityCounter.getAndIncrement();
+  }
+
+  /**
+   * 记录创建的实体，用于测试后清理
+   */
+  protected void registerEntity(String entityName) {
+    createdEntities.add(entityName);
+  }
+
+  /**
+   * 创建简单的查询对象，减少lambda使用
+   */
+  private Query createSimpleQuery() {
+    return new Query();
+  }
+
+  /**
+   * 创建带条件的查询对象
+   */
+  private Query createQueryWithCondition(Predicate condition) {
+    return Query.Builder.create()
+      .where(condition)
+      .build();
+  }
+
+  /**
+   * 创建带投影的查询对象
+   */
+  private Query createQueryWithSelect(String... fields) {
+    return Query.Builder.create()
+      .select(fields)
+      .build();
+  }
+
+  /**
+   * 演示不同的查询构建方式，减少lambda使用
+   */
+  private void demonstrateQueryBuilding() {
+    String entityName = "demo_entity";
+
+    // 方式1：使用Query.Builder（推荐，减少lambda）
+    Query query1 = Query.Builder.create()
+      .select("id", "name", "age")
+      .where(Expressions.field("age").gte(18))
+      .orderBy(orderBy -> orderBy.asc("name"))
+      .page(1, 10)
+      .build();
+
+    // 方式2：使用辅助方法
+    Query query2 = createQueryWithCondition(Expressions.field("age").gte(18));
+
+    // 方式3：使用简单查询
+    Query query3 = createSimpleQuery();
+
+    // 方式4：使用QueryBuilder的静态方法（如果可用）
+    // Query query4 = QueryBuilder.simpleQuery("id", "name");
   }
 
   void createClassesEntity(String entityName) {
-    session.createEntity(entityName, entity -> entity
+    session.schema().createEntity(entityName, entity -> entity
       .addField(new StringField("id").asIdentity().setDefaultValue(UUID))
       .addField(new StringField("classCode"))
       .addField(new StringField("className"))
@@ -53,20 +158,20 @@ public abstract class AbstractSessionTests {
   }
 
   void createStudentEntity(String entityName) {
-    Enum genderEnum = session.createEnum(entityName + "_gender", en ->
+    EnumDefinition genderEnum = session.schema().createEnum(entityName + "_gender", en ->
       en.addElement("UNKNOWN")
         .addElement("MALE")
         .addElement("FEMALE")
         .setComment("性别")
     );
-    Enum interestEnum = session.createEnum(entityName + "_interest", en ->
+    EnumDefinition interestEnum = session.schema().createEnum(entityName + "_interest", en ->
       en.addElement("chang")
         .addElement("tiao")
         .addElement("rap")
         .addElement("daLanQiu")
         .setComment("兴趣")
     );
-    session.createEntity(entityName, entity -> entity
+    session.schema().createEntity(entityName, entity -> entity
       .addField(new StringField("id").asIdentity())
       .addField(new StringField("studentName"))
       .addField(new EnumField("gender").setFrom(genderEnum.getName()))
@@ -78,7 +183,7 @@ public abstract class AbstractSessionTests {
   }
 
   void createStudentDetailEntity(String entityName) {
-    session.createEntity(entityName, entity -> entity
+    session.schema().createEntity(entityName, entity -> entity
       .addField(new LongField("id").asIdentity().setDefaultValue(AUTO_INCREMENT))
       .addField(new StringField("studentId"))
       .addField(new StringField("description"))
@@ -86,14 +191,14 @@ public abstract class AbstractSessionTests {
   }
 
   void createCourseEntity(String entityName) {
-    session.createEntity(entityName, entity -> entity
+    session.schema().createEntity(entityName, entity -> entity
       .addField(new StringField("courseNo").asIdentity().setDefaultValue(UUID))
       .addField(new StringField("courseName"))
     );
   }
 
   void createTeacherEntity(String entityName) {
-    session.createEntity(entityName, entity -> entity
+    session.schema().createEntity(entityName, entity -> entity
       .addField(new StringField("id").asIdentity().setDefaultValue(UUID))
       .addField(new StringField("teacherName"))
       .addField(new StringField("subject"))
@@ -103,7 +208,7 @@ public abstract class AbstractSessionTests {
   void createAssociations(String classRoomEntityName, String studentEntityName,
                           String studentDetailEntityName, String courseEntityName, String teacherEntityName) {
     // 班级:学生
-    session.createField(
+    session.schema().createField(
       new RelationField("students")
         .setModelName(classRoomEntityName)
         .setFrom(studentEntityName)
@@ -113,7 +218,7 @@ public abstract class AbstractSessionTests {
         .setCascadeDelete(true)
     );
     // 学生:学生明细 -> 1:1
-    session.createField(
+    session.schema().createField(
       new RelationField("studentDetail")
         .setModelName(studentEntityName)
         .setFrom(studentDetailEntityName)
@@ -122,7 +227,7 @@ public abstract class AbstractSessionTests {
         .setMultiple(false)
     );
     // 明细:学生 -> 1:1
-    session.createField(
+    session.schema().createField(
       new RelationField("student")
         .setModelName(studentDetailEntityName)
         .setFrom(studentEntityName)
@@ -153,7 +258,7 @@ public abstract class AbstractSessionTests {
         ]
       """;
     List<Map<String, Object>> list = jsonObjectConverter.parseToMapList(mockData);
-    session.insertAll(entityName, list);
+    session.data().insertAll(entityName, list);
   }
 
   void createStudentData(String entityName) {
@@ -229,7 +334,7 @@ public abstract class AbstractSessionTests {
       ]
       """;
     List<Map<String, Object>> list = jsonObjectConverter.parseToMapList(mockData);
-    session.insertAll(entityName, list);
+    session.data().insertAll(entityName, list);
   }
 
   void createCourseData(String entityName) {
@@ -258,7 +363,7 @@ public abstract class AbstractSessionTests {
         ]
       """;
     List<Map<String, Object>> list = jsonObjectConverter.parseToMapList(mockData);
-    session.insertAll(entityName, list);
+    session.data().insertAll(entityName, list);
   }
 
   void createTeacherData(String entityName) {
@@ -312,58 +417,93 @@ public abstract class AbstractSessionTests {
       ]
       """;
     List<Map<String, Object>> list = jsonObjectConverter.parseToMapList(mockData);
-    session.insertAll(entityName, list);
+    session.data().insertAll(entityName, list);
   }
 
   @Test
   void testRelation() {
-    String classesEntityName = "TestRelationClasses";
-    String studentEntityName = "TestRelationStudent";
-    String studentDetailEntityName = "TestRelationStudentDetail";
-    String courseEntityName = "TestRelationCourse";
-    String teacherEntityName = "TestRelationTeacher";
+    // 使用唯一实体名称避免测试冲突
+    String classesEntityName = generateEntityName("TestRelationClasses");
+    String studentEntityName = generateEntityName("TestRelationStudent");
+    String studentDetailEntityName = generateEntityName("TestRelationStudentDetail");
+    String courseEntityName = generateEntityName("TestRelationCourse");
+    String teacherEntityName = generateEntityName("TestRelationTeacher");
+
+    // 创建实体并注册用于清理
     createClassesEntity(classesEntityName);
+    registerEntity(classesEntityName);
     createStudentEntity(studentEntityName);
+    registerEntity(studentEntityName);
     createStudentDetailEntity(studentDetailEntityName);
+    registerEntity(studentDetailEntityName);
     createCourseEntity(courseEntityName);
+    registerEntity(courseEntityName);
     createTeacherEntity(teacherEntityName);
+    registerEntity(teacherEntityName);
+
+    // 创建关联关系
     createAssociations(classesEntityName, studentEntityName, studentDetailEntityName, courseEntityName, teacherEntityName);
+
+    // 插入测试数据
     createCourseData(courseEntityName);
     createClassesData(classesEntityName);
     createStudentData(studentEntityName);
     createTeacherData(teacherEntityName);
 
-    // 1:1
-    Map<String, Object> oneToOne = session.find(studentEntityName, query -> query
-      .withProjection(projection -> projection
-        .addField("studentName", field("studentName"))
-        .addField("description", field(studentDetailEntityName + ".description"))
-      )
-      .withJoin(joins -> joins
-        .addLeftJoin(join -> join.setFrom(studentDetailEntityName))
-      )
-      .withFilter(Expressions.field(studentEntityName + ".id").eq("1"))
-    ).getFirst();
-    Assertions.assertEquals("张三", oneToOne.get("studentName"));
-    Assertions.assertEquals("张三的描述", oneToOne.get("description"));
+    // 测试1:1关系查询
+    testOneToOneRelation(studentEntityName, studentDetailEntityName);
 
-    // 1:n
-    List<Map<String, Object>> oneToMany = session.find(classesEntityName, query -> query
-      .withProjection(projection -> projection
-        .addField("className", field("className"))
-        .addField("studentName", field(studentEntityName + ".studentName"))
-      )
-      .withJoin(joins -> joins
-        .addLeftJoin(join -> join
-          .setFrom(studentEntityName)
-        )
-      )
-      .withFilter(Expressions.field(classesEntityName + ".id").eq("1"))
-    );
-    Assertions.assertFalse(oneToMany.isEmpty());
-    Assertions.assertEquals("一年级1班", oneToMany.getFirst().get("className"));
-    Assertions.assertEquals("张三", oneToMany.getFirst().get("studentName"));
+    // 测试1:n关系查询
+    testOneToManyRelation(classesEntityName, studentEntityName);
+  }
 
+  /**
+   * 测试1:1关系查询
+   */
+  private void testOneToOneRelation(String studentEntityName, String studentDetailEntityName) {
+    Query query = Query.Builder.create()
+      .select(select -> select
+        .field("studentName", "studentName")
+        .field("description", studentDetailEntityName + ".description")
+      )
+      .leftJoin(join -> join
+        .model(studentDetailEntityName)
+      )
+      .where(Expressions.field(studentEntityName + ".id").eq("1"))
+      .build();
+
+    Map<String, Object> oneToOne = session.data().find(studentEntityName, query).getFirst();
+
+    // 详细的断言验证
+    Assertions.assertNotNull(oneToOne, "查询结果不应为空");
+    Assertions.assertEquals("张三", oneToOne.get("studentName"), "学生姓名应该匹配");
+    Assertions.assertEquals("张三的描述", oneToOne.get("description"), "学生描述应该匹配");
+  }
+
+  /**
+   * 测试1:n关系查询
+   */
+  private void testOneToManyRelation(String classesEntityName, String studentEntityName) {
+    Query query = Query.Builder.create()
+      .select(select -> select
+        .field("className", "className")
+        .field("studentName", studentEntityName + ".studentName")
+      )
+      .leftJoin(join -> join
+        .model(studentEntityName)
+      )
+      .where(Expressions.field(classesEntityName + ".id").eq("1"))
+      .build();
+
+    List<Map<String, Object>> oneToMany = session.data().find(classesEntityName, query);
+
+    // 详细的断言验证
+    Assertions.assertFalse(oneToMany.isEmpty(), "查询结果不应为空");
+    Assertions.assertTrue(oneToMany.size() >= 1, "应该至少有一条记录");
+
+    Map<String, Object> firstRecord = oneToMany.getFirst();
+    Assertions.assertEquals("一年级1班", firstRecord.get("className"), "班级名称应该匹配");
+    Assertions.assertEquals("张三", firstRecord.get("studentName"), "学生姓名应该匹配");
   }
 
   @Test
@@ -371,7 +511,7 @@ public abstract class AbstractSessionTests {
     String studentEntityName = "testEnumStudent";
     createStudentEntity(studentEntityName);
     createStudentData(studentEntityName);
-    List<Map> list = session.find("testEnumStudent", q -> q, Map.class);
+    List<Map<String, Object>> list = session.dsl().select().from("testEnumStudent").execute();
     Assertions.assertFalse(list.isEmpty());
     Map first = list.getFirst();
     Assertions.assertInstanceOf(String.class, first.get("gender"));
@@ -379,7 +519,7 @@ public abstract class AbstractSessionTests {
   }
 
   void createTeacherCollection2(String entityName) {
-    session.createEntity(entityName, entity -> entity
+    session.schema().createEntity(entityName, entity -> entity
       // 主键
       .addField(new LongField("id").asIdentity().setDefaultValue(GeneratedValue.AUTO_INCREMENT).setComment("Primary Key"))
       // 姓名
@@ -455,7 +595,7 @@ public abstract class AbstractSessionTests {
       ]
       """;
     List<Map<String, Object>> list = jsonObjectConverter.parseToMapList(mockData);
-    session.insertAll(entityName, list);
+    session.data().insertAll(entityName, list);
   }
 
   void createTeacherCourseEntity(String teacherEntityName, String teacherCourseEntity) {
@@ -484,14 +624,14 @@ public abstract class AbstractSessionTests {
       ]
       """;
     List<Map<String, Object>> list = jsonObjectConverter.parseToMapList(mockData);
-    session.createEntity(teacherCourseEntity, sScore -> sScore
+    session.schema().createEntity(teacherCourseEntity, sScore -> sScore
       .addField(new LongField("id").asIdentity().setDefaultValue(GeneratedValue.AUTO_INCREMENT))
       .addField(new StringField("c_name"))
       .addField(new FloatField("c_score"))
       .addField(new LongField("teacher_id"))
       .setComment("教师成绩表")
     );
-    session.createField(
+    session.schema().createField(
       new RelationField("courses")
         .setModelName(teacherEntityName)
         .setMultiple(true)
@@ -499,13 +639,29 @@ public abstract class AbstractSessionTests {
         .setFrom(teacherCourseEntity)
         .setForeignField("teacher_id")
     );
-    session.insertAll(teacherCourseEntity, list);
+    session.data().insertAll(teacherCourseEntity, list);
   }
 
   @Test
   void testInsert() {
-    String entityName = "testInsert_teacher";
+    String entityName = generateEntityName("testInsert_teacher");
     createTeacherCollection2(entityName);
+    registerEntity(entityName);
+
+    // 测试插入基本数据
+    testInsertBasicRecord(entityName);
+
+    // 测试插入带扩展信息的数据
+    testInsertRecordWithExtra(entityName);
+
+    // 测试插入null值
+    testInsertRecordWithNull(entityName);
+  }
+
+  /**
+   * 测试插入基本记录
+   */
+  private void testInsertBasicRecord(String entityName) {
     Map<String, Object> record = new HashMap<>();
     record.put("name", "张三丰");
     record.put("age", 218);
@@ -513,27 +669,54 @@ public abstract class AbstractSessionTests {
     record.put("createDatetime", LocalDateTime.now());
     record.put("birthday", LocalDate.of(1247, 1, 1));
     record.put("isLocked", true);
-//    record.put("extra", """
-//      [{
-//         "foo": "bar"
-//      }]
-//      """);
-    Assertions.assertEquals(1, session.insert(entityName, record));
-    Map<String, Object> record2 = new HashMap<>();
-    record2.put("name", "李白");
-    record2.put("age", 61);
-    record2.put("description", "字太白，号青莲居士");
-    record2.put("createDatetime", LocalDateTime.now());
-    record2.put("birthday", LocalDate.of(701, 2, 28));
-    record2.put("extra", Map.of("foo", "bar"));
-    Assertions.assertEquals(1, session.insert(entityName, record2, Assertions::assertNotNull));
-    Map<String, Object> record3 = new HashMap<>();
-    record3.put("name", "杜甫");
-    record3.put("age", 58);
-    record3.put("description", "字子美，自号少陵野老，唐代伟大的现实主义诗人");
-    record3.put("birthday", LocalDate.of(712, 2, 12));
-    record3.put("extra", null);
-    Assertions.assertEquals(1, session.insert(entityName, record3, Assertions::assertNotNull));
+
+    int affectedRows = session.data().insert(entityName, record);
+    Assertions.assertEquals(1, affectedRows, "应该成功插入一条记录");
+
+    // 验证插入的数据
+    Map<String, Object> insertedRecord = session.data().findById(entityName, record.get("id"));
+    Assertions.assertNotNull(insertedRecord, "插入的记录应该能够被查询到");
+    Assertions.assertEquals("张三丰", insertedRecord.get("name"), "姓名应该匹配");
+    Assertions.assertEquals(218, insertedRecord.get("age"), "年龄应该匹配");
+  }
+
+  /**
+   * 测试插入带扩展信息的记录
+   */
+  private void testInsertRecordWithExtra(String entityName) {
+    Map<String, Object> record = new HashMap<>();
+    record.put("name", "李白");
+    record.put("age", 61);
+    record.put("description", "字太白，号青莲居士");
+    record.put("createDatetime", LocalDateTime.now());
+    record.put("birthday", LocalDate.of(701, 2, 28));
+    record.put("extra", Map.of("foo", "bar"));
+
+    int affectedRows = session.data().insert(entityName, record);
+    Assertions.assertEquals(1, affectedRows, "应该成功插入一条记录");
+
+    // 验证扩展信息
+    Map<String, Object> insertedRecord = session.data().findById(entityName, record.get("id"));
+    Assertions.assertNotNull(insertedRecord.get("extra"), "扩展信息不应为空");
+  }
+
+  /**
+   * 测试插入null值
+   */
+  private void testInsertRecordWithNull(String entityName) {
+    Map<String, Object> record = new HashMap<>();
+    record.put("name", "杜甫");
+    record.put("age", 58);
+    record.put("description", "字子美，自号少陵野老，唐代伟大的现实主义诗人");
+    record.put("birthday", LocalDate.of(712, 2, 12));
+    record.put("extra", null);
+
+    int affectedRows = session.data().insert(entityName, record);
+    Assertions.assertEquals(1, affectedRows, "应该成功插入一条记录");
+
+    // 验证null值处理
+    Map<String, Object> insertedRecord = session.data().findById(entityName, record.get("id"));
+    Assertions.assertNull(insertedRecord.get("extra"), "扩展信息应该为null");
   }
 
   @Test
@@ -550,7 +733,7 @@ public abstract class AbstractSessionTests {
     record.put("name", "李白");
     record.put("age", 61);
     record.put("description", "字太白，号青莲居士；是一名刺客型英雄");
-    int affectedRows = session.updateById(entityName, record, 2);
+    int affectedRows = session.data().updateById(entityName, record, 2);
     Assertions.assertEquals(1, affectedRows);
     Map<String, Object> record2 = new HashMap<>();
     // record 中有没有id都不影响结果
@@ -558,7 +741,7 @@ public abstract class AbstractSessionTests {
     record2.put("name", "李白");
     record2.put("age", 61);
     record2.put("description", "字太白，号青莲居士；是一名刺客型英雄");
-    int affectedRows2 = session.updateById(entityName, record2, 999);
+    int affectedRows2 = session.data().updateById(entityName, record2, 999);
     Assertions.assertEquals(0, affectedRows2);
   }
 
@@ -566,9 +749,9 @@ public abstract class AbstractSessionTests {
   void testFindById() {
     String entityName = "testFindById_teacher";
     createTeacherCollection2(entityName);
-    Map<String, Object> record = session.findById(entityName, 1);
+    Map<String, Object> record = session.data().findById(entityName, 1);
     Assertions.assertFalse(record.isEmpty());
-    Map<String, Object> record2 = session.findById(entityName, 999);
+    Map<String, Object> record2 = session.data().findById(entityName, 999);
     Assertions.assertNull(record2);
   }
 
@@ -576,13 +759,15 @@ public abstract class AbstractSessionTests {
   void testFind() {
     String entityName = "testFind_teacher";
     createTeacherCollection2(entityName);
-    List<Map<String, Object>> list = session.find(entityName, query ->
-      query
-        .withProjection(project -> project
-          .addField("teacher_id", field("id"))
-          .addField("teacher_name", field("name"))
-        )
-        .withFilter(Expressions.field("name").eq("张三").or(Expressions.field("name").eq("李四"))));
+    Query query = Query.Builder.create()
+      .select(select -> select
+        .field("teacher_id", "id")
+        .field("teacher_name", "name")
+      )
+      .where(Expressions.field("name").eq("张三").or(Expressions.field("name").eq("李四")))
+      .build();
+
+    List<Map<String, Object>> list = session.data().find(entityName, query);
     Assertions.assertFalse(list.isEmpty());
     Assertions.assertEquals(2, list.size());
   }
@@ -594,28 +779,25 @@ public abstract class AbstractSessionTests {
     createTeacherCollection2(entityName);
     createTeacherCourseEntity(entityName, courseEntityName);
     // 聚合分组
-    List<Map<String, Object>> groupList = session.find(entityName, query -> query
-      .withProjection(projection -> projection
-        .addField("teacher_name", field("name"))
-        .addField("course_count", count(field(courseEntityName + ".teacher_id")))
-        .addField("course_score_sum", sum(field(courseEntityName + ".c_score")))
+    List<Map<String, Object>> groupList = session.data().find(entityName, query -> query
+      .select(projection -> projection
+        .field("teacher_name", field("name"))
+        .field("course_count", count(field(courseEntityName + ".teacher_id")))
+        .field("course_score_sum", sum(field(courseEntityName + ".c_score")))
       )
-      .withJoin(joiners -> joiners
-        .addInnerJoin(joiner -> joiner
-          .setFrom(courseEntityName)
-          .setFilter("""
+      .innerJoin(joiners -> joiners
+        .model(courseEntityName)
+        .where("""
             {
               "teacher_id": {
                 "_ne": 999
               }
             }
-            """)
-        )
+          """))
+      .groupBy(groupBy -> groupBy
+        .field("teacher_name")
       )
-      .withGroupBy(groupBy -> groupBy
-        .addField("teacher_name")
-      )
-      .withFilter(Expressions.field("name").eq("李四"))
+      .where(Expressions.field("name").eq("李四"))
     );
     Assertions.assertFalse(groupList.isEmpty());
     Map<String, Object> groupFirst = groupList.getFirst();
@@ -623,57 +805,57 @@ public abstract class AbstractSessionTests {
     Assertions.assertEquals(4, ((Number) groupFirst.get("course_count")).intValue());
     Assertions.assertEquals(338, ((Number) groupFirst.get("course_score_sum")).intValue());
     // group by time
-    List<Map<String, Object>> dateFormatList = session.find(entityName, query -> query
-      .withProjection(projection -> projection
-        .addField("year", dateFormat(field("birthday"), "yyyy-MM-dd hh:mm:ss"))
-        .addField("user_count", count(field("id"))))
-      .withGroupBy(groupBy ->
-        groupBy.addField("year")
+    List<Map<String, Object>> dateFormatList = session.data().find(entityName, query -> query
+      .select(projection -> projection
+        .field("year", dateFormat(field("birthday"), "yyyy-MM-dd hh:mm:ss"))
+        .field("user_count", count(field("id"))))
+      .groupBy(groupBy ->
+        groupBy.field("year")
       )
     );
     Assertions.assertFalse(dateFormatList.isEmpty());
-    List<Map<String, Object>> dateFormatList1 = session.find(entityName, query -> query
-      .withProjection(projection -> projection
-        .addField("year", dateFormat(field("birthday"), "yyyy-MM-dd"))
-        .addField("user_count", count(field("id"))))
-      .withGroupBy(groupBy ->
-        groupBy.addField("year")
+    List<Map<String, Object>> dateFormatList1 = session.data().find(entityName, query -> query
+      .select(projection -> projection
+        .field("year", dateFormat(field("birthday"), "yyyy-MM-dd"))
+        .field("user_count", count(field("id"))))
+      .groupBy(groupBy ->
+        groupBy.field("year")
       )
     );
     Assertions.assertFalse(dateFormatList1.isEmpty());
-    List<Map<String, Object>> dateFormatList2 = session.find(entityName, query -> query
-      .withProjection(projection -> projection
-        .addField("year", dateFormat(field("createDatetime"), "yyyy-MM-dd hh:mm:ss"))
-        .addField("user_count", count(field("id"))))
-      .withGroupBy(groupBy ->
-        groupBy.addField("year")
+    List<Map<String, Object>> dateFormatList2 = session.data().find(entityName, query -> query
+      .select(projection -> projection
+        .field("year", dateFormat(field("createDatetime"), "yyyy-MM-dd hh:mm:ss"))
+        .field("user_count", count(field("id"))))
+      .groupBy(groupBy ->
+        groupBy.field("year")
       )
     );
     Assertions.assertFalse(dateFormatList2.isEmpty());
-    List<Map<String, Object>> dayOfYearList = session.find(entityName, query -> query
-      .withProjection(projection -> projection
-        .addField("dayOfYear", dayOfYear(field("birthday")))
-        .addField("user_count", count(field("id"))))
-      .withGroupBy(groupBy ->
-        groupBy.addField("dayOfYear")
+    List<Map<String, Object>> dayOfYearList = session.data().find(entityName, query -> query
+      .select(projection -> projection
+        .field("dayOfYear", dayOfYear(field("birthday")))
+        .field("user_count", count(field("id"))))
+      .groupBy(groupBy ->
+        groupBy.field("dayOfYear")
       )
     );
     Assertions.assertFalse(dayOfYearList.isEmpty());
-    List<Map<String, Object>> dayOfMonthList = session.find(entityName, query -> query
-      .withProjection(projection -> projection
-        .addField("dayOfMonth", dayOfMonth(field("birthday")))
-        .addField("user_count", count(field("id"))))
-      .withGroupBy(groupBy ->
-        groupBy.addField("dayOfMonth")
+    List<Map<String, Object>> dayOfMonthList = session.data().find(entityName, query -> query
+      .select(projection -> projection
+        .field("dayOfMonth", dayOfMonth(field("birthday")))
+        .field("user_count", count(field("id"))))
+      .groupBy(groupBy ->
+        groupBy.field("dayOfMonth")
       )
     );
     Assertions.assertFalse(dayOfMonthList.isEmpty());
-    List<Map<String, Object>> dayOfWeekList = session.find(entityName, query -> query
-      .withProjection(projection -> projection
-        .addField("dayOfWeek", dayOfWeek(field("birthday")))
-        .addField("user_count", count(field("id"))))
-      .withGroupBy(groupBy ->
-        groupBy.addField("dayOfWeek")
+    List<Map<String, Object>> dayOfWeekList = session.data().find(entityName, query -> query
+      .select(projection -> projection
+        .field("dayOfWeek", dayOfWeek(field("birthday")))
+        .field("user_count", count(field("id"))))
+      .groupBy(groupBy ->
+        groupBy.field("dayOfWeek")
       )
     );
     Assertions.assertFalse(dayOfWeekList.isEmpty());
@@ -683,8 +865,11 @@ public abstract class AbstractSessionTests {
   void testCountByCondition() {
     String entityName = "testCountByCondition_teacher";
     createTeacherCollection2(entityName);
-    long total = session.count(entityName, query -> query
-      .withFilter(Expressions.field("name").eq("张三").or(Expressions.field("name").eq("李四"))));
+    Query query = Query.Builder.create()
+      .where(Expressions.field("name").eq("张三").or(Expressions.field("name").eq("李四")))
+      .build();
+
+    long total = session.data().count(entityName, query);
     Assertions.assertEquals(2, total);
   }
 
@@ -692,7 +877,7 @@ public abstract class AbstractSessionTests {
   void testExistsByCondition() {
     String entityName = "testExistsByCondition_teacher";
     createTeacherCollection2(entityName);
-    boolean exists = session.exists(entityName, query -> query.setFilter("""
+    boolean exists = session.data().exists(entityName, query -> query.where("""
       {
         "_or": [
           {
@@ -715,7 +900,7 @@ public abstract class AbstractSessionTests {
   void testFindAll() {
     String entityName = "testFindAll_teacher";
     createTeacherCollection2(entityName);
-    List<Map<String, Object>> list = session.find(entityName, query -> query);
+    List<Map<String, Object>> list = session.data().find(entityName, createSimpleQuery());
     Assertions.assertFalse(list.isEmpty());
   }
 
@@ -723,7 +908,7 @@ public abstract class AbstractSessionTests {
   void testFindAllWhenResultDto() {
     String entityName = "testFindAllWhenResultDto_teacher";
     createTeacherCollection2(entityName);
-    List<TeacherDTO> list = session.find(entityName, query -> query, TeacherDTO.class);
+    List<TeacherDTO> list = session.data().find(entityName, createSimpleQuery(), TeacherDTO.class);
     Assertions.assertFalse(list.isEmpty());
     Assertions.assertNotNull(list.getFirst().getId());
   }
@@ -732,25 +917,25 @@ public abstract class AbstractSessionTests {
   void testCountAll() {
     String entityName = "testCountAll_teacher";
     createTeacherCollection2(entityName);
-    Assertions.assertTrue(session.exists(entityName, query -> query));
+    Assertions.assertTrue(session.data().exists(entityName, query -> query));
   }
 
   @Test
   void testExistsById() {
     String entityName = "testExistsById_teacher";
     createTeacherCollection2(entityName);
-    Assertions.assertTrue(session.existsById(entityName, 1));
+    Assertions.assertTrue(session.data().existsById(entityName, 1));
   }
 
   @Test
   void testDeleteById() {
     String entityName = "testDeleteById_teacher";
     createTeacherCollection2(entityName);
-    int affectedRows = session.deleteById(entityName, 1);
+    int affectedRows = session.data().deleteById(entityName, 1);
     Assertions.assertEquals(1, affectedRows);
-    int affectedRows2 = session.deleteById(entityName, 2);
+    int affectedRows2 = session.data().deleteById(entityName, 2);
     Assertions.assertEquals(1, affectedRows2);
-    int affectedRows3 = session.deleteById(entityName, 999);
+    int affectedRows3 = session.data().deleteById(entityName, 999);
     Assertions.assertEquals(0, affectedRows3);
   }
 
@@ -758,7 +943,7 @@ public abstract class AbstractSessionTests {
   void testDelete() {
     String entityName = "testDelete_teacher";
     createTeacherCollection2(entityName);
-    int affectedRows = session.delete(entityName, """
+    int affectedRows = session.data().delete(entityName, """
       {
         "id": {
           "_eq": 999
@@ -772,7 +957,7 @@ public abstract class AbstractSessionTests {
   void testDeleteAll() {
     String entityName = "testDeleteAll_teacher";
     createTeacherCollection2(entityName);
-    int affectedRows = session.deleteAll(entityName);
+    int affectedRows = session.data().deleteAll(entityName);
     Assertions.assertTrue(affectedRows > 0);
   }
 
@@ -782,11 +967,14 @@ public abstract class AbstractSessionTests {
     String courseEntityName = "testRelation_teacher_courses";
     createTeacherCollection2(entityName);
     createTeacherCourseEntity(entityName, courseEntityName);
-    List<Map<String, Object>> list = session.find(entityName, query -> query
-      .withProjection(projection -> projection
-        .addField("teacher_name", field("name")))
-      .withSort(sort -> sort.addOrder("id")
-      ));
+    Query query = Query.Builder.create()
+      .select(select -> select
+        .field("teacher_name", "name")
+      )
+      .orderBy(orderBy -> orderBy.asc("id"))
+      .build();
+
+    List<Map<String, Object>> list = session.data().find(entityName, query);
     Assertions.assertFalse(list.isEmpty());
     Map<String, Object> first = list.getFirst();
     Assertions.assertEquals("张三", first.get("teacher_name"));
@@ -794,7 +982,7 @@ public abstract class AbstractSessionTests {
 
 
   void createStudentCollection2(String entityName) {
-    Entity entity = session.createEntity(
+    EntityDefinition entity = session.schema().createEntity(
       entityName, e -> e.setComment("学生")
         .addField(new LongField("id").asIdentity().setDefaultValue(GeneratedValue.AUTO_INCREMENT).setComment("Primary Key"))
     );
@@ -804,41 +992,41 @@ public abstract class AbstractSessionTests {
     name.setComment("姓名");
     name.setNullable(false);
     name.setLength(10);
-    session.createField(name);
+    session.schema().createField(name);
     // text
     StringField description = new StringField("description").setComment("备注");
     description.setModelName(entityName);
-    session.createField(description);
+    session.schema().createField(description);
     // number
     IntField age = new IntField("age");
     age.setModelName(entityName);
     age.setComment("年龄");
-    session.createField(age);
+    session.schema().createField(age);
     // boolean
     BooleanField deleted = new BooleanField("is_deleted");
     deleted.setModelName(entityName);
     deleted.setComment("软删除");
     deleted.setDefaultValue(false);
-    session.createField(deleted);
+    session.schema().createField(deleted);
     // datetime
     DateTimeField createDatetime = new DateTimeField("createDatetime");
     createDatetime.setModelName(entityName);
     createDatetime.setComment("创建日期时间");
-    session.createField(createDatetime);
+    session.schema().createField(createDatetime);
     // date
     DateField birthday = new DateField("birthday");
     birthday.setModelName(entityName);
     birthday.setComment("出生日期");
-    session.createField(birthday);
+    session.schema().createField(birthday);
     // json
     JSONField interests = new JSONField("interests");
     interests.setModelName(entityName);
     interests.setComment("兴趣爱好");
-    session.createField(interests);
+    session.schema().createField(interests);
   }
 
   private void createScoreEntity2(String scoreModelName) {
-    session.createEntity(scoreModelName, sScore ->
+    session.schema().createEntity(scoreModelName, sScore ->
       sScore.addField(new LongField("student_id"))
         .addField(new StringField("course_name"))
         .addField(new FloatField("score"))
@@ -846,7 +1034,7 @@ public abstract class AbstractSessionTests {
   }
 
   void dropModel(String entityName) {
-    session.dropModel(entityName);
+    session.schema().dropModel(entityName);
   }
 
   @Test
@@ -878,11 +1066,11 @@ public abstract class AbstractSessionTests {
     createClassesData(classesEntityName);
     createStudentData(studentEntityName);
     createTeacherData(teacherEntityName);
-    Assertions.assertEquals(4, ((Entity) session.getModel(classesEntityName)).getFields().size());
-    session.modifyField(new StringField("classCode").setModelName(classesEntityName).setLength(100));
-    Assertions.assertEquals(4, ((Entity) session.getModel(classesEntityName)).getFields().size());
-    session.modifyField(new StringField("className").setModelName(classesEntityName));
-    Assertions.assertEquals(4, ((Entity) session.getModel(classesEntityName)).getFields().size());
+    Assertions.assertEquals(4, ((EntityDefinition) session.schema().getModel(classesEntityName)).getFields().size());
+    session.schema().modifyField(new StringField("classCode").setModelName(classesEntityName).setLength(100));
+    Assertions.assertEquals(4, ((EntityDefinition) session.schema().getModel(classesEntityName)).getFields().size());
+    session.schema().modifyField(new StringField("className").setModelName(classesEntityName));
+    Assertions.assertEquals(4, ((EntityDefinition) session.schema().getModel(classesEntityName)).getFields().size());
   }
 
   @Test
@@ -896,22 +1084,22 @@ public abstract class AbstractSessionTests {
   void testDropField() {
     String entityName = "testDropField_students";
     createStudentCollection2(entityName);
-    session.createIndex(new Index(entityName, "IDX_name").addField("name"));
-    session.createIndex(
-      new Index(entityName, "IDX_age_is_deleted")
+    session.schema().createIndex(new IndexDefinition(entityName, "IDX_name").addField("name"));
+    session.schema().createIndex(
+      new IndexDefinition(entityName, "IDX_age_is_deleted")
         .addField("name")
         .addField("is_deleted")
         .setUnique(true)
     );
-    session.dropIndex(entityName, "IDX_name");
-    session.dropIndex(entityName, "IDX_age_is_deleted");
-    session.dropField(entityName, "name");
-    session.dropField(entityName, "description");
-    session.dropField(entityName, "age");
-    session.dropField(entityName, "is_deleted");
-    session.dropField(entityName, "createDatetime");
-    session.dropField(entityName, "birthday");
-    Entity entity = (Entity) session.getModel(entityName);
+    session.schema().dropIndex(entityName, "IDX_name");
+    session.schema().dropIndex(entityName, "IDX_age_is_deleted");
+    session.schema().dropField(entityName, "name");
+    session.schema().dropField(entityName, "description");
+    session.schema().dropField(entityName, "age");
+    session.schema().dropField(entityName, "is_deleted");
+    session.schema().dropField(entityName, "createDatetime");
+    session.schema().dropField(entityName, "birthday");
+    EntityDefinition entity = (EntityDefinition) session.schema().getModel(entityName);
     Assertions.assertNull(entity.getField("name"));
     Assertions.assertNull(entity.getField("description"));
     Assertions.assertNull(entity.getField("age"));
@@ -921,7 +1109,7 @@ public abstract class AbstractSessionTests {
     Assertions.assertNull(entity.getIndex("IDX_name"));
     Assertions.assertNull(entity.getIndex("IDX_age_is_deleted"));
     dropModel(entityName);
-    Assertions.assertNull(session.getModel(entityName));
+    Assertions.assertNull(session.schema().getModel(entityName));
   }
 
   @Test
@@ -929,21 +1117,21 @@ public abstract class AbstractSessionTests {
     String entityName = "testDropField_students";
     createStudentCollection2(entityName);
     // when include single field
-    Index index = new Index(entityName, "IDX_name");
+    IndexDefinition index = new IndexDefinition(entityName, "IDX_name");
     index.setModelName(entityName);
     index.addField("name");
-    session.createIndex(index);
-    session.dropIndex(entityName, "IDX_name");
+    session.schema().createIndex(index);
+    session.schema().dropIndex(entityName, "IDX_name");
     // when include multiple field
-    Index multipleFiledIndex = new Index(entityName);
+    IndexDefinition multipleFiledIndex = new IndexDefinition(entityName);
     multipleFiledIndex.setModelName(entityName);
     multipleFiledIndex.addField("birthday");
     multipleFiledIndex.addField("age", DESC);
     multipleFiledIndex.addField("is_deleted", DESC);
     multipleFiledIndex.setName("IDX_compound");
-    session.createIndex(multipleFiledIndex);
-    session.dropIndex(entityName, "IDX_compound");
-    Entity entity = (Entity) session.getModel(entityName);
+    session.schema().createIndex(multipleFiledIndex);
+    session.schema().dropIndex(entityName, "IDX_compound");
+    EntityDefinition entity = (EntityDefinition) session.schema().getModel(entityName);
     Assertions.assertNull(entity.getIndex("IDX_compound"));
     dropModel(entityName);
   }
@@ -951,13 +1139,13 @@ public abstract class AbstractSessionTests {
   @Test
   void testCreateSequence() {
     String seqName = "user_seq";
-    session.createSequence(seqName, 1, 1);
+    session.schema().createSequence(seqName, 1, 1);
     long sequenceNextVal = 0;
     for (int i = 0; i < 10; i++) {
-      sequenceNextVal = session.getSequenceNextVal(seqName);
+      sequenceNextVal = session.schema().getSequenceNextVal(seqName);
     }
     Assertions.assertEquals(10, sequenceNextVal);
-    session.dropSequence(seqName);
+    session.schema().dropSequence(seqName);
   }
 
   @Test
@@ -987,9 +1175,9 @@ public abstract class AbstractSessionTests {
         .build();
       sessionFactory.addDataSourceProvider(dataSourceProvider);
       Session newSession = sessionFactory.createSession(identifier);
-      List<SchemaObject> models = newSession.syncModels();
+      List<SchemaObject> models = newSession.schema().syncModels();
       Assertions.assertFalse(models.isEmpty());
-      Entity studentDetailEntity = (Entity) models.stream().filter(m -> m.getName().equals(studentDetailEntityName)).findFirst().get();
+      EntityDefinition studentDetailEntity = (EntityDefinition) models.stream().filter(m -> m.getName().equals(studentDetailEntityName)).findFirst().get();
       Assertions.assertFalse(studentDetailEntity.getFields().isEmpty());
       Assertions.assertTrue(studentDetailEntity.getIndexes().isEmpty());
     } else {
@@ -1020,7 +1208,7 @@ public abstract class AbstractSessionTests {
     createClassesData(classesEntityName);
     createStudentData(studentEntityName);
     createTeacherData(teacherEntityName);
-    List<Classes> classesList = session.find(classesEntityName, new Query(), Classes.class);
+    List<Classes> classesList = session.data().find(classesEntityName, new Query(), Classes.class);
     for (Classes classes : classesList) {
       for (Student student : classes.getStudents()) {
         StudentDetail studentDetail = student.getStudentDetail();

@@ -1,8 +1,8 @@
 package tech.wetech.flexmodel.graphql;
 
 import graphql.schema.DataFetchingEnvironment;
-import tech.wetech.flexmodel.Session;
-import tech.wetech.flexmodel.SessionFactory;
+import tech.wetech.flexmodel.session.Session;
+import tech.wetech.flexmodel.session.SessionFactory;
 
 import java.util.Map;
 
@@ -22,7 +22,21 @@ public class FlexmodelMutationUpdateDataFetcher extends FlexmodelAbstractDataFet
     final String filter = where != null ? jsonObjectConverter.toJsonString(where) : null;
     assert setValue != null;
     try (Session session = sessionFactory.createSession(schemaName)) {
-      int rows = session.update(modelName, setValue, filter);
+
+      Map<String, Object> data = session.dsl()
+        .select()
+        .from(modelName)
+        .where(filter)
+        .executeOne();
+
+      data.putAll(setValue);
+
+      int rows = session.dsl()
+        .update(modelName)
+        .values(data)
+        .where(filter)
+        .execute();
+
       return Map.of(AFFECTED_ROWS, rows);
     }
   }

@@ -5,8 +5,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.wetech.flexmodel.Session;
-import tech.wetech.flexmodel.SessionFactory;
+import tech.wetech.flexmodel.session.Session;
+import tech.wetech.flexmodel.session.SessionFactory;
 import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
 
 /**

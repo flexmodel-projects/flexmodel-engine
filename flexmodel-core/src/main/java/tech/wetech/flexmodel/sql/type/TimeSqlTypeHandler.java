@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.sql.type;
 
-import tech.wetech.flexmodel.mapping.TimeTypeHandler;
+import tech.wetech.flexmodel.model.field.Field;
+import tech.wetech.flexmodel.type.TimeTypeHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,7 +19,7 @@ public class TimeSqlTypeHandler extends TimeTypeHandler implements SqlTypeHandle
   }
 
   @Override
-  public LocalTime getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
+  public LocalTime getNullableResult(ResultSet rs, String columnName, Field field) throws SQLException {
     try {
       return rs.getObject(columnName, LocalTime.class);
     } catch (NullPointerException e) {

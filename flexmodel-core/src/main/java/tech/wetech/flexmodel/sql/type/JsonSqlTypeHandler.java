@@ -1,7 +1,8 @@
 package tech.wetech.flexmodel.sql.type;
 
 import tech.wetech.flexmodel.JsonObjectConverter;
-import tech.wetech.flexmodel.mapping.JsonTypeHandler;
+import tech.wetech.flexmodel.model.field.Field;
+import tech.wetech.flexmodel.type.JsonTypeHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,7 +23,7 @@ public class JsonSqlTypeHandler extends JsonTypeHandler implements SqlTypeHandle
   }
 
   @Override
-  public Object getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
+  public Object getNullableResult(ResultSet rs, String columnName, Field field) throws SQLException {
     String jsonString = rs.getString(columnName);
     try {
       if (jsonString == null) {
@@ -35,7 +36,7 @@ public class JsonSqlTypeHandler extends JsonTypeHandler implements SqlTypeHandle
   }
 
   @Override
-  public Object convertParameter(tech.wetech.flexmodel.Field field, Object value) {
+  public Object convertParameter(Field field, Object value) {
     return jsonObjectConverter.toJsonString(value);
   }
 

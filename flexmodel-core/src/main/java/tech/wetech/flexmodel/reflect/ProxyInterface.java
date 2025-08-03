@@ -1,13 +1,13 @@
 package tech.wetech.flexmodel.reflect;
 
-import tech.wetech.flexmodel.Entity;
+import tech.wetech.flexmodel.model.EntityDefinition;
 
 /**
  * @author cjbi
  */
 public interface ProxyInterface {
 
-  Entity entityInfo();
+  EntityDefinition entityInfo();
 
   Class<?> originClass();
 

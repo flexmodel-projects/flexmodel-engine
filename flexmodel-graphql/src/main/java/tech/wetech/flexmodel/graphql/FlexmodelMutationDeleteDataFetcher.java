@@ -1,8 +1,8 @@
 package tech.wetech.flexmodel.graphql;
 
 import graphql.schema.DataFetchingEnvironment;
-import tech.wetech.flexmodel.Session;
-import tech.wetech.flexmodel.SessionFactory;
+import tech.wetech.flexmodel.session.Session;
+import tech.wetech.flexmodel.session.SessionFactory;
 
 import java.util.Map;
 
@@ -20,7 +20,12 @@ public class FlexmodelMutationDeleteDataFetcher extends FlexmodelAbstractDataFet
     Map<String, Object> where = getArgument(environment, WHERE);
     final String filter = where != null ? jsonObjectConverter.toJsonString(where) : null;
     try (Session session = sessionFactory.createSession(schemaName)) {
-      int rows = session.delete(modelName, filter);
+
+      int rows = session.dsl()
+        .deleteFrom(modelName)
+        .where(filter)
+        .execute();
+
       return Map.of(AFFECTED_ROWS, rows);
     }
   }

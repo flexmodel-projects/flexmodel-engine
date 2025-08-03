@@ -1,7 +1,7 @@
 package tech.wetech.flexmodel.parser;
 
 import org.junit.jupiter.api.Test;
-import tech.wetech.flexmodel.SchemaObject;
+import tech.wetech.flexmodel.model.SchemaObject;
 import tech.wetech.flexmodel.parser.impl.ModelParser;
 import tech.wetech.flexmodel.parser.impl.ParseException;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;

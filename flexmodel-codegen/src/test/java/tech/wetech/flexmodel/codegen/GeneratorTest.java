@@ -2,8 +2,8 @@ package tech.wetech.flexmodel.codegen;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import tech.wetech.flexmodel.Entity;
 import tech.wetech.flexmodel.ImportDescribe;
+import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.io.IOException;
@@ -22,10 +22,10 @@ class GeneratorTest {
     assert is != null;
     String content = new String(is.readAllBytes());
     ImportDescribe describe = new JacksonObjectConverter().parseToObject(content, ImportDescribe.class);
-    DAOGenerator daoGenerator = new DAOGenerator();
+    PojoGenerator generator = new PojoGenerator();
     GenerationContext generationContext = new GenerationContext();
-    generationContext.getModelClassList().add(ModelClass.buildModelClass(packageName, schemaName, (Entity) describe.getSchema().getFirst()));
-    String str = daoGenerator.generate(generationContext).getFirst();
+    generationContext.getModelClassList().add(ModelClass.buildModelClass(packageName, schemaName, (EntityDefinition) describe.getSchema().getFirst()));
+    String str = generator.generate(generationContext).getFirst();
     Assertions.assertNotNull(str);
   }
 

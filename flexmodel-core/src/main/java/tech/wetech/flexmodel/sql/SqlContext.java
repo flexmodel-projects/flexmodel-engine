@@ -1,6 +1,11 @@
 package tech.wetech.flexmodel.sql;
 
-import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.JsonObjectConverter;
+import tech.wetech.flexmodel.ModelRepository;
+import tech.wetech.flexmodel.model.field.ScalarType;
+import tech.wetech.flexmodel.naming.PhysicalNamingStrategy;
+import tech.wetech.flexmodel.session.AbstractSessionContext;
+import tech.wetech.flexmodel.session.SessionFactory;
 import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 import tech.wetech.flexmodel.sql.type.*;
 
@@ -23,7 +28,7 @@ public class SqlContext extends AbstractSessionContext {
 
   public SqlContext(String schemaName,
                     SqlExecutor sqlExecutor,
-                    MappedModels mappedModels,
+                    ModelRepository mappedModels,
                     JsonObjectConverter jsonObjectConverter,
                     SessionFactory factory
 

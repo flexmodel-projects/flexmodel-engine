@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.sql.type;
 
-import tech.wetech.flexmodel.mapping.BooleanTypeHandler;
+import tech.wetech.flexmodel.model.field.Field;
+import tech.wetech.flexmodel.type.BooleanTypeHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,7 +18,7 @@ public class BooleanSqlTypeHandler extends BooleanTypeHandler implements SqlType
   }
 
   @Override
-  public Boolean getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
+  public Boolean getNullableResult(ResultSet rs, String columnName, Field field) throws SQLException {
     return rs.getObject(columnName, Boolean.class);
   }
 }

@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.sql.type;
 
-import tech.wetech.flexmodel.mapping.TypeHandler;
+import tech.wetech.flexmodel.model.field.Field;
+import tech.wetech.flexmodel.type.TypeHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,7 +13,7 @@ public interface SqlTypeHandler<T> extends TypeHandler<T> {
 
   int getJdbcTypeCode();
 
-  default T getResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
+  default T getResult(ResultSet rs, String columnName, Field field) throws SQLException {
     try {
       return getNullableResult(rs, columnName, field);
     } catch (Exception e) {
@@ -20,6 +21,6 @@ public interface SqlTypeHandler<T> extends TypeHandler<T> {
     }
   }
 
-  T getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException;
+  T getNullableResult(ResultSet rs, String columnName, Field field) throws SQLException;
 
 }

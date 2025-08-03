@@ -44,7 +44,7 @@ public class MongoDBIntegrationTests extends AbstractSessionTests {
     String classesEntityName = "TestNativeQueryClasses";
     createClassesEntity(classesEntityName);
     createClassesData(classesEntityName);
-    List<Map> list = session.findByNativeQuery(
+    List<Map> list = session.data().findByNativeQueryStatement(
       """
         {
             "find": "TestNativeQueryClasses",
@@ -63,7 +63,7 @@ public class MongoDBIntegrationTests extends AbstractSessionTests {
     String classesEntityName = "TestNativeQueryModelClasses";
     createClassesEntity(classesEntityName);
     createClassesData(classesEntityName);
-    List<Map> list = session.findByNativeQuery(
+    List<Map> list = session.data().findByNativeQueryStatement(
       """
         {
             "find": "TestNativeQueryModelClasses",

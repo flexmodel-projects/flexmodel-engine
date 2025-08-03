@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.sql.type;
 
-import tech.wetech.flexmodel.mapping.BigintTypeHandler;
+import tech.wetech.flexmodel.model.field.Field;
+import tech.wetech.flexmodel.type.BigintTypeHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,7 +18,7 @@ public class BigintSqlTypeHandler extends BigintTypeHandler implements SqlTypeHa
   }
 
   @Override
-  public Long getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
+  public Long getNullableResult(ResultSet rs, String columnName, Field field) throws SQLException {
     Object value = rs.getObject(columnName);
     if (value == null) {
       return null;

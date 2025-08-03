@@ -2,6 +2,9 @@ package tech.wetech.flexmodel.dsl;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tech.wetech.flexmodel.query.expr.Expressions;
+import tech.wetech.flexmodel.query.expr.FilterExpression;
+import tech.wetech.flexmodel.query.expr.Predicate;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.util.Arrays;

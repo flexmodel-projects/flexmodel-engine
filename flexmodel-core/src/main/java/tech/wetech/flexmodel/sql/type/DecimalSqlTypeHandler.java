@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.sql.type;
 
-import tech.wetech.flexmodel.mapping.DecimalTypeHandler;
+import tech.wetech.flexmodel.model.field.Field;
+import tech.wetech.flexmodel.type.DecimalTypeHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,7 +18,7 @@ public class DecimalSqlTypeHandler extends DecimalTypeHandler implements SqlType
   }
 
   @Override
-  public Double getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
+  public Double getNullableResult(ResultSet rs, String columnName, Field field) throws SQLException {
     Object number = rs.getObject(columnName);
     if (number == null) {
       return null;

@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel.sql.type;
 
+import tech.wetech.flexmodel.model.field.Field;
+
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,7 +20,7 @@ public class LegacyDateSqlTypeHandler implements SqlTypeHandler {
   }
 
   @Override
-  public Date convertParameter(tech.wetech.flexmodel.Field field, Object value) {
+  public Date convertParameter(Field field, Object value) {
     if (value == null) {
       return null;
     }
@@ -29,7 +31,7 @@ public class LegacyDateSqlTypeHandler implements SqlTypeHandler {
   }
 
   @Override
-  public LocalDate getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
+  public LocalDate getNullableResult(ResultSet rs, String columnName, Field field) throws SQLException {
     try {
       return rs.getObject(columnName, Date.class).toLocalDate();
     } catch (NullPointerException e) {

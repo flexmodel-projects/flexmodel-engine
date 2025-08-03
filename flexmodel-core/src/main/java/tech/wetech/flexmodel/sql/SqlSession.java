@@ -1,11 +1,14 @@
 package tech.wetech.flexmodel.sql;
 
-import tech.wetech.flexmodel.AbstractSession;
+import tech.wetech.flexmodel.session.AbstractSession;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
+ * SQL数据库的Session实现
+ * 负责SQL数据库的事务管理和连接管理
+ *
  * @author cjbi
  */
 public class SqlSession extends AbstractSession {
@@ -13,8 +16,7 @@ public class SqlSession extends AbstractSession {
   private final Connection connection;
 
   public SqlSession(SqlContext sqlContext) {
-    super(sqlContext,
-      new SqlDataOperations(sqlContext), new SqlSchemaOperations(sqlContext));
+    super(sqlContext, new SqlDataService(sqlContext), new SqlSchemaService(sqlContext));
     this.connection = sqlContext.getConnection();
   }
 
@@ -60,5 +62,4 @@ public class SqlSession extends AbstractSession {
       throw new RuntimeException(e);
     }
   }
-
 }

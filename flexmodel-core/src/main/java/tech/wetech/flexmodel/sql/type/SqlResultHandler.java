@@ -16,7 +16,7 @@ public class SqlResultHandler<T> {
   private final Class<T> resultType;
   private final boolean isResultMap;
   private final Map<String, SqlTypeHandler<?>> sqlTypeHanlderMap = new HashMap<>();
-  private final Map<String, tech.wetech.flexmodel.Field> fmTypeFieldMap = new HashMap<>();
+  private final Map<String, tech.wetech.flexmodel.model.field.Field> fmTypeFieldMap = new HashMap<>();
   private final List<Field> fields;
 
   public SqlResultHandler(Class<T> resultType) {
@@ -34,7 +34,7 @@ public class SqlResultHandler<T> {
     }
   }
 
-  public void addSqlTypeHandler(String columnName, SqlTypeHandler<?> typeHandler, @Nullable tech.wetech.flexmodel.Field field) {
+  public void addSqlTypeHandler(String columnName, SqlTypeHandler<?> typeHandler, @Nullable tech.wetech.flexmodel.model.field.Field field) {
     sqlTypeHanlderMap.put(columnName, typeHandler);
     if (field != null) {
       fmTypeFieldMap.put(columnName, field);
@@ -46,7 +46,7 @@ public class SqlResultHandler<T> {
     return sqlTypeHanlderMap.getOrDefault(columnName, new UnknownSqlTypeHandler());
   }
 
-  public tech.wetech.flexmodel.Field getFmTypeField(String columnName) {
+  public tech.wetech.flexmodel.model.field.Field getFmTypeField(String columnName) {
     return fmTypeFieldMap.get(columnName);
   }
 

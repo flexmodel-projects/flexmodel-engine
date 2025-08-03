@@ -1,13 +1,12 @@
 package tech.wetech.flexmodel.graphql
 
-
-import tech.wetech.flexmodel.EnumField
-import tech.wetech.flexmodel.RelationField
-import tech.wetech.flexmodel.ScalarType
-import tech.wetech.flexmodel.TypedField
 import tech.wetech.flexmodel.codegen.AbstractGenerator
 import tech.wetech.flexmodel.codegen.GenerationContext
 import tech.wetech.flexmodel.codegen.ModelField
+import tech.wetech.flexmodel.model.field.EnumField
+import tech.wetech.flexmodel.model.field.RelationField
+import tech.wetech.flexmodel.model.field.ScalarType
+import tech.wetech.flexmodel.model.field.TypedField
 
 /**
  * @author cjbi

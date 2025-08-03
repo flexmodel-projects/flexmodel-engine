@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.sql.type;
 
-import tech.wetech.flexmodel.mapping.IntTypeHandler;
+import tech.wetech.flexmodel.model.field.Field;
+import tech.wetech.flexmodel.type.IntTypeHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,7 +18,7 @@ public class IntSqlTypeHandler extends IntTypeHandler implements SqlTypeHandler<
   }
 
   @Override
-  public Integer getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
+  public Integer getNullableResult(ResultSet rs, String columnName, Field field) throws SQLException {
     Object value = rs.getObject(columnName);
     if (value == null) {
       return null;

@@ -1,8 +1,12 @@
 package tech.wetech.flexmodel.parser;
 
-import tech.wetech.flexmodel.Enum;
-import tech.wetech.flexmodel.*;
+import tech.wetech.flexmodel.model.EntityDefinition;
+import tech.wetech.flexmodel.model.EnumDefinition;
+import tech.wetech.flexmodel.model.IndexDefinition;
+import tech.wetech.flexmodel.model.SchemaObject;
+import tech.wetech.flexmodel.model.field.*;
 import tech.wetech.flexmodel.parser.impl.ModelParser;
+import tech.wetech.flexmodel.query.Direction;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,8 +33,8 @@ public class ASTNodeConverter {
   }
 
   @SuppressWarnings("unchecked")
-  public static Entity toSchemaEntity(ModelParser.Model idlModel) {
-    Entity entity = new Entity(idlModel.name);
+  public static EntityDefinition toSchemaEntity(ModelParser.Model idlModel) {
+    EntityDefinition entity = new EntityDefinition(idlModel.name);
     for (ModelParser.Field field : idlModel.fields) {
       entity.addField(toSchemaField(field));
     }
@@ -41,7 +45,7 @@ public class ASTNodeConverter {
       }
       // 处理索引语法
       if (mAnno.name.equals("index")) {
-        Index index = new Index(entity.getName());
+        IndexDefinition index = new IndexDefinition(entity.getName());
         index.setName((String) mAnno.parameters.get("name"));
         if (mAnno.parameters.containsKey("unique")) {
           boolean unique = Boolean.parseBoolean((String) mAnno.parameters.get("unique"));
@@ -153,22 +157,22 @@ public class ASTNodeConverter {
     return field;
   }
 
-  public static Enum toSchemaEnum(ModelParser.Enumeration idlEnum) {
-    Enum anEnum = new Enum(idlEnum.name);
+  public static EnumDefinition toSchemaEnum(ModelParser.Enumeration idlEnum) {
+    EnumDefinition anEnum = new EnumDefinition(idlEnum.name);
     anEnum.setElements(idlEnum.elements);
     return anEnum;
   }
 
   public static ModelParser.ASTNode fromSchemaObject(SchemaObject schemaObject) {
-    if (schemaObject instanceof Entity) {
-      return fromSchemaEntity((Entity) schemaObject);
-    } else if (schemaObject instanceof Enum) {
-      return fromSchemaEnum((Enum) schemaObject);
+    if (schemaObject instanceof EntityDefinition) {
+      return fromSchemaEntity((EntityDefinition) schemaObject);
+    } else if (schemaObject instanceof EnumDefinition) {
+      return fromSchemaEnum((EnumDefinition) schemaObject);
     }
     return null;
   }
 
-  public static ModelParser.Model fromSchemaEntity(Entity entity) {
+  public static ModelParser.Model fromSchemaEntity(EntityDefinition entity) {
     ModelParser.Model model = new ModelParser.Model(entity.getName());
 
     // 添加字段
@@ -184,13 +188,13 @@ public class ASTNodeConverter {
     }
 
     // 处理索引
-    for (Index index : entity.getIndexes()) {
+    for (IndexDefinition index : entity.getIndexes()) {
       ModelParser.Annotation indexAnno = new ModelParser.Annotation("index");
       indexAnno.parameters.put("name", index.getName());
       indexAnno.parameters.put("unique", String.valueOf(index.isUnique()));
 
       List<Object> fields = new ArrayList<>();
-      for (Index.Field indexField : index.getFields()) {
+      for (IndexDefinition.Field indexField : index.getFields()) {
         if (indexField.direction() == Direction.ASC) { // 默认方向可省略
           fields.add(indexField.fieldName());
         } else {
@@ -273,7 +277,7 @@ public class ASTNodeConverter {
     return idlField;
   }
 
-  public static ModelParser.Enumeration fromSchemaEnum(Enum schemaEnum) {
+  public static ModelParser.Enumeration fromSchemaEnum(EnumDefinition schemaEnum) {
     ModelParser.Enumeration enumeration = new ModelParser.Enumeration(schemaEnum.getName());
     enumeration.elements = new ArrayList<>(schemaEnum.getElements());
     return enumeration;

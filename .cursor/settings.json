@@ -1,0 +1,43 @@
+{
+  "ai": {
+    "rules": [
+      "始终使用FlexModel的模型概念，使用model()而不是table()",
+      "优先使用QueryBuilder.create()进行简单查询",
+      "复杂查询使用QueryBuilder.create()",
+      "提供完整的代码示例和解释",
+      "遵循FlexModel DSL语法规范"
+    ],
+    "context": [
+      "FlexModel基于模型概念，不是传统的关系型数据库表概念",
+      "QueryBuilder提供了简洁的DSL语法，避免使用原始的Query类",
+      "连接操作基于模型之间的关联关系"
+    ]
+  },
+  "project": {
+    "name": "FlexModel Engine",
+    "description": "FlexModel统计访问层",
+    "language": "Java",
+    "framework": "FlexModel"
+  },
+  "code_style": {
+    "java": {
+      "indentation": 2,
+      "max_line_length": 120,
+      "naming_convention": "camelCase"
+    }
+  },
+  "ai_assistant": {
+    "preferences": {
+      "language": "zh-CN",
+      "code_examples": true,
+      "explanations": true,
+      "best_practices": true
+    },
+    "specializations": [
+      "统一数据访问层",
+      "Java开发",
+      "数据库查询优化",
+      "API设计"
+    ]
+  }
+}

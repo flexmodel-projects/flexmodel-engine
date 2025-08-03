@@ -1,6 +1,5 @@
 package tech.wetech.flexmodel.codegen
 
-
 import groovy.util.logging.Log
 
 import java.nio.file.Path

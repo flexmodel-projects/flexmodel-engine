@@ -6,9 +6,13 @@ import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import net.bytebuddy.implementation.bind.annotation.This;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.wetech.flexmodel.*;
-import tech.wetech.flexmodel.dsl.Expressions;
-import tech.wetech.flexmodel.mapping.TypeHandler;
+import tech.wetech.flexmodel.model.EntityDefinition;
+import tech.wetech.flexmodel.model.field.RelationField;
+import tech.wetech.flexmodel.model.field.TypedField;
+import tech.wetech.flexmodel.query.expr.Expressions;
+import tech.wetech.flexmodel.session.AbstractSessionContext;
+import tech.wetech.flexmodel.session.Session;
+import tech.wetech.flexmodel.type.TypeHandler;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -43,7 +47,7 @@ public class LazyLoadInterceptor {
    * @return
    */
   private Object castValueType(String modelName, String fieldName, Object value) {
-    Entity entity = (Entity) sessionContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
     TypedField<?, ?> field = entity.getField(fieldName);
     if (field != null) {
       TypeHandler<?> typeHandler = sessionContext.getTypeHandlerMap().get(field.getType());
@@ -89,7 +93,7 @@ public class LazyLoadInterceptor {
     try {
       boolean loaded = loadCache.getOrDefault(method, false);
       if (!loaded) {
-        Entity entity = (Entity) sessionContext.getModel(modelName);
+        EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
         String fieldName = ReflectionUtils.getFieldNameFromGetter(method);
         TypedField<?, ?> field = entity.getField(fieldName);
         if (field instanceof RelationField relationField) {
@@ -107,7 +111,7 @@ public class LazyLoadInterceptor {
               ParameterizedType returnType = (ParameterizedType) method.getGenericReturnType();
               Class<?> returnGenericType = (Class<?>) returnType.getActualTypeArguments()[0];
               localValue = castValueType(relationField.getFrom(), relationField.getForeignField(), localValue);
-              List<?> list = session.find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(localValue), returnGenericType);
+              List<?> list = session.data().find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(localValue), returnGenericType);
               invokeSetter(proxy, list, clazz, fieldName, method.getReturnType());
               return list;
             }
@@ -117,7 +121,7 @@ public class LazyLoadInterceptor {
             }
             try (Session session = sessionContext.getFactory().createSession(sessionContext.getSchemaName())) {
               localValue = castValueType(relationField.getFrom(), relationField.getForeignField(), localValue);
-              List<?> list = session.find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(localValue), method.getReturnType());
+              List<?> list = session.data().find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(localValue), method.getReturnType());
               if (list.isEmpty()) {
                 return null;
               }

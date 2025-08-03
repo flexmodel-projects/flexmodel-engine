@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel.sql.type;
 
+import tech.wetech.flexmodel.model.field.Field;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -17,7 +19,7 @@ public class LegacyDateTimeSqlTypeHandler implements SqlTypeHandler {
   }
 
   @Override
-  public Timestamp convertParameter(tech.wetech.flexmodel.Field field, Object value) {
+  public Timestamp convertParameter(Field field, Object value) {
     if (value == null) {
       return null;
     }
@@ -28,7 +30,7 @@ public class LegacyDateTimeSqlTypeHandler implements SqlTypeHandler {
   }
 
   @Override
-  public LocalDateTime getNullableResult(ResultSet rs, String columnName, tech.wetech.flexmodel.Field field) throws SQLException {
+  public LocalDateTime getNullableResult(ResultSet rs, String columnName, Field field) throws SQLException {
     try {
       return rs.getObject(columnName, Timestamp.class).toLocalDateTime();
     } catch (NullPointerException e) {

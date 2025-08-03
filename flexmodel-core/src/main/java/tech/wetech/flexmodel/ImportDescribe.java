@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel;
 
+import tech.wetech.flexmodel.model.SchemaObject;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

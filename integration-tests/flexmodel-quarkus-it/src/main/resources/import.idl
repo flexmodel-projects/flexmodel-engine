@@ -1,0 +1,124 @@
+model fs_datasource {
+  name : String @id,
+  type? : DatasourceType,
+  config? : JSON,
+  createdAt? : DateTime @default(now()),
+  updatedAt? : DateTime @default(now()),
+  enabled : Boolean @comment("数据源") @default("true"),
+}
+model fs_api_definition {
+  id : String @id @unique @default(ulid()),
+  name : String @length("255"),
+  parentId? : String @length("255"),
+  type : ApiType,
+  method? : String @length("255"),
+  path? : String @length("255"),
+  createdAt : DateTime @default(now()),
+  updatedAt : DateTime @default(now()),
+  meta? : JSON,
+  enabled : Boolean @comment("是否开启") @default("true"),
+}
+//model fs_api_log {
+//  id : String @id @default(ulid()),
+//  level : LogLevel,
+//  uri : String @length("2000"),
+//  data : JSON,
+//  createdAt : DateTime @default(now()),
+//  @index(unique: "false", fields: [level]),
+//}
+model fs_api_request_log {
+  id : String @id @default(ulid()),
+  url : String @length("2000") @comment("请求地址"),
+  http_method: String @length("255") @comment("请求方法"),
+  path: String @length("1000") @comment("请求路径"),
+  request_body : JSON @comment("请求参数"),
+  request_headers: JSON @comment("请求头"),
+  status_code : Int,
+  response_time : Int,
+  client_ip?: String @length("45") @comment("IP地址"),
+  created_at : DateTime @default(now()),
+  is_success: Boolean @comment("是否成功") @default("true"),
+  error_message? : JSON @comment("异常信息"),
+  @index(fields: [created_at]),
+  @index(fields: [is_error]),
+  @index(fields: [endpoint, created_at]),
+  @index(fields: [status_code, created_at])
+}
+model fs_identity_provider {
+  name : String @id,
+  createdAt : DateTime @default(now()),
+  provider? : JSON,
+  updatedAt : DateTime @default(now()),
+}
+model fs_config {
+  id : String @id @unique @default(ulid()),
+  key : String @comment("名称") @length("255"),
+  value? : String @length("255"),
+  createdAt : DateTime @default(now()),
+  updatedAt : DateTime @default(now()),
+  @comment("配置"),
+  @index(name:"IDX_CONFIG_KEY", unique: "true", fields: [key]),
+}
+model Teacher {
+  id : Long @id @default(autoIncrement()),
+  teacherName? : String @length("255"),
+  subject? : String @length("255"),
+}
+model Student {
+  id : Long @id @default(autoIncrement()),
+  studentName? : String @length("255"),
+  gender? : UserGender,
+  interest? : user_interest[],
+  age? : Int,
+  classId? : Long,
+  studentClass? : Classes @comment("班级") @relation(localField: "classId", foreignField: "id", cascadeDelete: "false"),
+  studentDetail? : StudentDetail @relation(localField: "id", foreignField: "studentId", cascadeDelete: "true"),
+  @index(name: "IDX_STUDENT_NAME",unique: "false", fields: [studentName]),
+  @index(name:"IDX_CLASS_ID", unique: "false", fields: [classId]),
+}
+model StudentDetail {
+  id : Long @id @default(autoIncrement()),
+  studentId? : Long,
+  student? : Student @comment("学生") @relation(localField: "studentId", foreignField: "id", cascadeDelete: "false"),
+  description? : String @length("255"),
+}
+model Classes {
+  id : Long @id @default(autoIncrement()),
+  classCode? : String @length("255"),
+  className? : String @length("255"),
+  students? : Student[] @relation(localField: "id", foreignField: "classId", cascadeDelete: "true"),
+}
+model Course {
+  courseNo : String @id @default(uuid()),
+  courseName? : String @length("255"),
+  @index(name:"IDX_COURSE_NO", unique: "false", fields: [courseNo]),
+}
+model fs_user {
+    id : String @id @default(ulid()),
+    username : String @length("255") @comment("用户名"),
+    avatar? : String @length("255") @comment("头像"),
+    password_hash : String @length("255") @comment("密码HASH"),
+    created_at : DateTime @default(now()) @comment("创建时间"),
+    updated_at : DateTime @default(now()) @comment("更新时间"),
+    @index(name:"IDX_USERNAME", unique: "true", fields: [username]),
+    @comment("用户")
+}
+enum ApiType {
+  FOLDER,
+  API
+}
+enum DatasourceType {
+  SYSTEM,
+  USER
+}
+enum UserGender {
+  UNKNOWN,
+  MALE,
+  FEMALE
+}
+enum user_interest {
+  chang,
+  tiao,
+  rap,
+  daLanQiu
+}

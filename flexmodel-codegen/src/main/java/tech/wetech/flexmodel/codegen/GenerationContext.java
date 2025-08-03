@@ -1,9 +1,9 @@
 package tech.wetech.flexmodel.codegen;
 
-import tech.wetech.flexmodel.Entity;
-import tech.wetech.flexmodel.Enum;
 import tech.wetech.flexmodel.ImportDescribe;
-import tech.wetech.flexmodel.SchemaObject;
+import tech.wetech.flexmodel.model.EntityDefinition;
+import tech.wetech.flexmodel.model.EnumDefinition;
+import tech.wetech.flexmodel.model.SchemaObject;
 
 import java.util.*;
 
@@ -138,10 +138,10 @@ public class GenerationContext {
     Map<String, ModelClass> modelClassMap = new HashMap<>();
     Map<String, EnumClass> enumClassMap = new HashMap<>();
     for (SchemaObject model : models) {
-      if (model instanceof Entity) {
-        modelClassMap.put(model.getName(), ModelClass.buildModelClass(configuration.getTarget().getReplaceString(), packageName, schema.getName(), (Entity) model));
-      } else if (model instanceof tech.wetech.flexmodel.Enum) {
-        enumClassMap.put(model.getName(), EnumClass.buildEnumClass(packageName, schema.getName(), (tech.wetech.flexmodel.Enum) model));
+      if (model instanceof EntityDefinition) {
+        modelClassMap.put(model.getName(), ModelClass.buildModelClass(configuration.getTarget().getReplaceString(), packageName, schema.getName(), (EntityDefinition) model));
+      } else if (model instanceof EnumDefinition) {
+        enumClassMap.put(model.getName(), EnumClass.buildEnumClass(packageName, schema.getName(), (EnumDefinition) model));
       }
     }
 
@@ -149,11 +149,11 @@ public class GenerationContext {
     context.setSchemaName(schema.getName());
     context.setPackageName(packageName);
     for (SchemaObject model : models) {
-      if (model instanceof Entity) {
+      if (model instanceof EntityDefinition) {
         ModelClass modelClass = modelClassMap.get(model.getName());
         context.getModelClassList().add(modelClass);
         context.getImports().add(modelClass.getFullClassName());
-      } else if (model instanceof Enum) {
+      } else if (model instanceof EnumDefinition) {
         EnumClass enumClass = enumClassMap.get(model.getName());
         context.getEnumClassList().add(enumClass);
         context.getImports().add(enumClass.getFullClassName());
