@@ -11,9 +11,9 @@ import tech.wetech.flexmodel.model.NativeQueryDefinition;
 import tech.wetech.flexmodel.model.field.GeneratedValue;
 import tech.wetech.flexmodel.model.field.TypedField;
 import tech.wetech.flexmodel.operation.DataOperations;
-import tech.wetech.flexmodel.operation.SchemaOperations;
 import tech.wetech.flexmodel.query.Query;
 import tech.wetech.flexmodel.query.QueryHelper;
+import tech.wetech.flexmodel.query.SchemaOperations;
 import tech.wetech.flexmodel.reflect.ReflectionUtils;
 import tech.wetech.flexmodel.sql.StringHelper;
 
@@ -129,7 +129,7 @@ public class MongoDataOperations extends BaseMongoStatement implements DataOpera
   @Override
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
     List<Map<String, Object>> mapList = findMapList(modelName, query);
-    if (query.isNestedQueryEnabled()) {
+    if (query.isNestedEnabled()) {
       QueryHelper.nestedQuery(mapList, this::findMapList, (ModelDefinition) mongoContext.getModel(modelName), query, mongoContext, mongoContext.getNestedQueryMaxDepth());
     }
     return mongoContext.getJsonObjectConverter().convertValueList(mapList, resultType);

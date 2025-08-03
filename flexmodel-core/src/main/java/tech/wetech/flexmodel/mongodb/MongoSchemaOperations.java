@@ -9,8 +9,8 @@ import org.bson.conversions.Bson;
 import tech.wetech.flexmodel.ModelRepository;
 import tech.wetech.flexmodel.model.*;
 import tech.wetech.flexmodel.model.field.TypedField;
-import tech.wetech.flexmodel.operation.SchemaOperations;
 import tech.wetech.flexmodel.query.Direction;
+import tech.wetech.flexmodel.query.SchemaOperations;
 import tech.wetech.flexmodel.sql.StringHelper;
 
 import java.util.ArrayList;

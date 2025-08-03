@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static tech.wetech.flexmodel.query.QueryBuilder.field;
+import static tech.wetech.flexmodel.query.Query.field;
 
 
 /**
@@ -39,10 +39,10 @@ public class FlexmodelFindOneDataFetcher extends FlexmodelAbstractDataFetcher<Ma
       TypedField<?, ?> idField = entity.findIdField().orElseThrow();
 
       List<RelationField> relationFields = new ArrayList<>();
-      List<Map<String, Object>> list = session.find(entity.getName(), query -> query
-        .where(filter)
+
+      List<Map<String, Object>> list = session.dsl()
         .select(projection -> {
-          projection.addField(idField.getName(), field(entity.getName() + "." + idField.getName()));
+          projection.field(idField.getName(), field(entity.getName() + "." + idField.getName()));
           for (SelectedField selectedField : selectedFields) {
             TypedField<?, ?> flexModelField = entity.getField(selectedField.getName());
             if (flexModelField == null) {
@@ -52,12 +52,15 @@ public class FlexmodelFindOneDataFetcher extends FlexmodelAbstractDataFetcher<Ma
               relationFields.add(secondaryRelationField);
               continue;
             }
-            projection.addField(selectedField.getName(), field(flexModelField.getModelName() + "." + flexModelField.getName()));
+            projection.field(selectedField.getName(), field(flexModelField.getModelName() + "." + flexModelField.getName()));
           }
           return projection;
         })
+        .from(entity.getName())
+        .where(filter)
         .page(1, 1)
-      );
+        .execute();
+
       if (list.isEmpty()) {
         return null;
       }

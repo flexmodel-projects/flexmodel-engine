@@ -3,6 +3,9 @@ package tech.wetech.flexmodel.session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tech.wetech.flexmodel.annotation.ModelClass;
+import tech.wetech.flexmodel.query.DSLQueryBuilder;
+import tech.wetech.flexmodel.query.Direction;
+import tech.wetech.flexmodel.query.TypedDSLQueryBuilder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -12,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DSLQueryBuilderTest {
 
   private Session session;
-  private Session.DSLQueryBuilder dslQueryBuilder;
+  private DSLQueryBuilder dslQueryBuilder;
 
   @ModelClass("User")
   public static class User {
@@ -49,13 +52,13 @@ public class DSLQueryBuilderTest {
   @BeforeEach
   void setUp() {
     // 创建一个简单的测试，不依赖Mockito
-    dslQueryBuilder = new Session.DSLQueryBuilder(session);
+    dslQueryBuilder = new DSLQueryBuilder(session);
   }
 
   @Test
   void testFromWithString() {
     // 测试使用字符串指定模型名
-    Session.DSLQueryBuilder result = dslQueryBuilder.from("User");
+    DSLQueryBuilder result = dslQueryBuilder.from("User");
 
     assertSame(dslQueryBuilder, result);
     // 这里应该返回原始的DSLQueryBuilder，execute()返回Map
@@ -64,7 +67,7 @@ public class DSLQueryBuilderTest {
   @Test
   void testFromWithClass() {
     // 测试使用实体类指定模型
-    Session.TypedDSLQueryBuilder<User> result = dslQueryBuilder.from(User.class);
+    TypedDSLQueryBuilder<User> result = dslQueryBuilder.from(User.class);
 
     assertNotNull(result);
     assertNotSame(dslQueryBuilder, result);
@@ -74,12 +77,12 @@ public class DSLQueryBuilderTest {
   @Test
   void testTypedDSLQueryBuilderChaining() {
     // 测试带类型的DSL查询构建器的链式调用
-    Session.TypedDSLQueryBuilder<User> typedBuilder = dslQueryBuilder.from(User.class);
+    TypedDSLQueryBuilder<User> typedBuilder = dslQueryBuilder.from(User.class);
 
-    Session.TypedDSLQueryBuilder<User> result = typedBuilder
+    TypedDSLQueryBuilder<User> result = typedBuilder
       .select("id", "name")
       .where("name = 'John'")
-      .orderBy("name", Session.Direction.ASC)
+      .orderBy("name", Direction.ASC)
       .page(1, 10);
 
     assertSame(typedBuilder, result);
@@ -89,7 +92,7 @@ public class DSLQueryBuilderTest {
   @Test
   void testModelNameExtraction() {
     // 测试从实体类提取模型名
-    Session.TypedDSLQueryBuilder<User> typedBuilder = dslQueryBuilder.from(User.class);
+    TypedDSLQueryBuilder<User> typedBuilder = dslQueryBuilder.from(User.class);
 
     // 验证TypedDSLQueryBuilder正确创建
     assertNotNull(typedBuilder);

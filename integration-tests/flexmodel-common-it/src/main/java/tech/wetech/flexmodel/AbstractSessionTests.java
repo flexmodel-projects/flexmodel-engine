@@ -11,7 +11,6 @@ import tech.wetech.flexmodel.model.SchemaObject;
 import tech.wetech.flexmodel.model.field.*;
 import tech.wetech.flexmodel.query.Direction;
 import tech.wetech.flexmodel.query.Query;
-import tech.wetech.flexmodel.query.QueryBuilder;
 import tech.wetech.flexmodel.query.expr.Expressions;
 import tech.wetech.flexmodel.query.expr.Predicate;
 import tech.wetech.flexmodel.session.Session;
@@ -27,7 +26,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static tech.wetech.flexmodel.model.field.GeneratedValue.AUTO_INCREMENT;
 import static tech.wetech.flexmodel.model.field.GeneratedValue.UUID;
 import static tech.wetech.flexmodel.query.Direction.DESC;
-import static tech.wetech.flexmodel.query.QueryBuilder.*;
+import static tech.wetech.flexmodel.query.Query.*;
+
 
 /**
  * @author cjbi
@@ -111,7 +111,7 @@ public abstract class AbstractSessionTests {
    * 创建带条件的查询对象
    */
   private Query createQueryWithCondition(Predicate condition) {
-    return QueryBuilder.create()
+    return Query.Builder.create()
       .where(condition)
       .build();
   }
@@ -120,7 +120,7 @@ public abstract class AbstractSessionTests {
    * 创建带投影的查询对象
    */
   private Query createQueryWithSelect(String... fields) {
-    return QueryBuilder.create()
+    return Query.Builder.create()
       .select(fields)
       .build();
   }
@@ -131,8 +131,8 @@ public abstract class AbstractSessionTests {
   private void demonstrateQueryBuilding() {
     String entityName = "demo_entity";
 
-    // 方式1：使用QueryBuilder（推荐，减少lambda）
-    Query query1 = QueryBuilder.create()
+    // 方式1：使用Query.Builder（推荐，减少lambda）
+    Query query1 = Query.Builder.create()
       .select("id", "name", "age")
       .where(Expressions.field("age").gte(18))
       .orderBy(orderBy -> orderBy.asc("name"))
@@ -461,7 +461,7 @@ public abstract class AbstractSessionTests {
    * 测试1:1关系查询
    */
   private void testOneToOneRelation(String studentEntityName, String studentDetailEntityName) {
-    Query query = QueryBuilder.create()
+    Query query = Query.Builder.create()
       .select(select -> select
         .field("studentName", "studentName")
         .field("description", studentDetailEntityName + ".description")
@@ -484,7 +484,7 @@ public abstract class AbstractSessionTests {
    * 测试1:n关系查询
    */
   private void testOneToManyRelation(String classesEntityName, String studentEntityName) {
-    Query query = QueryBuilder.create()
+    Query query = Query.Builder.create()
       .select(select -> select
         .field("className", "className")
         .field("studentName", studentEntityName + ".studentName")
@@ -511,7 +511,7 @@ public abstract class AbstractSessionTests {
     String studentEntityName = "testEnumStudent";
     createStudentEntity(studentEntityName);
     createStudentData(studentEntityName);
-    List<Map> list = session.find("testEnumStudent", q -> q, Map.class);
+    List<Map<String, Object>> list = session.dsl().select().from("testEnumStudent").execute();
     Assertions.assertFalse(list.isEmpty());
     Map first = list.getFirst();
     Assertions.assertInstanceOf(String.class, first.get("gender"));
@@ -759,7 +759,7 @@ public abstract class AbstractSessionTests {
   void testFind() {
     String entityName = "testFind_teacher";
     createTeacherCollection2(entityName);
-    Query query = QueryBuilder.create()
+    Query query = Query.Builder.create()
       .select(select -> select
         .field("teacher_id", "id")
         .field("teacher_name", "name")
@@ -781,24 +781,21 @@ public abstract class AbstractSessionTests {
     // 聚合分组
     List<Map<String, Object>> groupList = session.find(entityName, query -> query
       .select(projection -> projection
-        .addField("teacher_name", field("name"))
-        .addField("course_count", count(field(courseEntityName + ".teacher_id")))
-        .addField("course_score_sum", sum(field(courseEntityName + ".c_score")))
+        .field("teacher_name", field("name"))
+        .field("course_count", count(field(courseEntityName + ".teacher_id")))
+        .field("course_score_sum", sum(field(courseEntityName + ".c_score")))
       )
       .innerJoin(joiners -> joiners
-        .addInnerJoin(joiner -> joiner
-          .setFrom(courseEntityName)
-          .setFilter("""
+        .model(courseEntityName)
+        .where("""
             {
               "teacher_id": {
                 "_ne": 999
               }
             }
-            """)
-        )
-      )
+          """))
       .groupBy(groupBy -> groupBy
-        .addField("teacher_name")
+        .field("teacher_name")
       )
       .where(Expressions.field("name").eq("李四"))
     );
@@ -810,55 +807,55 @@ public abstract class AbstractSessionTests {
     // group by time
     List<Map<String, Object>> dateFormatList = session.find(entityName, query -> query
       .select(projection -> projection
-        .addField("year", dateFormat(field("birthday"), "yyyy-MM-dd hh:mm:ss"))
-        .addField("user_count", count(field("id"))))
+        .field("year", dateFormat(field("birthday"), "yyyy-MM-dd hh:mm:ss"))
+        .field("user_count", count(field("id"))))
       .groupBy(groupBy ->
-        groupBy.addField("year")
+        groupBy.field("year")
       )
     );
     Assertions.assertFalse(dateFormatList.isEmpty());
     List<Map<String, Object>> dateFormatList1 = session.find(entityName, query -> query
       .select(projection -> projection
-        .addField("year", dateFormat(field("birthday"), "yyyy-MM-dd"))
-        .addField("user_count", count(field("id"))))
+        .field("year", dateFormat(field("birthday"), "yyyy-MM-dd"))
+        .field("user_count", count(field("id"))))
       .groupBy(groupBy ->
-        groupBy.addField("year")
+        groupBy.field("year")
       )
     );
     Assertions.assertFalse(dateFormatList1.isEmpty());
     List<Map<String, Object>> dateFormatList2 = session.find(entityName, query -> query
       .select(projection -> projection
-        .addField("year", dateFormat(field("createDatetime"), "yyyy-MM-dd hh:mm:ss"))
-        .addField("user_count", count(field("id"))))
+        .field("year", dateFormat(field("createDatetime"), "yyyy-MM-dd hh:mm:ss"))
+        .field("user_count", count(field("id"))))
       .groupBy(groupBy ->
-        groupBy.addField("year")
+        groupBy.field("year")
       )
     );
     Assertions.assertFalse(dateFormatList2.isEmpty());
     List<Map<String, Object>> dayOfYearList = session.find(entityName, query -> query
       .select(projection -> projection
-        .addField("dayOfYear", dayOfYear(field("birthday")))
-        .addField("user_count", count(field("id"))))
+        .field("dayOfYear", dayOfYear(field("birthday")))
+        .field("user_count", count(field("id"))))
       .groupBy(groupBy ->
-        groupBy.addField("dayOfYear")
+        groupBy.field("dayOfYear")
       )
     );
     Assertions.assertFalse(dayOfYearList.isEmpty());
     List<Map<String, Object>> dayOfMonthList = session.find(entityName, query -> query
       .select(projection -> projection
-        .addField("dayOfMonth", dayOfMonth(field("birthday")))
-        .addField("user_count", count(field("id"))))
+        .field("dayOfMonth", dayOfMonth(field("birthday")))
+        .field("user_count", count(field("id"))))
       .groupBy(groupBy ->
-        groupBy.addField("dayOfMonth")
+        groupBy.field("dayOfMonth")
       )
     );
     Assertions.assertFalse(dayOfMonthList.isEmpty());
     List<Map<String, Object>> dayOfWeekList = session.find(entityName, query -> query
       .select(projection -> projection
-        .addField("dayOfWeek", dayOfWeek(field("birthday")))
-        .addField("user_count", count(field("id"))))
+        .field("dayOfWeek", dayOfWeek(field("birthday")))
+        .field("user_count", count(field("id"))))
       .groupBy(groupBy ->
-        groupBy.addField("dayOfWeek")
+        groupBy.field("dayOfWeek")
       )
     );
     Assertions.assertFalse(dayOfWeekList.isEmpty());
@@ -868,7 +865,7 @@ public abstract class AbstractSessionTests {
   void testCountByCondition() {
     String entityName = "testCountByCondition_teacher";
     createTeacherCollection2(entityName);
-    Query query = QueryBuilder.create()
+    Query query = Query.Builder.create()
       .where(Expressions.field("name").eq("张三").or(Expressions.field("name").eq("李四")))
       .build();
 
@@ -970,7 +967,7 @@ public abstract class AbstractSessionTests {
     String courseEntityName = "testRelation_teacher_courses";
     createTeacherCollection2(entityName);
     createTeacherCourseEntity(entityName, courseEntityName);
-    Query query = QueryBuilder.create()
+    Query query = Query.Builder.create()
       .select(select -> select
         .field("teacher_name", "name")
       )

@@ -164,7 +164,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
     Pair<String, Map<String, Object>> pair = toQuerySqlWithPrepared(modelName, query);
     List mapList = sqlExecutor.queryForList(pair.first(), pair.second(), getSqlResultHandler((ModelDefinition) sqlContext.getModel(modelName), query, Map.class));
-    if (query.isNestedQueryEnabled()) {
+    if (query.isNestedEnabled()) {
       QueryHelper.nestedQuery(mapList, this::findMapList, (ModelDefinition) sqlContext.getModel(modelName), query, sqlContext, sqlContext.getNestedQueryMaxDepth());
     }
     return ReflectionUtils.toClassBeanList(sqlContext.getJsonObjectConverter(), mapList, resultType);

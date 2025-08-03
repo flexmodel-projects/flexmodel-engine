@@ -124,7 +124,7 @@ public interface DataOperations {
 
   default <T> List<T> find(String modelName, Predicate predicate, Class<T> resultType) {
     Query query = new Query();
-    query.where(predicate);
+    query.setFilter(predicate.toJsonString());
     return find(modelName, query, resultType);
   }
 
@@ -174,14 +174,14 @@ public interface DataOperations {
    * @return List of records
    */
   @SuppressWarnings("all")
-  default List<Map<String, Object>> find(String modelName, UnaryOperator<Query> queryUnaryOperator) {
-    List list = find(modelName, queryUnaryOperator, Map.class);
+  default List<Map<String, Object>> find(String modelName, UnaryOperator<Query.Builder> queryUnaryOperator) {
+    List list = find(modelName, queryUnaryOperator.apply(Query.Builder.create()).build(), Map.class);
     return list;
   }
 
   default List<Map<String, Object>> find(String modelName, Predicate predicate) {
     Query query = new Query();
-    query.where(predicate);
+    query.setFilter(predicate.toJsonString());
     List list = find(modelName, query, Map.class);
     return list;
   }
@@ -200,7 +200,7 @@ public interface DataOperations {
 
   default long count(String modelName, Predicate predicate) {
     Query query = new Query();
-    query.where(predicate);
+    query.setFilter(predicate.toJsonString());
     return count(modelName, query);
   }
 
@@ -222,8 +222,8 @@ public interface DataOperations {
    * @param queryUnaryOperator Query unary operator
    * @return True if exists, false otherwise
    */
-  default boolean exists(String modelName, UnaryOperator<Query> queryUnaryOperator) {
-    return count(modelName, queryUnaryOperator) > 0;
+  default boolean exists(String modelName, UnaryOperator<Query.Builder> queryUnaryOperator) {
+    return count(modelName, queryUnaryOperator.apply(Query.Builder.create()).build()) > 0;
   }
 
   /**

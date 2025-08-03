@@ -145,7 +145,7 @@ public abstract class BaseSqlStatement {
     Query.Projection projection = query.getProjection();
     Map<String, RelationField> relationFields = QueryHelper.findRelationFields(model, query);
     StringJoiner columns = new StringJoiner(", ");
-    if (projection != null) {
+    if (projection != null && !projection.getFields().isEmpty()) {
       projection.getFields().forEach((key, value) -> {
         if (!relationFields.containsKey(key)) {
           String sqlCall = toSqlCall(value);

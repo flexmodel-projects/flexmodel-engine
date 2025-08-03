@@ -72,7 +72,7 @@ public class QueryHelper {
   public static Map<String, RelationField> findRelationFields(ModelDefinition model, Query query) {
     Map<String, RelationField> relationFields = new HashMap<>();
     if (model instanceof EntityDefinition entity) {
-      if (query != null && query.getProjection() != null) {
+      if (query != null && query.getProjection() != null && !query.getProjection().getFields().isEmpty()) {
         for (Map.Entry<String, Query.QueryCall> entry : query.getProjection().getFields().entrySet()) {
           String key = entry.getKey();
           Query.QueryCall value = entry.getValue();
@@ -96,7 +96,9 @@ public class QueryHelper {
   }
 
   private static List<Map<String, Object>> findRelationList(BiFunction<String, Query, List<Map<String, Object>>> relationFn, RelationField relationField, Set<Object> ids) {
-    return relationFn.apply(relationField.getFrom(), new Query().where(field(relationField.getForeignField()).in(ids)));
+    Query query = new Query();
+    query.setFilter(field(relationField.getForeignField()).in(ids).toJsonString());
+    return relationFn.apply(relationField.getFrom(), query);
   }
 
   public static void nestedQuery(List<Map<String, Object>> parentList,

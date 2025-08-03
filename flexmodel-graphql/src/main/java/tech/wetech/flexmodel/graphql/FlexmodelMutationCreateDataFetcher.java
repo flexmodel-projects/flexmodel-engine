@@ -1,13 +1,10 @@
 package tech.wetech.flexmodel.graphql;
 
 import graphql.schema.DataFetchingEnvironment;
-import tech.wetech.flexmodel.model.EntityDefinition;
-import tech.wetech.flexmodel.model.field.TypedField;
 import tech.wetech.flexmodel.session.Session;
 import tech.wetech.flexmodel.session.SessionFactory;
 
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author cjbi
@@ -24,9 +21,12 @@ public class FlexmodelMutationCreateDataFetcher extends FlexmodelAbstractDataFet
     Map<String, Object> arguments = getArguments(environment);
     if (arguments.get("data") instanceof Map data) {
       try (Session session = sessionFactory.createSession(schemaName)) {
-        EntityDefinition entity = (EntityDefinition) session.getModel(modelName);
-        session.insert(modelName, data);
-        Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
+
+        session.dsl()
+          .insertInto(modelName)
+          .values(data)
+          .execute();
+
         return data;
       }
     }

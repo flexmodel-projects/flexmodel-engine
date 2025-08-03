@@ -6,8 +6,8 @@ import tech.wetech.flexmodel.generator.ULID;
 import tech.wetech.flexmodel.model.*;
 import tech.wetech.flexmodel.model.field.*;
 import tech.wetech.flexmodel.operation.DataOperations;
-import tech.wetech.flexmodel.operation.SchemaOperations;
 import tech.wetech.flexmodel.query.Query;
+import tech.wetech.flexmodel.query.SchemaOperations;
 import tech.wetech.flexmodel.reflect.LazyObjProxy;
 import tech.wetech.flexmodel.reflect.ReflectionUtils;
 
@@ -371,5 +371,10 @@ public abstract class AbstractSession implements Session {
   @Override
   public SchemaOperations schema() {
     return schemaOperations;
+  }
+
+  @Override
+  public DSL dsl() {
+    return new DSL(this);
   }
 }

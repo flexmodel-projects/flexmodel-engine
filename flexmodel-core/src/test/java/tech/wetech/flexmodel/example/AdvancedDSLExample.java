@@ -1,5 +1,6 @@
 package tech.wetech.flexmodel.example;
 
+import tech.wetech.flexmodel.query.Direction;
 import tech.wetech.flexmodel.query.expr.Predicate;
 import tech.wetech.flexmodel.session.Session;
 
@@ -27,29 +28,34 @@ public class AdvancedDSLExample {
   public void basicQueryExamples() {
     // 1. 简单查询
     List<Map<String, Object>> allUsers = session.dsl()
+      .select()
       .from("users")
       .execute();
 
     // 2. 带条件的查询
     List<Map<String, Object>> activeUsers = session.dsl()
+      .select()
       .from("users")
       .where(field("status").eq("active"))
       .execute();
 
     // 3. 带排序的查询
     List<Map<String, Object>> sortedUsers = session.dsl()
+      .select()
       .from("users")
-      .orderBy("name", Session.Direction.ASC)
+      .orderBy("name", Direction.ASC)
       .execute();
 
     // 4. 带分页的查询
     List<Map<String, Object>> pagedUsers = session.dsl()
+      .select()
       .from("users")
       .page(1, 10)
       .execute();
 
     // 5. 限制结果数量
     List<Map<String, Object>> limitedUsers = session.dsl()
+      .select()
       .from("users")
       .limit(5)
       .execute();
@@ -61,17 +67,20 @@ public class AdvancedDSLExample {
   public void entityQueryExamples() {
     // 1. 使用实体类查询
     List<User> users = session.dsl()
+      .select()
       .from(User.class)
       .execute();
 
     // 2. 使用实体类和方法引用
     List<User> usersByName = session.dsl()
+      .select()
       .from(User.class)
       .where(field(User::getName).eq("张三"))
       .execute();
 
     // 3. 使用实体类查询单个结果
     User user = session.dsl()
+      .select()
       .from(User.class)
       .where(field(User::getId).eq(1L))
       .executeOne();
@@ -87,6 +96,7 @@ public class AdvancedDSLExample {
       .and(field(User::getName).contains("张"));
 
     List<User> users = session.dsl()
+      .select()
       .from(User.class)
       .where(andCondition)
       .execute();
@@ -96,6 +106,7 @@ public class AdvancedDSLExample {
       .or(field(User::getStatus).eq("pending"));
 
     List<User> activeOrPendingUsers = session.dsl()
+      .select()
       .from(User.class)
       .where(orCondition)
       .execute();
@@ -109,6 +120,7 @@ public class AdvancedDSLExample {
       .and(field(User::getName).contains("张"));
 
     List<User> complexUsers = session.dsl()
+      .select()
       .from(User.class)
       .where(complexCondition)
       .execute();
@@ -138,15 +150,17 @@ public class AdvancedDSLExample {
   public void sortingExamples() {
     // 1. 单字段排序
     List<User> usersByName = session.dsl()
+      .select()
       .from(User.class)
-      .orderBy("name", Session.Direction.ASC)
+      .orderBy("name", Direction.ASC)
       .execute();
 
     // 2. 多字段排序
     List<User> usersByAgeAndName = session.dsl()
+      .select()
       .from(User.class)
-      .orderBy("age", Session.Direction.DESC)
-      .orderBy("name", Session.Direction.ASC)
+      .orderBy("age", Direction.DESC)
+      .orderBy("name", Direction.ASC)
       .execute();
   }
 
@@ -156,19 +170,22 @@ public class AdvancedDSLExample {
   public void paginationExamples() {
     // 1. 基本分页
     List<User> firstPage = session.dsl()
+      .select()
       .from(User.class)
       .page(1, 10)
       .execute();
 
     // 2. 带排序的分页
     List<User> sortedPage = session.dsl()
+      .select()
       .from(User.class)
-      .orderBy("id", Session.Direction.DESC)
+      .orderBy("id", Direction.DESC)
       .page(2, 5)
       .execute();
 
     // 3. 使用limit
     List<User> limitedUsers = session.dsl()
+      .select()
       .from(User.class)
       .limit(5)
       .execute();
@@ -260,17 +277,20 @@ public class AdvancedDSLExample {
   public void statisticsExamples() {
     // 1. 基本统计
     long totalUsers = session.dsl()
+      .select()
       .from(User.class)
       .count();
 
     // 2. 条件统计
     long activeUsers = session.dsl()
+      .select()
       .from(User.class)
       .where(field(User::getStatus).eq("active"))
       .count();
 
     // 3. 检查存在性
     boolean hasActiveUsers = session.dsl()
+      .select()
       .from(User.class)
       .where(field(User::getStatus).eq("active"))
       .exists();
@@ -288,12 +308,14 @@ public class AdvancedDSLExample {
   public void stringConditionExamples() {
     // 1. 简单字符串条件
     List<User> users = session.dsl()
+      .select()
       .from(User.class)
       .where("age > 18 AND status = 'active'")
       .execute();
 
     // 2. 复杂字符串条件
     List<User> complexUsers = session.dsl()
+      .select()
       .from(User.class)
       .where("(age >= 18 AND age <= 65) AND (status = 'active' OR status = 'pending')")
       .execute();
@@ -305,6 +327,7 @@ public class AdvancedDSLExample {
   public void nestedQueryExamples() {
     // 启用嵌套查询
     List<User> usersWithRelations = session.dsl()
+      .select()
       .from(User.class)
       .where(field(User::getStatus).eq("active"))
       .enableNested()
@@ -331,7 +354,7 @@ public class AdvancedDSLExample {
       .where(field("u.age").gte(18)
         .and(field("u.status").eq("active")))
       .groupBy("u.id", "u.name", "u.email")
-      .orderBy("total_amount", Session.Direction.DESC)
+      .orderBy("total_amount", Direction.DESC)
       .page(1, 10)
       .execute();
 

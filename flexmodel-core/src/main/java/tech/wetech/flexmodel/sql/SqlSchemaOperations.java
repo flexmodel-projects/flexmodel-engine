@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.model.*;
 import tech.wetech.flexmodel.model.field.*;
-import tech.wetech.flexmodel.operation.SchemaOperations;
+import tech.wetech.flexmodel.query.SchemaOperations;
 
 import java.util.Iterator;
 import java.util.List;

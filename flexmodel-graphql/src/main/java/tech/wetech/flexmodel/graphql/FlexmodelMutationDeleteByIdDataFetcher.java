@@ -1,10 +1,14 @@
 package tech.wetech.flexmodel.graphql;
 
 import graphql.schema.DataFetchingEnvironment;
+import tech.wetech.flexmodel.model.EntityDefinition;
+import tech.wetech.flexmodel.model.field.TypedField;
+import tech.wetech.flexmodel.query.expr.Expressions;
 import tech.wetech.flexmodel.session.Session;
 import tech.wetech.flexmodel.session.SessionFactory;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author cjbi
@@ -19,8 +23,21 @@ public class FlexmodelMutationDeleteByIdDataFetcher extends FlexmodelAbstractDat
   public Map<String, Object> get(DataFetchingEnvironment environment) throws Exception {
     Object id = getArgument(environment, ID);
     try (Session session = sessionFactory.createSession(schemaName)) {
-      Map<String, Object> data = session.findById(modelName, id);
-      session.deleteById(modelName, id);
+
+      EntityDefinition entity = (EntityDefinition) session.getModel(modelName);
+      Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
+
+      Map<String, Object> data = session.dsl()
+        .select()
+        .from(modelName)
+        .where(Expressions.field(idFieldOptional.get().getName()).eq(id))
+        .executeOne();
+
+      session.dsl()
+        .deleteFrom(modelName)
+        .where(Expressions.field(idFieldOptional.get().getName()).eq(id))
+        .execute();
+
       return data;
     }
   }

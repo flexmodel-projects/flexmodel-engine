@@ -1,4 +1,4 @@
-package tech.wetech.flexmodel.operation;
+package tech.wetech.flexmodel.query;
 
 import tech.wetech.flexmodel.model.*;
 import tech.wetech.flexmodel.model.field.TypedField;
