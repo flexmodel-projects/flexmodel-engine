@@ -24,15 +24,11 @@ public class SqlStatementBuilder {
     this.sqlContext = sqlContext;
   }
 
-  public String buildQuerySql(String modelName, Query query) {
-    return buildQuerySql(modelName, query, false).first();
-  }
-
   public Pair<String, Map<String, Object>> toQuerySqlWithPrepared(String modelName, Query query) {
-    return buildQuerySql(modelName, query, true);
+    return buildQuerySql(modelName, query);
   }
 
-  private Pair<String, Map<String, Object>> buildQuerySql(String modelName, Query query, boolean prepared) {
+  private Pair<String, Map<String, Object>> buildQuerySql(String modelName, Query query) {
     QueryHelper.validate(sqlContext, modelName, query);
     Map<String, Object> params = new HashMap<>();
     ModelDefinition model = (ModelDefinition) sqlContext.getModel(modelName);
@@ -40,8 +36,8 @@ public class SqlStatementBuilder {
     Map<String, String> projectionMap = new HashMap<>();
     appendProjection(modelName, query, model, projectionMap, sqlBuilder);
     appendFromClause(modelName, sqlBuilder);
-    appendJoins(modelName, query, model, sqlBuilder, params, prepared);
-    appendWhereClause(query, sqlBuilder, params, prepared);
+    appendJoins(modelName, query, model, sqlBuilder, params, true);
+    appendWhereClause(query, sqlBuilder, params, true);
     appendGroupByClause(query, projectionMap, sqlBuilder);
     appendOrderByClause(query, sqlBuilder);
     appendLimitClause(query, sqlBuilder);

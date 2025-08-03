@@ -131,23 +131,26 @@ public class QueryHelper {
         .map(item -> item.get(relationField.getLocalField()))
         .filter(Objects::nonNull)
         .collect(Collectors.toSet());
-      Map<Object, List<Map<String, Object>>> relationDataGroup = findRelationList(relationFn, relationField, ids).stream()
-        .collect(Collectors.groupingBy(e -> e.get(relationField.getForeignField())));
+      EntityDefinition relModel = (EntityDefinition) sessionContext.getModel(relationField.getFrom());
+      if (relModel != null && relModel.getField(relationField.getForeignField()) != null) {
+        Map<Object, List<Map<String, Object>>> relationDataGroup = findRelationList(relationFn, relationField, ids).stream()
+          .collect(Collectors.groupingBy(e -> e.get(relationField.getForeignField())));
 
-      parentList.forEach(item -> {
-        if (model instanceof EntityDefinition) {
-          Object id = item.get(relationField.getLocalField());
-          if (id == null) {
-            item.put(key, relationField.isMultiple() ? List.of() : null);
-            return;
+        parentList.forEach(item -> {
+          if (model instanceof EntityDefinition) {
+            Object id = item.get(relationField.getLocalField());
+            if (id == null) {
+              item.put(key, relationField.isMultiple() ? List.of() : null);
+              return;
+            }
+            List<Map<String, Object>> list = relationDataGroup.getOrDefault(id, List.of());
+            maxDepth.decrementAndGet();
+            nestedQuery(list, relationFn, (ModelDefinition) sessionContext.getModel(relationField.getFrom()), null, sessionContext, maxDepth);
+            Object value = relationField.isMultiple() ? list : (!list.isEmpty() ? list.getFirst() : null);
+            item.put(key, value);
           }
-          List<Map<String, Object>> list = relationDataGroup.getOrDefault(id, List.of());
-          maxDepth.decrementAndGet();
-          nestedQuery(list, relationFn, (ModelDefinition) sessionContext.getModel(relationField.getFrom()), null, sessionContext, maxDepth);
-          Object value = relationField.isMultiple() ? list : (!list.isEmpty() ? list.getFirst() : null);
-          item.put(key, value);
-        }
-      });
+        });
+      }
     });
   }
 
