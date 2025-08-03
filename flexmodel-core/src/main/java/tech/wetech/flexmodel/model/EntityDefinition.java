@@ -55,7 +55,7 @@ public class EntityDefinition extends AbstractModelDefinition<EntityDefinition> 
 
   public IndexDefinition getIndex(String name) {
     return this.getIndexes().stream()
-      .filter(i -> i.getName().equals(name))
+      .filter(i -> name.equals(i.getName()))
       .findFirst()
       .orElse(null);
   }

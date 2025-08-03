@@ -66,19 +66,26 @@ public class MongoSchemaService extends BaseService implements SchemaService {
 
   @Override
   public EntityDefinition createEntity(EntityDefinition collection) {
+    // 保存到ModelRepository中
+    modelRepository.save(schemaName, collection);
+
     String collectionName = getCollectionName(collection.getName());
     mongoDatabase.createCollection(collectionName);
-    for (IndexDefinition index : collection.getIndexes()) {
+
+    // 创建集合中已定义的索引
+    List<IndexDefinition> indexesToCreate = new ArrayList<>(collection.getIndexes());
+    for (IndexDefinition index : indexesToCreate) {
       createIndex(index);
     }
+
+    // 为主键字段创建唯一索引
     collection.findIdField().ifPresent(idField -> {
       IndexDefinition index = new IndexDefinition(idField.getModelName());
       index.setUnique(true);
       index.addField(idField.getName());
       createIndex(index);
     });
-    // 保存到ModelRepository中
-    modelRepository.save(schemaName, collection);
+
     return collection;
   }
 
@@ -145,13 +152,20 @@ public class MongoSchemaService extends BaseService implements SchemaService {
         : Indexes.descending(field.fieldName())
       );
     }
+    String indexName = getPhysicalIndexName(index);
+    index.setName(indexName);
+
     IndexOptions indexOptions = new IndexOptions();
     indexOptions.name(getPhysicalIndexName(index));
     indexOptions.unique(index.isUnique());
     mongoDatabase.getCollection(collectionName).createIndex(Indexes.compoundIndex(indexes), indexOptions);
+
+    // 只有在索引不存在时才添加到实体中，避免重复添加
     EntityDefinition entity = (EntityDefinition) sessionContext.getModel(index.getModelName());
-    entity.addIndex(index);
-    modelRepository.save(schemaName, entity);
+    if (entity != null && entity.getIndex(index.getName()) == null) {
+      entity.addIndex(index);
+      modelRepository.save(schemaName, entity);
+    }
     return index;
   }
 
