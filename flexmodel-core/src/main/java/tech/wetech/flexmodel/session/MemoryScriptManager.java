@@ -30,7 +30,7 @@ public class MemoryScriptManager {
       log.info("开始从BuildItem加载脚本到内存...");
       ServiceLoader.load(BuildItem.class).forEach(this::loadScriptFromBuildItem);
       log.info("BuildItem脚本加载完成，共加载 {} 个schema", schemaScripts.size());
-    } catch (Exception e) {
+    } catch (Error e) {
       log.error("从BuildItem加载脚本到内存出错", e);
     }
   }
