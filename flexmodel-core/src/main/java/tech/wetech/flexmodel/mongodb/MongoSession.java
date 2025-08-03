@@ -11,7 +11,7 @@ import tech.wetech.flexmodel.session.AbstractSession;
 public class MongoSession extends AbstractSession {
 
   public MongoSession(MongoContext mongoContext) {
-    super(new MongoDataService(mongoContext), new MongoSchemaService(mongoContext));
+    super(mongoContext, new MongoDataService(mongoContext), new MongoSchemaService(mongoContext));
   }
 
   @Override

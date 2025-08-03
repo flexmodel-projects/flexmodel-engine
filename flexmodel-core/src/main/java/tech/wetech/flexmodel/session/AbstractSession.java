@@ -1,7 +1,5 @@
 package tech.wetech.flexmodel.session;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.service.DataService;
 import tech.wetech.flexmodel.service.SchemaService;
 
@@ -13,13 +11,13 @@ import tech.wetech.flexmodel.service.SchemaService;
  */
 public abstract class AbstractSession implements Session {
 
-    private static final Logger log = LoggerFactory.getLogger(AbstractSession.class);
-
+    private final AbstractSessionContext sessionContext;
     private final DataService dataService;
     private final SchemaService schemaService;
 
-    public AbstractSession(DataService dataService,
+    public AbstractSession(AbstractSessionContext sessionContext, DataService dataService,
                            SchemaService schemaService) {
+        this.sessionContext = sessionContext;
         this.dataService = dataService;
         this.schemaService = schemaService;
     }
@@ -36,12 +34,12 @@ public abstract class AbstractSession implements Session {
 
     @Override
     public SessionFactory getFactory() {
-        return null;
+        return sessionContext.getFactory();
     }
 
     @Override
     public String getName() {
-        return "";
+        return sessionContext.getSchemaName();
     }
 
     @Override

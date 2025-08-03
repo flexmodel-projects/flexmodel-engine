@@ -16,7 +16,7 @@ public class SqlSession extends AbstractSession {
   private final Connection connection;
 
   public SqlSession(SqlContext sqlContext) {
-    super(new SqlDataService(sqlContext), new SqlSchemaService(sqlContext));
+    super(sqlContext, new SqlDataService(sqlContext), new SqlSchemaService(sqlContext));
     this.connection = sqlContext.getConnection();
   }
 
