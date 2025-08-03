@@ -153,7 +153,7 @@ public class SessionFactory {
   }
 
   private void processModels(List<SchemaObject> models, Session session) {
-    Map<String, SchemaObject> wrapperMap = session.getAllModels().stream().collect(Collectors.toMap(SchemaObject::getName, m -> m));
+    Map<String, SchemaObject> wrapperMap = session.schema().getAllModels().stream().collect(Collectors.toMap(SchemaObject::getName, m -> m));
     for (SchemaObject model : models) {
       SchemaObject older = wrapperMap.get(model.getName());
       if (older != null && Objects.equals(older.getIdl(), model.getIdl())) {
@@ -177,8 +177,8 @@ public class SessionFactory {
 
   private void updateEnum(Session session, EnumDefinition newer) {
     try {
-      session.dropModel(newer.getName());
-      session.createEnum(newer);
+      session.schema().dropModel(newer.getName());
+      session.schema().createEnum(newer);
     } catch (Exception e) {
       log.warn("Error processing model: {}", e.getMessage(), e);
     }
@@ -186,7 +186,7 @@ public class SessionFactory {
 
   private void updateEntity(Session session, EntityDefinition newer, EntityDefinition older) throws Exception {
     try {
-      session.createEntity(newer.clone());
+      session.schema().createEntity(newer.clone());
     } catch (Exception e) {
       if (older != null) {
         updateEntityFields(session, newer, older);
@@ -198,9 +198,9 @@ public class SessionFactory {
     newer.getFields().forEach(field -> {
       try {
         if (older.getField(field.getName()) == null) {
-          session.createField(field);
+          session.schema().createField(field);
         } else if (!field.equals(older.getField(field.getName()))) {
-          session.modifyField(field);
+          session.schema().modifyField(field);
         }
       } catch (Exception e) {
         log.warn("Error updating field: {}", e.getMessage(), e);
@@ -211,7 +211,7 @@ public class SessionFactory {
   private void processImportData(List<ImportDescribe.ImportData> data, Session session) {
     data.forEach(item -> {
       try {
-        session.insertAll(item.getModelName(), item.getValues());
+        session.data().insertAll(item.getModelName(), item.getValues());
       } catch (Exception e) {
         log.warn("Error importing data: {}", e.getMessage());
       }

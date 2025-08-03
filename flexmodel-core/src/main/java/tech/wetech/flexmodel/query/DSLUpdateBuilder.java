@@ -95,9 +95,9 @@ public class DSLUpdateBuilder {
     }
 
     if (whereId != null) {
-      return session.updateById(modelName, values, whereId);
+      return session.data().updateById(modelName, values, whereId);
     } else if (whereCondition != null) {
-      return session.update(modelName, values, whereCondition);
+      return session.data().update(modelName, values, whereCondition);
     } else {
       throw new IllegalStateException("WHERE condition must be specified using where() or whereId() method");
     }

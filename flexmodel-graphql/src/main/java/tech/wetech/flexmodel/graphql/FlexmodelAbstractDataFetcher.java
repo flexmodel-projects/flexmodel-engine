@@ -55,8 +55,8 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
   }
 
   protected List<Map<String, Object>> findRelationDataList(Session session, DataFetchingEnvironment env, String path, String modelName, RelationField relationField, Object id) {
-    EntityDefinition entity = (EntityDefinition) session.getModel(relationField.getModelName());
-    EntityDefinition targetEntity = (EntityDefinition) session.getModel(relationField.getFrom());
+    EntityDefinition entity = (EntityDefinition) session.schema().getModel(relationField.getModelName());
+    EntityDefinition targetEntity = (EntityDefinition) session.schema().getModel(relationField.getFrom());
     path = path == null ? relationField.getName() : path + "/" + relationField.getName();
     List<SelectedField> selectedFields = env.getSelectionSet().getFields(path + "/*");
     List<RelationField> relationFields = new ArrayList<>();

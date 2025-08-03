@@ -24,7 +24,7 @@ public class FlexmodelMutationDeleteByIdDataFetcher extends FlexmodelAbstractDat
     Object id = getArgument(environment, ID);
     try (Session session = sessionFactory.createSession(schemaName)) {
 
-      EntityDefinition entity = (EntityDefinition) session.getModel(modelName);
+      EntityDefinition entity = (EntityDefinition) session.schema().getModel(modelName);
       Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
 
       Map<String, Object> data = session.dsl()

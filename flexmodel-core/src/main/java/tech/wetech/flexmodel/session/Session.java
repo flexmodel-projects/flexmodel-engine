@@ -1,14 +1,14 @@
 package tech.wetech.flexmodel.session;
 
-import tech.wetech.flexmodel.operation.DataOperations;
-import tech.wetech.flexmodel.query.SchemaOperations;
+import tech.wetech.flexmodel.service.DataService;
+import tech.wetech.flexmodel.service.SchemaService;
 
 import java.io.Closeable;
 
 /**
  * @author cjbi
  */
-public interface Session extends SchemaOperations, DataOperations, Closeable {
+public interface Session extends Closeable {
 
   /**
    * 开启事务
@@ -39,14 +39,14 @@ public interface Session extends SchemaOperations, DataOperations, Closeable {
    *
    * @return 数据操作对象
    */
-  DataOperations data();
+  DataService data();
 
   /**
    * 获取模型操作对象
    *
    * @return 模型操作对象
    */
-  SchemaOperations schema();
+  SchemaService schema();
 
   DSL dsl();
 

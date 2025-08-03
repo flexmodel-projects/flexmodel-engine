@@ -111,7 +111,7 @@ public class LazyLoadInterceptor {
               ParameterizedType returnType = (ParameterizedType) method.getGenericReturnType();
               Class<?> returnGenericType = (Class<?>) returnType.getActualTypeArguments()[0];
               localValue = castValueType(relationField.getFrom(), relationField.getForeignField(), localValue);
-              List<?> list = session.find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(localValue), returnGenericType);
+              List<?> list = session.data().find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(localValue), returnGenericType);
               invokeSetter(proxy, list, clazz, fieldName, method.getReturnType());
               return list;
             }
@@ -121,7 +121,7 @@ public class LazyLoadInterceptor {
             }
             try (Session session = sessionContext.getFactory().createSession(sessionContext.getSchemaName())) {
               localValue = castValueType(relationField.getFrom(), relationField.getForeignField(), localValue);
-              List<?> list = session.find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(localValue), method.getReturnType());
+              List<?> list = session.data().find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(localValue), method.getReturnType());
               if (list.isEmpty()) {
                 return null;
               }

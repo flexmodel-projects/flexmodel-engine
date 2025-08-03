@@ -72,12 +72,12 @@ public class DSLDeleteBuilder {
     }
 
     if (whereId != null) {
-      return session.deleteById(modelName, whereId);
+      return session.data().deleteById(modelName, whereId);
     } else if (whereCondition != null) {
-      return session.delete(modelName, whereCondition);
+      return session.data().delete(modelName, whereCondition);
     } else {
       // 如果没有WHERE条件，删除所有记录
-      return session.deleteAll(modelName);
+      return session.data().deleteAll(modelName);
     }
   }
 

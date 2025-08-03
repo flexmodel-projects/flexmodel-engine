@@ -194,7 +194,7 @@ public class DSLQueryBuilder {
     if (modelName == null) {
       throw new IllegalStateException("Model name or entity class must be specified using from() method");
     }
-    return session.find(modelName, query, resultType);
+    return session.data().find(modelName, query, resultType);
   }
 
   /**
@@ -229,7 +229,7 @@ public class DSLQueryBuilder {
     if (modelName == null) {
       throw new IllegalStateException("Model name or entity class must be specified using from() method");
     }
-    return session.count(modelName, query);
+    return session.data().count(modelName, query);
   }
 
   /**

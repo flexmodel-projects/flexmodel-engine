@@ -1,4 +1,4 @@
-package tech.wetech.flexmodel.operation;
+package tech.wetech.flexmodel.service;
 
 import tech.wetech.flexmodel.query.Query;
 import tech.wetech.flexmodel.query.expr.Predicate;
@@ -8,11 +8,11 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 /**
- * Data Operations
+ * 数据服务
  *
  * @author cjbi
  */
-public interface DataOperations {
+public interface DataService {
 
   /**
    * Insert a record
@@ -107,19 +107,6 @@ public interface DataOperations {
       rows += insert(modelName, record);
     }
     return rows;
-  }
-
-  /**
-   * Find records based on conditions
-   *
-   * @param modelName          Model name
-   * @param queryUnaryOperator Query unary operator
-   * @return List of records
-   */
-  default <T> List<T> find(String modelName, UnaryOperator<Query> queryUnaryOperator, Class<T> resultType) {
-    Query query = new Query();
-    queryUnaryOperator.apply(query);
-    return find(modelName, query, resultType);
   }
 
   default <T> List<T> find(String modelName, Predicate predicate, Class<T> resultType) {

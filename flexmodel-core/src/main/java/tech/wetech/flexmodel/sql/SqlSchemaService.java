@@ -2,9 +2,11 @@ package tech.wetech.flexmodel.sql;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.wetech.flexmodel.ModelRepository;
 import tech.wetech.flexmodel.model.*;
 import tech.wetech.flexmodel.model.field.*;
-import tech.wetech.flexmodel.query.SchemaOperations;
+import tech.wetech.flexmodel.service.BaseService;
+import tech.wetech.flexmodel.service.SchemaService;
 
 import java.util.Iterator;
 import java.util.List;
@@ -15,32 +17,36 @@ import java.util.stream.Collectors;
 /**
  * @author cjbi
  */
-public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOperations {
+public class SqlSchemaService extends BaseService implements SchemaService {
 
-  private final Logger log = LoggerFactory.getLogger(SqlSchemaOperations.class);
+  private final Logger log = LoggerFactory.getLogger(SqlSchemaService.class);
+  private final SqlContext sessionContext;
+  private final ModelRepository modelRepository;
 
-  public SqlSchemaOperations(SqlContext sqlContext) {
-    super(sqlContext);
+  public SqlSchemaService(SqlContext sessionContext) {
+    super(sessionContext);
+    this.sessionContext = sessionContext;
+    this.modelRepository = sessionContext.getModelRepository();
   }
 
   @Override
   public List<SchemaObject> syncModels() {
-    return sqlContext.getMappedModels().syncFromDatabase(sqlContext);
+    return sessionContext.getModelRepository().syncFromDatabase(sessionContext);
   }
 
   @Override
   public List<SchemaObject> syncModels(Set<String> modelNames) {
-    return sqlContext.getMappedModels().syncFromDatabase(sqlContext, modelNames);
+    return sessionContext.getModelRepository().syncFromDatabase(sessionContext, modelNames);
   }
 
   @Override
   public List<SchemaObject> getAllModels() {
-    return sqlContext.getMappedModels().findAll(sqlContext.getSchemaName());
+    return sessionContext.getModelRepository().findAll(sessionContext.getSchemaName());
   }
 
   @Override
   public SchemaObject getModel(String modelName) {
-    return sqlContext.getModel(modelName);
+    return sessionContext.getModel(modelName);
   }
 
   @Override
@@ -49,38 +55,44 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
     if (model instanceof EntityDefinition entity) {
       dropTable(toSqlTable(entity));
     }
+    modelRepository.delete(sessionContext.getSchemaName(), modelName);
   }
 
   @Override
   public EntityDefinition createEntity(EntityDefinition collection) {
     SqlTable sqlTable = toSqlTable(collection);
     createTable(sqlTable);
+    // 保存到ModelRepository中
+    modelRepository.save(sessionContext.getSchemaName(), collection);
     return collection;
   }
 
   @Override
   public NativeQueryDefinition createNativeQueryModel(NativeQueryDefinition model) {
+    modelRepository.save(sessionContext.getSchemaName(), model);
     return model;
   }
 
   @Override
   public EnumDefinition createEnum(EnumDefinition anEnum) {
+    // 保存到ModelRepository中
+    modelRepository.save(sessionContext.getSchemaName(), anEnum);
     return anEnum;
   }
 
   private void createTable(SqlTable sqlTable) {
-    String[] sqlCreateString = sqlContext.getSqlDialect().getTableExporter().getSqlCreateString(sqlTable);
+    String[] sqlCreateString = sessionContext.getSqlDialect().getTableExporter().getSqlCreateString(sqlTable);
     for (String sql : sqlCreateString) {
-      sqlContext.getJdbcOperations().update(sql);
+      sessionContext.getJdbcOperations().update(sql);
     }
     createUniqueKeys(sqlTable);
     createIndexes(sqlTable);
   }
 
   private void dropTable(SqlTable sqlTable) {
-    String[] sqlDropString = sqlContext.getSqlDialect().getTableExporter().getSqlDropString(sqlTable);
+    String[] sqlDropString = sessionContext.getSqlDialect().getTableExporter().getSqlDropString(sqlTable);
     for (String sql : sqlDropString) {
-      sqlContext.getJdbcOperations().update(sql);
+      sessionContext.getJdbcOperations().update(sql);
     }
   }
 
@@ -88,6 +100,12 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   public TypedField<?, ?> createField(TypedField<?, ?> field) {
     if (!(field instanceof RelationField)) {
       createColumn(toSqlColumn(field));
+    }
+    // 更新实体定义，添加新字段
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(field.getModelName());
+    if (entity != null) {
+      entity.addField(field);
+      modelRepository.save(sessionContext.getSchemaName(), entity);
     }
     return field;
   }
@@ -98,6 +116,13 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
       if (!(field instanceof RelationField)) {
         modifyColumn(toSqlColumn(field));
       }
+      // 更新实体定义，修改字段
+      EntityDefinition entity = (EntityDefinition) sessionContext.getModel(field.getModelName());
+      if (entity != null) {
+        entity.removeField(field.getName());
+        entity.addField(field);
+        modelRepository.save(sessionContext.getSchemaName(), entity);
+      }
     } catch (Exception e) {
       log.error("Modify field occurred exception： {}", e.getMessage(), e);
     }
@@ -105,8 +130,8 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   }
 
   private void modifyColumn(SqlColumn sqlColumn) {
-    String sqlAlterModifyColumnString = sqlContext.getSqlDialect().getSqlAlterTableModifyColumnString(sqlColumn);
-    sqlContext.getJdbcOperations().update(sqlAlterModifyColumnString);
+    String sqlAlterModifyColumnString = sessionContext.getSqlDialect().getSqlAlterTableModifyColumnString(sqlColumn);
+    sessionContext.getJdbcOperations().update(sqlAlterModifyColumnString);
     SqlTable sqlTable = new SqlTable();
     sqlTable.setName(sqlColumn.getTableName());
     if (sqlColumn.isUnique() && !sqlColumn.isPrimaryKey()) {
@@ -116,9 +141,9 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   }
 
   private void createColumn(SqlColumn sqlColumn) {
-    String[] sqlCreateString = sqlContext.getSqlDialect().getColumnExporter().getSqlCreateString(sqlColumn);
+    String[] sqlCreateString = sessionContext.getSqlDialect().getColumnExporter().getSqlCreateString(sqlColumn);
     for (String sql : sqlCreateString) {
-      sqlContext.getJdbcOperations().update(sql);
+      sessionContext.getJdbcOperations().update(sql);
     }
     SqlTable sqlTable = new SqlTable();
     sqlTable.setName(sqlColumn.getTableName());
@@ -131,67 +156,87 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   @Override
   public void dropField(String modelName, String fieldName) {
     dropColumn(toSqlColumn(new TypedField<>(fieldName, "unknown").setModelName(modelName)));
+
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+    entity.removeField(fieldName);
+    // 移除相关索引
+    for (IndexDefinition index : entity.getIndexes()) {
+      if (index.containsField(fieldName)) {
+        entity.removeIndex(index.getName());
+      }
+    }
+    sessionContext.getModelRepository().save(sessionContext.getSchemaName(), entity);
   }
 
   private void dropColumn(SqlColumn sqlColumn) {
-    String[] sqlDropString = sqlContext.getSqlDialect().getColumnExporter().getSqlDropString(sqlColumn);
+    String[] sqlDropString = sessionContext.getSqlDialect().getColumnExporter().getSqlDropString(sqlColumn);
     for (String sql : sqlDropString) {
-      sqlContext.getJdbcOperations().update(sql);
+      sessionContext.getJdbcOperations().update(sql);
     }
   }
 
   @Override
   public IndexDefinition createIndex(IndexDefinition index) {
     SqlIndex sqlIndex = toSqlIndex(index);
-    StandardIndexExporter indexExporter = sqlContext.getSqlDialect().getIndexExporter();
+    StandardIndexExporter indexExporter = sessionContext.getSqlDialect().getIndexExporter();
     String[] sqlCreateString = indexExporter.getSqlCreateString(sqlIndex);
     for (String sql : sqlCreateString) {
-      sqlContext.getJdbcOperations().update(sql);
+      sessionContext.getJdbcOperations().update(sql);
     }
+
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(index.getModelName());
+    entity.addIndex(index);
+
+    modelRepository.save(sessionContext.getSchemaName(), entity);
     return index;
   }
 
   @Override
   public void dropIndex(String modelName, String indexName) {
-    StandardIndexExporter indexExporter = sqlContext.getSqlDialect().getIndexExporter();
+    StandardIndexExporter indexExporter = sessionContext.getSqlDialect().getIndexExporter();
     SqlIndex sqlIndex = toSqlIndex(new IndexDefinition(modelName, indexName));
     String[] sqlDropString = indexExporter.getSqlDropString(sqlIndex);
     for (String sql : sqlDropString) {
-      sqlContext.getJdbcOperations().update(sql);
+      sessionContext.getJdbcOperations().update(sql);
     }
+
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+    entity.removeIndex(indexName);
+    modelRepository.save(sessionContext.getSchemaName(), entity);
+
   }
 
 
   @Override
   public void createSequence(String sequenceKey, int initialValue, int incrementSize) {
     String sequenceName = toPhysicalSequenceString(sequenceKey);
-    String[] sqlCreateString = sqlContext.getSqlDialect().getSequenceExporter().getSqlCreateString(new SqlSequence(sequenceName, initialValue, incrementSize));
+    String[] sqlCreateString = sessionContext.getSqlDialect().getSequenceExporter().getSqlCreateString(new SqlSequence(sequenceName, initialValue, incrementSize));
     for (String sql : sqlCreateString) {
-      sqlContext.getJdbcOperations().update(sql);
+      sessionContext.getJdbcOperations().update(sql);
     }
   }
 
   @Override
   public void dropSequence(String sequenceKey) {
     String sequenceName = toPhysicalSequenceString(sequenceKey);
-    String[] sqlDropString = sqlContext.getSqlDialect().getSequenceExporter().getSqlDropString(new SqlSequence(sequenceName, 0, 1));
+    String[] sqlDropString = sessionContext.getSqlDialect().getSequenceExporter().getSqlDropString(new SqlSequence(sequenceName, 0, 1));
     for (String sql : sqlDropString) {
-      sqlContext.getJdbcOperations().update(sql);
+      sessionContext.getJdbcOperations().update(sql);
     }
   }
 
   @Override
   public long getSequenceNextVal(String sequenceName) {
-    return sqlContext.getSqlDialect().getSequenceNextVal(sequenceName, sqlContext.getJdbcOperations());
+    return sessionContext.getSqlDialect().getSequenceNextVal(sequenceName, sessionContext.getJdbcOperations());
   }
 
   private void createIndexes(SqlTable sqlTable) {
     Iterator<SqlIndex> itr = sqlTable.getIndexIterator();
     while (itr.hasNext()) {
       SqlIndex index = itr.next();
-      String[] sqlCreateString = sqlContext.getSqlDialect().getIndexExporter().getSqlCreateString(index);
+      String[] sqlCreateString = sessionContext.getSqlDialect().getIndexExporter().getSqlCreateString(index);
       for (String sql : sqlCreateString) {
-        sqlContext.getJdbcOperations().update(sql);
+        sessionContext.getJdbcOperations().update(sql);
       }
     }
   }
@@ -200,9 +245,9 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
     Iterator<SqlUniqueKey> ukItr = sqlTable.getUniqueKeyIterator();
     while (ukItr.hasNext()) {
       SqlUniqueKey uniqueKey = ukItr.next();
-      String[] sqlCreateString = sqlContext.getSqlDialect().getUniqueKeyExporter().getSqlCreateString(uniqueKey);
+      String[] sqlCreateString = sessionContext.getSqlDialect().getUniqueKeyExporter().getSqlCreateString(uniqueKey);
       for (String sql : sqlCreateString) {
-        sqlContext.getJdbcOperations().update(sql);
+        sessionContext.getJdbcOperations().update(sql);
       }
     }
   }
@@ -245,7 +290,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
         toPhysicalTableString(relationField.getFrom())
       );
       associationColumn.setSqlTypeCode(
-        sqlContext.getTypeHandler(((EntityDefinition) getModel(field.getModelName())).findIdField().orElseThrow()
+        sessionContext.getTypeHandler(((EntityDefinition) getModel(field.getModelName())).findIdField().orElseThrow()
           .getType()).getJdbcTypeCode()
       );
       return associationColumn;
@@ -255,7 +300,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
       idColumn.setName(field.getName());
       idColumn.setPrimaryKey(true);
       idColumn.setUnique(true);
-      idColumn.setSqlTypeCode(sqlContext.getTypeHandler(field.getType()).getJdbcTypeCode());
+      idColumn.setSqlTypeCode(sessionContext.getTypeHandler(field.getType()).getJdbcTypeCode());
       idColumn.setAutoIncrement(Objects.equals(field.getDefaultValue(), GeneratedValue.AUTO_INCREMENT));
       idColumn.setComment(field.getComment());
       return idColumn;
@@ -264,7 +309,7 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
       aSqlColumn.setUnique(field.isUnique());
       aSqlColumn.setName(field.getName());
 
-      aSqlColumn.setSqlTypeCode(sqlContext.getTypeHandler(field.getType()).getJdbcTypeCode());
+      aSqlColumn.setSqlTypeCode(sessionContext.getTypeHandler(field.getType()).getJdbcTypeCode());
       // fixme support large Objects
       aSqlColumn.setNullable(field.isNullable());
       aSqlColumn.setComment(field.getComment());
@@ -286,12 +331,12 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
         }
         case JSONField jsonField -> {
           if (field.getDefaultValue() != null && !(field.getDefaultValue() instanceof GeneratedValue)) {
-            aSqlColumn.setDefaultValue(sqlContext.getJsonObjectConverter().toJsonString(jsonField.getDefaultValue()));
+            aSqlColumn.setDefaultValue(sessionContext.getJsonObjectConverter().toJsonString(jsonField.getDefaultValue()));
           }
         }
         case BooleanField booleanField -> {
           if (field.getDefaultValue() != null && !(field.getDefaultValue() instanceof GeneratedValue)) {
-            aSqlColumn.setDefaultValue(sqlContext.getSqlDialect().toBooleanValueString((Boolean) booleanField.getDefaultValue()));
+            aSqlColumn.setDefaultValue(sessionContext.getSqlDialect().toBooleanValueString((Boolean) booleanField.getDefaultValue()));
           }
         }
         default -> {
@@ -331,10 +376,11 @@ public class SqlSchemaOperations extends BaseSqlStatement implements SchemaOpera
   }
 
   private String toPhysicalTableString(String name) {
-    EntityDefinition model = (EntityDefinition) sqlContext.getModel(name);
+    EntityDefinition model = (EntityDefinition) sessionContext.getModel(name);
     if (model == null) {
       return name;
     }
     return model.getName();
   }
+
 }

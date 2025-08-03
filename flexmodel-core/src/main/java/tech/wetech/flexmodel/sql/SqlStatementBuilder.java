@@ -16,11 +16,11 @@ import static tech.wetech.flexmodel.query.Query.Join.JoinType.LEFT_JOIN;
 /**
  * @author cjbi
  */
-public abstract class BaseSqlStatement {
+public class SqlStatementBuilder {
 
   protected final SqlContext sqlContext;
 
-  public BaseSqlStatement(SqlContext sqlContext) {
+  public SqlStatementBuilder(SqlContext sqlContext) {
     this.sqlContext = sqlContext;
   }
 

@@ -39,7 +39,7 @@ public class FlexmodelListDataFetcher extends FlexmodelAbstractDataFetcher<List<
     Map<String, Object> where = getArgument(env, WHERE);
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     try (Session session = sessionFactory.createSession(schemaName)) {
-      EntityDefinition entity = (EntityDefinition) session.getModel(modelName);
+      EntityDefinition entity = (EntityDefinition) session.schema().getModel(modelName);
       List<RelationField> relationFields = new ArrayList<>();
 
       String whereString = null;

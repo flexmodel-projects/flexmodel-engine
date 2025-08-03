@@ -2,17 +2,19 @@ package tech.wetech.flexmodel.sql;
 
 import tech.wetech.flexmodel.ExpressionCalculator;
 import tech.wetech.flexmodel.ExpressionCalculatorException;
-import tech.wetech.flexmodel.ModelRepository;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.ModelDefinition;
 import tech.wetech.flexmodel.model.NativeQueryDefinition;
 import tech.wetech.flexmodel.model.field.Field;
 import tech.wetech.flexmodel.model.field.RelationField;
 import tech.wetech.flexmodel.model.field.TypedField;
-import tech.wetech.flexmodel.operation.DataOperations;
 import tech.wetech.flexmodel.query.Query;
 import tech.wetech.flexmodel.query.QueryHelper;
+import tech.wetech.flexmodel.reflect.LazyObjProxy;
 import tech.wetech.flexmodel.reflect.ReflectionUtils;
+import tech.wetech.flexmodel.service.BaseService;
+import tech.wetech.flexmodel.service.DataService;
+import tech.wetech.flexmodel.sql.SqlStatementBuilder.Pair;
 import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 import tech.wetech.flexmodel.sql.type.SqlResultHandler;
 import tech.wetech.flexmodel.sql.type.SqlTypeHandler;
@@ -24,47 +26,65 @@ import java.util.stream.Collectors;
 /**
  * @author cjbi
  */
-public class SqlDataOperations extends BaseSqlStatement implements DataOperations {
+public class SqlDataService extends BaseService implements DataService {
 
-  private final String schemaName;
   private final SqlExecutor sqlExecutor;
-  private final ModelRepository mappedModels;
   private final SqlDialect sqlDialect;
   private final ExpressionCalculator<SqlClauseResult> sqlExpressionCalculator;
   private final Map<String, SqlTypeHandler<?>> typeHandlerMap;
+  private final SqlStatementBuilder builder;
+  private final SqlContext sessionContext;
 
-  public SqlDataOperations(SqlContext sqlContext) {
-    super(sqlContext);
-    this.schemaName = sqlContext.getSchemaName();
-    this.sqlExecutor = sqlContext.getJdbcOperations();
-    this.mappedModels = sqlContext.getMappedModels();
-    this.sqlDialect = sqlContext.getSqlDialect();
-    this.sqlExpressionCalculator = sqlContext.getConditionCalculator();
-    this.typeHandlerMap = sqlContext.getTypeHandlerMap();
+  public SqlDataService(SqlContext sessionContext) {
+    super(sessionContext);
+    this.sqlExecutor = sessionContext.getJdbcOperations();
+    this.sqlDialect = sessionContext.getSqlDialect();
+    this.sqlExpressionCalculator = sessionContext.getConditionCalculator();
+    this.typeHandlerMap = sessionContext.getTypeHandlerMap();
+    this.sessionContext = sessionContext;
+    this.builder = new SqlStatementBuilder(sessionContext);
   }
 
   @Override
   public int insert(String modelName, Object objR) {
-    Map<String, Object> record = ReflectionUtils.toClassBean(sqlContext.getJsonObjectConverter(), objR, Map.class);
-    String sql = getInsertSqlString(modelName, record);
-    EntityDefinition entity = (EntityDefinition) sqlContext.getModel(modelName);
-    Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
-    if (idFieldOptional.isPresent()) {
-      TypedField<?, ?> idField = idFieldOptional.get();
-      if (record.get(idField.getName()) != null) {
-        // ID already provided in the record, just insert
+    Map<String, Object> data = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
+    Map<String, Object> processedData = generateValue(modelName, data, false);
+
+    try {
+      Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), processedData, Map.class);
+      String sql = getInsertSqlString(modelName, record);
+      EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+      Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
+      if (idFieldOptional.isPresent()) {
+        TypedField<?, ?> idField = idFieldOptional.get();
+        if (record.get(idField.getName()) != null) {
+          // ID already provided in the record, just insert
+          return sqlExecutor.update(sql, record);
+        }
+        // Auto-generate ID and put it back into the record
+        if (sqlDialect.useFirstGeneratedId()) {
+          return sqlExecutor.updateAndReturnFirstGeneratedKeys(sql, record, generatedId ->
+            record.put(idField.getName(), generatedId));
+        }
+        return sqlExecutor.updateAndReturnGeneratedKeys(sql, record,
+          new String[]{sqlDialect.getGeneratedKeyName(idField.getName())}, keys ->
+            record.put(idField.getName(), keys.getFirst()));
+      } else {
         return sqlExecutor.update(sql, record);
       }
-      // Auto-generate ID and put it back into the record
-      if (sqlDialect.useFirstGeneratedId()) {
-        return sqlExecutor.updateAndReturnFirstGeneratedKeys(sql, record, generatedId ->
-          record.put(idField.getName(), generatedId));
+    } finally {
+      // 获取生成的ID（如果有的话）
+      EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+      Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
+      Object id = null;
+      if (idFieldOptional.isPresent()) {
+        id = processedData.get(idFieldOptional.get().getName());
+        // 将生成的ID放回到原始的data map中
+        data.put(idFieldOptional.get().getName(), id);
       }
-      return sqlExecutor.updateAndReturnGeneratedKeys(sql, record,
-        new String[]{sqlDialect.getGeneratedKeyName(idField.getName())}, keys ->
-          record.put(idField.getName(), keys.getFirst()));
-    } else {
-      return sqlExecutor.update(sql, record);
+
+      // 处理关联关系
+      insertRelationRecord(modelName, data, id);
     }
   }
 
@@ -85,9 +105,12 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
 
   @Override
   public int updateById(String modelName, Object objR, Object id) {
-    Map<String, Object> record = ReflectionUtils.toClassBean(sqlContext.getJsonObjectConverter(), objR, Map.class);
+    Map<String, Object> data = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
+    Map<String, Object> processedData = generateValue(modelName, data, true);
+
+    Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), processedData, Map.class);
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-    EntityDefinition entity = (EntityDefinition) sqlContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
 
     StringBuilder sql = new StringBuilder("update ")
@@ -113,9 +136,11 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
 
   @Override
   public int update(String modelName, Object objR, String filter) {
-    Map<String, Object> record = ReflectionUtils.toClassBean(sqlContext.getJsonObjectConverter(), objR, Map.class);
+    Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
+    Map<String, Object> processedData = generateValue(modelName, record, true);
+
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-    EntityDefinition entity = (EntityDefinition) sqlContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     SqlClauseResult sqlResult = getSqlCauseResult(filter);
 
@@ -123,7 +148,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
       .append(physicalTableName)
       .append(" set ");
     StringJoiner assignment = new StringJoiner(", ");
-    record.keySet().stream()
+    processedData.keySet().stream()
       .filter(col -> !col.equals(idField.getName()))
       .forEach(col -> assignment.add(sqlDialect.quoteIdentifier(col) + "=:" + col));
     sql.append(assignment);
@@ -139,7 +164,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   @Override
   public <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-    EntityDefinition entity = (EntityDefinition) sqlContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     String columnsString = entity.getFields().stream()
       .filter(f -> !(f instanceof RelationField))
@@ -154,46 +179,48 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
                  " where (" + sqlDialect.quoteIdentifier(idField.getName()) + "= :id)";
     Map<String, Object> dataMap = sqlExecutor.queryForObject(sql, Map.of("id", id), getSqlResultHandler(entity, null, Map.class));
     if (nestedQuery && dataMap != null) {
-      QueryHelper.nestedQuery(List.of(dataMap), this::findMapList, (ModelDefinition) sqlContext.getModel(modelName), null, sqlContext, sqlContext.getNestedQueryMaxDepth());
+      QueryHelper.nestedQuery(List.of(dataMap), this::findMapList, (ModelDefinition) sessionContext.getModel(modelName), null, sessionContext, sessionContext.getNestedQueryMaxDepth());
     }
-    return ReflectionUtils.toClassBean(sqlContext.getJsonObjectConverter(), dataMap, resultType);
+    T result = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), dataMap, resultType);
+    return LazyObjProxy.createProxy(result, modelName, sessionContext);
   }
 
   @Override
   @SuppressWarnings("all")
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
-    Pair<String, Map<String, Object>> pair = toQuerySqlWithPrepared(modelName, query);
-    List mapList = sqlExecutor.queryForList(pair.first(), pair.second(), getSqlResultHandler((ModelDefinition) sqlContext.getModel(modelName), query, Map.class));
+    Pair<String, Map<String, Object>> pair = builder.toQuerySqlWithPrepared(modelName, query);
+    List mapList = sqlExecutor.queryForList(pair.first(), pair.second(), getSqlResultHandler((ModelDefinition) sessionContext.getModel(modelName), query, Map.class));
     if (query.isNestedEnabled()) {
-      QueryHelper.nestedQuery(mapList, this::findMapList, (ModelDefinition) sqlContext.getModel(modelName), query, sqlContext, sqlContext.getNestedQueryMaxDepth());
+      QueryHelper.nestedQuery(mapList, this::findMapList, (ModelDefinition) sessionContext.getModel(modelName), query, sessionContext, sessionContext.getNestedQueryMaxDepth());
     }
-    return ReflectionUtils.toClassBeanList(sqlContext.getJsonObjectConverter(), mapList, resultType);
+    List<T> results = ReflectionUtils.toClassBeanList(sessionContext.getJsonObjectConverter(), mapList, resultType);
+    return LazyObjProxy.createProxyList(results, modelName, sessionContext);
   }
 
   @Override
   public <T> List<T> findByNativeQueryStatement(String statement, Object objR, Class<T> resultType) {
-    Map<String, Object> params = ReflectionUtils.toClassBean(sqlContext.getJsonObjectConverter(), objR, Map.class);
+    Map<String, Object> params = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
     List<Map<String, Object>> list = sqlExecutor.queryForList(StringHelper.replacePlaceholder(statement), params);
-    return ReflectionUtils.toClassBeanList(sqlContext.getJsonObjectConverter(), list, resultType);
+    return ReflectionUtils.toClassBeanList(sessionContext.getJsonObjectConverter(), list, resultType);
   }
 
   @Override
   public <T> List<T> findByNativeQueryModel(String modelName, Object params, Class<T> resultType) {
-    NativeQueryDefinition model = (NativeQueryDefinition) sqlContext.getModel(modelName);
+    NativeQueryDefinition model = (NativeQueryDefinition) sessionContext.getModel(modelName);
     String statement = model.getStatement();
     return findByNativeQueryStatement(statement, params, resultType);
   }
 
   @SuppressWarnings("all")
   private List<Map<String, Object>> findMapList(String modelName, Query query) {
-    Pair<String, Map<String, Object>> pair = toQuerySqlWithPrepared(modelName, query);
-    List list = sqlExecutor.queryForList(pair.first(), pair.second(), getSqlResultHandler((ModelDefinition) sqlContext.getModel(modelName), query, Map.class));
+    Pair<String, Map<String, Object>> pair = builder.toQuerySqlWithPrepared(modelName, query);
+    List list = sqlExecutor.queryForList(pair.first(), pair.second(), getSqlResultHandler((ModelDefinition) sessionContext.getModel(modelName), query, Map.class));
     return list;
   }
 
   @Override
   public long count(String modelName, Query query) {
-    Pair<String, Map<String, Object>> pair = toQuerySqlWithPrepared(modelName, query);
+    Pair<String, Map<String, Object>> pair = builder.toQuerySqlWithPrepared(modelName, query);
     String sql = "select count(*) from(" + pair.first() + ") tmp_count";
     return sqlExecutor.queryForScalar(sql, pair.second(), Long.class);
   }
@@ -201,7 +228,7 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   @Override
   public int deleteById(String modelName, Object id) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-    EntityDefinition entity = (EntityDefinition) sqlContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     String sql = "delete from " +
                  physicalTableName +
@@ -259,12 +286,12 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
         sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler(), null);
         if (value instanceof Query.QueryField queryField) {
           if (queryField.getAliasName() != null) {
-            ModelDefinition queryModel = (ModelDefinition) sqlContext.getModel(queryField.getAliasName());
+            ModelDefinition queryModel = (ModelDefinition) sessionContext.getModel(queryField.getAliasName());
             Field field = queryModel != null
               ? queryModel.getField(queryField.getFieldName())
               : model.getField(queryField.getFieldName());
             if (field instanceof TypedField<?, ?> typedField) {
-              sqlResultHandler.addSqlTypeHandler(key, sqlContext.getTypeHandler(typedField.getType()), null);
+              sqlResultHandler.addSqlTypeHandler(key, sessionContext.getTypeHandler(typedField.getType()), null);
             } else {
               sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler(), null);
             }
@@ -272,10 +299,10 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
             sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler(), null);
           }
           Field field = queryField.getAliasName() != null
-            ? ((ModelDefinition) sqlContext.getModel(queryField.getAliasName())).getField(queryField.getFieldName())
+            ? ((ModelDefinition) sessionContext.getModel(queryField.getAliasName())).getField(queryField.getFieldName())
             : model.getField(queryField.getFieldName());
           if (field instanceof TypedField<?, ?> typedField) {
-            sqlResultHandler.addSqlTypeHandler(key, sqlContext.getTypeHandler(typedField.getType()), field);
+            sqlResultHandler.addSqlTypeHandler(key, sessionContext.getTypeHandler(typedField.getType()), field);
           } else {
             sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler(), null);
           }
@@ -288,11 +315,15 @@ public class SqlDataOperations extends BaseSqlStatement implements DataOperation
   }
 
   private String toPhysicalTablenameQuoteString(String name) {
-    EntityDefinition entity = (EntityDefinition) sqlContext.getModel(name);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(name);
     if (entity == null) {
       return sqlDialect.quoteIdentifier(name);
     }
     return sqlDialect.quoteIdentifier(entity.getName());
   }
 
+  @Override
+  public DataService getDataService() {
+    return this;
+  }
 }

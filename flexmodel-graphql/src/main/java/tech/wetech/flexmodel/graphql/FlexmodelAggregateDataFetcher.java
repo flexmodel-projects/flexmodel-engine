@@ -36,7 +36,7 @@ public class FlexmodelAggregateDataFetcher extends FlexmodelAbstractDataFetcher<
     Map<String, Object> where = getArgument(env, WHERE);
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     try (Session session = sessionFactory.createSession(schemaName)) {
-      EntityDefinition entity = (EntityDefinition) session.getModel(modelName);
+      EntityDefinition entity = (EntityDefinition) session.schema().getModel(modelName);
 
       String whereString = null;
       if (where != null) {

@@ -54,7 +54,7 @@ public class DSLInsertBuilder {
     if (values == null) {
       throw new IllegalStateException("Values must be specified using values() method");
     }
-    return session.insert(modelName, values);
+    return session.data().insert(modelName, values);
   }
 
   /**

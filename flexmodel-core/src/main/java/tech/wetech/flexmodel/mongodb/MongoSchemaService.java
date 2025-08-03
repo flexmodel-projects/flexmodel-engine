@@ -10,7 +10,8 @@ import tech.wetech.flexmodel.ModelRepository;
 import tech.wetech.flexmodel.model.*;
 import tech.wetech.flexmodel.model.field.TypedField;
 import tech.wetech.flexmodel.query.Direction;
-import tech.wetech.flexmodel.query.SchemaOperations;
+import tech.wetech.flexmodel.service.BaseService;
+import tech.wetech.flexmodel.service.SchemaService;
 import tech.wetech.flexmodel.sql.StringHelper;
 
 import java.util.ArrayList;
@@ -21,43 +22,46 @@ import java.util.stream.Collectors;
 /**
  * @author cjbi
  */
-public class MongoSchemaOperations extends BaseMongoStatement implements SchemaOperations {
+public class MongoSchemaService extends BaseService implements SchemaService {
 
   private final String schemaName;
   private final MongoDatabase mongoDatabase;
-  private final ModelRepository mappedModels;
+  private final ModelRepository modelRepository;
+  private final MongoContext sessionContext;
 
-  public MongoSchemaOperations(MongoContext mongoContext) {
-    super(mongoContext);
-    this.schemaName = mongoContext.getSchemaName();
-    this.mongoDatabase = mongoContext.getMongoDatabase();
-    this.mappedModels = mongoContext.getMappedModels();
+  public MongoSchemaService(MongoContext sessionContext) {
+    super(sessionContext);
+    this.schemaName = sessionContext.getSchemaName();
+    this.mongoDatabase = sessionContext.getMongoDatabase();
+    this.modelRepository = sessionContext.getModelRepository();
+    this.sessionContext = sessionContext;
   }
 
   @Override
   public List<SchemaObject> syncModels() {
-    return mongoContext.getMappedModels().syncFromDatabase(mongoContext);
+    return sessionContext.getModelRepository().syncFromDatabase(sessionContext);
   }
 
   @Override
   public List<SchemaObject> syncModels(Set<String> modelNames) {
-    return mongoContext.getMappedModels().syncFromDatabase(mongoContext, modelNames);
+    return sessionContext.getModelRepository().syncFromDatabase(sessionContext, modelNames);
   }
 
   @Override
   public List<SchemaObject> getAllModels() {
-    return mappedModels.findAll(mongoContext.getSchemaName());
+    return modelRepository.findAll(sessionContext.getSchemaName());
   }
 
   @Override
   public SchemaObject getModel(String modelName) {
-    return mappedModels.find(schemaName, modelName);
+    return modelRepository.find(schemaName, modelName);
   }
 
   @Override
   public void dropModel(String modelName) {
     String collectionName = getCollectionName(modelName);
     mongoDatabase.getCollection(collectionName).drop();
+    modelRepository.delete(schemaName, modelName);
   }
 
   @Override
@@ -73,16 +77,21 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
       index.addField(idField.getName());
       createIndex(index);
     });
+    // 保存到ModelRepository中
+    modelRepository.save(schemaName, collection);
     return collection;
   }
 
   @Override
   public NativeQueryDefinition createNativeQueryModel(NativeQueryDefinition model) {
+    modelRepository.save(schemaName, model);
     return model;
   }
 
   @Override
   public EnumDefinition createEnum(EnumDefinition anEnum) {
+    // 保存到ModelRepository中
+    modelRepository.save(schemaName, anEnum);
     return anEnum;
   }
 
@@ -94,18 +103,36 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
       index.addField(field.getName());
       createIndex(index);
     }
+    // 更新实体定义，添加新字段
+    EntityDefinition entity = (EntityDefinition) modelRepository.find(schemaName, field.getModelName());
+    if (entity != null) {
+      entity.addField(field);
+      modelRepository.save(schemaName, entity);
+    }
     return field;
   }
 
   @Override
   public TypedField<?, ?> modifyField(TypedField<?, ?> field) {
     // mongodb无需修改schema
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(field.getModelName());
+    entity.removeField(field.getName());
+    entity.addField(field);
+    modelRepository.save(schemaName, entity);
     return field;
   }
 
   @Override
   public void dropField(String modelName, String fieldName) {
-    // ignored
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+    entity.removeField(fieldName);
+    // 移除相关索引
+    for (IndexDefinition index : entity.getIndexes()) {
+      if (index.containsField(fieldName)) {
+        entity.removeIndex(index.getName());
+      }
+    }
+    sessionContext.getModelRepository().save(schemaName, entity);
   }
 
   @Override
@@ -122,6 +149,9 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
     indexOptions.name(getPhysicalIndexName(index));
     indexOptions.unique(index.isUnique());
     mongoDatabase.getCollection(collectionName).createIndex(Indexes.compoundIndex(indexes), indexOptions);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(index.getModelName());
+    entity.addIndex(index);
+    modelRepository.save(schemaName, entity);
     return index;
   }
 
@@ -139,6 +169,9 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   public void dropIndex(String modelName, String indexName) {
     String collectionName = getCollectionName(modelName);
     mongoDatabase.getCollection(collectionName).dropIndex(indexName);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+    entity.removeIndex(indexName);
+    sessionContext.getModelRepository().save(schemaName, entity);
   }
 
   @Override
@@ -153,7 +186,7 @@ public class MongoSchemaOperations extends BaseMongoStatement implements SchemaO
   }
 
   private String getCollectionName(String modelName) {
-    EntityDefinition model = (EntityDefinition) mongoContext.getModel(modelName);
+    EntityDefinition model = (EntityDefinition) sessionContext.getModel(modelName);
     if (model == null) {
       return modelName;
     }

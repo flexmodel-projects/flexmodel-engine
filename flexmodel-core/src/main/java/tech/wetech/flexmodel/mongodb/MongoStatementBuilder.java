@@ -18,11 +18,11 @@ import static tech.wetech.flexmodel.query.Query.Join.JoinType.INNER_JOIN;
 /**
  * @author cjbi
  */
-abstract class BaseMongoStatement {
+class MongoStatementBuilder {
 
   protected final MongoContext mongoContext;
 
-  BaseMongoStatement(MongoContext mongoContext) {
+  MongoStatementBuilder(MongoContext mongoContext) {
     this.mongoContext = mongoContext;
   }
 

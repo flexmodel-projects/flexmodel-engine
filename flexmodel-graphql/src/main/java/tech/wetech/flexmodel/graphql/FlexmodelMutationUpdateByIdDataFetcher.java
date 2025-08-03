@@ -27,7 +27,7 @@ public class FlexmodelMutationUpdateByIdDataFetcher extends FlexmodelAbstractDat
 
     try (Session session = sessionFactory.createSession(schemaName)) {
 
-      EntityDefinition entity = (EntityDefinition) session.getModel(modelName);
+      EntityDefinition entity = (EntityDefinition) session.schema().getModel(modelName);
       Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
 
       Map<String, Object> data = session.dsl()

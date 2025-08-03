@@ -1,4 +1,4 @@
-package tech.wetech.flexmodel.query;
+package tech.wetech.flexmodel.service;
 
 import tech.wetech.flexmodel.model.*;
 import tech.wetech.flexmodel.model.field.TypedField;
@@ -8,11 +8,11 @@ import java.util.Set;
 import java.util.function.UnaryOperator;
 
 /**
- * Schema执行器
+ * Schema服务
  *
  * @author cjbi
  */
-public interface SchemaOperations {
+public interface SchemaService {
 
   /**
    * 同步模型变更

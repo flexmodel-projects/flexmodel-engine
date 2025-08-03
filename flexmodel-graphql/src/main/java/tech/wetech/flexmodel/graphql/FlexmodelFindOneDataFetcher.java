@@ -35,7 +35,7 @@ public class FlexmodelFindOneDataFetcher extends FlexmodelAbstractDataFetcher<Ma
     Map<String, Object> where = getArgument(env, WHERE);
     final String filter = where != null ? jsonObjectConverter.toJsonString(where) : null;
     try (Session session = sessionFactory.createSession(schemaName)) {
-      EntityDefinition entity = (EntityDefinition) session.getModel(modelName);
+      EntityDefinition entity = (EntityDefinition) session.schema().getModel(modelName);
       TypedField<?, ?> idField = entity.findIdField().orElseThrow();
 
       List<RelationField> relationFields = new ArrayList<>();

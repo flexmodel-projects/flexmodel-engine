@@ -59,10 +59,10 @@ public abstract class AbstractSessionContext {
     if (model != null) {
       return model;
     }
-    return this.getMappedModels().find(getSchemaName(), name);
+    return this.getModelRepository().find(getSchemaName(), name);
   }
 
-  public ModelRepository getMappedModels() {
+  public ModelRepository getModelRepository() {
     return mappedModels;
   }
 
