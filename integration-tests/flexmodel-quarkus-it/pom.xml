@@ -97,7 +97,6 @@
             </schema>
             <target>
               <packageName>tech.wetech.flexmodel</packageName>
-              <directory>src/main/test222</directory>
             </target>
           </generator>
         </configuration>
