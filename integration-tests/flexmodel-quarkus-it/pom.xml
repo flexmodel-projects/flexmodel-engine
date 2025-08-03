@@ -93,7 +93,7 @@
           <generator>
             <schema>
               <name>system</name>
-              <import-script>src/main/resource/import.idl</import-script>
+              <import-script>src/main/resources/import.idl</import-script>
             </schema>
             <target>
               <packageName>tech.wetech.flexmodel</packageName>
