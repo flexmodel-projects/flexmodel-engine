@@ -6,6 +6,7 @@ import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.ModelDefinition;
 import tech.wetech.flexmodel.model.NativeQueryDefinition;
 import tech.wetech.flexmodel.model.field.Field;
+import tech.wetech.flexmodel.model.field.GeneratedValue;
 import tech.wetech.flexmodel.model.field.RelationField;
 import tech.wetech.flexmodel.model.field.TypedField;
 import tech.wetech.flexmodel.query.Query;
@@ -90,11 +91,20 @@ public class SqlDataService extends BaseService implements DataService {
 
   private String getInsertSqlString(String modelName, Map<String, Object> record) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+    Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
     StringJoiner columns = new StringJoiner(", ", "(", ")");
     StringJoiner values = new StringJoiner(", ", "(", ")");
     record.forEach((key, value) -> {
-      columns.add(sqlDialect.quoteIdentifier(key));
-      values.add(":" + key);
+      if (idFieldOptional.isPresent() && key.equals(idFieldOptional.get().getName())) {
+        if (!Objects.equals(idFieldOptional.get().getDefaultValue(), GeneratedValue.AUTO_INCREMENT)) {
+          columns.add(sqlDialect.quoteIdentifier(key));
+          values.add(":" + key);
+        }
+      } else if (entity.getField(key) != null) {
+        columns.add(sqlDialect.quoteIdentifier(key));
+        values.add(":" + key);
+      }
     });
     return "insert into " +
            physicalTableName +
