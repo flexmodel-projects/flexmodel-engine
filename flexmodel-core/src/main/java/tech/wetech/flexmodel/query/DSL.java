@@ -22,8 +22,17 @@ class DSL {
    *
    * @return DSL查询构建器
    */
-  public DSLQueryBuilder select() {
-    return new DSLQueryBuilder(session);
+  public DSLQueryBuilder selectFrom(String modelName) {
+    return new DSLQueryBuilder(session).select().from(modelName);
+  }
+
+  /**
+   * 创建DSL查询构建器
+   *
+   * @return DSL查询构建器
+   */
+  public <T> TypedDSLQueryBuilder<T> selectFrom(Class<T> entityClass) {
+    return new TypedDSLQueryBuilder<>(selectFrom(getModelNameFromClass(entityClass)), entityClass);
   }
 
   /**
