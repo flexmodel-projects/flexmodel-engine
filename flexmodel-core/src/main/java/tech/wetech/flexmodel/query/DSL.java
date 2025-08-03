@@ -1,7 +1,7 @@
-package tech.wetech.flexmodel.session;
+package tech.wetech.flexmodel.query;
 
 import tech.wetech.flexmodel.annotation.ModelClass;
-import tech.wetech.flexmodel.query.*;
+import tech.wetech.flexmodel.session.Session;
 
 import java.util.function.UnaryOperator;
 
@@ -53,6 +53,21 @@ class DSL {
   public <T> TypedDSLInsertBuilder<T> insertInto(Class<T> entityClass) {
     return new TypedDSLInsertBuilder<>(insertInto(getModelNameFromClass(entityClass)), entityClass);
   }
+
+  /**
+   * 设置要合并的模型名称
+   */
+  public DSLMergeBuilder mergeInto(String modelName) {
+    return new DSLMergeBuilder(session).mergeInto(modelName);
+  }
+
+  /**
+   * 设置要合并的实体类
+   */
+  public <T> TypedDSLMergeBuilder<T> mergeInto(Class<T> entityClass) {
+    return new TypedDSLMergeBuilder<>(mergeInto(getModelNameFromClass(entityClass)), entityClass);
+  }
+
 
   /**
    * 设置要更新的模型名称

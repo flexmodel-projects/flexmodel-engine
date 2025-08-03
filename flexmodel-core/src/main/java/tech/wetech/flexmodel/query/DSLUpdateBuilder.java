@@ -2,7 +2,9 @@ package tech.wetech.flexmodel.query;
 
 import tech.wetech.flexmodel.annotation.ModelClass;
 import tech.wetech.flexmodel.query.expr.Predicate;
+import tech.wetech.flexmodel.reflect.ReflectionUtils;
 import tech.wetech.flexmodel.session.Session;
+import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,8 +53,9 @@ public class DSLUpdateBuilder {
   /**
    * 设置多个字段的值
    */
-  public DSLUpdateBuilder values(Map<String, Object> values) {
-    this.values.putAll(values);
+  public DSLUpdateBuilder values(Object values) {
+    Map<String, Object> data = ReflectionUtils.toClassBean(new JacksonObjectConverter(), values, Map.class);
+    this.values.putAll(data);
     return this;
   }
 

@@ -1,5 +1,6 @@
 package tech.wetech.flexmodel.session;
 
+import tech.wetech.flexmodel.query.DSL;
 import tech.wetech.flexmodel.service.DataService;
 import tech.wetech.flexmodel.service.SchemaService;
 

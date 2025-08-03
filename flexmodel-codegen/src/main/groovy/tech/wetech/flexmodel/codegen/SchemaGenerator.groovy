@@ -30,11 +30,12 @@ class SchemaGenerator extends AbstractGenerator {
     out.println "import tech.wetech.flexmodel.codegen.ObjectUtils;"
     out.println "import tech.wetech.flexmodel.BuildItem;"
     out.println "import tech.wetech.flexmodel.model.EntityDefinition;"
+    out.println "import tech.wetech.flexmodel.model.EnumDefinition;"
     out.println "import tech.wetech.flexmodel.model.SchemaObject;"
     out.println "import tech.wetech.flexmodel.ImportDescribe;"
-    modelClassList.each {
-      out.println "import ${rootPackage}.dsl.${it.shortClassName}DSL;"
-    }
+    /* modelClassList.each {
+       out.println "import ${rootPackage}.dsl.${it.shortClassName}DSL;"
+     }*/
 
     out.println ""
     out.println "import java.util.ArrayList;"
@@ -48,15 +49,15 @@ class SchemaGenerator extends AbstractGenerator {
 
     out.println "public class ${className} implements BuildItem {"
 
-    modelClassList.each { model ->
-      out.println ""
-      if (model.comment) {
-        out.println "  /**"
-        out.println "   * ${model.comment}"
-        out.println "   */"
-      }
-      out.println "  public static final ${model.shortClassName}DSL ${model.variableName} = new ${model.shortClassName}DSL();"
-    }
+//    modelClassList.each { model ->
+//      out.println ""
+//      if (model.comment) {
+//        out.println "  /**"
+//        out.println "   * ${model.comment}"
+//        out.println "   */"
+//      }
+//      out.println "  public static final ${model.shortClassName}DSL ${model.variableName} = new ${model.shortClassName}DSL();"
+//    }
     out.println ""
     out.println "  @Override"
     out.println "  public String getSchemaName() {"
@@ -71,7 +72,7 @@ class SchemaGenerator extends AbstractGenerator {
       out.println "      EntityDefinition ${model.variableName} = (EntityDefinition) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.original)}\");"
     }
     context.enumClassList.each { model ->
-      out.println "      EntityDefinition ${model.variableName} = (EntityDefinition) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.original)}\");"
+      out.println "      EnumDefinition ${model.variableName} = (EnumDefinition) ObjectUtils.deserialize(\"${ObjectUtils.serialize(model.original)}\");"
     }
     modelClassList.each { model ->
       out.println "      list.add(${model.variableName});"
