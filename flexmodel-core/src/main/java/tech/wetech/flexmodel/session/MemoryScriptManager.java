@@ -26,9 +26,13 @@ public class MemoryScriptManager {
    * 从BuildItem加载脚本到内存
    */
   public void loadScriptsFromBuildItems() {
-    log.info("开始从BuildItem加载脚本到内存...");
-    ServiceLoader.load(BuildItem.class).forEach(this::loadScriptFromBuildItem);
-    log.info("BuildItem脚本加载完成，共加载 {} 个schema", schemaScripts.size());
+    try {
+      log.info("开始从BuildItem加载脚本到内存...");
+      ServiceLoader.load(BuildItem.class).forEach(this::loadScriptFromBuildItem);
+      log.info("BuildItem脚本加载完成，共加载 {} 个schema", schemaScripts.size());
+    } catch (Exception e) {
+      log.error("从BuildItem加载脚本到内存出错", e);
+    }
   }
 
   /**
@@ -55,13 +59,6 @@ public class MemoryScriptManager {
    */
   public Set<String> getSchemaNames() {
     return schemaScripts.keySet();
-  }
-
-  /**
-   * 检查schema是否有脚本配置
-   */
-  public boolean hasScriptConfig(String schemaName) {
-    return schemaScripts.containsKey(schemaName);
   }
 
   /**
