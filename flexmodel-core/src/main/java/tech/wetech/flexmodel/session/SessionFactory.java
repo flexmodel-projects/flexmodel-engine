@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  */
 public class SessionFactory {
 
-  private final ModelRepository mappedModels;
+  private final ModelRepository modelRepository;
   private final Map<String, DataSourceProvider> dataSourceProviders = new HashMap<>();
   private final Cache cache;
   private final Logger log = LoggerFactory.getLogger(SessionFactory.class);
@@ -48,12 +48,12 @@ public class SessionFactory {
     this.memoryScriptManager = new MemoryScriptManager();
     addDataSourceProvider(defaultDataSourceProvider);
     dataSourceProviders.forEach(this::addDataSourceProvider);
-    this.mappedModels = initializeMappedModels(defaultDataSourceProvider);
+    this.modelRepository = initializeModelRepository(defaultDataSourceProvider);
     this.failsafe = failsafe;
     processBuildItem();
   }
 
-  private ModelRepository initializeMappedModels(DataSourceProvider dataSourceProvider) {
+  private ModelRepository initializeModelRepository(DataSourceProvider dataSourceProvider) {
     if (dataSourceProvider instanceof JdbcDataSourceProvider jdbcDataSourceProvider) {
       return new CachingModelRepository(new JdbcModelRepository(jdbcDataSourceProvider.dataSource(), jsonObjectConverter), cache);
     } else if (dataSourceProvider instanceof MongoDataSourceProvider) {
@@ -223,7 +223,7 @@ public class SessionFactory {
   }
 
   public List<SchemaObject> getModels(String schemaName) {
-    return mappedModels.findAll(schemaName);
+    return modelRepository.findAll(schemaName);
   }
 
   public Cache getCache() {
@@ -258,13 +258,13 @@ public class SessionFactory {
       return switch (dataSourceProviders.get(id)) {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
-          SqlContext sqlContext = new SqlContext(id, new NamedParameterSqlExecutor(connection), mappedModels, jsonObjectConverter, this);
+          SqlContext sqlContext = new SqlContext(id, new NamedParameterSqlExecutor(connection), modelRepository, jsonObjectConverter, this);
           sqlContext.setFailsafe(true);
           yield new SqlSession(sqlContext);
         }
         case MongoDataSourceProvider mongodb -> {
           MongoDatabase mongoDatabase = mongodb.mongoDatabase();
-          MongoContext mongoContext = new MongoContext(id, mongoDatabase, mappedModels, jsonObjectConverter, this);
+          MongoContext mongoContext = new MongoContext(id, mongoDatabase, modelRepository, jsonObjectConverter, this);
           mongoContext.setFailsafe(true);
           yield new MongoSession(mongoContext);
         }
@@ -284,12 +284,12 @@ public class SessionFactory {
       return switch (dataSourceProviders.get(identifier)) {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
-          SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), mappedModels, jsonObjectConverter, this);
+          SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), modelRepository, jsonObjectConverter, this);
           yield new SqlSession(sqlContext);
         }
         case MongoDataSourceProvider mongodb -> {
           MongoDatabase mongoDatabase = mongodb.mongoDatabase();
-          MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, mappedModels, jsonObjectConverter, this);
+          MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, modelRepository, jsonObjectConverter, this);
           yield new MongoSession(mongoContext);
         }
         case null,
