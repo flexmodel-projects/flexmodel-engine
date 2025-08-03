@@ -51,11 +51,12 @@ public class MongoDataService extends BaseService implements DataService {
 
     Map<String, Object> data = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
     Map<String, Object> processedData = generateValue(modelName, data, false);
+
     try {
       Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), processedData, Map.class);
       EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
       TypedField<?, ?> idField = entity.findIdField().orElseThrow();
-      if (!record.containsKey(idField.getName()) && idField.getDefaultValue().equals(GeneratedValue.AUTO_INCREMENT)) {
+      if (GeneratedValue.AUTO_INCREMENT.equals(idField.getDefaultValue())) {
         setId(modelName, record);
       }
       String collectionName = getCollectionName(modelName);

@@ -57,7 +57,8 @@ public abstract class BaseService {
         continue;
       }
       Object value = newData.get(field.getName());
-      if (field.getDefaultValue() != null && newData.containsKey(field.getName())) {
+      if (field.getDefaultValue() != null) {
+        // 修复：对于有默认值的字段，无论是否在输入数据中存在，都应该生成默认值
         newData.put(field.getName(), generateFieldValue(field, value, isUpdate));
       }
     }
@@ -71,7 +72,7 @@ public abstract class BaseService {
   }
 
   protected Object generateFieldValue(TypedField<?, ?> field, Object value, boolean isUpdate) {
-    if (!isUpdate && value == null) {
+    if (value == null) {
       if (Objects.equals(field.getDefaultValue(), GeneratedValue.ULID)) {
         return ULID.random().toString();
       } else if (Objects.equals(field.getDefaultValue(), GeneratedValue.UUID)) {
