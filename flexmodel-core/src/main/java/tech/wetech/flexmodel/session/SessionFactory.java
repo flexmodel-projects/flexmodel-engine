@@ -57,9 +57,7 @@ public class SessionFactory {
     if (dataSourceProvider instanceof JdbcDataSourceProvider jdbcDataSourceProvider) {
       return new CachingModelRepository(new JdbcModelRepository(jdbcDataSourceProvider.dataSource(), jsonObjectConverter), cache);
     } else if (dataSourceProvider instanceof MongoDataSourceProvider) {
-      InMemoryModelRepository inMemoryRepo = new InMemoryModelRepository();
-      inMemoryRepo.setMemoryScriptManager(memoryScriptManager);
-      return inMemoryRepo;
+      return new InMemoryModelRepository();
     } else {
       throw new IllegalArgumentException("Unsupported DataSourceProvider");
     }
@@ -76,6 +74,10 @@ public class SessionFactory {
     memoryScriptManager.getSchemaNames().forEach(schemaName -> {
       MemoryScriptManager.SchemaScriptConfig config = memoryScriptManager.getScriptConfig(schemaName);
       config.getSchema().forEach(model -> cache.put(schemaName + ":" + model.getName(), model));
+      try (Session session = createFailsafeSession(schemaName)) {
+        processModels(config.getSchema(), session);
+        processImportData(config.getData(), session);
+      }
     });
   }
 
