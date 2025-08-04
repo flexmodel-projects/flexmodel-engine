@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.JsonObjectConverter;
 
 import java.io.IOException;
@@ -21,6 +23,7 @@ import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_
  */
 public class JacksonObjectConverter implements JsonObjectConverter {
 
+  private static final Logger log = LoggerFactory.getLogger(JacksonObjectConverter.class);
   private final JsonMapper jsonMapper;
 
   public JacksonObjectConverter() {
@@ -35,7 +38,10 @@ public class JacksonObjectConverter implements JsonObjectConverter {
     builder.disable(FAIL_ON_EMPTY_BEANS);
     builder.addModule(new JavaTimeModule());
     builder.addModule(new FlexmodelCoreModule());
-    ServiceLoader.load(Module.class).forEach(builder::addModule);
+    ServiceLoader.load(Module.class).forEach(m -> {
+      log.info("[flexmodel-engine] 加载Module:{}", m.getClass().getName());
+      builder.addModule(m);
+    });
     this.jsonMapper = builder.build();
   }
 
