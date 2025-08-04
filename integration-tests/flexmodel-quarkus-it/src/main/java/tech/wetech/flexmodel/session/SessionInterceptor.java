@@ -21,7 +21,7 @@ public class SessionInterceptor {
   private static final Logger log = LoggerFactory.getLogger(SessionInterceptor.class);
 
   @jakarta.inject.Inject
-  private QuarkusSessionManager sessionManager;
+  QuarkusSessionManager sessionManager;
 
   @AroundInvoke
   public Object aroundInvoke(InvocationContext context) throws Exception {
@@ -33,11 +33,12 @@ public class SessionInterceptor {
       sessionManaged = context.getTarget().getClass().getAnnotation(SessionManaged.class);
     }
 
+    Session session;
     // 根据注解参数创建Session
     if (sessionManaged != null && !sessionManaged.schema().isEmpty()) {
-      sessionManager.getSession(sessionManaged.schema());
+      session = sessionManager.getSession(sessionManaged.schema());
     } else {
-      sessionManager.getSession(); // 使用默认Session
+      session = sessionManager.getSession(); // 使用默认Session
     }
 
     try {
@@ -50,7 +51,7 @@ public class SessionInterceptor {
       throw e;
     } finally {
       // 确保在方法执行完成后关闭Session
-      sessionManager.closeSession();
+      sessionManager.closeSession(session.getName());
       log.debug("Session closed for method: {}", context.getMethod().getName());
     }
   }

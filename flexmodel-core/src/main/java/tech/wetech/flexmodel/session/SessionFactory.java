@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 public class SessionFactory {
 
   private final ModelRepository modelRepository;
+  private final DataSourceProvider defaultDataSourceProvider;
   private final Map<String, DataSourceProvider> dataSourceProviders = new HashMap<>();
   private final Cache cache;
   private final Logger log = LoggerFactory.getLogger(SessionFactory.class);
@@ -46,6 +47,7 @@ public class SessionFactory {
     this.cache = cache;
     this.jsonObjectConverter = new JacksonObjectConverter();
     this.memoryScriptManager = new MemoryScriptManager();
+    this.defaultDataSourceProvider = defaultDataSourceProvider;
     addDataSourceProvider(defaultDataSourceProvider);
     dataSourceProviders.forEach(this::addDataSourceProvider);
     this.modelRepository = initializeModelRepository(defaultDataSourceProvider);
@@ -248,6 +250,14 @@ public class SessionFactory {
     dataSourceProviders.remove(dsId);
   }
 
+  public Session createSession() {
+    return createSession(defaultDataSourceProvider.getId());
+  }
+
+  public Session createFailsefeSession() {
+    return createFailsafeSession(defaultDataSourceProvider.getId());
+  }
+
   /**
    * 宽松模式:
    * 允许ddl语句的错误
@@ -351,5 +361,9 @@ public class SessionFactory {
    */
   public MemoryScriptManager getMemoryScriptManager() {
     return memoryScriptManager;
+  }
+
+  public String getDefaultSchema() {
+    return defaultDataSourceProvider.getId();
   }
 }
