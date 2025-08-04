@@ -18,6 +18,7 @@ public class SessionManager {
 
   protected SessionFactory sessionFactory;
   protected final ThreadLocal<Map<String, Session>> sessionMapHolder = new ThreadLocal<>();
+  protected final ThreadLocal<String> lastUsedSchemaHolder = new ThreadLocal<>();
 
   public SessionManager() {
     // 默认构造函数，用于继承
@@ -42,6 +43,8 @@ public class SessionManager {
       session = sessionFactory.createSession(schemaName);
       sessionMap.put(schemaName, session);
     }
+    // 记录最近使用的schema
+    lastUsedSchemaHolder.set(schemaName);
     return session;
   }
 
@@ -90,6 +93,7 @@ public class SessionManager {
       sessionMap.clear();
     }
     sessionMapHolder.remove();
+    lastUsedSchemaHolder.remove();
   }
 
   /**
@@ -122,6 +126,19 @@ public class SessionManager {
   public Session getCurrentSession(String schemaName) {
     Map<String, Session> sessionMap = getSessionMap();
     return sessionMap.get(schemaName);
+  }
+
+  /**
+   * 获取最近使用的Session（不创建新的）
+   *
+   * @return 最近使用的Session，如果不存在则返回null
+   */
+  public Session getCurrentSession() {
+    String lastUsedSchema = lastUsedSchemaHolder.get();
+    if (lastUsedSchema != null) {
+      return getCurrentSession(lastUsedSchema);
+    }
+    return null;
   }
 
   /**

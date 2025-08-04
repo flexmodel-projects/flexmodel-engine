@@ -98,8 +98,10 @@ public class SqlDataService extends BaseService implements DataService {
     record.forEach((key, value) -> {
       if (idFieldOptional.isPresent() && key.equals(idFieldOptional.get().getName())) {
         if (!Objects.equals(idFieldOptional.get().getDefaultValue(), GeneratedValue.AUTO_INCREMENT)) {
-          columns.add(sqlDialect.quoteIdentifier(key));
-          values.add(":" + key);
+          if (record.get(idFieldOptional.get().getName()) != null) {
+            columns.add(sqlDialect.quoteIdentifier(key));
+            values.add(":" + key);
+          }
         }
       } else if (entity.getField(key) != null) {
         columns.add(sqlDialect.quoteIdentifier(key));
