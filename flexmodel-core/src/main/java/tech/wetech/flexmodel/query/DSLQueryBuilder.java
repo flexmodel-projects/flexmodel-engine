@@ -41,9 +41,13 @@ public class DSLQueryBuilder {
   }
 
   /**
-   * 设置要查询的字段
+   * 设置要查询的字段，不传则查询所有字段
    */
   public DSLQueryBuilder select(String... fields) {
+    if (fields.length == 0) {
+      // 不存在则查询所有
+      return this;
+    }
     Query.Projection projection = new Query.Projection();
     for (String field : fields) {
       projection.addField(field, new Query.QueryField(field));
