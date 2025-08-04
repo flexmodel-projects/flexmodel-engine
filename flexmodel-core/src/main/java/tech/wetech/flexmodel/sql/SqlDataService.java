@@ -280,7 +280,7 @@ public class SqlDataService extends BaseService implements DataService {
    */
   private <T> SqlResultHandler<T> getSqlResultHandler(ModelDefinition model, Query query, Class<T> resultType) {
     SqlResultHandler<T> sqlResultHandler = new SqlResultHandler<>(resultType);
-    if (query == null || query.getProjection() == null) {
+    if (query == null || query.getProjection() == null || query.getProjection().getFields().isEmpty()) {
       for (Field field : model.getFields()) {
         if (field instanceof TypedField<?, ?> typedField) {
           sqlResultHandler.addSqlTypeHandler(field.getName(), typeHandlerMap.get(typedField.getType()), field);
