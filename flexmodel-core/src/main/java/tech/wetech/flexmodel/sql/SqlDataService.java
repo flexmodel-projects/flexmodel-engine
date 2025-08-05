@@ -6,7 +6,6 @@ import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.ModelDefinition;
 import tech.wetech.flexmodel.model.NativeQueryDefinition;
 import tech.wetech.flexmodel.model.field.Field;
-import tech.wetech.flexmodel.model.field.GeneratedValue;
 import tech.wetech.flexmodel.model.field.RelationField;
 import tech.wetech.flexmodel.model.field.TypedField;
 import tech.wetech.flexmodel.query.Query;
@@ -97,13 +96,11 @@ public class SqlDataService extends BaseService implements DataService {
     StringJoiner values = new StringJoiner(", ", "(", ")");
     record.forEach((key, value) -> {
       if (idFieldOptional.isPresent() && key.equals(idFieldOptional.get().getName())) {
-        if (!Objects.equals(idFieldOptional.get().getDefaultValue(), GeneratedValue.AUTO_INCREMENT)) {
-          if (record.get(idFieldOptional.get().getName()) != null) {
-            columns.add(sqlDialect.quoteIdentifier(key));
-            values.add(":" + key);
-          }
+        if (entity.getField(key) != null) {
+          columns.add(sqlDialect.quoteIdentifier(key));
+          values.add(":" + key);
         }
-      } else if (entity.getField(key) != null) {
+      } else {
         columns.add(sqlDialect.quoteIdentifier(key));
         values.add(":" + key);
       }
