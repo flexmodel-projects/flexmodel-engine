@@ -96,7 +96,7 @@ public class SqlDataService extends BaseService implements DataService {
     StringJoiner values = new StringJoiner(", ", "(", ")");
     record.forEach((key, value) -> {
       if (idFieldOptional.isPresent() && key.equals(idFieldOptional.get().getName())) {
-        if (entity.getField(key) != null) {
+        if (record.get(key) != null) {
           columns.add(sqlDialect.quoteIdentifier(key));
           values.add(":" + key);
         }
