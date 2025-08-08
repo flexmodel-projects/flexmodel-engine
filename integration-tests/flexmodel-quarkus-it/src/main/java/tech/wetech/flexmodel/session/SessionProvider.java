@@ -18,7 +18,7 @@ public class SessionProvider {
   private static final Logger log = LoggerFactory.getLogger(SessionProvider.class);
 
   @Inject
-  private QuarkusSessionManager sessionManager;
+  QuarkusSessionManager sessionManager;
 
   /**
    * 提供默认Session
@@ -29,7 +29,7 @@ public class SessionProvider {
   @RequestScoped
   public Session provideSession() {
     log.debug("Providing default session");
-    return sessionManager.getSession();
+    return sessionManager.getCurrentSession();
   }
 
   /**

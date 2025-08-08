@@ -38,7 +38,7 @@ public class SessionInterceptor {
     if (sessionManaged != null && !sessionManaged.schema().isEmpty()) {
       session = sessionManager.getSession(sessionManaged.schema());
     } else {
-      session = sessionManager.getSession(); // 使用默认Session
+      session = sessionManager.getCurrentSession(); // 使用默认Session
     }
 
     try {

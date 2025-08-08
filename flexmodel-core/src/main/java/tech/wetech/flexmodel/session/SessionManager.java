@@ -49,16 +49,6 @@ public class SessionManager {
   }
 
   /**
-   * 获取默认模式的Session
-   *
-   * @return Session实例
-   */
-  public Session getSession() {
-    String defaultSchema = sessionFactory.getDefaultSchema();
-    return getSession(defaultSchema);
-  }
-
-  /**
    * 关闭指定模式的Session
    *
    * @param schemaName 模式名称
@@ -118,27 +108,16 @@ public class SessionManager {
   }
 
   /**
-   * 获取指定模式的当前Session（不创建新的）
-   *
-   * @param schemaName 模式名称
-   * @return 当前Session，如果不存在则返回null
-   */
-  public Session getCurrentSession(String schemaName) {
-    Map<String, Session> sessionMap = getSessionMap();
-    return sessionMap.get(schemaName);
-  }
-
-  /**
    * 获取最近使用的Session（不创建新的）
    *
    * @return 最近使用的Session，如果不存在则返回null
    */
   public Session getCurrentSession() {
-    String lastUsedSchema = lastUsedSchemaHolder.get();
-    if (lastUsedSchema != null) {
-      return getCurrentSession(lastUsedSchema);
+    String currentSchema = lastUsedSchemaHolder.get();
+    if (currentSchema == null) {
+      currentSchema = sessionFactory.getDefaultSchema();
     }
-    return null;
+    return getSession(currentSchema);
   }
 
   /**
