@@ -9,6 +9,8 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.codegen.EnumClass;
 import tech.wetech.flexmodel.codegen.GenerationContext;
 import tech.wetech.flexmodel.codegen.ModelClass;
@@ -29,6 +31,7 @@ import static graphql.schema.idl.RuntimeWiring.newRuntimeWiring;
 public class GraphQLProvider {
   private final SessionFactory sf;
   private GraphQL graphQL;
+  private final Logger log = LoggerFactory.getLogger(GraphQLProvider.class);
 
   public GraphQLProvider(SessionFactory sessionFactory) {
     this.sf = sessionFactory;
@@ -48,24 +51,15 @@ public class GraphQLProvider {
     joinDataFetchers.put("mutation_response", joinMap);
 
     for (String schemaName : sf.getSchemaNames()) {
+      log.debug("Generation graphQL schema: {}", schemaName);
       List<SchemaObject> models = sf.getModels(schemaName);
       for (SchemaObject model : models) {
         if (model instanceof EntityDefinition entity) {
+          log.debug("Generation graphQL model: {}", model.getName());
           context.getModelClassList().add(ModelClass.buildModelClass("", schemaName, entity));
           joinDataFetchers.put(schemaName + "_" + model.getName(), joinMap);
           joinDataFetchers.put(schemaName + "_" + model.getName() + "_aggregate", joinMap);
-        } else if (model instanceof EnumDefinition andEnum) {
-          context.getEnumClassList().add(EnumClass.buildEnumClass("", schemaName, andEnum));
-        } else {
-          // todo 支持非实体类型
-        }
-      }
-    }
 
-    for (String schemaName : sf.getSchemaNames()) {
-      List<SchemaObject> models = sf.getModels(schemaName);
-      for (SchemaObject model : models) {
-        if (model instanceof EntityDefinition entity) {
           for (DataFetchers fetchType : DataFetchers.values()) {
             if (fetchType.isQuery()) {
               queryDataFetchers.put(
@@ -78,12 +72,20 @@ public class GraphQLProvider {
                 fetchType.getDataFetcherFunc().apply(schemaName, model.getName(), sf));
             }
           }
+        } else if (model instanceof EnumDefinition andEnum) {
+          log.debug("Generation graphQL model: {}", model.getName());
+          context.getEnumClassList().add(EnumClass.buildEnumClass("", schemaName, andEnum));
+        } else {
+          log.debug("Ignore model: {}", model.getName());
+          // 暂时忽略非实体类型
         }
       }
     }
 
     String schemaString = generator.generate(context).getFirst();
-
+    if (log.isDebugEnabled()) {
+      log.debug("GraphQL schema:\n{}", schemaString);
+    }
     SchemaParser schemaParser = new SchemaParser();
     TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(schemaString);
 

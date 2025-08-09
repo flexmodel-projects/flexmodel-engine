@@ -60,10 +60,10 @@ public class SqlSchemaService extends BaseService implements SchemaService {
 
   @Override
   public EntityDefinition createEntity(EntityDefinition collection) {
-    SqlTable sqlTable = toSqlTable(collection);
-    createTable(sqlTable);
     // 保存到ModelRepository中
     modelRepository.save(sessionContext.getSchemaName(), collection);
+    SqlTable sqlTable = toSqlTable(collection);
+    createTable(sqlTable);
     return collection;
   }
 
@@ -98,30 +98,30 @@ public class SqlSchemaService extends BaseService implements SchemaService {
 
   @Override
   public TypedField<?, ?> createField(TypedField<?, ?> field) {
-    if (!(field instanceof RelationField)) {
-      createColumn(toSqlColumn(field));
-    }
     // 更新实体定义，添加新字段
     EntityDefinition entity = (EntityDefinition) sessionContext.getModel(field.getModelName());
     if (entity != null) {
       entity.addField(field);
       modelRepository.save(sessionContext.getSchemaName(), entity);
     }
+    if (!(field instanceof RelationField)) {
+      createColumn(toSqlColumn(field));
+    }
     return field;
   }
 
   @Override
   public TypedField<?, ?> modifyField(TypedField<?, ?> field) {
+    // 更新实体定义，修改字段
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(field.getModelName());
+    if (entity != null) {
+      entity.removeField(field.getName());
+      entity.addField(field);
+      modelRepository.save(sessionContext.getSchemaName(), entity);
+    }
     try {
       if (!(field instanceof RelationField)) {
         modifyColumn(toSqlColumn(field));
-      }
-      // 更新实体定义，修改字段
-      EntityDefinition entity = (EntityDefinition) sessionContext.getModel(field.getModelName());
-      if (entity != null) {
-        entity.removeField(field.getName());
-        entity.addField(field);
-        modelRepository.save(sessionContext.getSchemaName(), entity);
       }
     } catch (Exception e) {
       log.error("Modify field occurred exception： {}", e.getMessage(), e);
@@ -177,33 +177,30 @@ public class SqlSchemaService extends BaseService implements SchemaService {
 
   @Override
   public IndexDefinition createIndex(IndexDefinition index) {
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(index.getModelName());
+    entity.addIndex(index);
+    modelRepository.save(sessionContext.getSchemaName(), entity);
+
     SqlIndex sqlIndex = toSqlIndex(index);
     StandardIndexExporter indexExporter = sessionContext.getSqlDialect().getIndexExporter();
     String[] sqlCreateString = indexExporter.getSqlCreateString(sqlIndex);
     for (String sql : sqlCreateString) {
       sessionContext.getJdbcOperations().update(sql);
     }
-
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(index.getModelName());
-    entity.addIndex(index);
-
-    modelRepository.save(sessionContext.getSchemaName(), entity);
     return index;
   }
 
   @Override
   public void dropIndex(String modelName, String indexName) {
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+    entity.removeIndex(indexName);
+    modelRepository.save(sessionContext.getSchemaName(), entity);
     StandardIndexExporter indexExporter = sessionContext.getSqlDialect().getIndexExporter();
     SqlIndex sqlIndex = toSqlIndex(new IndexDefinition(modelName, indexName));
     String[] sqlDropString = indexExporter.getSqlDropString(sqlIndex);
     for (String sql : sqlDropString) {
       sessionContext.getJdbcOperations().update(sql);
     }
-
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
-    entity.removeIndex(indexName);
-    modelRepository.save(sessionContext.getSchemaName(), entity);
-
   }
 
 

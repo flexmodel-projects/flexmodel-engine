@@ -27,11 +27,11 @@ public class MemoryScriptManager {
    */
   public void loadScriptsFromBuildItems() {
     try {
-      log.info("开始从BuildItem加载脚本到内存...");
+      log.info("Start loading scripts from BuildItem to memory...");
       ServiceLoader.load(BuildItem.class).forEach(this::loadScriptFromBuildItem);
-      log.info("BuildItem脚本加载完成，共加载 {} 个schema", schemaScripts.size());
+      log.info("The BuildItem script is loaded, loading a total of {} schemas", schemaScripts.size());
     } catch (Error e) {
-      log.error("从BuildItem加载脚本到内存出错", e);
+      log.error("From BuildItem loading script to memory error: ", e);
     }
   }
 
@@ -44,7 +44,7 @@ public class MemoryScriptManager {
     List<ImportDescribe.ImportData> data = buildItem.getData();
 
     schemaScripts.put(schemaName, new SchemaScriptConfig(schemaName, schema, data));
-    log.info("加载schema: {}, 模型数量: {}, 数据项数量: {}", schemaName, schema.size(), data.size());
+    log.info("Load schema: {}, Number of models: {}, Number of data items: {}", schemaName, schema.size(), data.size());
   }
 
   /**
