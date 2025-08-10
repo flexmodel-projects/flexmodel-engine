@@ -83,8 +83,8 @@ public class GraphQLProvider {
     }
 
     String schemaString = generator.generate(context).getFirst();
-    if (log.isDebugEnabled()) {
-      log.debug("GraphQL schema:\n{}", schemaString);
+    if (log.isTraceEnabled()) {
+      log.trace("GraphQL schema:\n{}", schemaString);
     }
     SchemaParser schemaParser = new SchemaParser();
     TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(schemaString);
