@@ -9,7 +9,7 @@ import tech.wetech.flexmodel.model.field.RelationField;
 import tech.wetech.flexmodel.naming.PhysicalNamingStrategy;
 import tech.wetech.flexmodel.query.Direction;
 import tech.wetech.flexmodel.query.Query;
-import tech.wetech.flexmodel.query.QueryHelper;
+import tech.wetech.flexmodel.service.BaseService;
 
 import java.util.*;
 
@@ -18,11 +18,12 @@ import static tech.wetech.flexmodel.query.Query.Join.JoinType.INNER_JOIN;
 /**
  * @author cjbi
  */
-class MongoStatementBuilder {
+class MongoStatementBuilder extends BaseService {
 
   protected final MongoContext mongoContext;
 
   MongoStatementBuilder(MongoContext mongoContext) {
+    super(mongoContext);
     this.mongoContext = mongoContext;
   }
 
@@ -82,7 +83,7 @@ class MongoStatementBuilder {
 
   private void addProjectionStage(List<Document> pipeline, ModelDefinition model, Query query) {
     Document project = new Document("_id", false);
-    Map<String, RelationField> relationFields = QueryHelper.findRelationFields(model, query);
+    Map<String, RelationField> relationFields = findRelationFields(model, query);
     boolean hasAggFunc = false;
 
     Query.Projection projection = query.getProjection();
@@ -194,7 +195,7 @@ class MongoStatementBuilder {
   }
 
   protected List<Document> createPipeline(String modelName, Query query) {
-    QueryHelper.validate(mongoContext, modelName, query);
+    validateQuery(modelName, query);
     ModelDefinition model = (ModelDefinition) mongoContext.getModel(modelName);
     PhysicalNamingStrategy physicalNamingStrategy = mongoContext.getPhysicalNamingStrategy();
     List<Document> pipeline = new ArrayList<>();

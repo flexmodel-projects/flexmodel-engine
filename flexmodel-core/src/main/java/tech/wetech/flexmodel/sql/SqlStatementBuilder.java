@@ -5,7 +5,7 @@ import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.ModelDefinition;
 import tech.wetech.flexmodel.model.field.RelationField;
 import tech.wetech.flexmodel.query.Query;
-import tech.wetech.flexmodel.query.QueryHelper;
+import tech.wetech.flexmodel.service.BaseService;
 import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 
 import java.util.*;
@@ -16,11 +16,12 @@ import static tech.wetech.flexmodel.query.Query.Join.JoinType.LEFT_JOIN;
 /**
  * @author cjbi
  */
-public class SqlStatementBuilder {
+public class SqlStatementBuilder extends BaseService {
 
   protected final SqlContext sqlContext;
 
   public SqlStatementBuilder(SqlContext sqlContext) {
+    super(sqlContext);
     this.sqlContext = sqlContext;
   }
 
@@ -29,7 +30,7 @@ public class SqlStatementBuilder {
   }
 
   private Pair<String, Map<String, Object>> buildQuerySql(String modelName, Query query) {
-    QueryHelper.validate(sqlContext, modelName, query);
+    validateQuery(modelName, query);
     Map<String, Object> params = new HashMap<>();
     ModelDefinition model = (ModelDefinition) sqlContext.getModel(modelName);
     StringBuilder sqlBuilder = new StringBuilder("\nselect ");
@@ -139,7 +140,7 @@ public class SqlStatementBuilder {
   private void appendProjection(String modelName, Query query, ModelDefinition model, Map<String, String> projectionMap, StringBuilder sqlBuilder) {
     SqlDialect sqlDialect = sqlContext.getSqlDialect();
     Query.Projection projection = query.getProjection();
-    Map<String, RelationField> relationFields = QueryHelper.findRelationFields(model, query);
+    Map<String, RelationField> relationFields = findRelationFields(model, query);
     StringJoiner columns = new StringJoiner(", ");
     if (projection != null && !projection.getFields().isEmpty()) {
       projection.getFields().forEach((key, value) -> {

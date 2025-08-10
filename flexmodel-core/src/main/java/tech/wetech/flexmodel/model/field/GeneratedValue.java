@@ -43,4 +43,11 @@ public class GeneratedValue implements Serializable {
   public String getName() {
     return name;
   }
+
+  @Override
+  public String toString() {
+    return "GeneratedValue{" +
+           "name='" + name + '\'' +
+           '}';
+  }
 }
