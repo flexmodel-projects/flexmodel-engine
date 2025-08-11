@@ -3,7 +3,7 @@ package tech.wetech.flexmodel.sql;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.JsonObjectConverter;
-import tech.wetech.flexmodel.ModelRepository;
+import tech.wetech.flexmodel.ModelRegistry;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.IndexDefinition;
 import tech.wetech.flexmodel.model.ModelDefinition;
@@ -29,14 +29,14 @@ import static tech.wetech.flexmodel.model.field.ScalarType.STRING;
 /**
  * @author cjbi
  */
-public class JdbcModelRepository implements ModelRepository {
-  public static final String STORED_TABLES = "fe_models";
+public class JdbcModelRegistry implements ModelRegistry {
+  public static final String STORED_TABLES = "fe_model_registry";
   private final DataSource dataSource;
   private final SqlDialect sqlDialect;
-  private final Logger log = LoggerFactory.getLogger(JdbcModelRepository.class);
+  private final Logger log = LoggerFactory.getLogger(JdbcModelRegistry.class);
   private final JsonObjectConverter jsonObjectConverter;
 
-  public JdbcModelRepository(DataSource dataSource, JsonObjectConverter jsonObjectConverter) {
+  public JdbcModelRegistry(DataSource dataSource, JsonObjectConverter jsonObjectConverter) {
     this.dataSource = dataSource;
     this.jsonObjectConverter = jsonObjectConverter;
     try (Connection connection = dataSource.getConnection()) {
@@ -142,19 +142,19 @@ public class JdbcModelRepository implements ModelRepository {
   }
 
   @Override
-  public List<SchemaObject> syncFromDatabase(AbstractSessionContext context) {
-    return syncFromDatabase(context, null);
+  public List<SchemaObject> loadFromDatabase(AbstractSessionContext context) {
+    return loadFromDatabase(context, null);
   }
 
   @Override
-  public List<SchemaObject> syncFromDatabase(AbstractSessionContext context, Set<String> includes) {
+  public List<SchemaObject> loadFromDatabase(AbstractSessionContext context, Set<String> includes) {
     SqlContext sqlContext = (SqlContext) context;
     List<EntityDefinition> entities = convert(sqlContext.getSqlMetadata().getTables(includes), sqlContext);
-    Map<String, SchemaObject> metaMap = findAll(sqlContext.getSchemaName()).stream().collect(Collectors.toMap(SchemaObject::getName, wrapper -> wrapper));
+    Map<String, SchemaObject> metaMap = getAllRegistered(sqlContext.getSchemaName()).stream().collect(Collectors.toMap(SchemaObject::getName, wrapper -> wrapper));
     for (EntityDefinition entity : entities) {
       SchemaObject model = getIgnoreCase(entity.getName(), metaMap);
       if (model == null) {
-        this.save(sqlContext.getSchemaName(), entity);
+        this.register(sqlContext.getSchemaName(), entity);
         metaMap.put(entity.getName(), entity);
       }
     }
@@ -373,7 +373,7 @@ public class JdbcModelRepository implements ModelRepository {
   }
 
   @Override
-  public List<SchemaObject> findAll(String schemaName) {
+  public List<SchemaObject> getAllRegistered(String schemaName) {
 
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
@@ -408,7 +408,7 @@ public class JdbcModelRepository implements ModelRepository {
   }
 
   @Override
-  public void deleteAll(String schemaName) {
+  public void unregister(String schemaName) {
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
       String sqlDeleteString = "delete from " + sqlDialect.quoteIdentifier(STORED_TABLES) +
@@ -420,7 +420,7 @@ public class JdbcModelRepository implements ModelRepository {
   }
 
   @Override
-  public void delete(String schemaName, String modelName) {
+  public void unregister(String schemaName, String modelName) {
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
       String sqlDeleteString = getDeleteString();
@@ -431,14 +431,14 @@ public class JdbcModelRepository implements ModelRepository {
   }
 
   @Override
-  public void save(String schemaName, SchemaObject object) {
+  public void register(String schemaName, SchemaObject object) {
     try (Connection connection = dataSource.getConnection()) {
       String content = jsonObjectConverter.toJsonString(object);
       log.trace("Persist:\n{}", content);
       connection.setAutoCommit(false);
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
       SchemaObject older;
-      if ((older = this.find(schemaName, object.getName())) != null) {
+      if ((older = this.getRegistered(schemaName, object.getName())) != null) {
         String oldContent = jsonObjectConverter.toJsonString(older);
         if (!oldContent.equals(content)) {
           String updateString = "update " + sqlDialect.quoteIdentifier(STORED_TABLES) + "set " + sqlDialect.quoteIdentifier("content") + "=:content" +
@@ -471,7 +471,7 @@ public class JdbcModelRepository implements ModelRepository {
   }
 
   @Override
-  public SchemaObject find(String schemaName, String modelName) {
+  public SchemaObject getRegistered(String schemaName, String modelName) {
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
       String sqlSelectString = "select " + sqlDialect.quoteIdentifier("content") +

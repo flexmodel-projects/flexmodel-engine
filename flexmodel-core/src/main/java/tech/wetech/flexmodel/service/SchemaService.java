@@ -17,9 +17,9 @@ public interface SchemaService {
   /**
    * 同步模型变更
    */
-  List<SchemaObject> syncModels();
+  List<SchemaObject> loadModels();
 
-  List<SchemaObject> syncModels(Set<String> modelNames);
+  List<SchemaObject> loadModels(Set<String> modelNames);
 
   /**
    * 获取所有模型

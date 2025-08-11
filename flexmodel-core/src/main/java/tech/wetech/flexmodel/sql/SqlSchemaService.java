@@ -2,7 +2,7 @@ package tech.wetech.flexmodel.sql;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.wetech.flexmodel.ModelRepository;
+import tech.wetech.flexmodel.ModelRegistry;
 import tech.wetech.flexmodel.model.*;
 import tech.wetech.flexmodel.model.field.*;
 import tech.wetech.flexmodel.service.BaseService;
@@ -21,27 +21,27 @@ public class SqlSchemaService extends BaseService implements SchemaService {
 
   private final Logger log = LoggerFactory.getLogger(SqlSchemaService.class);
   private final SqlContext sessionContext;
-  private final ModelRepository modelRepository;
+  private final ModelRegistry modelRegistry;
 
   public SqlSchemaService(SqlContext sessionContext) {
     super(sessionContext);
     this.sessionContext = sessionContext;
-    this.modelRepository = sessionContext.getModelRepository();
+    this.modelRegistry = sessionContext.getModelRegistry();
   }
 
   @Override
-  public List<SchemaObject> syncModels() {
-    return sessionContext.getModelRepository().syncFromDatabase(sessionContext);
+  public List<SchemaObject> loadModels() {
+    return sessionContext.getModelRegistry().loadFromDatabase(sessionContext);
   }
 
   @Override
-  public List<SchemaObject> syncModels(Set<String> modelNames) {
-    return sessionContext.getModelRepository().syncFromDatabase(sessionContext, modelNames);
+  public List<SchemaObject> loadModels(Set<String> modelNames) {
+    return sessionContext.getModelRegistry().loadFromDatabase(sessionContext, modelNames);
   }
 
   @Override
   public List<SchemaObject> getAllModels() {
-    return sessionContext.getModelRepository().findAll(sessionContext.getSchemaName());
+    return sessionContext.getModelRegistry().getAllRegistered(sessionContext.getSchemaName());
   }
 
   @Override
@@ -55,13 +55,13 @@ public class SqlSchemaService extends BaseService implements SchemaService {
     if (model instanceof EntityDefinition entity) {
       dropTable(toSqlTable(entity));
     }
-    modelRepository.delete(sessionContext.getSchemaName(), modelName);
+    modelRegistry.unregister(sessionContext.getSchemaName(), modelName);
   }
 
   @Override
   public EntityDefinition createEntity(EntityDefinition collection) {
     // 保存到ModelRepository中
-    modelRepository.save(sessionContext.getSchemaName(), collection);
+    modelRegistry.register(sessionContext.getSchemaName(), collection);
     SqlTable sqlTable = toSqlTable(collection);
     createTable(sqlTable);
     return collection;
@@ -69,14 +69,14 @@ public class SqlSchemaService extends BaseService implements SchemaService {
 
   @Override
   public NativeQueryDefinition createNativeQueryModel(NativeQueryDefinition model) {
-    modelRepository.save(sessionContext.getSchemaName(), model);
+    modelRegistry.register(sessionContext.getSchemaName(), model);
     return model;
   }
 
   @Override
   public EnumDefinition createEnum(EnumDefinition anEnum) {
     // 保存到ModelRepository中
-    modelRepository.save(sessionContext.getSchemaName(), anEnum);
+    modelRegistry.register(sessionContext.getSchemaName(), anEnum);
     return anEnum;
   }
 
@@ -102,7 +102,7 @@ public class SqlSchemaService extends BaseService implements SchemaService {
     EntityDefinition entity = (EntityDefinition) sessionContext.getModel(field.getModelName());
     if (entity != null) {
       entity.addField(field);
-      modelRepository.save(sessionContext.getSchemaName(), entity);
+      modelRegistry.register(sessionContext.getSchemaName(), entity);
     }
     if (!(field instanceof RelationField)) {
       createColumn(toSqlColumn(field));
@@ -117,7 +117,7 @@ public class SqlSchemaService extends BaseService implements SchemaService {
     if (entity != null) {
       entity.removeField(field.getName());
       entity.addField(field);
-      modelRepository.save(sessionContext.getSchemaName(), entity);
+      modelRegistry.register(sessionContext.getSchemaName(), entity);
     }
     try {
       if (!(field instanceof RelationField)) {
@@ -165,7 +165,7 @@ public class SqlSchemaService extends BaseService implements SchemaService {
         entity.removeIndex(index.getName());
       }
     }
-    sessionContext.getModelRepository().save(sessionContext.getSchemaName(), entity);
+    sessionContext.getModelRegistry().register(sessionContext.getSchemaName(), entity);
   }
 
   private void dropColumn(SqlColumn sqlColumn) {
@@ -179,7 +179,7 @@ public class SqlSchemaService extends BaseService implements SchemaService {
   public IndexDefinition createIndex(IndexDefinition index) {
     EntityDefinition entity = (EntityDefinition) sessionContext.getModel(index.getModelName());
     entity.addIndex(index);
-    modelRepository.save(sessionContext.getSchemaName(), entity);
+    modelRegistry.register(sessionContext.getSchemaName(), entity);
 
     SqlIndex sqlIndex = toSqlIndex(index);
     StandardIndexExporter indexExporter = sessionContext.getSqlDialect().getIndexExporter();
@@ -194,7 +194,7 @@ public class SqlSchemaService extends BaseService implements SchemaService {
   public void dropIndex(String modelName, String indexName) {
     EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
     entity.removeIndex(indexName);
-    modelRepository.save(sessionContext.getSchemaName(), entity);
+    modelRegistry.register(sessionContext.getSchemaName(), entity);
     StandardIndexExporter indexExporter = sessionContext.getSqlDialect().getIndexExporter();
     SqlIndex sqlIndex = toSqlIndex(new IndexDefinition(modelName, indexName));
     String[] sqlDropString = indexExporter.getSqlDropString(sqlIndex);

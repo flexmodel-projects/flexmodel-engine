@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel.cache;
 
-import tech.wetech.flexmodel.ModelRepository;
+import tech.wetech.flexmodel.ModelRegistry;
 import tech.wetech.flexmodel.model.SchemaObject;
 import tech.wetech.flexmodel.session.AbstractSessionContext;
 
@@ -9,23 +9,23 @@ import java.util.*;
 /**
  * @author cjbi
  */
-public class InMemoryModelRepository implements ModelRepository {
+public class InMemoryModelRegistry implements ModelRegistry {
 
   private final Map<String, Map<String, SchemaObject>> map = new HashMap<>();
 
   @Override
-  public List<SchemaObject> syncFromDatabase(AbstractSessionContext context) {
+  public List<SchemaObject> loadFromDatabase(AbstractSessionContext context) {
     // ignore
     return Collections.emptyList();
   }
 
   @Override
-  public List<SchemaObject> syncFromDatabase(AbstractSessionContext sqlContext, Set<String> includes) {
+  public List<SchemaObject> loadFromDatabase(AbstractSessionContext sqlContext, Set<String> includes) {
     return Collections.emptyList();
   }
 
   @Override
-  public List<SchemaObject> findAll(String schemaName) {
+  public List<SchemaObject> getAllRegistered(String schemaName) {
     List<SchemaObject> result = new ArrayList<>();
 
     // 从内存映射中获取
@@ -38,17 +38,17 @@ public class InMemoryModelRepository implements ModelRepository {
   }
 
   @Override
-  public void deleteAll(String schemaName) {
+  public void unregister(String schemaName) {
     map.clear();
   }
 
   @Override
-  public void delete(String schemaName, String modelName) {
+  public void unregister(String schemaName, String modelName) {
     map.get(schemaName).remove(modelName);
   }
 
   @Override
-  public void save(String schemaName, SchemaObject object) {
+  public void register(String schemaName, SchemaObject object) {
     map.compute(schemaName, (key, value) -> {
       if (value == null) {
         value = new HashMap<>();
@@ -59,7 +59,7 @@ public class InMemoryModelRepository implements ModelRepository {
   }
 
   @Override
-  public SchemaObject find(String schemaName, String modelName) {
+  public SchemaObject getRegistered(String schemaName, String modelName) {
     // 从内存映射中查找
     return map.getOrDefault(schemaName, Collections.emptyMap()).get(modelName);
   }

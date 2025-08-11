@@ -6,7 +6,7 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import tech.wetech.flexmodel.ModelRepository;
+import tech.wetech.flexmodel.ModelRegistry;
 import tech.wetech.flexmodel.model.*;
 import tech.wetech.flexmodel.model.field.TypedField;
 import tech.wetech.flexmodel.query.Direction;
@@ -26,48 +26,48 @@ public class MongoSchemaService extends BaseService implements SchemaService {
 
   private final String schemaName;
   private final MongoDatabase mongoDatabase;
-  private final ModelRepository modelRepository;
+  private final ModelRegistry modelRegistry;
   private final MongoContext sessionContext;
 
   public MongoSchemaService(MongoContext sessionContext) {
     super(sessionContext);
     this.schemaName = sessionContext.getSchemaName();
     this.mongoDatabase = sessionContext.getMongoDatabase();
-    this.modelRepository = sessionContext.getModelRepository();
+    this.modelRegistry = sessionContext.getModelRegistry();
     this.sessionContext = sessionContext;
   }
 
   @Override
-  public List<SchemaObject> syncModels() {
-    return sessionContext.getModelRepository().syncFromDatabase(sessionContext);
+  public List<SchemaObject> loadModels() {
+    return sessionContext.getModelRegistry().loadFromDatabase(sessionContext);
   }
 
   @Override
-  public List<SchemaObject> syncModels(Set<String> modelNames) {
-    return sessionContext.getModelRepository().syncFromDatabase(sessionContext, modelNames);
+  public List<SchemaObject> loadModels(Set<String> modelNames) {
+    return sessionContext.getModelRegistry().loadFromDatabase(sessionContext, modelNames);
   }
 
   @Override
   public List<SchemaObject> getAllModels() {
-    return modelRepository.findAll(sessionContext.getSchemaName());
+    return modelRegistry.getAllRegistered(sessionContext.getSchemaName());
   }
 
   @Override
   public SchemaObject getModel(String modelName) {
-    return modelRepository.find(schemaName, modelName);
+    return modelRegistry.getRegistered(schemaName, modelName);
   }
 
   @Override
   public void dropModel(String modelName) {
     String collectionName = getCollectionName(modelName);
     mongoDatabase.getCollection(collectionName).drop();
-    modelRepository.delete(schemaName, modelName);
+    modelRegistry.unregister(schemaName, modelName);
   }
 
   @Override
   public EntityDefinition createEntity(EntityDefinition collection) {
     // 保存到ModelRepository中
-    modelRepository.save(schemaName, collection);
+    modelRegistry.register(schemaName, collection);
 
     String collectionName = getCollectionName(collection.getName());
     mongoDatabase.createCollection(collectionName);
@@ -91,14 +91,14 @@ public class MongoSchemaService extends BaseService implements SchemaService {
 
   @Override
   public NativeQueryDefinition createNativeQueryModel(NativeQueryDefinition model) {
-    modelRepository.save(schemaName, model);
+    modelRegistry.register(schemaName, model);
     return model;
   }
 
   @Override
   public EnumDefinition createEnum(EnumDefinition anEnum) {
     // 保存到ModelRepository中
-    modelRepository.save(schemaName, anEnum);
+    modelRegistry.register(schemaName, anEnum);
     return anEnum;
   }
 
@@ -111,10 +111,10 @@ public class MongoSchemaService extends BaseService implements SchemaService {
       createIndex(index);
     }
     // 更新实体定义，添加新字段
-    EntityDefinition entity = (EntityDefinition) modelRepository.find(schemaName, field.getModelName());
+    EntityDefinition entity = (EntityDefinition) modelRegistry.getRegistered(schemaName, field.getModelName());
     if (entity != null) {
       entity.addField(field);
-      modelRepository.save(schemaName, entity);
+      modelRegistry.register(schemaName, entity);
     }
     return field;
   }
@@ -125,7 +125,7 @@ public class MongoSchemaService extends BaseService implements SchemaService {
     EntityDefinition entity = (EntityDefinition) sessionContext.getModel(field.getModelName());
     entity.removeField(field.getName());
     entity.addField(field);
-    modelRepository.save(schemaName, entity);
+    modelRegistry.register(schemaName, entity);
     return field;
   }
 
@@ -139,7 +139,7 @@ public class MongoSchemaService extends BaseService implements SchemaService {
         entity.removeIndex(index.getName());
       }
     }
-    sessionContext.getModelRepository().save(schemaName, entity);
+    sessionContext.getModelRegistry().register(schemaName, entity);
   }
 
   @Override
@@ -164,7 +164,7 @@ public class MongoSchemaService extends BaseService implements SchemaService {
     EntityDefinition entity = (EntityDefinition) sessionContext.getModel(index.getModelName());
     if (entity != null && entity.getIndex(index.getName()) == null) {
       entity.addIndex(index);
-      modelRepository.save(schemaName, entity);
+      modelRegistry.register(schemaName, entity);
     }
     return index;
   }
@@ -185,7 +185,7 @@ public class MongoSchemaService extends BaseService implements SchemaService {
     mongoDatabase.getCollection(collectionName).dropIndex(indexName);
     EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
     entity.removeIndex(indexName);
-    sessionContext.getModelRepository().save(schemaName, entity);
+    sessionContext.getModelRegistry().register(schemaName, entity);
   }
 
   @Override

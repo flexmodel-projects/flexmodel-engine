@@ -6,11 +6,11 @@ import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.DataSourceProvider;
 import tech.wetech.flexmodel.ImportDescribe;
 import tech.wetech.flexmodel.JsonObjectConverter;
-import tech.wetech.flexmodel.ModelRepository;
+import tech.wetech.flexmodel.ModelRegistry;
 import tech.wetech.flexmodel.cache.Cache;
-import tech.wetech.flexmodel.cache.CachingModelRepository;
+import tech.wetech.flexmodel.cache.CachingModelRegistry;
 import tech.wetech.flexmodel.cache.ConcurrentHashMapCache;
-import tech.wetech.flexmodel.cache.InMemoryModelRepository;
+import tech.wetech.flexmodel.cache.InMemoryModelRegistry;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.EnumDefinition;
 import tech.wetech.flexmodel.model.SchemaObject;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  */
 public class SessionFactory {
 
-  private final ModelRepository modelRepository;
+  private final ModelRegistry modelRepository;
   private final DataSourceProvider defaultDataSourceProvider;
   private final Map<String, DataSourceProvider> dataSourceProviders = new HashMap<>();
   private final Cache cache;
@@ -55,11 +55,11 @@ public class SessionFactory {
     processBuildItem();
   }
 
-  private ModelRepository initializeModelRepository(DataSourceProvider dataSourceProvider) {
+  private ModelRegistry initializeModelRepository(DataSourceProvider dataSourceProvider) {
     if (dataSourceProvider instanceof JdbcDataSourceProvider jdbcDataSourceProvider) {
-      return new CachingModelRepository(new JdbcModelRepository(jdbcDataSourceProvider.dataSource(), jsonObjectConverter), cache);
+      return new CachingModelRegistry(new JdbcModelRegistry(jdbcDataSourceProvider.dataSource(), jsonObjectConverter), cache);
     } else if (dataSourceProvider instanceof MongoDataSourceProvider) {
-      return new InMemoryModelRepository();
+      return new InMemoryModelRegistry();
     } else {
       throw new IllegalArgumentException("Unsupported DataSourceProvider");
     }
@@ -227,7 +227,7 @@ public class SessionFactory {
   }
 
   public List<SchemaObject> getModels(String schemaName) {
-    return modelRepository.findAll(schemaName);
+    return modelRepository.getAllRegistered(schemaName);
   }
 
   public Cache getCache() {
