@@ -31,22 +31,22 @@ public class SqlSchemaService extends BaseService implements SchemaService {
 
   @Override
   public List<SchemaObject> loadModels() {
-    return sessionContext.getModelRegistry().loadFromDatabase(sessionContext);
+    return sessionContext.getModelRegistry().loadFromDataSource(sessionContext);
   }
 
   @Override
   public List<SchemaObject> loadModels(Set<String> modelNames) {
-    return sessionContext.getModelRegistry().loadFromDatabase(sessionContext, modelNames);
+    return sessionContext.getModelRegistry().loadFromDataSource(sessionContext, modelNames);
   }
 
   @Override
-  public List<SchemaObject> getAllModels() {
-    return sessionContext.getModelRegistry().getAllRegistered(sessionContext.getSchemaName());
+  public List<SchemaObject> listModels() {
+    return sessionContext.getModelRegistry().listRegistered(sessionContext.getSchemaName());
   }
 
   @Override
   public SchemaObject getModel(String modelName) {
-    return sessionContext.getModel(modelName);
+    return sessionContext.getModelDefinition(modelName);
   }
 
   @Override
@@ -55,27 +55,27 @@ public class SqlSchemaService extends BaseService implements SchemaService {
     if (model instanceof EntityDefinition entity) {
       dropTable(toSqlTable(entity));
     }
-    modelRegistry.unregister(sessionContext.getSchemaName(), modelName);
+    modelRegistry.unregisterAll(sessionContext.getSchemaName(), modelName);
   }
 
   @Override
-  public EntityDefinition createEntity(EntityDefinition collection) {
-    // 保存到ModelRepository中
-    modelRegistry.register(sessionContext.getSchemaName(), collection);
-    SqlTable sqlTable = toSqlTable(collection);
+  public EntityDefinition createEntity(EntityDefinition entity) {
+    // 保存到ModelRegistry中
+    modelRegistry.register(sessionContext.getSchemaName(), entity);
+    SqlTable sqlTable = toSqlTable(entity);
     createTable(sqlTable);
-    return collection;
+    return entity;
   }
 
   @Override
-  public NativeQueryDefinition createNativeQueryModel(NativeQueryDefinition model) {
-    modelRegistry.register(sessionContext.getSchemaName(), model);
-    return model;
+  public NativeQueryDefinition createNativeQuery(NativeQueryDefinition nq) {
+    modelRegistry.register(sessionContext.getSchemaName(), nq);
+    return nq;
   }
 
   @Override
   public EnumDefinition createEnum(EnumDefinition anEnum) {
-    // 保存到ModelRepository中
+    // 保存到ModelRegistry中
     modelRegistry.register(sessionContext.getSchemaName(), anEnum);
     return anEnum;
   }
@@ -99,7 +99,7 @@ public class SqlSchemaService extends BaseService implements SchemaService {
   @Override
   public TypedField<?, ?> createField(TypedField<?, ?> field) {
     // 更新实体定义，添加新字段
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(field.getModelName());
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(field.getModelName());
     if (entity != null) {
       entity.addField(field);
       modelRegistry.register(sessionContext.getSchemaName(), entity);
@@ -113,7 +113,7 @@ public class SqlSchemaService extends BaseService implements SchemaService {
   @Override
   public TypedField<?, ?> modifyField(TypedField<?, ?> field) {
     // 更新实体定义，修改字段
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(field.getModelName());
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(field.getModelName());
     if (entity != null) {
       entity.removeField(field.getName());
       entity.addField(field);
@@ -157,7 +157,7 @@ public class SqlSchemaService extends BaseService implements SchemaService {
   public void dropField(String modelName, String fieldName) {
     dropColumn(toSqlColumn(new TypedField<>(fieldName, "unknown").setModelName(modelName)));
 
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
     entity.removeField(fieldName);
     // 移除相关索引
     for (IndexDefinition index : entity.getIndexes()) {
@@ -177,7 +177,7 @@ public class SqlSchemaService extends BaseService implements SchemaService {
 
   @Override
   public IndexDefinition createIndex(IndexDefinition index) {
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(index.getModelName());
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(index.getModelName());
     entity.addIndex(index);
     modelRegistry.register(sessionContext.getSchemaName(), entity);
 
@@ -192,7 +192,7 @@ public class SqlSchemaService extends BaseService implements SchemaService {
 
   @Override
   public void dropIndex(String modelName, String indexName) {
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
     entity.removeIndex(indexName);
     modelRegistry.register(sessionContext.getSchemaName(), entity);
     StandardIndexExporter indexExporter = sessionContext.getSqlDialect().getIndexExporter();
@@ -373,7 +373,7 @@ public class SqlSchemaService extends BaseService implements SchemaService {
   }
 
   private String toPhysicalTableString(String name) {
-    EntityDefinition model = (EntityDefinition) sessionContext.getModel(name);
+    EntityDefinition model = (EntityDefinition) sessionContext.getModelDefinition(name);
     if (model == null) {
       return name;
     }

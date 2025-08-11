@@ -32,7 +32,7 @@ public class SqlStatementBuilder extends BaseService {
   private Pair<String, Map<String, Object>> buildQuerySql(String modelName, Query query) {
     validateQuery(modelName, query);
     Map<String, Object> params = new HashMap<>();
-    ModelDefinition model = (ModelDefinition) sqlContext.getModel(modelName);
+    ModelDefinition model = (ModelDefinition) sqlContext.getModelDefinition(modelName);
     StringBuilder sqlBuilder = new StringBuilder("\nselect ");
     Map<String, String> projectionMap = new HashMap<>();
     appendProjection(modelName, query, model, projectionMap, sqlBuilder);

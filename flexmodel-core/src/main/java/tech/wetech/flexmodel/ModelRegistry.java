@@ -16,19 +16,19 @@ public interface ModelRegistry {
   /**
    * 从数据库中加载模型
    *
-   * @param sqlContext
+   * @param sessionContext
    * @return
    */
-  List<SchemaObject> loadFromDatabase(AbstractSessionContext sqlContext);
+  List<SchemaObject> loadFromDataSource(AbstractSessionContext sessionContext);
 
   /**
    * 从数据库中加载模型
    *
-   * @param sqlContext
+   * @param sessionContext
    * @param includes
    * @return
    */
-  List<SchemaObject> loadFromDatabase(AbstractSessionContext sqlContext, Set<String> includes);
+  List<SchemaObject> loadFromDataSource(AbstractSessionContext sessionContext, Set<String> includes);
 
   /**
    * 获取所有已注册的模型
@@ -36,14 +36,14 @@ public interface ModelRegistry {
    * @param schemaName
    * @return
    */
-  List<SchemaObject> getAllRegistered(String schemaName);
+  List<SchemaObject> listRegistered(String schemaName);
 
   /**
    * 注销模型
    *
    * @param schemaName
    */
-  void unregister(String schemaName);
+  void unregisterAll(String schemaName);
 
   /**
    * 注销模型
@@ -51,7 +51,7 @@ public interface ModelRegistry {
    * @param schemaName
    * @param modelName
    */
-  void unregister(String schemaName, String modelName);
+  void unregisterAll(String schemaName, String modelName);
 
   /**
    * 注册模型

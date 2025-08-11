@@ -21,32 +21,32 @@ public class CachingModelRegistry implements ModelRegistry {
   }
 
   @Override
-  public List<SchemaObject> loadFromDatabase(AbstractSessionContext context) {
+  public List<SchemaObject> loadFromDataSource(AbstractSessionContext sessionContext) {
     cache.invalidateAll();
-    return delegate.loadFromDatabase(context);
+    return delegate.loadFromDataSource(sessionContext);
   }
 
   @Override
-  public List<SchemaObject> loadFromDatabase(AbstractSessionContext sqlContext, Set<String> includes) {
+  public List<SchemaObject> loadFromDataSource(AbstractSessionContext sessionContext, Set<String> includes) {
     cache.invalidateAll();
-    return delegate.loadFromDatabase(sqlContext, includes);
+    return delegate.loadFromDataSource(sessionContext, includes);
   }
 
   @Override
-  public List<SchemaObject> getAllRegistered(String schemaName) {
-    return delegate.getAllRegistered(schemaName);
+  public List<SchemaObject> listRegistered(String schemaName) {
+    return delegate.listRegistered(schemaName);
   }
 
   @Override
-  public void unregister(String schemaName) {
+  public void unregisterAll(String schemaName) {
     cache.invalidateAll();
-    delegate.unregister(schemaName);
+    delegate.unregisterAll(schemaName);
   }
 
   @Override
-  public void unregister(String schemaName, String modelName) {
+  public void unregisterAll(String schemaName, String modelName) {
     cache.invalidate(schemaName + ":" + modelName);
-    delegate.unregister(schemaName, modelName);
+    delegate.unregisterAll(schemaName, modelName);
   }
 
   @Override

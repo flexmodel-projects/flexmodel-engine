@@ -26,7 +26,7 @@ public interface SchemaService {
    *
    * @return 模型列表
    */
-  List<SchemaObject> getAllModels();
+  List<SchemaObject> listModels();
 
   /**
    * 获取模型
@@ -46,18 +46,18 @@ public interface SchemaService {
   /**
    * 创建实体
    *
-   * @param collection
+   * @param entity
    * @return
    */
-  EntityDefinition createEntity(EntityDefinition collection);
+  EntityDefinition createEntity(EntityDefinition entity);
 
   /**
    * 创建本地查询
    *
-   * @param model
+   * @param nq
    * @return
    */
-  NativeQueryDefinition createNativeQueryModel(NativeQueryDefinition model);
+  NativeQueryDefinition createNativeQuery(NativeQueryDefinition nq);
 
   /**
    * 创建枚举
@@ -131,15 +131,15 @@ public interface SchemaService {
    * @return
    */
   default EntityDefinition createEntity(String modelName, UnaryOperator<EntityDefinition> entityUnaryOperator) {
-    EntityDefinition collection = new EntityDefinition(modelName);
-    entityUnaryOperator.apply(collection);
-    return createEntity(collection);
+    EntityDefinition entity = new EntityDefinition(modelName);
+    entityUnaryOperator.apply(entity);
+    return createEntity(entity);
   }
 
-  default NativeQueryDefinition createNativeQueryModel(String modelName, UnaryOperator<NativeQueryDefinition> modelUnaryOperator) {
+  default NativeQueryDefinition createNativeQuery(String modelName, UnaryOperator<NativeQueryDefinition> modelUnaryOperator) {
     NativeQueryDefinition model = new NativeQueryDefinition(modelName);
     modelUnaryOperator.apply(model);
-    return createNativeQueryModel(model);
+    return createNativeQuery(model);
   }
 
   default EnumDefinition createEnum(String name, UnaryOperator<EnumDefinition> enumUnaryOperator) {

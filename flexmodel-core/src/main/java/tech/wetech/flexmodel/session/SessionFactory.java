@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  */
 public class SessionFactory {
 
-  private final ModelRegistry modelRepository;
+  private final ModelRegistry modelRegistry;
   private final DataSourceProvider defaultDataSourceProvider;
   private final Map<String, DataSourceProvider> dataSourceProviders = new HashMap<>();
   private final Cache cache;
@@ -50,12 +50,12 @@ public class SessionFactory {
     this.defaultDataSourceProvider = defaultDataSourceProvider;
     addDataSourceProvider(defaultDataSourceProvider);
     dataSourceProviders.forEach(this::addDataSourceProvider);
-    this.modelRepository = initializeModelRepository(defaultDataSourceProvider);
+    this.modelRegistry = initializeModelRegistry(defaultDataSourceProvider);
     this.failsafe = failsafe;
     processBuildItem();
   }
 
-  private ModelRegistry initializeModelRepository(DataSourceProvider dataSourceProvider) {
+  private ModelRegistry initializeModelRegistry(DataSourceProvider dataSourceProvider) {
     if (dataSourceProvider instanceof JdbcDataSourceProvider jdbcDataSourceProvider) {
       return new CachingModelRegistry(new JdbcModelRegistry(jdbcDataSourceProvider.dataSource(), jsonObjectConverter), cache);
     } else if (dataSourceProvider instanceof MongoDataSourceProvider) {
@@ -157,7 +157,7 @@ public class SessionFactory {
   }
 
   private void processModels(List<SchemaObject> models, Session session) {
-    Map<String, SchemaObject> wrapperMap = session.schema().getAllModels().stream().collect(Collectors.toMap(SchemaObject::getName, m -> m));
+    Map<String, SchemaObject> wrapperMap = session.schema().listModels().stream().collect(Collectors.toMap(SchemaObject::getName, m -> m));
     for (SchemaObject model : models) {
       SchemaObject older = wrapperMap.get(model.getName());
       if (older != null && Objects.equals(older.getIdl(), model.getIdl())) {
@@ -227,7 +227,7 @@ public class SessionFactory {
   }
 
   public List<SchemaObject> getModels(String schemaName) {
-    return modelRepository.getAllRegistered(schemaName);
+    return modelRegistry.listRegistered(schemaName);
   }
 
   public Cache getCache() {
@@ -270,13 +270,13 @@ public class SessionFactory {
       return switch (dataSourceProviders.get(id)) {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
-          SqlContext sqlContext = new SqlContext(id, new NamedParameterSqlExecutor(connection), modelRepository, jsonObjectConverter, this);
+          SqlContext sqlContext = new SqlContext(id, new NamedParameterSqlExecutor(connection), modelRegistry, jsonObjectConverter, this);
           sqlContext.setFailsafe(true);
           yield new SqlSession(sqlContext);
         }
         case MongoDataSourceProvider mongodb -> {
           MongoDatabase mongoDatabase = mongodb.mongoDatabase();
-          MongoContext mongoContext = new MongoContext(id, mongoDatabase, modelRepository, jsonObjectConverter, this);
+          MongoContext mongoContext = new MongoContext(id, mongoDatabase, modelRegistry, jsonObjectConverter, this);
           mongoContext.setFailsafe(true);
           yield new MongoSession(mongoContext);
         }
@@ -296,12 +296,12 @@ public class SessionFactory {
       return switch (dataSourceProviders.get(identifier)) {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
-          SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), modelRepository, jsonObjectConverter, this);
+          SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), modelRegistry, jsonObjectConverter, this);
           yield new SqlSession(sqlContext);
         }
         case MongoDataSourceProvider mongodb -> {
           MongoDatabase mongoDatabase = mongodb.mongoDatabase();
-          MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, modelRepository, jsonObjectConverter, this);
+          MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, modelRegistry, jsonObjectConverter, this);
           yield new MongoSession(mongoContext);
         }
         case null,

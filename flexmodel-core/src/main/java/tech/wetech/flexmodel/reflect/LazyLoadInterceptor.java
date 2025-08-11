@@ -47,7 +47,7 @@ public class LazyLoadInterceptor {
    * @return
    */
   private Object castValueType(String modelName, String fieldName, Object value) {
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
     TypedField<?, ?> field = entity.getField(fieldName);
     if (field != null) {
       TypeHandler<?> typeHandler = sessionContext.getTypeHandlerMap().get(field.getType());
@@ -93,7 +93,7 @@ public class LazyLoadInterceptor {
     try {
       boolean loaded = loadCache.getOrDefault(method, false);
       if (!loaded) {
-        EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+        EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
         String fieldName = ReflectionUtils.getFieldNameFromGetter(method);
         TypedField<?, ?> field = entity.getField(fieldName);
         if (field instanceof RelationField relationField) {

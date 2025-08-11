@@ -142,15 +142,15 @@ public class JdbcModelRegistry implements ModelRegistry {
   }
 
   @Override
-  public List<SchemaObject> loadFromDatabase(AbstractSessionContext context) {
-    return loadFromDatabase(context, null);
+  public List<SchemaObject> loadFromDataSource(AbstractSessionContext sessionContext) {
+    return loadFromDataSource(sessionContext, null);
   }
 
   @Override
-  public List<SchemaObject> loadFromDatabase(AbstractSessionContext context, Set<String> includes) {
-    SqlContext sqlContext = (SqlContext) context;
+  public List<SchemaObject> loadFromDataSource(AbstractSessionContext sessionContext, Set<String> includes) {
+    SqlContext sqlContext = (SqlContext) sessionContext;
     List<EntityDefinition> entities = convert(sqlContext.getSqlMetadata().getTables(includes), sqlContext);
-    Map<String, SchemaObject> metaMap = getAllRegistered(sqlContext.getSchemaName()).stream().collect(Collectors.toMap(SchemaObject::getName, wrapper -> wrapper));
+    Map<String, SchemaObject> metaMap = listRegistered(sqlContext.getSchemaName()).stream().collect(Collectors.toMap(SchemaObject::getName, wrapper -> wrapper));
     for (EntityDefinition entity : entities) {
       SchemaObject model = getIgnoreCase(entity.getName(), metaMap);
       if (model == null) {
@@ -373,7 +373,7 @@ public class JdbcModelRegistry implements ModelRegistry {
   }
 
   @Override
-  public List<SchemaObject> getAllRegistered(String schemaName) {
+  public List<SchemaObject> listRegistered(String schemaName) {
 
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
@@ -408,7 +408,7 @@ public class JdbcModelRegistry implements ModelRegistry {
   }
 
   @Override
-  public void unregister(String schemaName) {
+  public void unregisterAll(String schemaName) {
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
       String sqlDeleteString = "delete from " + sqlDialect.quoteIdentifier(STORED_TABLES) +
@@ -420,7 +420,7 @@ public class JdbcModelRegistry implements ModelRegistry {
   }
 
   @Override
-  public void unregister(String schemaName, String modelName) {
+  public void unregisterAll(String schemaName, String modelName) {
     try (Connection connection = dataSource.getConnection()) {
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
       String sqlDeleteString = getDeleteString();

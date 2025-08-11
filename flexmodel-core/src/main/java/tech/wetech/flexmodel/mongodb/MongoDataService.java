@@ -49,21 +49,21 @@ public class MongoDataService extends BaseService implements DataService {
   public int insert(String modelName, Object objR) {
 
     Map<String, Object> data = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
-    Map<String, Object> processedData = generateValue(modelName, data, false);
+    Map<String, Object> processedData = generateFieldValues(modelName, data, false);
 
     try {
       Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), processedData, Map.class);
-      EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+      EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
       TypedField<?, ?> idField = entity.findIdField().orElseThrow();
       if (GeneratedValue.AUTO_INCREMENT.equals(idField.getDefaultValue())) {
-        setId(modelName, record);
+        assignAutoIncrementId(modelName, record);
       }
       String collectionName = getCollectionName(modelName);
       InsertOneResult result = mongoDatabase.getCollection(collectionName, Map.class).insertOne(record);
       return result.wasAcknowledged() ? 1 : 0;
     } finally {
       // 获取生成的ID（如果有的话）
-      EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+      EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
       Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
       Object id = null;
       if (idFieldOptional.isPresent()) {
@@ -73,11 +73,11 @@ public class MongoDataService extends BaseService implements DataService {
       }
 
       // 处理关联关系
-      insertRelationRecord(modelName, data, id);
+      insertRelatedRecords(modelName, data, id);
     }
   }
 
-  private void setId(String modelName, Map<String, Object> record) {
+  private void assignAutoIncrementId(String modelName, Map<String, Object> record) {
     String sequenceName = modelName + "_seq";
     try {
       schemaService.createSequence(sequenceName, 1, 1);
@@ -93,11 +93,11 @@ public class MongoDataService extends BaseService implements DataService {
   public int updateById(String modelName, Object objR, Object id) {
 
     Map<String, Object> data = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
-    Map<String, Object> processedData = generateValue(modelName, data, true);
+    Map<String, Object> processedData = generateFieldValues(modelName, data, true);
 
     Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), processedData, Map.class);
     String collectionName = getCollectionName(modelName);
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     UpdateResult result = mongoDatabase.getCollection(collectionName, Map.class).updateOne(Filters.eq(idField.getName(), id), new Document("$set", new Document(record)));
     return (int) result.getModifiedCount();
@@ -107,8 +107,7 @@ public class MongoDataService extends BaseService implements DataService {
   public int update(String modelName, Object objR, String filter) {
 
     Map<String, Object> data = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
-    Map<String, Object> processedData = generateValue(modelName, data, true);
-
+    Map<String, Object> processedData = generateFieldValues(modelName, data, true);
 
     Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), processedData, Map.class);
     String collectionName = getCollectionName(modelName);
@@ -121,7 +120,7 @@ public class MongoDataService extends BaseService implements DataService {
   @Override
   public int deleteById(String modelName, Object id) {
     String collectionName = getCollectionName(modelName);
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
     return (int) mongoDatabase.getCollection(collectionName)
       .deleteMany(Filters.eq(idField.getName(), id)).getDeletedCount();
@@ -147,14 +146,14 @@ public class MongoDataService extends BaseService implements DataService {
   @SuppressWarnings({"rawtypes", "unchecked"})
   public <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery) {
     String collectionName = getCollectionName(modelName);
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
 
     Map dataMap = mongoDatabase.getCollection(collectionName, Map.class)
       .find(Filters.eq(idField.getName(), id))
       .first();
     if (nestedQuery && dataMap != null) {
-      nestedQuery(List.of(dataMap), this::findMapList, (ModelDefinition) sessionContext.getModel(modelName),
+      nestedQuery(List.of(dataMap), this::queryAsMapList, (ModelDefinition) sessionContext.getModelDefinition(modelName),
         null, sessionContext.getNestedQueryMaxDepth());
     }
     T result = sessionContext.getJsonObjectConverter().convertValue(dataMap, resultType);
@@ -166,16 +165,16 @@ public class MongoDataService extends BaseService implements DataService {
 
   @Override
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
-    List<Map<String, Object>> mapList = findMapList(modelName, query);
+    List<Map<String, Object>> mapList = queryAsMapList(modelName, query);
     if (query.isNestedEnabled()) {
-      nestedQuery(mapList, this::findMapList, (ModelDefinition) sessionContext.getModel(modelName), query, sessionContext.getNestedQueryMaxDepth());
+      nestedQuery(mapList, this::queryAsMapList, (ModelDefinition) sessionContext.getModelDefinition(modelName), query, sessionContext.getNestedQueryMaxDepth());
     }
     List<T> results = sessionContext.getJsonObjectConverter().convertValueList(mapList, resultType);
     return LazyObjProxy.createProxyList(results, modelName, sessionContext);
   }
 
   @Override
-  public <T> List<T> findByNativeQueryStatement(String statement, Object obj, Class<T> resultType) {
+  public <T> List<T> findByNativeStatement(String statement, Object obj, Class<T> resultType) {
     Map<String, Object> params = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), obj, Map.class);
     String json = StringHelper.simpleRenderTemplate(statement, params);
     Document result = mongoDatabase.runCommand(Document.parse(json));
@@ -184,14 +183,14 @@ public class MongoDataService extends BaseService implements DataService {
   }
 
   @Override
-  public <T> List<T> findByNativeQueryModel(String modelName, Object obj, Class<T> resultType) {
+  public <T> List<T> findByNativeQuery(String modelName, Object obj, Class<T> resultType) {
     Map<String, Object> params = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), obj, Map.class);
-    NativeQueryDefinition model = (NativeQueryDefinition) sessionContext.getModel(modelName);
-    return findByNativeQueryStatement(model.getStatement(), params, resultType);
+    NativeQueryDefinition model = (NativeQueryDefinition) sessionContext.getModelDefinition(modelName);
+    return findByNativeStatement(model.getStatement(), params, resultType);
   }
 
   @SuppressWarnings({"rawtypes"})
-  private List<Map<String, Object>> findMapList(String modelName, Query query) {
+  private List<Map<String, Object>> queryAsMapList(String modelName, Query query) {
     List<Document> pipeline = builder.createPipeline(modelName, query);
 
     String collectionName = getCollectionName(modelName);

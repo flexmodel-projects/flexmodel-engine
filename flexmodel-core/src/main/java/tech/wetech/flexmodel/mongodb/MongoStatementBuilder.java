@@ -196,7 +196,7 @@ class MongoStatementBuilder extends BaseService {
 
   protected List<Document> createPipeline(String modelName, Query query) {
     validateQuery(modelName, query);
-    ModelDefinition model = (ModelDefinition) mongoContext.getModel(modelName);
+    ModelDefinition model = (ModelDefinition) mongoContext.getModelDefinition(modelName);
     PhysicalNamingStrategy physicalNamingStrategy = mongoContext.getPhysicalNamingStrategy();
     List<Document> pipeline = new ArrayList<>();
     addMatchStage(pipeline, query);

@@ -34,9 +34,9 @@ public interface DataService {
 
   <T> List<T> find(String modelName, Query query, Class<T> resultType);
 
-  <T> List<T> findByNativeQueryStatement(String statement, Object params, Class<T> resultType);
+  <T> List<T> findByNativeStatement(String statement, Object params, Class<T> resultType);
 
-  <T> List<T> findByNativeQueryModel(String modelName, Object params, Class<T> resultType);
+  <T> List<T> findByNativeQuery(String modelName, Object params, Class<T> resultType);
 
   /**
    * Count records based on conditions

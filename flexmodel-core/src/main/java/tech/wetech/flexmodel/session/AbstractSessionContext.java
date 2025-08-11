@@ -54,7 +54,7 @@ public abstract class AbstractSessionContext {
     }
   }
 
-  public SchemaObject getModel(String name) {
+  public SchemaObject getModelDefinition(String name) {
     ModelDefinition model = aliasModelMap.get(name);
     if (model != null) {
       return model;

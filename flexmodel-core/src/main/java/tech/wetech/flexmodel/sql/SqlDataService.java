@@ -50,14 +50,14 @@ public class SqlDataService extends BaseService implements DataService {
     long startTime = System.currentTimeMillis();
 
     Map<String, Object> data = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
-    Map<String, Object> processedData = generateValue(modelName, data, false);
+    Map<String, Object> processedData = generateFieldValues(modelName, data, false);
 
     try {
       Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), processedData, Map.class);
       String sql = getInsertSqlString(modelName, record);
       log.debug("Generated INSERT SQL: {}", sql);
 
-      EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+      EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
       Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
       int result;
       if (idFieldOptional.isPresent()) {
@@ -89,7 +89,7 @@ public class SqlDataService extends BaseService implements DataService {
       throw e;
     } finally {
       // 获取生成的ID（如果有的话）
-      EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+      EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
       Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
       Object id = null;
       if (idFieldOptional.isPresent()) {
@@ -99,13 +99,13 @@ public class SqlDataService extends BaseService implements DataService {
       }
 
       // 处理关联关系
-      insertRelationRecord(modelName, data, id);
+      insertRelatedRecords(modelName, data, id);
     }
   }
 
   private String getInsertSqlString(String modelName, Map<String, Object> record) {
     String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
     Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
     StringJoiner columns = new StringJoiner(", ", "(", ")");
     StringJoiner values = new StringJoiner(", ", "(", ")");
@@ -134,11 +134,11 @@ public class SqlDataService extends BaseService implements DataService {
 
     try {
       Map<String, Object> data = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
-      Map<String, Object> processedData = generateValue(modelName, data, true);
+      Map<String, Object> processedData = generateFieldValues(modelName, data, true);
 
       Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), processedData, Map.class);
       String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-      EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+      EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
       TypedField<?, ?> idField = entity.findIdField().orElseThrow();
 
       StringBuilder sql = new StringBuilder("update ")
@@ -180,10 +180,10 @@ public class SqlDataService extends BaseService implements DataService {
 
     try {
       Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
-      Map<String, Object> processedData = generateValue(modelName, record, true);
+      Map<String, Object> processedData = generateFieldValues(modelName, record, true);
 
       String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-      EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+      EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
       TypedField<?, ?> idField = entity.findIdField().orElseThrow();
       SqlClauseResult sqlResult = getSqlCauseResult(filter);
 
@@ -222,7 +222,7 @@ public class SqlDataService extends BaseService implements DataService {
 
     try {
       String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-      EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+      EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
       TypedField<?, ?> idField = entity.findIdField().orElseThrow();
       String columnsString = entity.getFields().stream()
         .filter(f -> !(f instanceof RelationField))
@@ -245,7 +245,7 @@ public class SqlDataService extends BaseService implements DataService {
       }
 
       if (nestedQuery && dataMap != null) {
-        nestedQuery(List.of(dataMap), this::findMapList, (ModelDefinition) sessionContext.getModel(modelName), null, sessionContext.getNestedQueryMaxDepth());
+        nestedQuery(List.of(dataMap), this::findMapList, (ModelDefinition) sessionContext.getModelDefinition(modelName), null, sessionContext.getNestedQueryMaxDepth());
       }
 
       T result = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), dataMap, resultType);
@@ -271,9 +271,9 @@ public class SqlDataService extends BaseService implements DataService {
       Pair<String, Map<String, Object>> pair = builder.toQuerySqlWithPrepared(modelName, query);
       log.debug("Generated SELECT SQL: {}", pair.first());
 
-      List mapList = sqlExecutor.queryForList(pair.first(), pair.second(), getSqlResultHandler((ModelDefinition) sessionContext.getModel(modelName), query, Map.class));
+      List mapList = sqlExecutor.queryForList(pair.first(), pair.second(), getSqlResultHandler((ModelDefinition) sessionContext.getModelDefinition(modelName), query, Map.class));
       if (query.isNestedEnabled()) {
-        nestedQuery(mapList, this::findMapList, (ModelDefinition) sessionContext.getModel(modelName), query, sessionContext.getNestedQueryMaxDepth());
+        nestedQuery(mapList, this::findMapList, (ModelDefinition) sessionContext.getModelDefinition(modelName), query, sessionContext.getNestedQueryMaxDepth());
       }
       List<T> results = ReflectionUtils.toClassBeanList(sessionContext.getJsonObjectConverter(), mapList, resultType);
       List<T> finalResults = LazyObjProxy.createProxyList(results, modelName, sessionContext);
@@ -289,7 +289,7 @@ public class SqlDataService extends BaseService implements DataService {
   }
 
   @Override
-  public <T> List<T> findByNativeQueryStatement(String statement, Object objR, Class<T> resultType) {
+  public <T> List<T> findByNativeStatement(String statement, Object objR, Class<T> resultType) {
     log.debug("Starting SQL native query: {}", statement);
     long startTime = System.currentTimeMillis();
 
@@ -309,14 +309,14 @@ public class SqlDataService extends BaseService implements DataService {
   }
 
   @Override
-  public <T> List<T> findByNativeQueryModel(String modelName, Object params, Class<T> resultType) {
+  public <T> List<T> findByNativeQuery(String modelName, Object params, Class<T> resultType) {
     log.debug("Starting SQL native query model: {}", modelName);
     long startTime = System.currentTimeMillis();
 
     try {
-      NativeQueryDefinition model = (NativeQueryDefinition) sessionContext.getModel(modelName);
+      NativeQueryDefinition model = (NativeQueryDefinition) sessionContext.getModelDefinition(modelName);
       String statement = model.getStatement();
-      List<T> results = findByNativeQueryStatement(statement, params, resultType);
+      List<T> results = findByNativeStatement(statement, params, resultType);
 
       long duration = System.currentTimeMillis() - startTime;
       log.debug("SQL native query model completed for {} in {}ms, results: {}", modelName, duration, results.size());
@@ -335,7 +335,7 @@ public class SqlDataService extends BaseService implements DataService {
 
     try {
       Pair<String, Map<String, Object>> pair = builder.toQuerySqlWithPrepared(modelName, query);
-      List list = sqlExecutor.queryForList(pair.first(), pair.second(), getSqlResultHandler((ModelDefinition) sessionContext.getModel(modelName), query, Map.class));
+      List list = sqlExecutor.queryForList(pair.first(), pair.second(), getSqlResultHandler((ModelDefinition) sessionContext.getModelDefinition(modelName), query, Map.class));
 
       long duration = System.currentTimeMillis() - startTime;
       log.debug("SQL findMapList completed for model: {} in {}ms, results: {}", modelName, duration, list.size());
@@ -376,7 +376,7 @@ public class SqlDataService extends BaseService implements DataService {
 
     try {
       String physicalTableName = toPhysicalTablenameQuoteString(modelName);
-      EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+      EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
       TypedField<?, ?> idField = entity.findIdField().orElseThrow();
       String sql = "delete from " +
                    physicalTableName +
@@ -460,7 +460,7 @@ public class SqlDataService extends BaseService implements DataService {
         sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler(), null);
         if (value instanceof Query.QueryField queryField) {
           if (queryField.getAliasName() != null) {
-            ModelDefinition queryModel = (ModelDefinition) sessionContext.getModel(queryField.getAliasName());
+            ModelDefinition queryModel = (ModelDefinition) sessionContext.getModelDefinition(queryField.getAliasName());
             Field field = queryModel != null
               ? queryModel.getField(queryField.getFieldName())
               : model.getField(queryField.getFieldName());
@@ -473,7 +473,7 @@ public class SqlDataService extends BaseService implements DataService {
             sqlResultHandler.addSqlTypeHandler(key, new UnknownSqlTypeHandler(), null);
           }
           Field field = queryField.getAliasName() != null
-            ? ((ModelDefinition) sessionContext.getModel(queryField.getAliasName())).getField(queryField.getFieldName())
+            ? ((ModelDefinition) sessionContext.getModelDefinition(queryField.getAliasName())).getField(queryField.getFieldName())
             : model.getField(queryField.getFieldName());
           if (field instanceof TypedField<?, ?> typedField) {
             sqlResultHandler.addSqlTypeHandler(key, sessionContext.getTypeHandler(typedField.getType()), field);
@@ -489,7 +489,7 @@ public class SqlDataService extends BaseService implements DataService {
   }
 
   private String toPhysicalTablenameQuoteString(String name) {
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(name);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(name);
     if (entity == null) {
       return sqlDialect.quoteIdentifier(name);
     }

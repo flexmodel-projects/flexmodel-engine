@@ -39,17 +39,17 @@ public class MongoSchemaService extends BaseService implements SchemaService {
 
   @Override
   public List<SchemaObject> loadModels() {
-    return sessionContext.getModelRegistry().loadFromDatabase(sessionContext);
+    return sessionContext.getModelRegistry().loadFromDataSource(sessionContext);
   }
 
   @Override
   public List<SchemaObject> loadModels(Set<String> modelNames) {
-    return sessionContext.getModelRegistry().loadFromDatabase(sessionContext, modelNames);
+    return sessionContext.getModelRegistry().loadFromDataSource(sessionContext, modelNames);
   }
 
   @Override
-  public List<SchemaObject> getAllModels() {
-    return modelRegistry.getAllRegistered(sessionContext.getSchemaName());
+  public List<SchemaObject> listModels() {
+    return modelRegistry.listRegistered(sessionContext.getSchemaName());
   }
 
   @Override
@@ -61,43 +61,43 @@ public class MongoSchemaService extends BaseService implements SchemaService {
   public void dropModel(String modelName) {
     String collectionName = getCollectionName(modelName);
     mongoDatabase.getCollection(collectionName).drop();
-    modelRegistry.unregister(schemaName, modelName);
+    modelRegistry.unregisterAll(schemaName, modelName);
   }
 
   @Override
-  public EntityDefinition createEntity(EntityDefinition collection) {
-    // 保存到ModelRepository中
-    modelRegistry.register(schemaName, collection);
+  public EntityDefinition createEntity(EntityDefinition entity) {
+    // 保存到ModelRegistry中
+    modelRegistry.register(schemaName, entity);
 
-    String collectionName = getCollectionName(collection.getName());
+    String collectionName = getCollectionName(entity.getName());
     mongoDatabase.createCollection(collectionName);
 
     // 创建集合中已定义的索引
-    List<IndexDefinition> indexesToCreate = new ArrayList<>(collection.getIndexes());
+    List<IndexDefinition> indexesToCreate = new ArrayList<>(entity.getIndexes());
     for (IndexDefinition index : indexesToCreate) {
       createIndex(index);
     }
 
     // 为主键字段创建唯一索引
-    collection.findIdField().ifPresent(idField -> {
+    entity.findIdField().ifPresent(idField -> {
       IndexDefinition index = new IndexDefinition(idField.getModelName());
       index.setUnique(true);
       index.addField(idField.getName());
       createIndex(index);
     });
 
-    return collection;
+    return entity;
   }
 
   @Override
-  public NativeQueryDefinition createNativeQueryModel(NativeQueryDefinition model) {
-    modelRegistry.register(schemaName, model);
-    return model;
+  public NativeQueryDefinition createNativeQuery(NativeQueryDefinition nq) {
+    modelRegistry.register(schemaName, nq);
+    return nq;
   }
 
   @Override
   public EnumDefinition createEnum(EnumDefinition anEnum) {
-    // 保存到ModelRepository中
+    // 保存到ModelRegistry中
     modelRegistry.register(schemaName, anEnum);
     return anEnum;
   }
@@ -122,7 +122,7 @@ public class MongoSchemaService extends BaseService implements SchemaService {
   @Override
   public TypedField<?, ?> modifyField(TypedField<?, ?> field) {
     // mongodb无需修改schema
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(field.getModelName());
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(field.getModelName());
     entity.removeField(field.getName());
     entity.addField(field);
     modelRegistry.register(schemaName, entity);
@@ -131,7 +131,7 @@ public class MongoSchemaService extends BaseService implements SchemaService {
 
   @Override
   public void dropField(String modelName, String fieldName) {
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
     entity.removeField(fieldName);
     // 移除相关索引
     for (IndexDefinition index : entity.getIndexes()) {
@@ -161,7 +161,7 @@ public class MongoSchemaService extends BaseService implements SchemaService {
     mongoDatabase.getCollection(collectionName).createIndex(Indexes.compoundIndex(indexes), indexOptions);
 
     // 只有在索引不存在时才添加到实体中，避免重复添加
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(index.getModelName());
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(index.getModelName());
     if (entity != null && entity.getIndex(index.getName()) == null) {
       entity.addIndex(index);
       modelRegistry.register(schemaName, entity);
@@ -183,7 +183,7 @@ public class MongoSchemaService extends BaseService implements SchemaService {
   public void dropIndex(String modelName, String indexName) {
     String collectionName = getCollectionName(modelName);
     mongoDatabase.getCollection(collectionName).dropIndex(indexName);
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
     entity.removeIndex(indexName);
     sessionContext.getModelRegistry().register(schemaName, entity);
   }
@@ -200,7 +200,7 @@ public class MongoSchemaService extends BaseService implements SchemaService {
   }
 
   private String getCollectionName(String modelName) {
-    EntityDefinition model = (EntityDefinition) sessionContext.getModel(modelName);
+    EntityDefinition model = (EntityDefinition) sessionContext.getModelDefinition(modelName);
     if (model == null) {
       return modelName;
     }

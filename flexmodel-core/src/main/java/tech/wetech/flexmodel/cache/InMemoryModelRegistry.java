@@ -14,18 +14,18 @@ public class InMemoryModelRegistry implements ModelRegistry {
   private final Map<String, Map<String, SchemaObject>> map = new HashMap<>();
 
   @Override
-  public List<SchemaObject> loadFromDatabase(AbstractSessionContext context) {
+  public List<SchemaObject> loadFromDataSource(AbstractSessionContext sessionContext) {
     // ignore
     return Collections.emptyList();
   }
 
   @Override
-  public List<SchemaObject> loadFromDatabase(AbstractSessionContext sqlContext, Set<String> includes) {
+  public List<SchemaObject> loadFromDataSource(AbstractSessionContext sessionContext, Set<String> includes) {
     return Collections.emptyList();
   }
 
   @Override
-  public List<SchemaObject> getAllRegistered(String schemaName) {
+  public List<SchemaObject> listRegistered(String schemaName) {
     List<SchemaObject> result = new ArrayList<>();
 
     // 从内存映射中获取
@@ -38,12 +38,12 @@ public class InMemoryModelRegistry implements ModelRegistry {
   }
 
   @Override
-  public void unregister(String schemaName) {
+  public void unregisterAll(String schemaName) {
     map.clear();
   }
 
   @Override
-  public void unregister(String schemaName, String modelName) {
+  public void unregisterAll(String schemaName, String modelName) {
     map.get(schemaName).remove(modelName);
   }
 

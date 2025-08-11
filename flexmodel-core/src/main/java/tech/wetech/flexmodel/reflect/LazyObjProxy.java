@@ -24,7 +24,7 @@ public class LazyObjProxy {
   @SuppressWarnings("unchecked")
   public static <T> T createProxy(T obj, String modelName, AbstractSessionContext sessionContext) {
     try {
-      EntityDefinition entity = (EntityDefinition) sessionContext.getModel(modelName);
+      EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
       Class<?> subClazz = new ByteBuddy()
         .subclass(obj.getClass())
         .implement(ProxyInterface.class)
@@ -32,7 +32,7 @@ public class LazyObjProxy {
         .intercept(MethodDelegation.to(new LazyLoadInterceptor(modelName,
           sessionContext.getJsonObjectConverter().convertValue(obj, Map.class), sessionContext))) // 委托给 LazyLoadInterceptor
         .method(ElementMatchers.named("entityInfo"))
-        .intercept(FixedValue.value(sessionContext.getModel(modelName)))
+        .intercept(FixedValue.value(sessionContext.getModelDefinition(modelName)))
         .method(ElementMatchers.named("originClass"))
         .intercept(FixedValue.value(obj.getClass()))
         .make()
