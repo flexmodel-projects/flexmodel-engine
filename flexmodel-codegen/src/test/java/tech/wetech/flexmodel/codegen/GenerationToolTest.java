@@ -2,7 +2,7 @@ package tech.wetech.flexmodel.codegen;
 
 import groovy.text.GStringTemplateEngine;
 import org.junit.jupiter.api.Test;
-import tech.wetech.flexmodel.ImportDescribe;
+import tech.wetech.flexmodel.ModelImportBundle;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.parser.impl.ParseException;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
@@ -56,7 +56,7 @@ class GenerationToolTest extends AbstractIntegrationTest {
     InputStream is = GeneratorTest.class.getClassLoader().getResourceAsStream("import.json");
     assert is != null;
     String content = new String(is.readAllBytes());
-    ImportDescribe describe = new JacksonObjectConverter().parseToObject(content, ImportDescribe.class);
+    ModelImportBundle describe = new JacksonObjectConverter().parseToObject(content, ModelImportBundle.class);
     GenerationContext generationContext = new GenerationContext();
     generationContext.setPackageName(packageName);
     generationContext.getModelClassList().add(ModelClass.buildModelClass(packageName, schemaName, (EntityDefinition) describe.getSchema().getFirst()));

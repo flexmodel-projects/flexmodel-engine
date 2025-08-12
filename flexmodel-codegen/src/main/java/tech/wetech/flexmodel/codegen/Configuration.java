@@ -1,7 +1,7 @@
 package tech.wetech.flexmodel.codegen;
 
-import tech.wetech.flexmodel.ImportDescribe;
 import tech.wetech.flexmodel.JsonObjectConverter;
+import tech.wetech.flexmodel.ModelImportBundle;
 import tech.wetech.flexmodel.model.SchemaObject;
 import tech.wetech.flexmodel.parser.ASTNodeConverter;
 import tech.wetech.flexmodel.parser.impl.ModelParser;
@@ -43,10 +43,10 @@ public class Configuration implements Serializable {
     this.target = target;
   }
 
-  public ImportDescribe getImportDescribe() {
+  public ModelImportBundle getImportDescribe() {
     JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
     List<SchemaObject> models = new ArrayList<>();
-    List<ImportDescribe.ImportData> data = new ArrayList<>();
+    List<ModelImportBundle.ImportData> data = new ArrayList<>();
     // read from script
     String[] importScripts = schema.getImportScript().split(",");
     for (String importScript : importScripts) {
@@ -57,7 +57,7 @@ public class Configuration implements Serializable {
         if (importScript.endsWith(".json")) {
           try {
             String content = Files.readString(scriptFile.toPath());
-            ImportDescribe describe = jsonObjectConverter.parseToObject(content, ImportDescribe.class);
+            ModelImportBundle describe = jsonObjectConverter.parseToObject(content, ModelImportBundle.class);
             models.addAll(describe.getSchema());
             data.addAll(describe.getData());
           } catch (IOException e) {
@@ -81,7 +81,7 @@ public class Configuration implements Serializable {
         }
       }
     }
-    ImportDescribe importDescribe = new ImportDescribe();
+    ModelImportBundle importDescribe = new ModelImportBundle();
     importDescribe.setSchema(models);
     importDescribe.setData(data);
     return importDescribe;

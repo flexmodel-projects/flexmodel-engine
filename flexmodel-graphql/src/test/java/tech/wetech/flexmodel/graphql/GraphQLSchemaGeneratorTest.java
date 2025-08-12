@@ -2,7 +2,7 @@ package tech.wetech.flexmodel.graphql;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import tech.wetech.flexmodel.ImportDescribe;
+import tech.wetech.flexmodel.ModelImportBundle;
 import tech.wetech.flexmodel.codegen.EnumClass;
 import tech.wetech.flexmodel.codegen.GenerationContext;
 import tech.wetech.flexmodel.codegen.ModelClass;
@@ -27,7 +27,7 @@ class GraphQLSchemaGeneratorTest {
     InputStream is = GraphQLSchemaGeneratorTest.class.getClassLoader().getResourceAsStream("import.json");
     assert is != null;
     String content = new String(is.readAllBytes());
-    ImportDescribe describe = new JacksonObjectConverter().parseToObject(content, ImportDescribe.class);
+    ModelImportBundle describe = new JacksonObjectConverter().parseToObject(content, ModelImportBundle.class);
     GraphQLSchemaGenerator daoGenerator = new GraphQLSchemaGenerator();
     GenerationContext generationContext = new GenerationContext();
     generationContext.setPackageName(packageName);

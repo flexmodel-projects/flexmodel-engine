@@ -32,7 +32,7 @@ class SchemaGenerator extends AbstractGenerator {
     out.println "import tech.wetech.flexmodel.model.EntityDefinition;"
     out.println "import tech.wetech.flexmodel.model.EnumDefinition;"
     out.println "import tech.wetech.flexmodel.model.SchemaObject;"
-    out.println "import tech.wetech.flexmodel.ImportDescribe;"
+    out.println "import tech.wetech.flexmodel.ModelImportBundle;"
     /* modelClassList.each {
        out.println "import ${rootPackage}.dsl.${it.shortClassName}DSL;"
      }*/
@@ -88,12 +88,12 @@ class SchemaGenerator extends AbstractGenerator {
     out.println ""
     out.println "  @Override"
     out.println "  @SuppressWarnings(\"all\")"
-    out.println "  public List<ImportDescribe.ImportData> getData() {"
-    out.println "    List<ImportDescribe.ImportData> list = new ArrayList<>();"
+    out.println "  public List<ModelImportBundle.ImportData> getData() {"
+    out.println "    List<ModelImportBundle.ImportData> list = new ArrayList<>();"
     out.println "    try {"
     List<?> list = context.getVariable("import_data");
     list.each {
-      out.println "      list.add((ImportDescribe.ImportData) ObjectUtils.deserialize(\"${ObjectUtils.serialize(it)}\"));"
+      out.println "      list.add((ModelImportBundle.ImportData) ObjectUtils.deserialize(\"${ObjectUtils.serialize(it)}\"));"
     }
     out.println "    } catch (Exception e) {"
     out.println "      e.printStackTrace();"

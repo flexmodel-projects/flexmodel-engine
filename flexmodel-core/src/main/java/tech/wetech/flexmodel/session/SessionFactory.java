@@ -4,8 +4,8 @@ import com.mongodb.client.MongoDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.DataSourceProvider;
-import tech.wetech.flexmodel.ImportDescribe;
 import tech.wetech.flexmodel.JsonObjectConverter;
+import tech.wetech.flexmodel.ModelImportBundle;
 import tech.wetech.flexmodel.ModelRegistry;
 import tech.wetech.flexmodel.cache.Cache;
 import tech.wetech.flexmodel.cache.CachingModelRegistry;
@@ -125,10 +125,10 @@ public class SessionFactory {
   }
 
   public void loadJSONString(String schemaName, String jsonString) {
-    ImportDescribe describe = jsonObjectConverter.parseToObject(jsonString, ImportDescribe.class);
+    ModelImportBundle bundle = jsonObjectConverter.parseToObject(jsonString, ModelImportBundle.class);
     try (Session session = createFailsafeSession(schemaName)) {
-      processModels(describe.getSchema(), session);
-      processImportData(describe.getData(), session);
+      processModels(bundle.getSchema(), session);
+      processImportData(bundle.getData(), session);
     }
   }
 
@@ -212,7 +212,7 @@ public class SessionFactory {
     });
   }
 
-  private void processImportData(List<ImportDescribe.ImportData> data, Session session) {
+  private void processImportData(List<ModelImportBundle.ImportData> data, Session session) {
     data.forEach(item -> {
       try {
         session.data().insertAll(item.getModelName(), item.getValues());

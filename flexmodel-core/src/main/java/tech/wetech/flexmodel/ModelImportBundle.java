@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @author cjbi
  */
-public class ImportDescribe implements Serializable {
+public class ModelImportBundle implements Serializable {
 
   private List<SchemaObject> schema = new ArrayList<>();
   private List<ImportData> data = new ArrayList<>();

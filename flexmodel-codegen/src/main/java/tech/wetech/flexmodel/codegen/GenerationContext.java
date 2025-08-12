@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel.codegen;
 
-import tech.wetech.flexmodel.ImportDescribe;
+import tech.wetech.flexmodel.ModelImportBundle;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.EnumDefinition;
 import tech.wetech.flexmodel.model.SchemaObject;
@@ -130,9 +130,9 @@ public class GenerationContext {
   }
 
   public static GenerationContext buildGenerationContext(Configuration configuration) {
-    ImportDescribe importDescribe = configuration.getImportDescribe();
+    ModelImportBundle importDescribe = configuration.getImportDescribe();
     List<SchemaObject> models = importDescribe.getSchema();
-    List<ImportDescribe.ImportData> data = importDescribe.getData();
+    List<ModelImportBundle.ImportData> data = importDescribe.getData();
     Schema schema = configuration.getSchema();
     String packageName = configuration.getTarget().getPackageName();
     Map<String, ModelClass> modelClassMap = new HashMap<>();

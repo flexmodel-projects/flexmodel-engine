@@ -18,5 +18,5 @@ public interface BuildItem {
    */
   List<SchemaObject> getSchema();
 
-  List<ImportDescribe.ImportData> getData();
+  List<ModelImportBundle.ImportData> getData();
 }

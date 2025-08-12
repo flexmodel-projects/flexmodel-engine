@@ -3,7 +3,7 @@ package tech.wetech.flexmodel.session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.BuildItem;
-import tech.wetech.flexmodel.ImportDescribe;
+import tech.wetech.flexmodel.ModelImportBundle;
 import tech.wetech.flexmodel.model.SchemaObject;
 
 import java.util.*;
@@ -41,7 +41,7 @@ public class MemoryScriptManager {
   public void loadScriptFromBuildItem(BuildItem buildItem) {
     String schemaName = buildItem.getSchemaName();
     List<SchemaObject> schema = buildItem.getSchema();
-    List<ImportDescribe.ImportData> data = buildItem.getData();
+    List<ModelImportBundle.ImportData> data = buildItem.getData();
 
     schemaScripts.put(schemaName, new SchemaScriptConfig(schemaName, schema, data));
     log.info("Load schema: {}, Number of models: {}, Number of data items: {}", schemaName, schema.size(), data.size());
@@ -67,9 +67,9 @@ public class MemoryScriptManager {
   public static class SchemaScriptConfig {
     private final String schemaName;
     private final List<SchemaObject> schema;
-    private final List<ImportDescribe.ImportData> data;
+    private final List<ModelImportBundle.ImportData> data;
 
-    public SchemaScriptConfig(String schemaName, List<SchemaObject> schema, List<ImportDescribe.ImportData> data) {
+    public SchemaScriptConfig(String schemaName, List<SchemaObject> schema, List<ModelImportBundle.ImportData> data) {
       this.schemaName = schemaName;
       this.schema = new ArrayList<>(schema);
       this.data = new ArrayList<>(data);
@@ -83,7 +83,7 @@ public class MemoryScriptManager {
       return new ArrayList<>(schema);
     }
 
-    public List<ImportDescribe.ImportData> getData() {
+    public List<ModelImportBundle.ImportData> getData() {
       return new ArrayList<>(data);
     }
   }

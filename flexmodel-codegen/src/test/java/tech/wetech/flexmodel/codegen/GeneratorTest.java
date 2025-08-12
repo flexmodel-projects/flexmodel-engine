@@ -2,7 +2,7 @@ package tech.wetech.flexmodel.codegen;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import tech.wetech.flexmodel.ImportDescribe;
+import tech.wetech.flexmodel.ModelImportBundle;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
@@ -21,7 +21,7 @@ class GeneratorTest {
     InputStream is = GeneratorTest.class.getClassLoader().getResourceAsStream("import.json");
     assert is != null;
     String content = new String(is.readAllBytes());
-    ImportDescribe describe = new JacksonObjectConverter().parseToObject(content, ImportDescribe.class);
+    ModelImportBundle describe = new JacksonObjectConverter().parseToObject(content, ModelImportBundle.class);
     PojoGenerator generator = new PojoGenerator();
     GenerationContext generationContext = new GenerationContext();
     generationContext.getModelClassList().add(ModelClass.buildModelClass(packageName, schemaName, (EntityDefinition) describe.getSchema().getFirst()));
