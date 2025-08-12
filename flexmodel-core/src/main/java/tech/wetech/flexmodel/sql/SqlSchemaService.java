@@ -155,8 +155,11 @@ public class SqlSchemaService extends BaseService implements SchemaService {
 
   @Override
   public void dropField(String modelName, String fieldName) {
-    dropColumn(toSqlColumn(new TypedField<>(fieldName, "unknown").setModelName(modelName)));
-
+    try{
+      dropColumn(toSqlColumn(new TypedField<>(fieldName, "unknown").setModelName(modelName)));
+    }catch (Exception e){
+      log.error("Drop field occurred exception： {}", e.getMessage(), e);
+    }
     EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
     entity.removeField(fieldName);
     // 移除相关索引
