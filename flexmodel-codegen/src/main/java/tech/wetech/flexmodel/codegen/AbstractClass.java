@@ -1,5 +1,6 @@
 package tech.wetech.flexmodel.codegen;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -8,6 +9,9 @@ import java.util.Set;
  * @author cjbi
  */
 public abstract class AbstractClass<SELF extends AbstractClass<SELF>> implements Serializable {
+
+  @Serial
+  private static final long serialVersionUID = 1L;
 
   private final Set<String> imports = new HashSet<>();
   private String name;

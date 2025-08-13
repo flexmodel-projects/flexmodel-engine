@@ -1,5 +1,6 @@
 package tech.wetech.flexmodel.model.field;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -7,6 +8,9 @@ import java.util.Objects;
  * @author cjbi
  */
 public class GeneratedValue implements Serializable {
+
+  @Serial
+  private static final long serialVersionUID = 1L;
 
   private String name;
 
