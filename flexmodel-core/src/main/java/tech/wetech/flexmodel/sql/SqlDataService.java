@@ -59,30 +59,32 @@ public class SqlDataService extends BaseService implements DataService {
 
       EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
       Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
-      int result;
+      int rows;
       if (idFieldOptional.isPresent()) {
         TypedField<?, ?> idField = idFieldOptional.get();
         if (record.get(idField.getName()) != null) {
           // ID already provided in the record, just insert
-          result = sqlExecutor.update(sql, record);
+          rows = sqlExecutor.update(sql, record);
         } else {
           // Auto-generate ID and put it back into the record
           if (sqlDialect.useFirstGeneratedId()) {
-            result = sqlExecutor.updateAndReturnFirstGeneratedKeys(sql, record, generatedId ->
+            rows = sqlExecutor.updateAndReturnFirstGeneratedKeys(sql, record, generatedId ->
               record.put(idField.getName(), generatedId));
           } else {
-            result = sqlExecutor.updateAndReturnGeneratedKeys(sql, record,
+            rows = sqlExecutor.updateAndReturnGeneratedKeys(sql, record,
               new String[]{sqlDialect.getGeneratedKeyName(idField.getName())}, keys ->
                 record.put(idField.getName(), keys.getFirst()));
           }
         }
+        // 返回ID值
+        ReflectionUtils.setFieldValue(objR, idField.getName(), record.get(idField.getName()));
       } else {
-        result = sqlExecutor.update(sql, record);
+        rows = sqlExecutor.update(sql, record);
       }
 
       long duration = System.currentTimeMillis() - startTime;
-      log.debug("SQL insert completed for model: {} in {}ms, affected rows: {}", modelName, duration, result);
-      return result;
+      log.debug("SQL insert completed for model: {} in {}ms, affected rows: {}", modelName, duration, rows);
+      return rows;
     } catch (Exception e) {
       long duration = System.currentTimeMillis() - startTime;
       log.error("SQL insert failed for model: {} after {}ms", modelName, duration, e);

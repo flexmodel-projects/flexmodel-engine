@@ -1,7 +1,5 @@
 package tech.wetech.flexmodel.query;
 
-import tech.wetech.flexmodel.query.expr.Predicate;
-
 import java.util.List;
 import java.util.function.UnaryOperator;
 
@@ -53,7 +51,7 @@ public class TypedDSLQueryBuilder<T> {
    * 设置过滤条件（按ID）
    */
   public TypedDSLQueryBuilder<T> whereId(Object id) {
-    delegate.where(tech.wetech.flexmodel.query.expr.Expressions.field("id").eq(id));
+    delegate.where(Expressions.field("id").eq(id));
     return this;
   }
 

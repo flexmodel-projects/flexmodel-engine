@@ -1,4 +1,4 @@
-package tech.wetech.flexmodel.query.expr;
+package tech.wetech.flexmodel.query;
 
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 

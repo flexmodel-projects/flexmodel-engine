@@ -3,7 +3,7 @@ package tech.wetech.flexmodel.graphql;
 import graphql.schema.DataFetchingEnvironment;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.field.TypedField;
-import tech.wetech.flexmodel.query.expr.Expressions;
+import tech.wetech.flexmodel.query.Expressions;
 import tech.wetech.flexmodel.session.Session;
 import tech.wetech.flexmodel.session.SessionFactory;
 

@@ -1,7 +1,6 @@
 package tech.wetech.flexmodel.query;
 
-import tech.wetech.flexmodel.annotation.ModelClass;
-import tech.wetech.flexmodel.query.expr.Predicate;
+import tech.wetech.flexmodel.reflect.ReflectionUtils;
 import tech.wetech.flexmodel.session.Session;
 
 /**
@@ -32,7 +31,7 @@ public class DSLDeleteBuilder {
    */
   public <T> TypedDSLDeleteBuilder<T> deleteFrom(Class<T> entityClass) {
     this.entityClass = entityClass;
-    this.modelName = getModelNameFromClass(entityClass);
+    this.modelName = ReflectionUtils.getModelNameFromClass(entityClass);
     return new TypedDSLDeleteBuilder<>(this, entityClass);
   }
 
@@ -81,14 +80,4 @@ public class DSLDeleteBuilder {
     }
   }
 
-  /**
-   * 从实体类获取模型名称
-   */
-  private String getModelNameFromClass(Class<?> entityClass) {
-    ModelClass modelClass = entityClass.getAnnotation(ModelClass.class);
-    if (modelClass != null) {
-      return modelClass.value();
-    }
-    return entityClass.getSimpleName();
-  }
 }

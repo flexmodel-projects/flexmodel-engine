@@ -1,7 +1,7 @@
 package tech.wetech.flexmodel.service;
 
+import tech.wetech.flexmodel.query.Predicate;
 import tech.wetech.flexmodel.query.Query;
-import tech.wetech.flexmodel.query.expr.Predicate;
 
 import java.util.List;
 import java.util.Map;

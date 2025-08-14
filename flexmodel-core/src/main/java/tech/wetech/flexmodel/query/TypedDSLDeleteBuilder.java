@@ -1,7 +1,5 @@
 package tech.wetech.flexmodel.query;
 
-import tech.wetech.flexmodel.query.expr.Predicate;
-
 /**
  * 带类型的DSL删除构建器
  */

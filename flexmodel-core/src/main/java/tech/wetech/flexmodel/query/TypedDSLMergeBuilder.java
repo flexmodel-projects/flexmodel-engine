@@ -15,7 +15,7 @@ public class TypedDSLMergeBuilder<T> {
   /**
    * 设置要插入的值
    */
-  public TypedDSLMergeBuilder<T> values(Object values) {
+  public TypedDSLMergeBuilder<T> values(T values) {
     delegate.values(values);
     return this;
   }

@@ -1,9 +1,10 @@
 package tech.wetech.flexmodel.query;
 
-import tech.wetech.flexmodel.annotation.ModelClass;
 import tech.wetech.flexmodel.session.Session;
 
 import java.util.function.UnaryOperator;
+
+import static tech.wetech.flexmodel.reflect.ReflectionUtils.getModelNameFromClass;
 
 /**
  * @author cjbi
@@ -106,15 +107,5 @@ class DSL {
     return new TypedDSLDeleteBuilder<>(deleteFrom(getModelNameFromClass(entityClass)), entityClass);
   }
 
-  /**
-   * 从实体类获取模型名称
-   */
-  private String getModelNameFromClass(Class<?> entityClass) {
-    ModelClass modelClass = entityClass.getAnnotation(ModelClass.class);
-    if (modelClass != null) {
-      return modelClass.value();
-    }
-    return entityClass.getSimpleName();
-  }
 
 }

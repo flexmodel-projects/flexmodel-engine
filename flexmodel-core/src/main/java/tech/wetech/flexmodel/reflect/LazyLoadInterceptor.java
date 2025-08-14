@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.field.RelationField;
 import tech.wetech.flexmodel.model.field.TypedField;
-import tech.wetech.flexmodel.query.expr.Expressions;
+import tech.wetech.flexmodel.query.Expressions;
 import tech.wetech.flexmodel.session.AbstractSessionContext;
 import tech.wetech.flexmodel.session.Session;
 import tech.wetech.flexmodel.type.TypeHandler;

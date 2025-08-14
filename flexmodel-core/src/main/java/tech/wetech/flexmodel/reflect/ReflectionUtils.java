@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel.reflect;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.JsonObjectConverter;
 import tech.wetech.flexmodel.annotation.ModelClass;
 import tech.wetech.flexmodel.annotation.ModelField;
@@ -17,6 +19,44 @@ import java.util.Map;
  */
 public class ReflectionUtils {
 
+  private final Logger log = LoggerFactory.getLogger(ReflectionUtils.class);
+
+  public static void setFieldValue(Object obj, String fieldName, Object value) {
+    try {
+      // 构造setter方法名
+      String setterName = "set" + toUpperCamelCase(fieldName);
+      // 获取setter方法
+      Method setter = null;
+      Class<?> clazz = obj.getClass();
+
+      // 查找setter方法
+      for (Method method : clazz.getDeclaredMethods()) {
+        if (method.getName().equals(setterName) && method.getParameterCount() == 1) {
+          setter = method;
+          break;
+        }
+      }
+
+      // 如果没找到，尝试在父类中查找
+      if (setter == null) {
+        for (Method method : clazz.getMethods()) {
+          if (method.getName().equals(setterName) && method.getParameterCount() == 1) {
+            setter = method;
+            break;
+          }
+        }
+      }
+
+      if (setter != null) {
+
+        setter.setAccessible(true);
+        setter.invoke(obj, value);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
   public static String toUpperCamelCase(String str) {
     char[] cs = str.toCharArray();
     cs[0] -= 32;
@@ -31,6 +71,17 @@ public class ReflectionUtils {
       attr = method.getName().substring(2);
     }
     return Introspector.decapitalize(attr);
+  }
+
+  /**
+   * 从实体类获取模型名称
+   */
+  public static String getModelNameFromClass(Class<?> entityClass) {
+    ModelClass modelClass = entityClass.getAnnotation(ModelClass.class);
+    if (modelClass != null) {
+      return modelClass.value();
+    }
+    return entityClass.getSimpleName();
   }
 
   @SuppressWarnings("all")

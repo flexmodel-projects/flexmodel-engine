@@ -1,6 +1,5 @@
 package tech.wetech.flexmodel.query;
 
-import tech.wetech.flexmodel.annotation.ModelClass;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.field.TypedField;
 import tech.wetech.flexmodel.reflect.ReflectionUtils;
@@ -37,7 +36,7 @@ public class DSLMergeBuilder {
    */
   public <T> TypedDSLMergeBuilder<T> mergeInto(Class<T> entityClass) {
     this.entityClass = entityClass;
-    this.modelName = getModelNameFromClass(entityClass);
+    this.modelName = ReflectionUtils.getModelNameFromClass(entityClass);
     return new TypedDSLMergeBuilder<>(this, entityClass);
   }
 
@@ -75,14 +74,4 @@ public class DSLMergeBuilder {
     }
   }
 
-  /**
-   * 从实体类获取模型名称
-   */
-  private String getModelNameFromClass(Class<?> entityClass) {
-    ModelClass modelClass = entityClass.getAnnotation(ModelClass.class);
-    if (modelClass != null) {
-      return modelClass.value();
-    }
-    return entityClass.getSimpleName();
-  }
 }

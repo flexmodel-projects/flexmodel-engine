@@ -1,7 +1,5 @@
 package tech.wetech.flexmodel.query;
 
-import tech.wetech.flexmodel.annotation.ModelClass;
-import tech.wetech.flexmodel.query.expr.Predicate;
 import tech.wetech.flexmodel.reflect.ReflectionUtils;
 import tech.wetech.flexmodel.session.Session;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
@@ -38,7 +36,7 @@ public class DSLUpdateBuilder {
    */
   public <T> TypedDSLUpdateBuilder<T> update(Class<T> entityClass) {
     this.entityClass = entityClass;
-    this.modelName = getModelNameFromClass(entityClass);
+    this.modelName = ReflectionUtils.getModelNameFromClass(entityClass);
     return new TypedDSLUpdateBuilder<>(this, entityClass);
   }
 
@@ -106,14 +104,4 @@ public class DSLUpdateBuilder {
     }
   }
 
-  /**
-   * 从实体类获取模型名称
-   */
-  private String getModelNameFromClass(Class<?> entityClass) {
-    ModelClass modelClass = entityClass.getAnnotation(ModelClass.class);
-    if (modelClass != null) {
-      return modelClass.value();
-    }
-    return entityClass.getSimpleName();
-  }
 }

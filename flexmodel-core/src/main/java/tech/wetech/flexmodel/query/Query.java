@@ -1,7 +1,6 @@
 package tech.wetech.flexmodel.query;
 
 import tech.wetech.flexmodel.model.field.Field;
-import tech.wetech.flexmodel.query.expr.Predicate;
 
 import java.io.Serializable;
 import java.util.ArrayList;

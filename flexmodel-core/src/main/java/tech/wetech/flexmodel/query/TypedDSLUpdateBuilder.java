@@ -1,7 +1,5 @@
 package tech.wetech.flexmodel.query;
 
-import tech.wetech.flexmodel.query.expr.Predicate;
-
 /**
  * 带类型的DSL更新构建器
  */
@@ -25,7 +23,7 @@ public class TypedDSLUpdateBuilder<T> {
   /**
    * 设置多个字段的值
    */
-  public TypedDSLUpdateBuilder<T> values(Object values) {
+  public TypedDSLUpdateBuilder<T> values(T values) {
     delegate.values(values);
     return this;
   }

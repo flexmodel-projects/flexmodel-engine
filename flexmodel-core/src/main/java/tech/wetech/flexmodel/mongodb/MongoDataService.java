@@ -70,6 +70,7 @@ public class MongoDataService extends BaseService implements DataService {
         id = processedData.get(idFieldOptional.get().getName());
         // 将生成的ID放回到原始的data map中
         data.put(idFieldOptional.get().getName(), id);
+        ReflectionUtils.setFieldValue(objR, idFieldOptional.get().getName(), id);
       }
 
       // 处理关联关系

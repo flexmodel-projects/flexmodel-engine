@@ -1,4 +1,4 @@
-package tech.wetech.flexmodel.query.expr;
+package tech.wetech.flexmodel.query;
 
 import java.util.Arrays;
 import java.util.Collections;
