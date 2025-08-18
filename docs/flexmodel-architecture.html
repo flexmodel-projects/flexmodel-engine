@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flexmodel Engine 架构设计</title>
+    <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --container-bg: white;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --layer-bg: #fafafa;
+            --title-bg: #e0e0e0;
+            --shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --container-bg: #2d2d2d;
+            --text-color: #ffffff;
+            --border-color: #404040;
+            --layer-bg: #3a3a3a;
+            --title-bg: #404040;
+            --shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .architecture-container {
+            background: var(--container-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            max-width: 800px;
+            width: 100%;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .title {
+            text-align: center;
+            color: var(--text-color);
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .architecture-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .layer {
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            background: var(--layer-bg);
+            position: relative;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .layer-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            color: var(--text-color);
+            margin-bottom: 12px;
+            padding: 8px;
+            background: var(--title-bg);
+            border-radius: 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .modules {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+            gap: 10px;
+        }
+
+        .module {
+            background: #4a90e2;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 120px;
+            max-width: 200px;
+            flex: 1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .module:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .module-name {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+
+
+        .module-details {
+            font-size: 10px;
+            margin-top: 5px;
+            opacity: 0.8;
+            line-height: 1.3;
+        }
+
+        .sub-module {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 4px;
+            border-radius: 3px;
+            margin: 1px;
+            font-size: 9px;
+            width: 45%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .data-sources {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 8px;
+        }
+
+        .data-source {
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .data-source:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        /* 关系型数据库 */
+        .db-source {
+            background: #007bff;
+        }
+
+        /* NoSQL数据库 */
+        .nosql-source {
+            background: #6f42c1;
+        }
+
+        /* API数据源 */
+        .api-source {
+            background: #17a2b8;
+        }
+
+        /* 实时数据源 */
+        .realtime-source {
+            background: #28a745;
+        }
+
+        /* 文件数据源 */
+        .file-source {
+            background: #fd7e14;
+        }
+
+        .core-engine {
+            background: var(--layer-bg);
+        }
+
+        .core-engine .module {
+            background: #28a745;
+        }
+
+        .data-access {
+            background: var(--layer-bg);
+        }
+
+        .data-access .module {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .theme-btn {
+            background: var(--container-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .theme-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .export-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .export-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .architecture-container {
+                box-shadow: none;
+            }
+            .export-buttons {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-toggle">
+        <button class="theme-btn" onclick="toggleTheme()">🌙 夜间模式</button>
+    </div>
+    <div class="architecture-container">
+        <h1 class="title">Flexmodel Engine Architecture Design</h1>
+        
+        <div class="architecture-diagram">
+            <!-- 顶层模块 -->
+            <div class="layer">
+                <div class="layer-title">Flexmodel Engine</div>
+                <div class="modules">
+                    <div class="module">
+                        <div class="module-name">Modeling</div>
+                        <div class="module-details">
+                            <div class="sub-module">Entity</div>
+                            <div class="sub-module">Relation</div>
+                            <div class="sub-module">Field</div>
+                            <div class="sub-module">Validation</div>
+                        </div>
+                    </div>
+                    <div class="module">
+                        <div class="module-name">GraphQL</div>
+                        <div class="module-details">
+                            <div class="sub-module">Schema</div>
+                            <div class="sub-module">Resolver</div>
+                            <div class="sub-module">Query</div>
+                            <div class="sub-module">Mutation</div>
+                        </div>
+                    </div>
+                    <div class="module">
+                        <div class="module-name">JSON Logic</div>
+                        <div class="module-details">
+                            <div class="sub-module">Parser</div>
+                            <div class="sub-module">Evaluator</div>
+                            <div class="sub-module">Functions</div>
+                            <div class="sub-module">Rules</div>
+                        </div>
+                    </div>
+                    <div class="module">
+                        <div class="module-name">CodeGen</div>
+                        <div class="module-details">
+                            <div class="sub-module">Java</div>
+                            <div class="sub-module">Kotlin</div>
+                            <div class="sub-module">TypeScript</div>
+                            <div class="sub-module">Templates</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 核心引擎 -->
+            <div class="layer core-engine">
+                <div class="layer-title">Core Engine</div>
+                <div class="modules">
+                    <div class="module">
+                        <div class="module-name">Schema Parser</div>
+                        <div class="module-details">
+                            <div class="sub-module">IDL</div>
+                            <div class="sub-module">JSON</div>
+                            <div class="sub-module">AST</div>
+                            <div class="sub-module">Validation</div>
+                        </div>
+                    </div>
+                    <div class="module">
+                        <div class="module-name">Type Mapping</div>
+                        <div class="module-details">
+                            <div class="sub-module">Converter</div>
+                            <div class="sub-module">Adapter</div>
+                            <div class="sub-module">Transformer</div>
+                            <div class="sub-module">Registry</div>
+                        </div>
+                    </div>
+                    <div class="module">
+                        <div class="module-name">Session Manager</div>
+                        <div class="module-details">
+                            <div class="sub-module">Lifecycle</div>
+                            <div class="sub-module">Context</div>
+                            <div class="sub-module">State</div>
+                            <div class="sub-module">Events</div>
+                        </div>
+                    </div>
+                    <div class="module">
+                        <div class="module-name">Model Registry</div>
+                        <div class="module-details">
+                            <div class="sub-module">Cache</div>
+                            <div class="sub-module">Loader</div>
+                            <div class="sub-module">Resolver</div>
+                            <div class="sub-module">Metadata</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据访问层 -->
+            <div class="layer data-access">
+                <div class="layer-title">Data Access Layer</div>
+                <div class="modules">
+                    <div class="module">
+                        <div class="module-name">SQL</div>
+                        <div class="module-details">
+                            <div class="sub-module">MySQL</div>
+                            <div class="sub-module">PostgreSQL</div>
+                            <div class="sub-module">Oracle</div>
+                            <div class="sub-module">SQL Server</div>
+                        </div>
+                    </div>
+                    <div class="module">
+                        <div class="module-name">MongoDB</div>
+                        <div class="module-details">
+                            <div class="sub-module">Driver</div>
+                            <div class="sub-module">Aggregation</div>
+                            <div class="sub-module">Index</div>
+                            <div class="sub-module">Replica</div>
+                        </div>
+                    </div>
+                    <div class="module">
+                        <div class="module-name">Query</div>
+                        <div class="module-details">
+                            <div class="sub-module">DSL</div>
+                            <div class="sub-module">Optimizer</div>
+                            <div class="sub-module">Executor</div>
+                            <div class="sub-module">Plan</div>
+                        </div>
+                    </div>
+                    <div class="module">
+                        <div class="module-name">Custom</div>
+                        <div class="module-details">
+                            <div class="sub-module">API</div>
+                            <div class="sub-module">File</div>
+                            <div class="sub-module">Stream</div>
+                            <div class="sub-module">Plugin</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据源 -->
+            <div class="layer">
+                <div class="layer-title">Data Sources</div>
+                <div class="data-sources">
+                    <!-- 关系型数据库 -->
+                    <div class="data-source db-source">MySQL</div>
+                    <div class="data-source db-source">PostgreSQL</div>
+                    <div class="data-source db-source">Oracle</div>
+                    <div class="data-source db-source">SQLite</div>
+                    <div class="data-source db-source">SQL Server</div>
+                    <div class="data-source db-source">MariaDB</div>
+                    <div class="data-source db-source">DB2</div>
+                    <div class="data-source db-source">TiDB</div>
+                    
+                    <!-- NoSQL数据库 -->
+                    <div class="data-source nosql-source">MongoDB</div>
+                    
+                    <!-- API数据源 -->
+                    <div class="data-source api-source">HTTP API</div>
+                    <div class="data-source api-source">GraphQL API</div>
+                    <div class="data-source api-source">More Data Sources</div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="export-buttons">
+            <button class="export-btn" onclick="window.print()">打印/保存为PDF</button>
+            <button class="export-btn" onclick="captureScreenshot()">截图保存</button>
+        </div>
+    </div>
+
+    <script>
+        // 主题切换功能
+        function toggleTheme() {
+            const body = document.body;
+            const themeBtn = document.querySelector('.theme-btn');
+            const currentTheme = body.getAttribute('data-theme');
+            
+            if (currentTheme === 'dark') {
+                body.removeAttribute('data-theme');
+                themeBtn.textContent = '🌙 夜间模式';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeBtn.textContent = '☀️ 日间模式';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // 页面加载时恢复主题设置
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const themeBtn = document.querySelector('.theme-btn');
+            
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                themeBtn.textContent = '☀️ 日间模式';
+            }
+        });
+
+        function captureScreenshot() {
+            // 使用html2canvas库来截图（需要先引入）
+            if (typeof html2canvas !== 'undefined') {
+                html2canvas(document.querySelector('.architecture-container')).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'flexmodel-architecture.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                });
+            } else {
+                alert('请先引入html2canvas库以支持截图功能，或使用浏览器的打印功能保存为PDF');
+            }
+        }
+    </script>
+</body>
+</html>
