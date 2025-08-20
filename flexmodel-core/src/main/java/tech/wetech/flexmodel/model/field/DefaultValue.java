@@ -37,10 +37,6 @@ public class DefaultValue implements Serializable {
     private String type;
     private Object value;
     private String name;
-
-    public DefaultValue() {
-    }
-
     /**
      * 创建固定值类型的默认值
      */
@@ -85,7 +81,7 @@ public class DefaultValue implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DefaultValue that)) return false;
-        return type == that.type &&
+        return Objects.equals(type, that.type) &&
                Objects.equals(value, that.value) &&
                Objects.equals(name, that.name);
     }
