@@ -26,7 +26,7 @@ public class LegacyDateTimeSqlTypeHandler implements SqlTypeHandler {
     if (value instanceof LocalDateTime localDateTime) {
       return Timestamp.valueOf(localDateTime);
     }
-    return Timestamp.valueOf(value.toString());
+    return Timestamp.valueOf(value.toString().replace("T", " "));
   }
 
   @Override
