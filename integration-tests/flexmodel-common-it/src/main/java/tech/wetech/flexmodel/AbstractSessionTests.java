@@ -197,7 +197,7 @@ public abstract class AbstractSessionTests {
 
     void createTeacherEntity(String entityName) {
         session.schema().createEntity(entityName, entity -> entity
-            .addField(new StringField("id").asIdentity().setDefaultValue(DefaultValue.AUTO_INCREMENT))
+            .addField(new StringField("id").asIdentity().setDefaultValue(DefaultValue.UUID))
             .addField(new StringField("teacherName"))
             .addField(new StringField("subject"))
         );
