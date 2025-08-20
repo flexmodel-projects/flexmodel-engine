@@ -55,7 +55,10 @@
           "unique": false,
           "nullable": true,
           "modelName": "ApiInfo",
-          "defaultValue": { "name": "ulid" }
+          "defaultValue": { 
+            "type": "generated",
+            "name": "ulid" 
+          }
         },
         {
           "name": "name",
@@ -92,7 +95,10 @@
               "message": "must not be null"
             }
           ],
-          "defaultValue": "FOLDER"
+          "defaultValue": {
+            "type": "fixed",
+            "value": "FOLDER"
+          }
         },
         {
           "name": "method",
@@ -157,7 +163,10 @@
           "unique": false,
           "nullable": true,
           "modelName": "ApiLog",
-          "defaultValue": { "name": "ulid" }
+          "defaultValue": { 
+            "type": "generated",
+            "name": "ulid" 
+          }
         },
         {
           "name": "level",

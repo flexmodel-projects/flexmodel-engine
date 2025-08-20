@@ -559,7 +559,8 @@ public abstract class BaseService {
       }
 
       Object currentValue = processedData.get(field.getName());
-      if (field.getDefaultValue() != null) {
+      DefaultValue defaultValue = field.getDefaultValue();
+      if (defaultValue != null) {
         Object generatedValue = generateFieldValue(field, currentValue, isUpdate);
         processedData.put(field.getName(), generatedValue);
 
@@ -607,29 +608,37 @@ public abstract class BaseService {
       return currentValue;
     }
 
-    Object defaultValue = field.getDefaultValue();
-
-    if (Objects.equals(defaultValue, GeneratedValue.ULID)) {
-      String ulid = ULID.random().toString();
-      log.debug("Generated ULID for field: {} = {}", field.getName(), ulid);
-      return ulid;
-    } else if (Objects.equals(defaultValue, GeneratedValue.UUID)) {
-      String uuid = UUID.randomUUID().toString();
-      log.debug("Generated UUID for field: {} = {}", field.getName(), uuid);
-      return uuid;
-    } else if (Objects.equals(defaultValue, GeneratedValue.NOW)) {
-      Object timeValue = generateCurrentTimeValue(field);
-      log.debug("Generated current time for field: {} = {}", field.getName(), timeValue);
-      return timeValue;
-    } else if (defaultValue instanceof GeneratedValue) {
-      // 忽略其他生成值类型
-      log.debug("Ignored generated value type for field: {} = {}", field.getName(), defaultValue);
+    DefaultValue defaultValue = field.getDefaultValue();
+    if (defaultValue == null) {
       return null;
-    } else {
-      Object convertedDefault = convertParameter(field, defaultValue);
+    }
+
+    if (defaultValue.isGenerated()) {
+      String generatedName = defaultValue.getName();
+      if ("ulid".equals(generatedName)) {
+        String ulid = ULID.random().toString();
+        log.debug("Generated ULID for field: {} = {}", field.getName(), ulid);
+        return ulid;
+      } else if ("uuid".equals(generatedName)) {
+        String uuid = UUID.randomUUID().toString();
+        log.debug("Generated UUID for field: {} = {}", field.getName(), uuid);
+        return uuid;
+      } else if ("now".equals(generatedName)) {
+        Object timeValue = generateCurrentTimeValue(field);
+        log.debug("Generated current time for field: {} = {}", field.getName(), timeValue);
+        return timeValue;
+      } else {
+        // 忽略其他生成值类型
+        log.debug("Ignored generated value type for field: {} = {}", field.getName(), generatedName);
+        return null;
+      }
+    } else if (defaultValue.isFixed()) {
+      Object convertedDefault = convertParameter(field, defaultValue.getValue());
       log.debug("Used default value for field: {} = {}", field.getName(), convertedDefault);
       return convertedDefault;
     }
+    
+    return null;
   }
 
   /**

@@ -13,6 +13,7 @@
           "unique": false,
           "nullable": false,
           "defaultValue": {
+            "type": "generated",
             "name": "autoIncrement"
           }
         },
@@ -157,6 +158,7 @@
           "nullable": true,
           "modelName": "Datasource",
           "defaultValue": {
+            "type": "generated",
             "name": "uuid"
           }
         },
@@ -196,7 +198,10 @@
           "comment": "",
           "nullable": false,
           "modelName": "fs_datasource",
-          "defaultValue": true
+          "defaultValue": {
+            "type": "fixed",
+            "value": true
+          }
         }
       ],
       "indexes": []
@@ -213,6 +218,7 @@
           "nullable": true,
           "modelName": "fs_api_log",
           "defaultValue": {
+            "type": "generated",
             "name": "ulid"
           }
         },
@@ -273,6 +279,7 @@
           "unique": false,
           "nullable": true,
           "defaultValue": {
+            "type": "generated",
             "name": "autoIncrement"
           }
         },
@@ -343,6 +350,7 @@
           "unique": false,
           "nullable": true,
           "defaultValue": {
+            "type": "generated",
             "name": "autoIncrement"
           }
         },

@@ -136,19 +136,19 @@ public class ASTNodeConverter {
         case "default" -> {
           Object value = annotation.parameters.get("value");
           if (value instanceof ModelParser.FunctionCall func) {
-            field.setDefaultValue(new GeneratedValue(func.name));
+            field.setDefaultValue(DefaultValue.generated(func.name));
           } else {
             switch (field) {
-              case IntField intField -> intField.setDefaultValue(Integer.valueOf((String) annotation.parameters.get("value")));
-              case FloatField floatField -> floatField.setDefaultValue(Double.valueOf((String) annotation.parameters.get("value")));
+              case IntField intField -> intField.setFixedDefaultValue(Integer.valueOf((String) annotation.parameters.get("value")));
+              case FloatField floatField -> floatField.setFixedDefaultValue(Double.valueOf((String) annotation.parameters.get("value")));
               case DateField dateField ->
-                dateField.setDefaultValue(LocalDate.parse((String) annotation.parameters.get("value")));
+                dateField.setFixedDefaultValue(LocalDate.parse((String) annotation.parameters.get("value")));
               case DateTimeField dateTimeField ->
-                dateTimeField.setDefaultValue(LocalDateTime.parse((String) annotation.parameters.get("value")));
+                dateTimeField.setFixedDefaultValue(LocalDateTime.parse((String) annotation.parameters.get("value")));
               case TimeField dateTimeField ->
-                dateTimeField.setDefaultValue(LocalTime.parse((String) annotation.parameters.get("value")));
-              case BooleanField booleanField -> booleanField.setDefaultValue(Boolean.valueOf((String) annotation.parameters.get("value")));
-              default -> field.setDefaultValue(annotation.parameters.get("value"));
+                dateTimeField.setFixedDefaultValue(LocalTime.parse((String) annotation.parameters.get("value")));
+              case BooleanField booleanField -> booleanField.setFixedDefaultValue(Boolean.valueOf((String) annotation.parameters.get("value")));
+              default -> field.setDefaultValue(DefaultValue.fixed(annotation.parameters.get("value")));
             }
           }
         }
@@ -294,13 +294,13 @@ public class ASTNodeConverter {
     }
   }
 
-  private static void addDefaultAnnotation(ModelParser.Field idlField, Object defaultValue) {
+  private static void addDefaultAnnotation(ModelParser.Field idlField, DefaultValue defaultValue) {
     if (defaultValue != null) {
       ModelParser.Annotation anno = new ModelParser.Annotation("default");
-      if (defaultValue instanceof GeneratedValue generatedValue) {
-        anno.parameters.put("value", new ModelParser.FunctionCall(generatedValue.getName()));
-      } else {
-        anno.parameters.put("value", defaultValue.toString());
+      if (defaultValue.isGenerated()) {
+        anno.parameters.put("value", new ModelParser.FunctionCall(defaultValue.getName()));
+      } else if (defaultValue.isFixed()) {
+        anno.parameters.put("value", defaultValue.getValue().toString());
       }
       idlField.annotations.add(anno);
     }

@@ -8,7 +8,7 @@ import org.bson.Document;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.ModelDefinition;
 import tech.wetech.flexmodel.model.NativeQueryDefinition;
-import tech.wetech.flexmodel.model.field.GeneratedValue;
+import tech.wetech.flexmodel.model.field.DefaultValue;
 import tech.wetech.flexmodel.model.field.TypedField;
 import tech.wetech.flexmodel.query.Query;
 import tech.wetech.flexmodel.reflect.LazyObjProxy;
@@ -55,7 +55,8 @@ public class MongoDataService extends BaseService implements DataService {
       Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), processedData, Map.class);
       EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
       TypedField<?, ?> idField = entity.findIdField().orElseThrow();
-      if (GeneratedValue.AUTO_INCREMENT.equals(idField.getDefaultValue())) {
+      DefaultValue defaultValue = idField.getDefaultValue();
+      if (defaultValue != null && defaultValue.isGenerated() && "autoIncrement".equals(defaultValue.getName())) {
         assignAutoIncrementId(modelName, record);
       }
       String collectionName = getCollectionName(modelName);

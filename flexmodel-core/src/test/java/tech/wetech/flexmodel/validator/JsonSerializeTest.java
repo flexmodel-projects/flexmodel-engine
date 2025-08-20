@@ -39,7 +39,7 @@ public class JsonSerializeTest {
     // 是否禁用
     BooleanField isLocked = new BooleanField("isLocked");
     isLocked.setNullable(false);
-    isLocked.setDefaultValue(false);
+    isLocked.setFixedDefaultValue(false);
     isLocked.setComment("是否禁用");
     entity.addField(isLocked);
     // 创建时间

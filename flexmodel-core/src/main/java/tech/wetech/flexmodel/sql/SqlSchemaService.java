@@ -10,7 +10,6 @@ import tech.wetech.flexmodel.service.SchemaService;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -301,7 +300,8 @@ public class SqlSchemaService extends BaseService implements SchemaService {
       idColumn.setPrimaryKey(true);
       idColumn.setUnique(true);
       idColumn.setSqlTypeCode(sessionContext.getTypeHandler(field.getType()).getJdbcTypeCode());
-      idColumn.setAutoIncrement(Objects.equals(field.getDefaultValue(), GeneratedValue.AUTO_INCREMENT));
+      DefaultValue defaultValue = field.getDefaultValue();
+      idColumn.setAutoIncrement(defaultValue != null && defaultValue.isGenerated() && "autoIncrement".equals(defaultValue.getName()));
       idColumn.setComment(field.getComment());
       return idColumn;
     } else {
@@ -315,33 +315,34 @@ public class SqlSchemaService extends BaseService implements SchemaService {
       aSqlColumn.setComment(field.getComment());
       aSqlColumn.setTableName(toPhysicalTableString(field.getModelName()));
 
+      DefaultValue defaultValue = field.getDefaultValue();
       switch (field) {
         case StringField stringField -> {
           aSqlColumn.setLength(stringField.getLength());
-          if (field.getDefaultValue() != null && !(field.getDefaultValue() instanceof GeneratedValue)) {
-            aSqlColumn.setDefaultValue(field.getDefaultValue().toString());
+          if (defaultValue != null && defaultValue.isFixed()) {
+            aSqlColumn.setDefaultValue(defaultValue.getValue().toString());
           }
         }
         case FloatField decimalField -> {
           aSqlColumn.setPrecision(decimalField.getPrecision());
           aSqlColumn.setScale(decimalField.getScale());
-          if (field.getDefaultValue() != null && !(field.getDefaultValue() instanceof GeneratedValue)) {
-            aSqlColumn.setDefaultValue(field.getDefaultValue().toString());
+          if (defaultValue != null && defaultValue.isFixed()) {
+            aSqlColumn.setDefaultValue(defaultValue.getValue().toString());
           }
         }
         case JSONField jsonField -> {
-          if (field.getDefaultValue() != null && !(field.getDefaultValue() instanceof GeneratedValue)) {
-            aSqlColumn.setDefaultValue(sessionContext.getJsonObjectConverter().toJsonString(jsonField.getDefaultValue()));
+          if (defaultValue != null && defaultValue.isFixed()) {
+            aSqlColumn.setDefaultValue(sessionContext.getJsonObjectConverter().toJsonString(defaultValue.getValue()));
           }
         }
         case BooleanField booleanField -> {
-          if (field.getDefaultValue() != null && !(field.getDefaultValue() instanceof GeneratedValue)) {
-            aSqlColumn.setDefaultValue(sessionContext.getSqlDialect().toBooleanValueString((Boolean) booleanField.getDefaultValue()));
+          if (defaultValue != null && defaultValue.isFixed()) {
+            aSqlColumn.setDefaultValue(sessionContext.getSqlDialect().toBooleanValueString((Boolean) defaultValue.getValue()));
           }
         }
         default -> {
-          if (field.getDefaultValue() != null && !(field.getDefaultValue() instanceof GeneratedValue)) {
-            aSqlColumn.setDefaultValue(field.getDefaultValue().toString());
+          if (defaultValue != null && defaultValue.isFixed()) {
+            aSqlColumn.setDefaultValue(defaultValue.getValue().toString());
           }
         }
       }

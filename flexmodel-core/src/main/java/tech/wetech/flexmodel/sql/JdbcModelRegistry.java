@@ -23,7 +23,6 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static tech.wetech.flexmodel.model.field.GeneratedValue.AUTO_INCREMENT;
 import static tech.wetech.flexmodel.model.field.ScalarType.STRING;
 
 /**
@@ -232,7 +231,7 @@ public class JdbcModelRegistry implements ModelRegistry {
             field = stringField;
             if (sqlColumn.getDefaultValue() != null) {
               try {
-                stringField.setDefaultValue(sqlColumn.getDefaultValue());
+                stringField.setFixedDefaultValue(sqlColumn.getDefaultValue());
               } catch (Exception e) {
                 log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
               }
@@ -247,7 +246,7 @@ public class JdbcModelRegistry implements ModelRegistry {
             decimalField.setScale(sqlColumn.getScale());
             if (sqlColumn.getDefaultValue() != null) {
               try {
-                decimalField.setDefaultValue(Double.valueOf(sqlColumn.getDefaultValue()));
+                decimalField.setFixedDefaultValue(Double.valueOf(sqlColumn.getDefaultValue()));
               } catch (Exception e) {
                 log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
               }
@@ -259,7 +258,7 @@ public class JdbcModelRegistry implements ModelRegistry {
             field = intField;
             if (sqlColumn.getDefaultValue() != null) {
               try {
-                intField.setDefaultValue(Integer.valueOf(sqlColumn.getDefaultValue()));
+                intField.setFixedDefaultValue(Integer.valueOf(sqlColumn.getDefaultValue()));
               } catch (Exception e) {
                 log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
               }
@@ -271,7 +270,7 @@ public class JdbcModelRegistry implements ModelRegistry {
             field = bigintField;
             if (sqlColumn.getDefaultValue() != null && !sqlColumn.getDefaultValue().equals("NULL")) {
               try {
-                bigintField.setDefaultValue(Long.valueOf(sqlColumn.getDefaultValue()));
+                bigintField.setFixedDefaultValue(Long.valueOf(sqlColumn.getDefaultValue()));
               } catch (Exception e) {
                 log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
               }
@@ -283,7 +282,7 @@ public class JdbcModelRegistry implements ModelRegistry {
             field = booleanField;
             if (sqlColumn.getDefaultValue() != null) {
               try {
-                booleanField.setDefaultValue(Boolean.valueOf(sqlColumn.getDefaultValue()));
+                booleanField.setFixedDefaultValue(Boolean.valueOf(sqlColumn.getDefaultValue()));
               } catch (Exception e) {
                 log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
               }
@@ -295,7 +294,7 @@ public class JdbcModelRegistry implements ModelRegistry {
             field = datetimeField;
             if (sqlColumn.getDefaultValue() != null) {
               try {
-                datetimeField.setDefaultValue(LocalDateTime.parse(sqlColumn.getDefaultValue()));
+                datetimeField.setFixedDefaultValue(LocalDateTime.parse(sqlColumn.getDefaultValue()));
               } catch (Exception e) {
                 log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
               }
@@ -307,7 +306,7 @@ public class JdbcModelRegistry implements ModelRegistry {
             field = timeField;
             if (sqlColumn.getDefaultValue() != null) {
               try {
-                timeField.setDefaultValue(LocalTime.parse(sqlColumn.getDefaultValue()));
+                timeField.setFixedDefaultValue(LocalTime.parse(sqlColumn.getDefaultValue()));
               } catch (Exception e) {
                 log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
               }
@@ -319,7 +318,7 @@ public class JdbcModelRegistry implements ModelRegistry {
             field = dateField;
             if (sqlColumn.getDefaultValue() != null) {
               try {
-                dateField.setDefaultValue(LocalDate.parse(sqlColumn.getDefaultValue()));
+                dateField.setFixedDefaultValue(LocalDate.parse(sqlColumn.getDefaultValue()));
               } catch (Exception e) {
                 log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
               }
@@ -331,7 +330,7 @@ public class JdbcModelRegistry implements ModelRegistry {
             field = jsonField;
             if (sqlColumn.getDefaultValue() != null) {
               try {
-                jsonField.setDefaultValue(sqlContext.getJsonObjectConverter().parseToObject(sqlColumn.getDefaultValue(), Serializable.class));
+                jsonField.setFixedDefaultValue(sqlContext.getJsonObjectConverter().parseToObject(sqlColumn.getDefaultValue(), Serializable.class));
               } catch (Exception e) {
                 log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
               }
@@ -341,7 +340,7 @@ public class JdbcModelRegistry implements ModelRegistry {
         }
         field.setIdentity(sqlColumn.isPrimaryKey());
         if (sqlColumn.isAutoIncrement()) {
-          field.setDefaultValue(AUTO_INCREMENT);
+          field.setDefaultValue(DefaultValue.AUTO_INCREMENT);
         }
         field.setModelName(sqlColumn.getTableName());
         field.setComment(sqlColumn.getComment());
