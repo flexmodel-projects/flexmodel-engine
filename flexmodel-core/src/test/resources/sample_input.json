@@ -33,7 +33,10 @@
         "unique": false,
         "nullable": true,
         "modelName": "fs_datasource",
-        "defaultValue": { "name": "now" }
+        "defaultValue": { 
+          "type": "generated",
+          "name": "now" 
+        }
       },
       {
         "name": "updatedAt",
@@ -41,7 +44,10 @@
         "unique": false,
         "nullable": true,
         "modelName": "fs_datasource",
-        "defaultValue": { "name": "now" }
+        "defaultValue": { 
+          "type": "generated",
+          "name": "now" 
+        }
       },
       {
         "name": "enabled",
@@ -50,7 +56,10 @@
         "comment": "",
         "nullable": false,
         "modelName": "fs_datasource",
-        "defaultValue": true
+        "defaultValue": {
+          "type": "fixed",
+          "value": true
+        }
       }
     ],
     "indexes": []
@@ -66,7 +75,10 @@
         "unique": true,
         "nullable": true,
         "modelName": "fs_api_definition",
-        "defaultValue": { "name": "ulid" }
+        "defaultValue": { 
+          "type": "generated",
+          "name": "ulid" 
+        }
       },
       {
         "name": "name",
@@ -92,7 +104,10 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_api_definition",
-        "defaultValue": "FOLDER"
+        "defaultValue": {
+          "type": "fixed",
+          "value": "FOLDER"
+        }
       },
       {
         "name": "method",
@@ -116,7 +131,10 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_api_definition",
-        "defaultValue": { "name": "now" }
+        "defaultValue": { 
+          "type": "generated",
+          "name": "now" 
+        }
       },
       {
         "name": "updatedAt",
@@ -124,7 +142,10 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_api_definition",
-        "defaultValue": { "name": "now" }
+        "defaultValue": { 
+          "type": "generated",
+          "name": "now" 
+        }
       },
       {
         "name": "meta",
@@ -140,7 +161,10 @@
         "comment": "",
         "nullable": false,
         "modelName": "fs_api_definition",
-        "defaultValue": true
+        "defaultValue": {
+          "type": "fixed",
+          "value": true
+        }
       }
     ],
     "indexes": []
@@ -156,7 +180,10 @@
         "unique": false,
         "nullable": true,
         "modelName": "fs_api_log",
-        "defaultValue": { "name": "ulid" }
+        "defaultValue": { 
+          "type": "generated",
+          "name": "ulid" 
+        }
       },
       {
         "name": "level",
@@ -188,7 +215,10 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_api_log",
-        "defaultValue": { "name": "now" }
+        "defaultValue": { 
+          "type": "generated",
+          "name": "now" 
+        }
       }
     ],
     "indexes": [
@@ -223,7 +253,10 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_identity_provider",
-        "defaultValue": { "name": "now" }
+        "defaultValue": { 
+          "type": "generated",
+          "name": "now" 
+        }
       },
       {
         "name": "provider",
@@ -238,7 +271,10 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_identity_provider",
-        "defaultValue": { "name": "now" }
+        "defaultValue": { 
+          "type": "generated",
+          "name": "now" 
+        }
       }
     ],
     "indexes": []
@@ -255,7 +291,10 @@
         "unique": true,
         "nullable": true,
         "modelName": "fs_config",
-        "defaultValue": { "name": "ulid" }
+        "defaultValue": { 
+          "type": "generated",
+          "name": "ulid" 
+        }
       },
       {
         "name": "key",
@@ -279,7 +318,10 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_api_definition",
-        "defaultValue": { "name": "now" }
+        "defaultValue": { 
+          "type": "generated",
+          "name": "now" 
+        }
       },
       {
         "name": "updatedAt",
@@ -287,7 +329,10 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_config",
-        "defaultValue": { "name": "now" }
+        "defaultValue": { 
+          "type": "generated",
+          "name": "now" 
+        }
       }
     ],
     "indexes": [
@@ -447,7 +492,8 @@
         "modelName": "StudentDetail",
         "unique": false,
         "nullable": true,
-        "default": {
+        "defaultValue": {
+          "type": "generated",
           "name": "autoIncrement"
         }
       },
