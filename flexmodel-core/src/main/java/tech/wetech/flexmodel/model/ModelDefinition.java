@@ -2,13 +2,12 @@ package tech.wetech.flexmodel.model;
 
 import tech.wetech.flexmodel.model.field.Field;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author cjbi
  */
-public interface ModelDefinition extends Serializable, SchemaObject {
+public interface ModelDefinition extends SchemaObject {
 
   List<? extends Field> getFields();
 

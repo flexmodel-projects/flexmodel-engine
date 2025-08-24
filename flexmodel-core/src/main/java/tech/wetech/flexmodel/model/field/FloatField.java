@@ -3,7 +3,7 @@ package tech.wetech.flexmodel.model.field;
 /**
  * @author cjbi
  */
-public class FloatField extends TypedField<Number, FloatField> {
+public class FloatField extends TypedField<Double, FloatField> {
 
   /**
    * 数据长度

@@ -12,7 +12,7 @@ public class RelationField extends TypedField<Long, RelationField> {
    */
   private boolean multiple;
   /**
-   * 目标实体
+   * 来源模型
    */
   private String from;
   /**

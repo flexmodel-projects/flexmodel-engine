@@ -110,7 +110,7 @@ public class SessionFactory {
       }
 
       // 使用故障安全会话处理模型 - 使用默认数据源
-      try (Session session = createFailsafeSession(dataSourceProviders.keySet().iterator().next())) {
+      try (Session session = createFailsafeSession(schemaName)) {
         processModels(schema, session);
       }
 
