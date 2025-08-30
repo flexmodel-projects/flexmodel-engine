@@ -135,20 +135,20 @@ public class ASTNodeConverter {
         case "id" -> field.setIdentity(true);
         case "default" -> {
           Object value = annotation.parameters.get("value");
+          if (value == null) {
+            continue;
+          }
           if (value instanceof ModelParser.FunctionCall func) {
             field.setDefaultValue(DefaultValue.generated(func.name));
           } else {
             switch (field) {
-              case IntField intField -> intField.setFixedDefaultValue(Integer.valueOf((String) annotation.parameters.get("value")));
-              case FloatField floatField -> floatField.setFixedDefaultValue(Double.valueOf((String) annotation.parameters.get("value")));
-              case DateField dateField ->
-                dateField.setFixedDefaultValue(LocalDate.parse((String) annotation.parameters.get("value")));
-              case DateTimeField dateTimeField ->
-                dateTimeField.setFixedDefaultValue(LocalDateTime.parse((String) annotation.parameters.get("value")));
-              case TimeField dateTimeField ->
-                dateTimeField.setFixedDefaultValue(LocalTime.parse((String) annotation.parameters.get("value")));
-              case BooleanField booleanField -> booleanField.setFixedDefaultValue(Boolean.valueOf((String) annotation.parameters.get("value")));
-              default -> field.setDefaultValue(DefaultValue.fixed(annotation.parameters.get("value")));
+              case IntField intField -> intField.setFixedDefaultValue(Integer.valueOf(value.toString()));
+              case FloatField floatField -> floatField.setFixedDefaultValue(Double.valueOf(value.toString()));
+              case DateField dateField -> dateField.setFixedDefaultValue(LocalDate.parse(value.toString()));
+              case DateTimeField dateTimeField -> dateTimeField.setFixedDefaultValue(LocalDateTime.parse(value.toString()));
+              case TimeField dateTimeField -> dateTimeField.setFixedDefaultValue(LocalTime.parse(value.toString()));
+              case BooleanField booleanField -> booleanField.setFixedDefaultValue(Boolean.valueOf(value.toString()));
+              default -> field.setDefaultValue(DefaultValue.fixed(value.toString()));
             }
           }
         }
