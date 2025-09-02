@@ -32,7 +32,7 @@ public class ASTNodeConverter {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("all")
   public static EntityDefinition toSchemaEntity(ModelParser.Model idlModel) {
     EntityDefinition entity = new EntityDefinition(idlModel.name);
     for (ModelParser.Field field : idlModel.fields) {
@@ -118,9 +118,9 @@ public class ASTNodeConverter {
           relationField.setCascadeDelete(Boolean.parseBoolean(Objects.toString(relationAnno.parameters.get("cascadeDelete"))));
           field = relationField;
         } else {
-          field = new EnumField(idlField.name);
-          ((EnumField) field).setFrom(from);
-          ((EnumField) field).setMultiple(multiple);
+          field = new EnumRefField(idlField.name);
+          ((EnumRefField) field).setFrom(from);
+          ((EnumRefField) field).setMultiple(multiple);
         }
         yield field;
       }
@@ -259,7 +259,7 @@ public class ASTNodeConverter {
           String.valueOf(relationField.isCascadeDelete()));
         idlField.annotations.add(relationAnno);
       }
-      case EnumField enumField -> {
+      case EnumRefField enumField -> {
         // todo
       }
 
@@ -287,7 +287,7 @@ public class ASTNodeConverter {
   private static String getCorrespondingType(TypedField<?, ?> field) {
     if (field instanceof RelationField relationField) {
       return relationField.isMultiple() ? relationField.getFrom() + "[]" : relationField.getFrom();
-    } else if (field instanceof EnumField enumField) {
+    } else if (field instanceof EnumRefField enumField) {
       return enumField.isMultiple() ? enumField.getFrom() + "[]" : enumField.getFrom();
     } else {
       return field.getType();

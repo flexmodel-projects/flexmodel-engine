@@ -107,7 +107,7 @@ try (Session session = sessionFactory.createSession("mySchema")) {
 {
   "schema": [
     {
-      "type": "ENTITY",
+      "type": "entity",
       "name": "User",
       "comment": "用户表",
       "fields": [
@@ -302,9 +302,7 @@ log4j.logger.tech.wetech.flexmodel.sql=INFO
 
 ### 社区
 
-- 🌐 [官网](https://flexmodel.io)
-- 📺 [YouTube](https://youtube.com/@flexmodel)
-- 🐦 [Twitter](https://twitter.com/flexmodel_io)
+- 🌐 [官网](https://flexmodel.wetech.tech)
 
 ## 🙏 致谢
 

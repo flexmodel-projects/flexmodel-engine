@@ -2,7 +2,7 @@
   "schema": [
     {
       "name": "Datasource",
-      "type": "ENTITY",
+      "type": "entity",
       "fields": [
         {
           "name": "name",
@@ -46,7 +46,7 @@
     },
     {
       "name": "ApiInfo",
-      "type": "ENTITY",
+      "type": "entity",
       "fields": [
         {
           "name": "id",
@@ -55,9 +55,9 @@
           "unique": false,
           "nullable": true,
           "modelName": "ApiInfo",
-          "defaultValue": { 
+          "defaultValue": {
             "type": "generated",
-            "name": "ulid" 
+            "name": "ulid"
           }
         },
         {
@@ -154,7 +154,7 @@
     },
     {
       "name": "ApiLog",
-      "type": "ENTITY",
+      "type": "entity",
       "fields": [
         {
           "name": "id",
@@ -163,9 +163,9 @@
           "unique": false,
           "nullable": true,
           "modelName": "ApiLog",
-          "defaultValue": { 
+          "defaultValue": {
             "type": "generated",
-            "name": "ulid" 
+            "name": "ulid"
           }
         },
         {
@@ -226,7 +226,7 @@
     },
     {
       "name": "IdentityProvider",
-      "type": "ENTITY",
+      "type": "entity",
       "fields": [
         {
           "name": "createdAt",

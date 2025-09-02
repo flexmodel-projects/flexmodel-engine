@@ -27,7 +27,7 @@ public enum ScalarType {
   public static final String DATE_TYPE = "Date";
   public static final String TIME_TYPE = "Time";
   public static final String JSON_TYPE = "JSON";
-  public static final String ENUM_TYPE = "Enum";
+  public static final String ENUM_TYPE = "EnumRef";
   public static final String RELATION_TYPE = "Relation";
 
   ScalarType(String type) {

@@ -23,7 +23,7 @@ public class EntityDefinition extends AbstractModelDefinition<EntityDefinition> 
 
   @Override
   public String getType() {
-    return "ENTITY";
+    return "entity";
   }
 
   public String getComment() {

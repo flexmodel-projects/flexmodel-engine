@@ -2,7 +2,7 @@
   "schema": [
     {
       "name": "Datasource",
-      "type": "ENTITY",
+      "type": "entity",
       "fields": [
         {
           "name": "name",
@@ -59,7 +59,7 @@
     {
       "name": "ApiInfo",
       "comment": "接口信息",
-      "type": "ENTITY",
+      "type": "entity",
       "fields": [
         {
           "name": "id",
@@ -68,9 +68,9 @@
           "unique": true,
           "nullable": true,
           "modelName": "ApiInfo",
-          "defaultValue": { 
+          "defaultValue": {
             "type": "generated",
-            "name": "ulid" 
+            "name": "ulid"
           }
         },
         {
@@ -144,7 +144,7 @@
     },
     {
       "name": "ApiLog",
-      "type": "ENTITY",
+      "type": "entity",
       "fields": [
         {
           "name": "id",
@@ -153,9 +153,9 @@
           "unique": false,
           "nullable": true,
           "modelName": "ApiLog",
-          "defaultValue": { 
+          "defaultValue": {
             "type": "generated",
-            "name": "ulid" 
+            "name": "ulid"
           }
         },
         {
@@ -204,7 +204,7 @@
     },
     {
       "name": "IdentityProvider",
-      "type": "ENTITY",
+      "type": "entity",
       "fields": [
         {
           "name": "name",
@@ -241,7 +241,7 @@
     {
       "name": "Config",
       "comment": "配置",
-      "type": "ENTITY",
+      "type": "entity",
       "fields": [
         {
           "name": "id",
@@ -250,9 +250,9 @@
           "unique": true,
           "nullable": true,
           "modelName": "Config",
-          "defaultValue": { 
+          "defaultValue": {
             "type": "generated",
-            "name": "ulid" 
+            "name": "ulid"
           }
         },
         {
@@ -302,7 +302,7 @@
       ]
     },
     {
-      "type": "ENTITY",
+      "type": "entity",
       "name": "Teacher",
       "fields": [
         {
@@ -337,7 +337,7 @@
       "indexes": []
     },
     {
-      "type": "ENTITY",
+      "type": "entity",
       "name": "Student",
       "fields": [
         {
@@ -362,7 +362,7 @@
         },
         {
           "name": "gender",
-          "type": "Enum",
+          "type": "EnumRef",
           "from": "UserGender",
           "multiple": false,
           "modelName": "Student",
@@ -371,7 +371,7 @@
         },
         {
           "name": "interest",
-          "type": "Enum",
+          "type": "EnumRef",
           "from": "User_interest",
           "multiple": true,
           "modelName": "Student",
@@ -407,7 +407,7 @@
       "indexes": []
     },
     {
-      "type": "ENTITY",
+      "type": "entity",
       "name": "StudentDetail",
       "fields": [
         {
@@ -440,7 +440,7 @@
       "indexes": []
     },
     {
-      "type": "ENTITY",
+      "type": "entity",
       "name": "Classes",
       "fields": [
         {
@@ -482,7 +482,7 @@
       "indexes": []
     },
     {
-      "type": "ENTITY",
+      "type": "entity",
       "name": "Course",
       "fields": [
         {
@@ -528,7 +528,7 @@
     },
     {
       "name": "UserGender",
-      "type": "ENUM",
+      "type": "enum",
       "elements": [
         "UNKNOWN",
         "MALE",
@@ -538,7 +538,7 @@
     },
     {
       "name": "User_interest",
-      "type": "ENUM",
+      "type": "enum",
       "elements": [
         "Chang",
         "Tiao",

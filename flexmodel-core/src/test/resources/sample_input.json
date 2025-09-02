@@ -1,7 +1,7 @@
 [
   {
     "name": "fs_datasource",
-    "type": "ENTITY",
+    "type": "entity",
     "fields": [
       {
         "name": "name",
@@ -13,7 +13,7 @@
       },
       {
         "name": "type",
-        "type": "Enum",
+        "type": "EnumRef",
         "from": "DatasourceType",
         "multiple": false,
         "unique": false,
@@ -33,9 +33,9 @@
         "unique": false,
         "nullable": true,
         "modelName": "fs_datasource",
-        "defaultValue": { 
+        "defaultValue": {
           "type": "generated",
-          "name": "now" 
+          "name": "now"
         }
       },
       {
@@ -44,9 +44,9 @@
         "unique": false,
         "nullable": true,
         "modelName": "fs_datasource",
-        "defaultValue": { 
+        "defaultValue": {
           "type": "generated",
-          "name": "now" 
+          "name": "now"
         }
       },
       {
@@ -66,7 +66,7 @@
   },
   {
     "name": "fs_api_definition",
-    "type": "ENTITY",
+    "type": "entity",
     "fields": [
       {
         "name": "id",
@@ -75,9 +75,9 @@
         "unique": true,
         "nullable": true,
         "modelName": "fs_api_definition",
-        "defaultValue": { 
+        "defaultValue": {
           "type": "generated",
-          "name": "ulid" 
+          "name": "ulid"
         }
       },
       {
@@ -98,7 +98,7 @@
       },
       {
         "name": "type",
-        "type": "Enum",
+        "type": "EnumRef",
         "from": "ApiType",
         "multiple": false,
         "unique": false,
@@ -131,9 +131,9 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_api_definition",
-        "defaultValue": { 
+        "defaultValue": {
           "type": "generated",
-          "name": "now" 
+          "name": "now"
         }
       },
       {
@@ -142,9 +142,9 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_api_definition",
-        "defaultValue": { 
+        "defaultValue": {
           "type": "generated",
-          "name": "now" 
+          "name": "now"
         }
       },
       {
@@ -171,7 +171,7 @@
   },
   {
     "name": "fs_api_log",
-    "type": "ENTITY",
+    "type": "entity",
     "fields": [
       {
         "name": "id",
@@ -180,14 +180,14 @@
         "unique": false,
         "nullable": true,
         "modelName": "fs_api_log",
-        "defaultValue": { 
+        "defaultValue": {
           "type": "generated",
-          "name": "ulid" 
+          "name": "ulid"
         }
       },
       {
         "name": "level",
-        "type": "Enum",
+        "type": "EnumRef",
         "from": "LogLevel",
         "multiple": false,
         "unique": false,
@@ -215,9 +215,9 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_api_log",
-        "defaultValue": { 
+        "defaultValue": {
           "type": "generated",
-          "name": "now" 
+          "name": "now"
         }
       }
     ],
@@ -237,7 +237,7 @@
   },
   {
     "name": "fs_identity_provider",
-    "type": "ENTITY",
+    "type": "entity",
     "fields": [
       {
         "name": "name",
@@ -253,9 +253,9 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_identity_provider",
-        "defaultValue": { 
+        "defaultValue": {
           "type": "generated",
-          "name": "now" 
+          "name": "now"
         }
       },
       {
@@ -271,9 +271,9 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_identity_provider",
-        "defaultValue": { 
+        "defaultValue": {
           "type": "generated",
-          "name": "now" 
+          "name": "now"
         }
       }
     ],
@@ -282,7 +282,7 @@
   {
     "name": "fs_config",
     "comment": "配置",
-    "type": "ENTITY",
+    "type": "entity",
     "fields": [
       {
         "name": "id",
@@ -291,9 +291,9 @@
         "unique": true,
         "nullable": true,
         "modelName": "fs_config",
-        "defaultValue": { 
+        "defaultValue": {
           "type": "generated",
-          "name": "ulid" 
+          "name": "ulid"
         }
       },
       {
@@ -318,9 +318,9 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_api_definition",
-        "defaultValue": { 
+        "defaultValue": {
           "type": "generated",
-          "name": "now" 
+          "name": "now"
         }
       },
       {
@@ -329,9 +329,9 @@
         "unique": false,
         "nullable": false,
         "modelName": "fs_config",
-        "defaultValue": { 
+        "defaultValue": {
           "type": "generated",
-          "name": "now" 
+          "name": "now"
         }
       }
     ],
@@ -350,7 +350,7 @@
     ]
   },
   {
-    "type": "ENTITY",
+    "type": "entity",
     "name": "Teacher",
     "fields": [
       {
@@ -381,7 +381,7 @@
     "indexes": []
   },
   {
-    "type": "ENTITY",
+    "type": "entity",
     "name": "Student",
     "fields": [
       {
@@ -402,7 +402,7 @@
       },
       {
         "name": "gender",
-        "type": "Enum",
+        "type": "EnumRef",
         "from": "UserGender",
         "multiple": false,
         "modelName": "Student",
@@ -411,7 +411,7 @@
       },
       {
         "name": "interest",
-        "type": "Enum",
+        "type": "EnumRef",
         "from": "user_interest",
         "multiple": true,
         "modelName": "Student",
@@ -482,7 +482,7 @@
     ]
   },
   {
-    "type": "ENTITY",
+    "type": "entity",
     "name": "StudentDetail",
     "fields": [
       {
@@ -527,7 +527,7 @@
     "indexes": []
   },
   {
-    "type": "ENTITY",
+    "type": "entity",
     "name": "Classes",
     "fields": [
       {
@@ -569,7 +569,7 @@
     ]
   },
   {
-    "type": "ENTITY",
+    "type": "entity",
     "name": "Course",
     "fields": [
       {
@@ -605,7 +605,7 @@
   },
   {
     "name": "ApiType",
-    "type": "ENUM",
+    "type": "enum",
     "elements": [
       "FOLDER",
       "API"
@@ -614,7 +614,7 @@
   },
   {
     "name": "DatasourceType",
-    "type": "ENUM",
+    "type": "enum",
     "elements": [
       "SYSTEM",
       "USER"
@@ -623,7 +623,7 @@
   },
   {
     "name": "UserGender",
-    "type": "ENUM",
+    "type": "enum",
     "elements": [
       "UNKNOWN",
       "MALE",
@@ -633,7 +633,7 @@
   },
   {
     "name": "user_interest",
-    "type": "ENUM",
+    "type": "enum",
     "elements": [
       "chang",
       "tiao",
@@ -644,7 +644,7 @@
   },
   {
     "name": "LogLevel",
-    "type": "ENUM",
+    "type": "enum",
     "elements": [
       "DEBUG",
       "INFO",
@@ -656,6 +656,6 @@
   {
     "name": "select_log_count",
     "statement": "select count(*) as total from fs_api_log",
-    "type": "NATIVE_QUERY"
+    "type": "native_query"
   }
 ]

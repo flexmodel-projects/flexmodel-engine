@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * @author cjbi
  */
-public class EnumField extends TypedField<Serializable, EnumField> {
+public class EnumRefField extends TypedField<Serializable, EnumRefField> {
 
   /**
    * 多选
@@ -17,7 +17,7 @@ public class EnumField extends TypedField<Serializable, EnumField> {
    */
   private String from;
 
-  public EnumField(String name) {
+  public EnumRefField(String name) {
     super(name, ScalarType.ENUM.getType());
   }
 
@@ -25,7 +25,7 @@ public class EnumField extends TypedField<Serializable, EnumField> {
     return multiple;
   }
 
-  public EnumField setMultiple(boolean multiple) {
+  public EnumRefField setMultiple(boolean multiple) {
     this.multiple = multiple;
     return this;
   }
@@ -42,7 +42,7 @@ public class EnumField extends TypedField<Serializable, EnumField> {
     return from;
   }
 
-  public EnumField setFrom(String from) {
+  public EnumRefField setFrom(String from) {
     this.from = from;
     return this;
   }

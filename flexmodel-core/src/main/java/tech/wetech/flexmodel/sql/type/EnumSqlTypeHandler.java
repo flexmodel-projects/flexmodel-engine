@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel.sql.type;
 
-import tech.wetech.flexmodel.model.field.EnumField;
+import tech.wetech.flexmodel.model.field.EnumRefField;
 import tech.wetech.flexmodel.model.field.Field;
 import tech.wetech.flexmodel.type.EnumTypeHandler;
 
@@ -26,7 +26,7 @@ public class EnumSqlTypeHandler extends EnumTypeHandler implements SqlTypeHandle
     if (value == null) {
       return null;
     }
-    EnumField enumField = (EnumField) field;
+    EnumRefField enumField = (EnumRefField) field;
     if (enumField.isMultiple()) {
       if (value instanceof String[] strings) {
         return String.join(",", strings);
@@ -41,7 +41,7 @@ public class EnumSqlTypeHandler extends EnumTypeHandler implements SqlTypeHandle
 
   @Override
   public Object getNullableResult(ResultSet rs, String columnName, Field field) throws SQLException {
-    EnumField enumField = (EnumField) field;
+    EnumRefField enumField = (EnumRefField) field;
     String value = rs.getString(columnName);
     if (enumField.isMultiple()) {
       if (value == null) {

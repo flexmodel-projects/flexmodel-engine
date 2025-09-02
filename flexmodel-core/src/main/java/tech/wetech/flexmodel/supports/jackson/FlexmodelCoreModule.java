@@ -35,7 +35,7 @@ public class FlexmodelCoreModule extends SimpleModule {
     setMixInAnnotation(TimeField.class, TypedFieldMixIn.class);
     setMixInAnnotation(JSONField.class, TypedFieldMixIn.class);
     setMixInAnnotation(RelationField.class, TypedFieldMixIn.class);
-    setMixInAnnotation(EnumField.class, TypedFieldMixIn.class);
+    setMixInAnnotation(EnumRefField.class, TypedFieldMixIn.class);
     // Index
     setMixInAnnotation(IndexDefinition.class, IndexMixIn.class);
 

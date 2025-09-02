@@ -21,7 +21,7 @@ import tech.wetech.flexmodel.model.field.*;
   @JsonSubTypes.Type(value = BooleanField.class, name = ScalarType.BOOLEAN_TYPE),
   @JsonSubTypes.Type(value = JSONField.class, name = ScalarType.JSON_TYPE),
   @JsonSubTypes.Type(value = RelationField.class, name = ScalarType.RELATION_TYPE),
-  @JsonSubTypes.Type(value = EnumField.class, name = ScalarType.ENUM_TYPE),
+  @JsonSubTypes.Type(value = EnumRefField.class, name = ScalarType.ENUM_TYPE),
 })
 public abstract class TypedFieldMixIn {
 

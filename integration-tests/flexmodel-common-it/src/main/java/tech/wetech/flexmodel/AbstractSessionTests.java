@@ -172,8 +172,8 @@ public abstract class AbstractSessionTests {
         session.schema().createEntity(entityName, entity -> entity
             .addField(new StringField("id").asIdentity())
             .addField(new StringField("studentName"))
-            .addField(new EnumField("gender").setFrom(genderEnum.getName()))
-            .addField(new EnumField("interest").setFrom(interestEnum.getName()).setMultiple(true))
+            .addField(new EnumRefField("gender").setFrom(genderEnum.getName()))
+            .addField(new EnumRefField("interest").setFrom(interestEnum.getName()).setMultiple(true))
             .addField(new IntField("age"))
             .addField(new FloatField("height").setPrecision(3).setScale(2))
             .addField(new StringField("classId"))

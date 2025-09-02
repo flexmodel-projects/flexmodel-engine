@@ -3,7 +3,7 @@ package tech.wetech.flexmodel.codegen;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.ModelDefinition;
-import tech.wetech.flexmodel.model.field.EnumField;
+import tech.wetech.flexmodel.model.field.EnumRefField;
 import tech.wetech.flexmodel.model.field.RelationField;
 import tech.wetech.flexmodel.model.field.TypedField;
 
@@ -78,7 +78,7 @@ public class ModelClass extends AbstractClass<ModelClass> {
           }
 
         }
-        case EnumField anEnumField -> {
+        case EnumRefField anEnumField -> {
           String ftName = StringUtils.capitalize(
             StringUtils.snakeToCamel(
               replaceString != null ?

@@ -3,7 +3,7 @@ package tech.wetech.flexmodel.graphql
 import tech.wetech.flexmodel.codegen.AbstractGenerator
 import tech.wetech.flexmodel.codegen.GenerationContext
 import tech.wetech.flexmodel.codegen.ModelField
-import tech.wetech.flexmodel.model.field.EnumField
+import tech.wetech.flexmodel.model.field.EnumRefField
 import tech.wetech.flexmodel.model.field.RelationField
 import tech.wetech.flexmodel.model.field.ScalarType
 import tech.wetech.flexmodel.model.field.TypedField
@@ -53,8 +53,8 @@ class GraphQLSchemaGenerator extends AbstractGenerator {
         return "ID"
       }
       return "${typeMapping[f.type]}"
-    } else if (itt.isEnumField() && context.containsEnumClass((itt.original as EnumField).from)) {
-      def ef = itt.original as EnumField
+    } else if (itt.isEnumField() && context.containsEnumClass((itt.original as EnumRefField).from)) {
+      def ef = itt.original as EnumRefField
       if (ef.multiple) {
         return "[${itt.modelClass.schemaName}_${ef.from}]"
       } else {
@@ -201,8 +201,8 @@ class GraphQLSchemaGenerator extends AbstractGenerator {
         if (!it.isRelationField() && !it.isEnumField()) {
           TypedField f = it.original as TypedField
           out.println "  ${it.name}: ${comparisonMapping[f.type]}"
-        } else if (it.isEnumField() && context.containsEnumClass((it.original as EnumField).from)) {
-          EnumField enumField = it.original as EnumField
+        } else if (it.isEnumField() && context.containsEnumClass((it.original as EnumRefField).from)) {
+          EnumRefField enumField = it.original as EnumRefField
           out.println "  ${it.name}: ${schemaName}_${enumField.from}_comparison_exp"
         } else {
           out.println "  ${it.name}: String_comparison_exp"
@@ -355,7 +355,7 @@ class GraphQLSchemaGenerator extends AbstractGenerator {
     out.println ""
     context.enumClassList.each {
       out.println ""
-      out.println "\"${i18n.getString("gql.comparison_exp.comment", "Enum")}\""
+      out.println "\"${i18n.getString("gql.comparison_exp.comment", "EnumRef")}\""
       out.println "input ${it.schemaName}_${it.original.name}_comparison_exp {"
       out.println "  _eq: ${it.schemaName}_${it.original.name}"
       out.println "  _ne: ${it.schemaName}_${it.original.name}"

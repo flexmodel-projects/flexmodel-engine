@@ -43,8 +43,8 @@ public class Models {
         return session.schema().createEntity(entityName, entity -> entity
             .addField(new LongField("id").asIdentity().setDefaultValue(DefaultValue.AUTO_INCREMENT))
             .addField(new StringField("studentName"))
-            .addField(new EnumField("gender").setFrom(genderEnum.getName()))
-            .addField(new EnumField("interest").setFrom(interestEnum.getName()).setMultiple(true))
+            .addField(new EnumRefField("gender").setFrom(genderEnum.getName()))
+            .addField(new EnumRefField("interest").setFrom(interestEnum.getName()).setMultiple(true))
             .addField(new IntField("age"))
             .addField(new IntField("classId"))
             .addField(new JSONField("remark"))

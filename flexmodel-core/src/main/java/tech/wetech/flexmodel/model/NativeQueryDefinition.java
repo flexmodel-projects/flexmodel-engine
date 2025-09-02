@@ -32,7 +32,7 @@ public class NativeQueryDefinition extends AbstractModelDefinition<NativeQueryDe
 
   @Override
   public String getType() {
-    return "NATIVE_QUERY";
+    return "native_query";
   }
 
   /**
