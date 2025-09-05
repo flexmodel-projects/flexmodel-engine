@@ -21,7 +21,6 @@ class SchemaGenerator extends AbstractGenerator {
    */
   @Override
   void write(PrintWriter out, GenerationContext context) {
-    String rootPackage = context.getVariable("rootPackage");
     def modelClassList = context.modelClassList
     def className = context.schemaName.capitalize()
 
@@ -33,9 +32,6 @@ class SchemaGenerator extends AbstractGenerator {
     out.println "import tech.wetech.flexmodel.model.EnumDefinition;"
     out.println "import tech.wetech.flexmodel.model.SchemaObject;"
     out.println "import tech.wetech.flexmodel.ModelImportBundle;"
-    /* modelClassList.each {
-       out.println "import ${rootPackage}.dsl.${it.shortClassName}DSL;"
-     }*/
 
     out.println ""
     out.println "import java.util.ArrayList;"
@@ -49,15 +45,6 @@ class SchemaGenerator extends AbstractGenerator {
 
     out.println "public class ${className} implements BuildItem {"
 
-//    modelClassList.each { model ->
-//      out.println ""
-//      if (model.comment) {
-//        out.println "  /**"
-//        out.println "   * ${model.comment}"
-//        out.println "   */"
-//      }
-//      out.println "  public static final ${model.shortClassName}DSL ${model.variableName} = new ${model.shortClassName}DSL();"
-//    }
     out.println ""
     out.println "  @Override"
     out.println "  public String getSchemaName() {"
@@ -91,7 +78,7 @@ class SchemaGenerator extends AbstractGenerator {
     out.println "  public List<ModelImportBundle.ImportData> getData() {"
     out.println "    List<ModelImportBundle.ImportData> list = new ArrayList<>();"
     out.println "    try {"
-    List<?> list = context.getVariable("import_data");
+    List<?> list = context.import_data;
     list.each {
       out.println "      list.add((ModelImportBundle.ImportData) ObjectUtils.deserialize(\"${ObjectUtils.serialize(it)}\"));"
     }
