@@ -57,9 +57,16 @@ public class StringHelper {
           value = ((Map<?, ?>) value).get(key);
         } else {
           value = null;
+          break; // 如果中间某个键不存在，直接跳出循环
         }
       }
     }
+    
+    // 如果变量不存在（value为null），保持原始占位符不变
+    if (value == null) {
+      return template; // 返回原模板，不进行替换
+    }
+    
     return template.substring(0, endIndex) + value + template.substring(++i);
   }
 
