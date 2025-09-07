@@ -5,7 +5,7 @@ import tech.wetech.flexmodel.model.field.Field;
 /**
  * @author cjbi
  */
-public class BigintTypeHandler implements TypeHandler<Long> {
+public class LongTypeHandler implements TypeHandler<Long> {
 
   @Override
   public Long convertParameter(Field field, Object value) {

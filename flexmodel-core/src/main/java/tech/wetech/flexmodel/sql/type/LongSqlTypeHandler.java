@@ -1,7 +1,7 @@
 package tech.wetech.flexmodel.sql.type;
 
 import tech.wetech.flexmodel.model.field.Field;
-import tech.wetech.flexmodel.type.BigintTypeHandler;
+import tech.wetech.flexmodel.type.LongTypeHandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,7 +10,7 @@ import java.sql.Types;
 /**
  * @author cjbi
  */
-public class BigintSqlTypeHandler extends BigintTypeHandler implements SqlTypeHandler<Long> {
+public class LongSqlTypeHandler extends LongTypeHandler implements SqlTypeHandler<Long> {
 
   @Override
   public int getJdbcTypeCode() {

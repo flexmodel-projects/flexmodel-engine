@@ -29,7 +29,7 @@ public class MongoContext extends AbstractSessionContext {
     this.typeHandlerMap.put(ScalarType.STRING.getType(), new StringTypeHandler());
     this.typeHandlerMap.put(ScalarType.FLOAT.getType(), new DecimalTypeHandler());
     this.typeHandlerMap.put(ScalarType.INT.getType(), new IntTypeHandler());
-    this.typeHandlerMap.put(ScalarType.LONG.getType(), new BigintTypeHandler());
+    this.typeHandlerMap.put(ScalarType.LONG.getType(), new LongTypeHandler());
     this.typeHandlerMap.put(ScalarType.BOOLEAN.getType(), new BooleanTypeHandler());
     this.typeHandlerMap.put(ScalarType.DATETIME.getType(), new DateTimeTypeHandler());
     this.typeHandlerMap.put(ScalarType.DATE.getType(), new DateTypeHandler());
