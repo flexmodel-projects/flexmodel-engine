@@ -21,7 +21,7 @@ public class Query implements Serializable {
   private Projection projection;
   private Joins joins;
   private GroupBy groupBy;
-  private Sort sort;
+  private OrderBy sort;
   private Page page;
   private boolean nestedEnabled;
 
@@ -185,52 +185,52 @@ public class Query implements Serializable {
     }
   }
 
-  public static class Sort implements Serializable {
-    private List<Order> orders = new ArrayList<>();
+  public static class OrderBy implements Serializable {
+    private final List<Sort> sorts = new ArrayList<>();
 
-    public Sort asc(String field) {
+    public OrderBy asc(String field) {
       return addOrder(field, Direction.ASC);
     }
 
-    public Sort desc(String field) {
+    public OrderBy desc(String field) {
       return addOrder(field, Direction.DESC);
     }
 
-    public Sort addOrder(String field, Direction direction) {
-      Order order = new Order()
+    public OrderBy addOrder(String field, Direction order) {
+      Sort sort = new Sort()
         .setField(field)
-        .setDirection(direction);
-      orders.add(order);
+        .setOrder(order);
+      sorts.add(sort);
       return this;
     }
 
-    public List<Order> getOrders() {
-      return orders;
+    public List<Sort> getSorts() {
+      return sorts;
     }
 
-    public static class Order implements Serializable {
+    public static class Sort implements Serializable {
       private QueryField field;
-      private Direction direction = Direction.ASC;
+      private Direction order = Direction.ASC;
 
-      public Order() {
+      public Sort() {
       }
 
       public QueryField getField() {
         return field;
       }
 
-      public Order setField(String field) {
+      public Sort setField(String field) {
         this.field = new QueryField(field);
         return this;
       }
 
-      public Order setDirection(Direction direction) {
-        this.direction = direction;
+      public Sort setOrder(Direction order) {
+        this.order = order;
         return this;
       }
 
       public Direction getDirection() {
-        return direction;
+        return order;
       }
     }
   }
@@ -252,8 +252,8 @@ public class Query implements Serializable {
     this.groupBy = groupBy;
   }
 
-  public void setSort(Sort sort) {
-    this.sort = sort;
+  public void setOrderBy(OrderBy orderBy) {
+    this.sort = orderBy;
   }
 
   public void setPage(Page page) {
@@ -281,7 +281,7 @@ public class Query implements Serializable {
     return groupBy;
   }
 
-  public Sort getSort() {
+  public OrderBy getSort() {
     return sort;
   }
 
@@ -539,7 +539,7 @@ public class Query implements Serializable {
     public Builder orderBy(Consumer<OrderByBuilder> orderByConsumer) {
       OrderByBuilder orderByBuilder = new OrderByBuilder();
       orderByConsumer.accept(orderByBuilder);
-      Sort sort = new Sort();
+      OrderBy sort = new OrderBy();
       orderByBuilder.orders.forEach(order -> {
         if (order.direction == Direction.ASC) {
           sort.asc(order.field);
@@ -547,7 +547,7 @@ public class Query implements Serializable {
           sort.desc(order.field);
         }
       });
-      query.setSort(sort);
+      query.setOrderBy(sort);
       return this;
     }
 

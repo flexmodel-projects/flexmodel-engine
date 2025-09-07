@@ -93,21 +93,21 @@ public class DSLQueryBuilder {
    * 设置排序
    */
   public DSLQueryBuilder orderBy(String field, Direction direction) {
-    Query.Sort sort = new Query.Sort();
+    Query.OrderBy sort = new Query.OrderBy();
     if (direction == Direction.ASC) {
       sort.asc(field);
     } else {
       sort.desc(field);
     }
-    query.setSort(sort);
+    query.setOrderBy(sort);
     return this;
   }
 
   /**
    * 设置排序
    */
-  public DSLQueryBuilder orderBy(Query.Sort sort) {
-    query.setSort(sort);
+  public DSLQueryBuilder orderBy(Query.OrderBy sort) {
+    query.setOrderBy(sort);
     return this;
   }
 

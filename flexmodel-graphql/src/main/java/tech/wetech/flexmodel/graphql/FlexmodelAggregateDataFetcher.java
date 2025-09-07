@@ -43,9 +43,9 @@ public class FlexmodelAggregateDataFetcher extends FlexmodelAbstractDataFetcher<
         whereString = jsonObjectConverter.toJsonString(where);
       }
 
-      Query.Sort sort;
+      OrderBy sort;
       if (orderBy != null) {
-        sort = new Query.Sort();
+        sort = new OrderBy();
         orderBy.forEach((k, v) -> sort.addOrder(k, Direction.valueOf(v.toUpperCase())));
       } else {
         sort = null;

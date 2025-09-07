@@ -102,9 +102,9 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
       query.setPage(new Query.Page().setPageNumber(pageNumber).setPageSize(pageSize));
     }
     if (orderBy != null) {
-      Query.Sort sort = new Query.Sort();
+      Query.OrderBy sort = new Query.OrderBy();
       orderBy.forEach((k, v) -> sort.addOrder(k, Direction.valueOf(v.toUpperCase())));
-      query.setSort(sort);
+      query.setOrderBy(sort);
     }
     if (where != null) {
       query.setFilter(jsonObjectConverter.toJsonString(where));

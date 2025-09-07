@@ -37,7 +37,7 @@ class MongoStatementBuilder extends BaseService {
   private void addSortStage(List<Document> pipeline, Query query) {
     if (query.getSort() != null) {
       Document orders = new Document();
-      for (Query.Sort.Order order : query.getSort().getOrders()) {
+      for (Query.OrderBy.Sort order : query.getSort().getSorts()) {
         orders.put(order.getField().getFieldName(), order.getDirection() == Direction.ASC ? 1 : -1);
       }
       pipeline.add(new Document("$sort", orders));

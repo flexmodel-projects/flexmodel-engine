@@ -59,11 +59,11 @@ public class SqlStatementBuilder extends BaseService {
   }
 
   private void appendOrderByClause(Query query, StringBuilder sqlBuilder) {
-    Query.Sort sort = query.getSort();
+    Query.OrderBy sort = query.getSort();
     if (sort != null) {
       sqlBuilder.append("\norder by ");
       StringJoiner sortColumns = new StringJoiner(", ");
-      for (Query.Sort.Order order : sort.getOrders()) {
+      for (Query.OrderBy.Sort order : sort.getSorts()) {
         sortColumns.add(toFullColumnQuoteString(order.getField().getAliasName(), order.getField().getFieldName()) + " " + order.getDirection().name().toLowerCase());
       }
       sqlBuilder.append(sortColumns);
