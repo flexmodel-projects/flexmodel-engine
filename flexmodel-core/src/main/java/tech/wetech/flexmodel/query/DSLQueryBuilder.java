@@ -103,6 +103,20 @@ public class DSLQueryBuilder {
     return this;
   }
 
+
+  public DSLQueryBuilder orderBy(String field) {
+    orderBy(field, Direction.ASC);
+    return this;
+  }
+
+  /**
+   * 设置排序
+   */
+  public DSLQueryBuilder orderByDesc(String field) {
+    orderBy(field, Direction.DESC);
+    return this;
+  }
+
   /**
    * 设置排序
    */

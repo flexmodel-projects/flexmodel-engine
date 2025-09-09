@@ -50,6 +50,22 @@ public class Expressions {
     return new FilterExpression<>(fieldName);
   }
 
+  public static <T, R> String getFieldName(SFunction<T, R> getter) {
+    String fieldName = getFieldNameFromGetter(getter);
+    Class<?> targetClass = getTargetClass(getter);
+    // 如果能够获取到目标类，尝试获取注解中的字段名
+    if (targetClass != null) {
+      String annotatedFieldName = getAnnotatedFieldName(targetClass, fieldName);
+      if (annotatedFieldName != null) {
+        fieldName = annotatedFieldName;
+      }
+    } else {
+      // 如果无法获取目标类，记录警告信息但继续使用提取的字段名
+      log.error("警告: 无法获取目标类，将使用提取的字段名: " + fieldName);
+    }
+    return fieldName;
+  }
+
   /**
    * 从getter方法中提取字段名
    * 例如：User::getName -> "name"

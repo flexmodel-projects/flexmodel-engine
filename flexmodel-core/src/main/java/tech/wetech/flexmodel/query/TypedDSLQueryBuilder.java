@@ -63,6 +63,32 @@ public class TypedDSLQueryBuilder<T> {
     return this;
   }
 
+  public TypedDSLQueryBuilder<T> orderBy(String field) {
+    orderBy(field, Direction.ASC);
+    return this;
+  }
+
+  /**
+   * 设置排序
+   */
+  public TypedDSLQueryBuilder<T> orderByDesc(String field) {
+    orderBy(field, Direction.DESC);
+    return this;
+  }
+
+  public <R> TypedDSLQueryBuilder<T> orderBy(Expressions.SFunction<T, R> getter) {
+    orderBy(Expressions.getFieldName(getter), Direction.ASC);
+    return this;
+  }
+
+  /**
+   * 设置排序
+   */
+  public <R> TypedDSLQueryBuilder<T> orderByDesc(Expressions.SFunction<T, R> getter) {
+    orderBy(Expressions.getFieldName(getter), Direction.DESC);
+    return this;
+  }
+
   /**
    * 设置分页
    */
