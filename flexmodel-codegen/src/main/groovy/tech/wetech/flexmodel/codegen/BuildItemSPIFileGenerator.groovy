@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.codegen
 
 import groovy.util.logging.Log
+import tech.wetech.flexmodel.BuildItem
 
 import java.nio.file.Path
 
@@ -15,7 +16,7 @@ class BuildItemSPIFileGenerator extends AbstractGenerator {
     return Path.of(
       targetDirectory,
       "target/classes/META-INF/services",
-      "tech.wetech.flexmodel.BuildItem"
+      BuildItem.class.getName()
     ).toString()
   }
 

@@ -121,6 +121,16 @@ public class TypedDSLQueryBuilder<T> {
     return this;
   }
 
+  @SafeVarargs
+  public final <R> TypedDSLQueryBuilder<T> groupBy(Expressions.SFunction<T, R>... getters) {
+    String[] fields = new String[getters.length];
+    for (int i = 0; i < fields.length; i++) {
+      fields[i] = Expressions.getFieldName(getters[i]);
+    }
+    delegate.groupBy(fields);
+    return this;
+  }
+
   /**
    * 设置连接
    */

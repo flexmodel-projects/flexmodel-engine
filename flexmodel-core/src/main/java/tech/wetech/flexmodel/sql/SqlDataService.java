@@ -148,7 +148,8 @@ public class SqlDataService extends BaseService implements DataService {
         .append(" set ");
       StringJoiner assignment = new StringJoiner(", ");
 
-      record.keySet().stream().filter(col -> !col.equals(idField.getName()))
+      record.keySet().stream()
+        .filter(col -> !col.equals(idField.getName()) && (data.containsKey(col) || processedData.get(col) != null))
         .forEach(col -> assignment.add(sqlDialect.quoteIdentifier(col) + "=:" + col));
 
       sql.append(assignment);
@@ -159,7 +160,7 @@ public class SqlDataService extends BaseService implements DataService {
         .append(idField.getName())
         .append(")");
 
-      Map<String, Object> params = new HashMap<>(record);
+      Map<String, Object> params = new HashMap<>(processedData);
       params.put(idField.getName(), id);
 
       log.debug("Generated UPDATE SQL: {}", sql);
@@ -194,14 +195,14 @@ public class SqlDataService extends BaseService implements DataService {
         .append(" set ");
       StringJoiner assignment = new StringJoiner(", ");
       processedData.keySet().stream()
-        .filter(col -> !col.equals(idField.getName()))
+        .filter(col -> !col.equals(idField.getName()) && (record.containsKey(col) || processedData.get(col) != null))
         .forEach(col -> assignment.add(sqlDialect.quoteIdentifier(col) + "=:" + col));
       sql.append(assignment);
 
       sql.append(" where ")
         .append(" (").append(sqlResult.sqlClause()).append(")");
 
-      Map<String, Object> params = new HashMap<>(record);
+      Map<String, Object> params = new HashMap<>(processedData);
       params.putAll(sqlResult.args());
 
       log.debug("Generated UPDATE SQL: {}", sql);

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.annotation.ModelField;
 
+import java.lang.annotation.Annotation;
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -98,9 +99,29 @@ public class Expressions {
       // 查找字段并获取 @ModelField 注解
       Field field = findFieldByName(targetClass, fieldName);
       if (field != null) {
+        // 首先尝试直接获取注解
         ModelField modelField = field.getAnnotation(ModelField.class);
         if (modelField != null) {
           return modelField.value();
+        }
+
+        // 如果直接获取失败，可能是由于动态代理或字节码增强导致的
+        // 遍历所有注解，查找 ModelField 注解
+        Annotation[] annotations = field.getAnnotations();
+        for (Annotation annotation : annotations) {
+          // 检查注解是否为 ModelField 或其代理类
+          if (isModelFieldAnnotation(annotation)) {
+            // 通过反射获取注解的值
+            try {
+              Method valueMethod = annotation.getClass().getMethod("value");
+              Object value = valueMethod.invoke(annotation);
+              if (value instanceof String) {
+                return (String) value;
+              }
+            } catch (Exception e) {
+              log.warn("获取注解值失败: " + e.getMessage());
+            }
+          }
         }
       }
 
@@ -111,6 +132,35 @@ public class Expressions {
                 "，类: " + targetClass.getName() +
                 "，字段: " + fieldName);
       return null;
+    }
+  }
+
+  /**
+   * 检查注解是否为 ModelField 注解
+   */
+  private static boolean isModelFieldAnnotation(Annotation annotation) {
+    if (annotation == null) {
+      return false;
+    }
+
+    // 直接检查注解类型
+    if (annotation.annotationType() == ModelField.class) {
+      return true;
+    }
+
+    // 检查注解的类型名称（处理代理类的情况）
+    String annotationClassName = annotation.annotationType().getName();
+    if (ModelField.class.getName().equals(annotationClassName)) {
+      return true;
+    }
+
+    // 检查注解类是否实现了 ModelField 接口（代理类可能实现原始注解接口）
+    try {
+      // 通过反射检查注解类是否包含 value 方法
+      Method valueMethod = annotation.getClass().getMethod("value");
+      return valueMethod != null;
+    } catch (NoSuchMethodException e) {
+      return false;
     }
   }
 
