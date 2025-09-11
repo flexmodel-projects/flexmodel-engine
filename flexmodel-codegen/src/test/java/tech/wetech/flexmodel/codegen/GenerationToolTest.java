@@ -1,17 +1,8 @@
 package tech.wetech.flexmodel.codegen;
 
-import groovy.text.GStringTemplateEngine;
 import org.junit.jupiter.api.Test;
-import tech.wetech.flexmodel.ModelImportBundle;
-import tech.wetech.flexmodel.model.EntityDefinition;
-import tech.wetech.flexmodel.parser.impl.ParseException;
-import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author cjbi
@@ -34,7 +25,7 @@ class GenerationToolTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void testIDL() throws ParseException {
+  void testIDL() {
     Configuration configuration = new Configuration();
     Schema schemaConfig = new Schema();
     schemaConfig.setName("system_idl");
@@ -48,27 +39,6 @@ class GenerationToolTest extends AbstractIntegrationTest {
     configuration.setTarget(target);
     GenerationTool.run(configuration);
   }
-
-//  @Test
-  void testGenerateModelList() throws Exception {
-    String packageName = "com.example";
-    String schemaName = "system";
-    InputStream is = GeneratorTest.class.getClassLoader().getResourceAsStream("import.json");
-    assert is != null;
-    String content = new String(is.readAllBytes());
-    ModelImportBundle describe = new JacksonObjectConverter().parseToObject(content, ModelImportBundle.class);
-    GenerationContext generationContext = new GenerationContext();
-    generationContext.setPackageName(packageName);
-    generationContext.getModelClassList().add(ModelClass.buildModelClass(packageName, schemaName, (EntityDefinition) describe.getSchema().getFirst()));
-    GStringTemplateEngine engine = new GStringTemplateEngine();
-    URL resource = this.getClass().getClassLoader().getResource("templates/${packageNameAsPath}/${modelClass.modelName}.java.template");
-    while (generationContext.nextModel()) {
-      String string = engine.createTemplate(resource).make(new JacksonObjectConverter().convertValue(generationContext, Map.class)).toString();
-      System.out.println(string);
-    }
-    listFiles(new File(Objects.requireNonNull(this.getClass().getClassLoader().getResource("templates/")).toURI()));
-  }
-
   public static void listFiles(File dir) {
     File[] files = dir.listFiles();
     if (files == null) return;
