@@ -29,7 +29,7 @@ import static tech.wetech.flexmodel.model.field.ScalarType.STRING;
  * @author cjbi
  */
 public class JdbcModelRegistry implements ModelRegistry {
-  public static final String STORED_TABLES = "fe_model_registry";
+  public static final String STORED_TABLES = "f_model_registry";
   private final DataSource dataSource;
   private final SqlDialect sqlDialect;
   private final Logger log = LoggerFactory.getLogger(JdbcModelRegistry.class);
