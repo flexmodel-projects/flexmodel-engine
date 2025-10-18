@@ -291,25 +291,6 @@ public class SqlDataService extends BaseService implements DataService {
     }
   }
 
-  @Override
-  public <T> List<T> findByNativeStatement(String statement, Object objR, Class<T> resultType) {
-    log.debug("Starting SQL native query: {}", statement);
-    long startTime = System.currentTimeMillis();
-
-    try {
-      Map<String, Object> params = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
-      List<Map<String, Object>> list = sqlExecutor.queryForList(StringHelper.replacePlaceholder(statement), params);
-      List<T> results = ReflectionUtils.toClassBeanList(sessionContext.getJsonObjectConverter(), list, resultType);
-
-      long duration = System.currentTimeMillis() - startTime;
-      log.debug("SQL native query completed in {}ms, results: {}", duration, results.size());
-      return results;
-    } catch (Exception e) {
-      long duration = System.currentTimeMillis() - startTime;
-      log.error("SQL native query failed after {}ms", duration, e);
-      throw e;
-    }
-  }
 
   @Override
   public <T> List<T> findByNativeQuery(String modelName, Object params, Class<T> resultType) {
@@ -319,7 +300,9 @@ public class SqlDataService extends BaseService implements DataService {
     try {
       NativeQueryDefinition model = (NativeQueryDefinition) sessionContext.getModelDefinition(modelName);
       String statement = model.getStatement();
-      List<T> results = findByNativeStatement(statement, params, resultType);
+      List<?> list = (List<?>) executeNativeStatement(statement, params);
+
+      List<T> results = ReflectionUtils.toClassBeanList(sessionContext.getJsonObjectConverter(), list, resultType);
 
       long duration = System.currentTimeMillis() - startTime;
       log.debug("SQL native query model completed for {} in {}ms, results: {}", modelName, duration, results.size());
@@ -327,6 +310,48 @@ public class SqlDataService extends BaseService implements DataService {
     } catch (Exception e) {
       long duration = System.currentTimeMillis() - startTime;
       log.error("SQL native query model failed for {} after {}ms", modelName, duration, e);
+      throw e;
+    }
+  }
+
+  @Override
+  public Object executeNativeStatement(String statement, Object objR) {
+    log.debug("Starting SQL native execute: {}", statement);
+    long startTime = System.currentTimeMillis();
+
+    try {
+      Map<String, Object> params = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
+      String processedStatement = StringHelper.replacePlaceholder(statement);
+
+      // 判断 SQL 语句类型
+      String trimmedStatement = processedStatement.trim().toUpperCase();
+      boolean isQuery = trimmedStatement.startsWith("SELECT");
+      boolean isUpdate = trimmedStatement.startsWith("UPDATE")
+                         || trimmedStatement.startsWith("DELETE");
+      Object result;
+      if (isQuery) {
+        // 执行查询操作
+        List<Map<String, Object>> queryResult = sqlExecutor.queryForList(processedStatement, params);
+        result = queryResult;
+        log.debug("SQL native query completed in {}ms, results: {}",
+          System.currentTimeMillis() - startTime, queryResult.size());
+      } else if (isUpdate) {
+        // 执行更新操作
+        int affectedRows = sqlExecutor.update(processedStatement, params);
+        result = affectedRows;
+        log.debug("SQL native update completed in {}ms, affected rows: {}",
+          System.currentTimeMillis() - startTime, affectedRows);
+      } else {
+        // 不支持的 SQL 语句类型
+        throw new IllegalArgumentException("Unsupported SQL statement: " + statement);
+      }
+
+      long duration = System.currentTimeMillis() - startTime;
+      log.debug("SQL native execute completed in {}ms", duration);
+      return result;
+    } catch (Exception e) {
+      long duration = System.currentTimeMillis() - startTime;
+      log.error("SQL native execute failed after {}ms", duration, e);
       throw e;
     }
   }

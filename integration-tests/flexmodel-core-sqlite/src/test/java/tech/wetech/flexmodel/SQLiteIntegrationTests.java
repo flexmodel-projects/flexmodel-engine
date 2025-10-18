@@ -27,10 +27,11 @@ public class SQLiteIntegrationTests extends AbstractSessionTests {
     String classesEntityName = "testNativeQueryClasses";
     createClassesEntity(classesEntityName);
     createClassesData(classesEntityName);
-    List<Map> list = session.data().findByNativeStatement(
+    @SuppressWarnings("all")
+    List<Map> list = (List<Map>) session.data().executeNativeStatement(
       "select * from " + classesEntityName + " where id=${id} and className=${className} limit 10",
       Map.of("id", 3,
-        "className", "二年级1班"), Map.class);
+        "className", "二年级1班"));
     Assertions.assertFalse(list.isEmpty());
   }
 

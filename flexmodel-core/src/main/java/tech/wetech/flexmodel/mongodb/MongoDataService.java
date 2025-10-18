@@ -176,19 +176,41 @@ public class MongoDataService extends BaseService implements DataService {
   }
 
   @Override
-  public <T> List<T> findByNativeStatement(String statement, Object obj, Class<T> resultType) {
-    Map<String, Object> params = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), obj, Map.class);
-    String json = StringHelper.simpleRenderTemplate(statement, params);
-    Document result = mongoDatabase.runCommand(Document.parse(json));
-    List<?> list = (List<?>) ((Map<?, ?>) result.get("cursor")).get("firstBatch");
-    return sessionContext.getJsonObjectConverter().convertValueList(list, resultType);
-  }
-
-  @Override
   public <T> List<T> findByNativeQuery(String modelName, Object obj, Class<T> resultType) {
     Map<String, Object> params = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), obj, Map.class);
     NativeQueryDefinition model = (NativeQueryDefinition) sessionContext.getModelDefinition(modelName);
-    return findByNativeStatement(model.getStatement(), params, resultType);
+    List<?> list = (List<?>) executeNativeStatement(model.getStatement(), params);
+    return ReflectionUtils.toClassBeanList(sessionContext.getJsonObjectConverter(), list, resultType);
+  }
+
+  @Override
+  public Object executeNativeStatement(String statement, Object obj) {
+    Map<String, Object> params = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), obj, Map.class);
+    String json = StringHelper.simpleRenderTemplate(statement, params);
+    Document command = Document.parse(json);
+    Document result = mongoDatabase.runCommand(command);
+
+    // 判断是否为查询操作
+    boolean isQuery = command.containsKey("find") ||
+                      command.containsKey("aggregate") ||
+                      command.containsKey("count") ||
+                      command.containsKey("distinct");
+
+    if (isQuery) {
+      // 查询操作
+      List<?> list = (List<?>) ((Map<?, ?>) result.get("cursor")).get("firstBatch");
+      return list;
+    } else {
+      // 更新操作
+      if (result.containsKey("modifiedCount")) {
+        return result.getInteger("modifiedCount");
+      } else if (result.containsKey("matchedCount")) {
+        return result.getInteger("matchedCount");
+      } else if (result.containsKey("n")) {
+        return result.getInteger("n");
+      }
+      return 0;
+    }
   }
 
   @SuppressWarnings({"rawtypes"})

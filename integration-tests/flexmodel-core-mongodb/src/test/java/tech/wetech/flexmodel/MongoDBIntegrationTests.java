@@ -44,7 +44,8 @@ public class MongoDBIntegrationTests extends AbstractSessionTests {
     String classesEntityName = "TestNativeQueryClasses";
     createClassesEntity(classesEntityName);
     createClassesData(classesEntityName);
-    List<Map> list = session.data().findByNativeStatement(
+    @SuppressWarnings("all")
+    List<Map> list = (List<Map>) session.data().executeNativeStatement(
       """
         {
             "find": "TestNativeQueryClasses",
@@ -54,7 +55,7 @@ public class MongoDBIntegrationTests extends AbstractSessionTests {
         }
         """,
       Map.of("id", "3",
-        "className", "二年级1班"), Map.class);
+        "className", "二年级1班"));
     Assertions.assertFalse(list.isEmpty());
   }
 
@@ -63,7 +64,8 @@ public class MongoDBIntegrationTests extends AbstractSessionTests {
     String classesEntityName = "TestNativeQueryModelClasses";
     createClassesEntity(classesEntityName);
     createClassesData(classesEntityName);
-    List<Map> list = session.data().findByNativeStatement(
+    @SuppressWarnings("all")
+    List<Map> list = (List<Map>) session.data().executeNativeStatement(
       """
         {
             "find": "TestNativeQueryModelClasses",
@@ -73,7 +75,7 @@ public class MongoDBIntegrationTests extends AbstractSessionTests {
         }
         """,
       Map.of("id", "3",
-        "className", "二年级1班"), Map.class);
+        "className", "二年级1班"));
     Assertions.assertFalse(list.isEmpty());
   }
 

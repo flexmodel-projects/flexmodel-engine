@@ -34,9 +34,16 @@ public interface DataService {
 
   <T> List<T> find(String modelName, Query query, Class<T> resultType);
 
-  <T> List<T> findByNativeStatement(String statement, Object params, Class<T> resultType);
-
   <T> List<T> findByNativeQuery(String modelName, Object params, Class<T> resultType);
+
+  /**
+   * 执行原生 SQL 语句（自动判断查询或更新操作）
+   *
+   * @param statement 原生 SQL 语句，支持 ${paramName} 占位符
+   * @param params    参数对象
+   * @return 查询操作返回 List<Map<String, Object>>，更新操作返回 Integer（影响行数）
+   */
+  Object executeNativeStatement(String statement, Object params);
 
   /**
    * Count records based on conditions
