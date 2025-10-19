@@ -1,7 +1,5 @@
 package tech.wetech.flexmodel.reflect;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.JsonObjectConverter;
 import tech.wetech.flexmodel.annotation.ModelClass;
 import tech.wetech.flexmodel.annotation.ModelField;
@@ -18,8 +16,6 @@ import java.util.Map;
  * @author cjbi
  */
 public class ReflectionUtils {
-
-  private final Logger log = LoggerFactory.getLogger(ReflectionUtils.class);
 
   public static void setFieldValue(Object obj, String fieldName, Object value) {
     try {
