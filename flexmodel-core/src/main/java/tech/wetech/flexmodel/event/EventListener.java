@@ -30,9 +30,7 @@ public interface EventListener {
    * @param eventType 事件类型
    * @return 是否支持
    */
-  default boolean supports(String eventType) {
-    return true;
-  }
+  boolean supports(String eventType);
 
   /**
    * 获取监听器优先级，数字越小优先级越高
