@@ -70,7 +70,7 @@
           "modelName": "ApiInfo",
           "defaultValue": {
             "type": "generated",
-            "name": "ulid"
+            "name": "uuid"
           }
         },
         {
@@ -155,7 +155,7 @@
           "modelName": "ApiLog",
           "defaultValue": {
             "type": "generated",
-            "name": "ulid"
+            "name": "uuid"
           }
         },
         {
@@ -252,7 +252,7 @@
           "modelName": "Config",
           "defaultValue": {
             "type": "generated",
-            "name": "ulid"
+            "name": "uuid"
           }
         },
         {

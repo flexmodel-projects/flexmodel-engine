@@ -149,7 +149,7 @@ public abstract class AbstractSessionTests {
 
     void createClassesEntity(String entityName) {
         session.schema().createEntity(entityName, entity -> entity
-            .addField(new StringField("id").asIdentity().setDefaultValue(DefaultValue.ULID))
+            .addField(new StringField("id").asIdentity().setDefaultValue(DefaultValue.UUID))
             .addField(new StringField("classCode"))
             .addField(new StringField("className"))
         );

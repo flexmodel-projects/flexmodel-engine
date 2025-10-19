@@ -219,7 +219,7 @@
           "modelName": "fs_api_log",
           "defaultValue": {
             "type": "generated",
-            "name": "ulid"
+            "name": "uuid"
           }
         },
         {

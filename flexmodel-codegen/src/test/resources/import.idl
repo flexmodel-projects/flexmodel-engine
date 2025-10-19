@@ -23,7 +23,7 @@ model fs_datasource {
   enabled : Boolean @comment("") @default("true"),
 }
 model fs_api_log {
-  id : String @id @default(ulid()),
+  id : String @id @default(uuid()),
   level : LogLevel,
   uri : String @length("255"),
   data : JSON,

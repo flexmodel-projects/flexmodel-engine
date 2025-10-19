@@ -77,7 +77,7 @@
         "modelName": "fs_api_definition",
         "defaultValue": {
           "type": "generated",
-          "name": "ulid"
+          "name": "uuid"
         }
       },
       {
@@ -182,7 +182,7 @@
         "modelName": "fs_api_log",
         "defaultValue": {
           "type": "generated",
-          "name": "ulid"
+          "name": "uuid"
         }
       },
       {
@@ -293,7 +293,7 @@
         "modelName": "fs_config",
         "defaultValue": {
           "type": "generated",
-          "name": "ulid"
+          "name": "uuid"
         }
       },
       {

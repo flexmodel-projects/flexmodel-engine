@@ -7,7 +7,7 @@ model fs_datasource {
   enabled : Boolean @comment("数据源") @default("true"),
 }
 model fs_api_definition {
-  id : String @id @unique @default(ulid()),
+  id : String @id @unique @default(uuid()),
   name : String @length("255"),
   parentId? : String @length("255"),
   type : ApiType,
@@ -19,7 +19,7 @@ model fs_api_definition {
   enabled : Boolean @comment("是否开启") @default("true"),
 }
 //model fs_api_log {
-//  id : String @id @default(ulid()),
+//  id : String @id @default(uuid()),
 //  level : LogLevel,
 //  uri : String @length("2000"),
 //  data : JSON,
@@ -27,7 +27,7 @@ model fs_api_definition {
 //  @index(unique: "false", fields: [level]),
 //}
 model fs_api_request_log {
-  id : String @id @default(ulid()),
+  id : String @id @default(uuid()),
   url : String @length("2000") @comment("请求地址"),
   http_method: String @length("255") @comment("请求方法"),
   path: String @length("1000") @comment("请求路径"),
@@ -51,7 +51,7 @@ model fs_identity_provider {
   updatedAt : DateTime @default(now()),
 }
 model fs_config {
-  id : String @id @unique @default(ulid()),
+  id : String @id @unique @default(uuid()),
   key : String @comment("名称") @length("255"),
   value? : String @length("255"),
   createdAt : DateTime @default(now()),
@@ -94,7 +94,7 @@ model Course {
   @index(name:"IDX_COURSE_NO", unique: "false", fields: [courseNo]),
 }
 model fs_user {
-    id : String @id @default(ulid()),
+    id : String @id @default(uuid()),
     username : String @length("255") @comment("用户名"),
     avatar? : String @length("255") @comment("头像"),
     password_hash : String @length("255") @comment("密码HASH"),

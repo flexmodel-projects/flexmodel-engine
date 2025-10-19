@@ -2,7 +2,6 @@ package tech.wetech.flexmodel.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.wetech.flexmodel.generator.ULID;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.ModelDefinition;
 import tech.wetech.flexmodel.model.field.*;
@@ -615,11 +614,7 @@ public abstract class BaseService {
 
     if (defaultValue.isGenerated()) {
       String generatedName = defaultValue.getName();
-      if ("ulid".equals(generatedName)) {
-        String ulid = ULID.random().toString();
-        log.debug("Generated ULID for field: {} = {}", field.getName(), ulid);
-        return ulid;
-      } else if ("uuid".equals(generatedName)) {
+      if ("uuid".equals(generatedName)) {
         String uuid = UUID.randomUUID().toString();
         log.debug("Generated UUID for field: {} = {}", field.getName(), uuid);
         return uuid;
@@ -637,7 +632,7 @@ public abstract class BaseService {
       log.debug("Used default value for field: {} = {}", field.getName(), convertedDefault);
       return convertedDefault;
     }
-    
+
     return null;
   }
 

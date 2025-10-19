@@ -22,10 +22,6 @@ public class DefaultValue implements Serializable {
      */
     public static final DefaultValue UUID = DefaultValue.generated("uuid");
     /**
-     * ULID
-     */
-    public static final DefaultValue ULID = DefaultValue.generated("ulid");
-    /**
      * 当前值
      */
     public static final DefaultValue NOW = DefaultValue.generated("now");
