@@ -3,7 +3,10 @@ package tech.wetech.flexmodel.event.test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tech.wetech.flexmodel.DataSourceProvider;
-import tech.wetech.flexmodel.event.*;
+import tech.wetech.flexmodel.event.ChangedEvent;
+import tech.wetech.flexmodel.event.EventListener;
+import tech.wetech.flexmodel.event.EventPublisher;
+import tech.wetech.flexmodel.event.PreChangeEvent;
 import tech.wetech.flexmodel.event.impl.InsertedEvent;
 import tech.wetech.flexmodel.event.impl.PreInsertEvent;
 import tech.wetech.flexmodel.event.impl.PreUpdateEvent;
@@ -38,7 +41,7 @@ public class EventTest {
     lastInsertedData = new AtomicReference<>();
 
     // 添加测试监听器
-    eventPublisher.addPreChangeListener(new PreChangeEventListener() {
+    eventPublisher.addListener(new EventListener() {
       @Override
       public void onPreChange(PreChangeEvent event) {
         if ("PRE_INSERT".equals(event.getEventType())) {
@@ -46,18 +49,6 @@ public class EventTest {
         }
       }
 
-      @Override
-      public boolean supports(String eventType) {
-        return "PRE_INSERT".equals(eventType);
-      }
-
-      @Override
-      public int getOrder() {
-        return 100;
-      }
-    });
-
-    eventPublisher.addChangedListener(new ChangedEventListener() {
       @Override
       public void onChanged(ChangedEvent event) {
         if ("INSERTED".equals(event.getEventType())) {
@@ -68,7 +59,7 @@ public class EventTest {
 
       @Override
       public boolean supports(String eventType) {
-        return "INSERTED".equals(eventType);
+        return "PRE_INSERT".equals(eventType) || "INSERTED".equals(eventType);
       }
 
       @Override
@@ -112,10 +103,15 @@ public class EventTest {
     AtomicInteger order = new AtomicInteger(0);
 
     // 添加多个监听器测试优先级
-    eventPublisher.addPreChangeListener(new PreChangeEventListener() {
+    eventPublisher.addListener(new EventListener() {
       @Override
       public void onPreChange(PreChangeEvent event) {
         order.set(2); // 低优先级
+      }
+
+      @Override
+      public void onChanged(ChangedEvent event) {
+        // 不处理
       }
 
       @Override
@@ -129,10 +125,15 @@ public class EventTest {
       }
     });
 
-    eventPublisher.addPreChangeListener(new PreChangeEventListener() {
+    eventPublisher.addListener(new EventListener() {
       @Override
       public void onPreChange(PreChangeEvent event) {
         order.set(1); // 高优先级
+      }
+
+      @Override
+      public void onChanged(ChangedEvent event) {
+        // 不处理
       }
 
       @Override
@@ -159,10 +160,15 @@ public class EventTest {
   void testEventSupports() {
     AtomicInteger supportedCount = new AtomicInteger(0);
 
-    eventPublisher.addPreChangeListener(new PreChangeEventListener() {
+    eventPublisher.addListener(new EventListener() {
       @Override
       public void onPreChange(PreChangeEvent event) {
         supportedCount.incrementAndGet();
+      }
+
+      @Override
+      public void onChanged(ChangedEvent event) {
+        // 不处理
       }
 
       @Override

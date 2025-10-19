@@ -22,30 +22,16 @@ public interface EventPublisher {
     void publishChangedEvent(ChangedEvent event);
 
     /**
-     * 添加前置事件监听器
+     * 添加事件监听器
      *
      * @param listener 监听器
      */
-    void addPreChangeListener(PreChangeEventListener listener);
-
-    /**
-     * 添加后置事件监听器
-     *
-     * @param listener 监听器
-     */
-    void addChangedListener(ChangedEventListener listener);
-
-    /**
-     * 添加通用事件监听器
-     *
-     * @param listener 监听器
-     */
-    void addListener(FlexmodelEventListener listener);
+    void addListener(EventListener listener);
 
     /**
      * 移除监听器
      *
      * @param listener 监听器
      */
-    void removeListener(Object listener);
+    void removeListener(EventListener listener);
 }
