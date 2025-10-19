@@ -327,7 +327,10 @@ public class SqlDataService extends BaseService implements DataService {
       String trimmedStatement = processedStatement.trim().toUpperCase();
       boolean isQuery = trimmedStatement.startsWith("SELECT");
       boolean isUpdate = trimmedStatement.startsWith("UPDATE")
-                         || trimmedStatement.startsWith("DELETE");
+                         || trimmedStatement.startsWith("INSERT")
+                         || trimmedStatement.startsWith("DELETE")
+                         || trimmedStatement.startsWith("CREATE")
+                         || trimmedStatement.startsWith("ALTER");
       Object result;
       if (isQuery) {
         // 执行查询操作

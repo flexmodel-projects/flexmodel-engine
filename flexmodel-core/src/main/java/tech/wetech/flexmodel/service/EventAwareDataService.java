@@ -42,11 +42,12 @@ public class EventAwareDataService implements DataService {
   public int insert(String modelName, Object record) {
     log.debug("Starting insert operation for model: {}", modelName);
 
+    Object oldData = new JacksonObjectConverter().convertValue(record, Map.class);
+
     // 发布前置事件
-    PreInsertEvent preEvent = new PreInsertEvent(modelName, schemaName, record, extractId(modelName, record), sessionId, source);
+    PreInsertEvent preEvent = new PreInsertEvent(modelName, schemaName, oldData, extractId(modelName, record), sessionId, source);
     eventPublisher.publishPreChangeEvent(preEvent);
 
-    Object oldData = null; // 插入前没有数据
     int affectedRows = 0;
     Throwable exception = null;
     boolean success = false;
@@ -152,7 +153,8 @@ public class EventAwareDataService implements DataService {
     int affectedRows = 0;
     Throwable exception = null;
     boolean success = false;
-
+    PreUpdateEvent preUpdateEvent = new PreUpdateEvent(modelName, schemaName, null, record, null, sessionId, source);
+    eventPublisher.publishPreChangeEvent(preUpdateEvent);
     try {
       // 执行更新操作
       affectedRows = delegate.update(modelName, record, filter);
@@ -182,7 +184,8 @@ public class EventAwareDataService implements DataService {
     int affectedRows = 0;
     Throwable exception = null;
     boolean success = false;
-
+    PreDeleteEvent deleteEvent = new PreDeleteEvent(modelName, schemaName, null, null, sessionId, source);
+    eventPublisher.publishPreChangeEvent(deleteEvent);
     try {
       // 执行删除操作
       affectedRows = delegate.delete(modelName, filter);

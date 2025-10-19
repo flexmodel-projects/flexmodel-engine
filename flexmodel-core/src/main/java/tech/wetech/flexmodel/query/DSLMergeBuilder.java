@@ -63,6 +63,9 @@ public class DSLMergeBuilder {
     if (idFieldOptional.isPresent()) {
       Map<String, Object> data = ReflectionUtils.toClassBean(new JacksonObjectConverter(), values, Map.class);
       Object id = data.get(idFieldOptional.get().getName());
+      if (id == null) {
+        return session.data().insert(modelName, values);
+      }
       int rows = session.data().updateById(modelName, values, id);
       if (rows != 0) {
         return rows;
