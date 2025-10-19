@@ -1,5 +1,6 @@
 package tech.wetech.flexmodel.sql;
 
+import tech.wetech.flexmodel.service.DataService;
 import tech.wetech.flexmodel.session.AbstractSession;
 
 import java.sql.Connection;
@@ -17,6 +18,11 @@ public class SqlSession extends AbstractSession {
 
   public SqlSession(SqlContext sqlContext) {
     super(sqlContext, new SqlDataService(sqlContext), new SqlSchemaService(sqlContext));
+    this.connection = sqlContext.getConnection();
+  }
+
+  public SqlSession(SqlContext sqlContext, DataService dataService) {
+    super(sqlContext, dataService, new SqlSchemaService(sqlContext));
     this.connection = sqlContext.getConnection();
   }
 

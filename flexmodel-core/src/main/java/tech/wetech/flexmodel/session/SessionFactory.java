@@ -11,6 +11,8 @@ import tech.wetech.flexmodel.cache.Cache;
 import tech.wetech.flexmodel.cache.CachingModelRegistry;
 import tech.wetech.flexmodel.cache.ConcurrentHashMapCache;
 import tech.wetech.flexmodel.cache.InMemoryModelRegistry;
+import tech.wetech.flexmodel.event.EventPublisher;
+import tech.wetech.flexmodel.event.impl.SimpleEventPublisher;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.EnumDefinition;
 import tech.wetech.flexmodel.model.SchemaObject;
@@ -20,6 +22,8 @@ import tech.wetech.flexmodel.mongodb.MongoSession;
 import tech.wetech.flexmodel.parser.ASTNodeConverter;
 import tech.wetech.flexmodel.parser.impl.ModelParser;
 import tech.wetech.flexmodel.parser.impl.ParseException;
+import tech.wetech.flexmodel.service.DataService;
+import tech.wetech.flexmodel.service.EventAwareDataService;
 import tech.wetech.flexmodel.sql.*;
 import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
@@ -42,11 +46,13 @@ public class SessionFactory {
   private final JsonObjectConverter jsonObjectConverter;
   private final boolean failsafe;
   private final MemoryScriptManager memoryScriptManager;
+  private final EventPublisher eventPublisher;
 
-  SessionFactory(DataSourceProvider defaultDataSourceProvider, List<DataSourceProvider> dataSourceProviders, Cache cache, boolean failsafe) {
+  SessionFactory(DataSourceProvider defaultDataSourceProvider, List<DataSourceProvider> dataSourceProviders, Cache cache, boolean failsafe, EventPublisher eventPublisher) {
     this.cache = cache;
     this.jsonObjectConverter = new JacksonObjectConverter();
     this.memoryScriptManager = new MemoryScriptManager();
+    this.eventPublisher = eventPublisher != null ? eventPublisher : new SimpleEventPublisher();
     this.defaultDataSourceProvider = defaultDataSourceProvider;
     addDataSourceProvider(defaultDataSourceProvider);
     dataSourceProviders.forEach(this::addDataSourceProvider);
@@ -272,12 +278,25 @@ public class SessionFactory {
           Connection connection = jdbc.dataSource().getConnection();
           SqlContext sqlContext = new SqlContext(id, new NamedParameterSqlExecutor(connection), modelRegistry, jsonObjectConverter, this);
           sqlContext.setFailsafe(true);
-          yield new SqlSession(sqlContext);
+
+          // 创建原始的DataService
+          DataService originalDataService = new SqlDataService(sqlContext);
+
+          // 包装为事件感知的DataService
+          String sessionId = UUID.randomUUID().toString();
+          DataService eventAwareDataService = new EventAwareDataService(
+            originalDataService, eventPublisher, id, sessionId, this
+          );
+
+          yield new SqlSession(sqlContext, eventAwareDataService);
         }
         case MongoDataSourceProvider mongodb -> {
           MongoDatabase mongoDatabase = mongodb.mongoDatabase();
           MongoContext mongoContext = new MongoContext(id, mongoDatabase, modelRegistry, jsonObjectConverter, this);
           mongoContext.setFailsafe(true);
+
+          // MongoDB的事件支持暂时使用原始DataService
+          // TODO: 实现MongoDB的事件支持
           yield new MongoSession(mongoContext);
         }
         case null,
@@ -297,11 +316,25 @@ public class SessionFactory {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
           SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), modelRegistry, jsonObjectConverter, this);
-          yield new SqlSession(sqlContext);
+
+          // 创建原始的DataService
+          DataService originalDataService = new SqlDataService(sqlContext);
+
+          // 包装为事件感知的DataService
+          String sessionId = UUID.randomUUID().toString();
+          DataService eventAwareDataService = new EventAwareDataService(
+            originalDataService, eventPublisher, identifier, sessionId, this
+          );
+
+          // 创建SqlSession时使用包装后的DataService
+          yield new SqlSession(sqlContext, eventAwareDataService);
         }
         case MongoDataSourceProvider mongodb -> {
           MongoDatabase mongoDatabase = mongodb.mongoDatabase();
           MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, modelRegistry, jsonObjectConverter, this);
+
+          // MongoDB的事件支持暂时使用原始DataService
+          // TODO: 实现MongoDB的事件支持
           yield new MongoSession(mongoContext);
         }
         case null,
@@ -317,6 +350,7 @@ public class SessionFactory {
     private DataSourceProvider defaultDataSourceProvider = null;
     private final List<DataSourceProvider> dataSourceProviders = new ArrayList<>();
     private boolean failsafe = false;
+    private EventPublisher eventPublisher = null;
 
     Builder() {
     }
@@ -341,6 +375,11 @@ public class SessionFactory {
       return this;
     }
 
+    public Builder setEventPublisher(EventPublisher eventPublisher) {
+      this.eventPublisher = eventPublisher;
+      return this;
+    }
+
     public SessionFactory build() {
       if (defaultDataSourceProvider == null) {
         throw new IllegalStateException("Please set defaultDataSourceProvider");
@@ -348,7 +387,7 @@ public class SessionFactory {
       if (cache == null) {
         this.cache = new ConcurrentHashMapCache();
       }
-      return new SessionFactory(defaultDataSourceProvider, dataSourceProviders, cache, failsafe);
+      return new SessionFactory(defaultDataSourceProvider, dataSourceProviders, cache, failsafe, eventPublisher);
     }
   }
 
@@ -365,5 +404,18 @@ public class SessionFactory {
 
   public String getDefaultSchema() {
     return defaultDataSourceProvider.getId();
+  }
+
+  public ModelRegistry getModelRegistry() {
+    return modelRegistry;
+  }
+
+  /**
+   * 获取事件发布器
+   *
+   * @return 事件发布器
+   */
+  public EventPublisher getEventPublisher() {
+    return eventPublisher;
   }
 }
