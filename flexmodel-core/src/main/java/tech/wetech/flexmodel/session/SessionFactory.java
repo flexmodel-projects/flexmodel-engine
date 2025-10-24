@@ -133,7 +133,7 @@ public class SessionFactory {
   public void loadJSONString(String schemaName, String jsonString) {
     ModelImportBundle bundle = jsonObjectConverter.parseToObject(jsonString, ModelImportBundle.class);
     try (Session session = createFailsafeSession(schemaName)) {
-      processModels(bundle.getSchema(), session);
+      processModels(bundle.getObjects(), session);
       processImportData(bundle.getData(), session);
     }
   }

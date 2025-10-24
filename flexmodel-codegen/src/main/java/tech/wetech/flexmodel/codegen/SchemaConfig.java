@@ -5,12 +5,30 @@ import java.io.Serializable;
 /**
  * @author cjbi
  */
-public class Target implements Serializable {
-
+public class SchemaConfig implements Serializable {
+  private String name;
+  private String importScript = "import.json";
   private String packageName = "com.example";
   private String replaceString;
   private String directory;
   private String baseDir;
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getImportScript() {
+    return importScript;
+  }
+
+  public SchemaConfig setImportScript(String importScript) {
+    this.importScript = importScript;
+    return this;
+  }
 
   public String getPackageName() {
     return packageName;

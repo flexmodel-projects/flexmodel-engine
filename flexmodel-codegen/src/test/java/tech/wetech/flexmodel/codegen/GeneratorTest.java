@@ -24,7 +24,7 @@ class GeneratorTest {
     ModelImportBundle describe = new JacksonObjectConverter().parseToObject(content, ModelImportBundle.class);
     PojoGenerator generator = new PojoGenerator();
     GenerationContext generationContext = new GenerationContext();
-    generationContext.getModelClassList().add(ModelClass.buildModelClass(packageName, schemaName, (EntityDefinition) describe.getSchema().getFirst()));
+    generationContext.getModelClassList().add(ModelClass.buildModelClass(packageName, schemaName, (EntityDefinition) describe.getObjects().getFirst()));
     String str = generator.generate(generationContext).getFirst();
     Assertions.assertNotNull(str);
   }

@@ -96,13 +96,13 @@
         </executions>
         <configuration>
           <generator>
-            <schema>
-              <name>system</name>
-              <import-script>src/main/resources/import.idl</import-script>
-            </schema>
-            <target>
-              <packageName>tech.wetech.flexmodel</packageName>
-            </target>
+            <schemas>
+              <schema>
+                <name>system</name>
+                <import-script>src/main/resources/import.idl</import-script>
+                <packageName>tech.wetech.flexmodel</packageName>
+              </schema>
+            </schemas>
           </generator>
         </configuration>
       </plugin>

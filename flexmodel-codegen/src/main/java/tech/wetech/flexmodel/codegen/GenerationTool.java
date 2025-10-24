@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel.codegen;
 
+import tech.wetech.flexmodel.ModelImportBundle;
+
 import java.io.File;
 
 /**
@@ -10,16 +12,24 @@ import java.io.File;
 public class GenerationTool {
 
   public static void run(Configuration configuration) {
-    String packageName = configuration.getTarget().getPackageName();
-    String targetDirectory = configuration.getTarget().getDirectory() + File.separator +
-                             packageName.replace(".", File.separator);
-    GenerationContext context = GenerationContext.buildGenerationContext(configuration);
+    for (ModelImportBundle importDescribe : configuration.getImportDescribes()) {
+      SchemaConfig schema = configuration.getSchemas().stream()
+        .filter(s -> s.getName().equals(importDescribe.getSchemaName()))
+        .findFirst()
+        .orElseThrow();
 
-    new PojoGenerator().generate(context, targetDirectory);
-    new EnumGenerator().generate(context, targetDirectory);
+      String packageName = schema.getPackageName();
+      String targetDirectory = schema.getDirectory() + File.separator +
+                               packageName.replace(".", File.separator);
+      GenerationContext context = GenerationContext.buildGenerationContext(configuration, importDescribe);
+
+      new PojoGenerator().generate(context, targetDirectory);
+      new EnumGenerator().generate(context, targetDirectory);
 //    new DSLGenerator().generate(context, targetDirectory);
-    new SchemaGenerator().generate(context, targetDirectory);
-    new BuildItemSPIFileGenerator().generate(context, configuration.getTarget().getBaseDir());
-  }
+      new SchemaGenerator().generate(context, targetDirectory);
+      new BuildItemSPIFileGenerator().generate(context, schema.getBaseDir());
 
+    }
+  }
 }
+

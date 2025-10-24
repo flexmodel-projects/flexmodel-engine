@@ -12,31 +12,28 @@ class GenerationToolTest extends AbstractIntegrationTest {
   @Test
   void test() throws Exception {
     Configuration configuration = new Configuration();
-    Schema schemaConfig = new Schema();
+    SchemaConfig schemaConfig = new SchemaConfig();
     schemaConfig.setName("system");
-    configuration.setSchema(schemaConfig);
-    Target target = new Target();
-    target.setBaseDir("src/test/resources/");
-    target.setDirectory("src/test/java");
-    target.setPackageName("com.example");
-    target.setReplaceString("f_");
-    configuration.setTarget(target);
+    schemaConfig.setBaseDir("src/test/resources/");
+    schemaConfig.setDirectory("src/test/java");
+    schemaConfig.setPackageName("com.example");
+    schemaConfig.setReplaceString("f_");
+    configuration.addSchema(schemaConfig);
+
     GenerationTool.run(configuration);
   }
 
   @Test
   void testIDL() {
     Configuration configuration = new Configuration();
-    Schema schemaConfig = new Schema();
+    SchemaConfig schemaConfig = new SchemaConfig();
     schemaConfig.setName("system_idl");
     schemaConfig.setImportScript("import.idl");
-    configuration.setSchema(schemaConfig);
-    Target target = new Target();
-    target.setBaseDir("src/test/resources/");
-    target.setDirectory("src/test/java");
-    target.setPackageName("com.example_idl");
-    target.setReplaceString("f_");
-    configuration.setTarget(target);
+    schemaConfig.setBaseDir("src/test/resources/");
+    schemaConfig.setDirectory("src/test/java");
+    schemaConfig.setPackageName("com.example_idl");
+    schemaConfig.setReplaceString("f_");
+    configuration.addSchema(schemaConfig);
     GenerationTool.run(configuration);
   }
   public static void listFiles(File dir) {

@@ -9,6 +9,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import tech.wetech.flexmodel.codegen.Configuration;
 import tech.wetech.flexmodel.codegen.GenerationTool;
+import tech.wetech.flexmodel.codegen.SchemaConfig;
 
 import java.io.File;
 import java.net.URL;
@@ -64,11 +65,15 @@ public class FlexmodelMojo extends AbstractMojo {
       getLog().info("Compile source root: " + outputDirectory);
       // Configure the generator to output to the specified directory
       if (generator != null) {
-        if (generator.getTarget().getBaseDir() == null) {
-          generator.getTarget().setBaseDir(project.getBasedir().getAbsolutePath());
-        }
-        if (generator.getTarget().getDirectory() == null) {
-          generator.getTarget().setDirectory(outputDirectory);
+        if(generator.getSchemas()!=null) {
+          for (SchemaConfig schema : generator.getSchemas()) {
+            if (schema.getBaseDir() == null) {
+              schema.setBaseDir(project.getBasedir().getAbsolutePath());
+            }
+            if (schema.getDirectory() == null) {
+              schema.setDirectory(outputDirectory);
+            }
+          }
         }
         GenerationTool.run(generator);
 

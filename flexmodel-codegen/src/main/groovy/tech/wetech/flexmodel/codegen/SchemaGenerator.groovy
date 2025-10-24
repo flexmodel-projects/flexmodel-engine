@@ -22,7 +22,7 @@ class SchemaGenerator extends AbstractGenerator {
   @Override
   void write(PrintWriter out, GenerationContext context) {
     def modelClassList = context.modelClassList
-    def className = context.schemaName.capitalize()
+    def className = StringUtils.snakeToCamel(context.schemaName).capitalize()
 
     out.println "package ${context.packageName};"
     out.println ""

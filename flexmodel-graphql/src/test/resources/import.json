@@ -1,5 +1,5 @@
 {
-  "schema": [
+  "objects": [
     {
       "name": "Datasource",
       "type": "entity",

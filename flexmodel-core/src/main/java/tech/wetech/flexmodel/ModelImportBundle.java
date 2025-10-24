@@ -12,15 +12,24 @@ import java.util.Map;
  */
 public class ModelImportBundle implements Serializable {
 
-  private List<SchemaObject> schema = new ArrayList<>();
+  private String schemaName;
+  private List<SchemaObject> objects = new ArrayList<>();
   private List<ImportData> data = new ArrayList<>();
 
-  public List<SchemaObject> getSchema() {
-    return schema;
+  public String getSchemaName() {
+    return schemaName;
   }
 
-  public void setSchema(List<SchemaObject> schema) {
-    this.schema = schema;
+  public void setSchemaName(String schemaName) {
+    this.schemaName = schemaName;
+  }
+
+  public List<SchemaObject> getObjects() {
+    return objects;
+  }
+
+  public void setObjects(List<SchemaObject> objects) {
+    this.objects = objects;
   }
 
   public List<ImportData> getData() {
@@ -63,7 +72,7 @@ public class ModelImportBundle implements Serializable {
   @Override
   public String toString() {
     return "ImportDescribe{" +
-           "schema=" + schema +
+           "schema=" + objects +
            ", data=" + data +
            '}';
   }

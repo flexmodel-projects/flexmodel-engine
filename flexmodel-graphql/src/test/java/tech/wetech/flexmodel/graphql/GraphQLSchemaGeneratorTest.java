@@ -32,10 +32,10 @@ class GraphQLSchemaGeneratorTest {
     GenerationContext generationContext = new GenerationContext();
     generationContext.setPackageName(packageName);
     generationContext.setSchemaName(schemaName);
-    for (SchemaObject model : describe.getSchema()) {
-      if (model instanceof EntityDefinition) {
-        generationContext.getModelClassList().add(ModelClass.buildModelClass(packageName, schemaName, (EntityDefinition) model));
-      } else if (model instanceof EnumDefinition anEnum) {
+    for (SchemaObject schemaObject : describe.getObjects()) {
+      if (schemaObject instanceof EntityDefinition) {
+        generationContext.getModelClassList().add(ModelClass.buildModelClass(packageName, schemaName, (EntityDefinition) schemaObject));
+      } else if (schemaObject instanceof EnumDefinition anEnum) {
         generationContext.getEnumClassList().add(EnumClass.buildEnumClass(packageName, schemaName, anEnum));
       }
     }

@@ -148,17 +148,19 @@ public class GenerationContext {
       .anyMatch(e -> e.getOriginal().getName().equals(name));
   }
 
-  public static GenerationContext buildGenerationContext(Configuration configuration) {
-    ModelImportBundle importDescribe = configuration.getImportDescribe();
-    List<SchemaObject> models = importDescribe.getSchema();
+  public static GenerationContext buildGenerationContext(Configuration configuration, ModelImportBundle importDescribe) {
+    SchemaConfig schema = configuration.getSchemas().stream()
+      .filter(s -> s.getName().equals(importDescribe.getSchemaName()))
+      .findFirst()
+      .orElseThrow();
+    List<SchemaObject> models = importDescribe.getObjects();
     List<ModelImportBundle.ImportData> data = importDescribe.getData();
-    Schema schema = configuration.getSchema();
-    String packageName = configuration.getTarget().getPackageName();
+    String packageName = schema.getPackageName();
     Map<String, ModelClass> modelClassMap = new HashMap<>();
     Map<String, EnumClass> enumClassMap = new HashMap<>();
     for (SchemaObject model : models) {
       if (model instanceof EntityDefinition) {
-        modelClassMap.put(model.getName(), ModelClass.buildModelClass(configuration.getTarget().getReplaceString(), packageName, schema.getName(), (EntityDefinition) model));
+        modelClassMap.put(model.getName(), ModelClass.buildModelClass(schema.getReplaceString(), packageName, schema.getName(), (EntityDefinition) model));
       } else if (model instanceof EnumDefinition) {
         enumClassMap.put(model.getName(), EnumClass.buildEnumClass(packageName, schema.getName(), (EnumDefinition) model));
       }

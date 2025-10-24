@@ -105,7 +105,7 @@ try (Session session = sessionFactory.createSession("mySchema")) {
 
 ```json
 {
-  "schema": [
+  "objects": [
     {
       "type": "entity",
       "name": "User",
