@@ -10,7 +10,7 @@ class SchemaGenerator extends AbstractGenerator {
 
   @Override
   String getTargetFile(GenerationContext context, String targetDirectory) {
-    return Path.of(targetDirectory, StringUtils.capitalize(context.getSchemaName()) + ".java").toString()
+    return Path.of(targetDirectory, StringUtils.snakeToCamel(context.schemaName).capitalize() + ".java").toString()
   }
 
   /**
