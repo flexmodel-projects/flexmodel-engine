@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.event;
 
 import tech.wetech.flexmodel.query.Query;
+import tech.wetech.flexmodel.session.SessionFactory;
 
 import java.util.Map;
 
@@ -17,7 +18,7 @@ public abstract class PreChangeEvent extends BaseEvent {
     private Query query;
 
     protected PreChangeEvent(EventType eventType, String modelName, String schemaName,
-                             Map<String, Object> newData, Object id, String sessionId, Object source) {
+                             Map<String, Object> newData, Object id, String sessionId, SessionFactory source) {
         super(eventType, modelName, schemaName, sessionId, source);
         this.newData = newData;
         this.id = id;
@@ -25,7 +26,7 @@ public abstract class PreChangeEvent extends BaseEvent {
     }
 
     protected PreChangeEvent(EventType eventType, String modelName, String schemaName,
-                             Map<String, Object> oldData, Map<String, Object> newData, Object id, Query query, String sessionId, Object source) {
+                             Map<String, Object> oldData, Map<String, Object> newData, Object id, Query query, String sessionId, SessionFactory source) {
         super(eventType, modelName, schemaName, sessionId, source);
         this.oldData = oldData;
         this.newData = newData;
