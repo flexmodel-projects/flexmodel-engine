@@ -4,9 +4,10 @@ FlexModel 事件功能提供了前置事件（PreChange）和后置事件（Chan
 
 ## 功能特性
 
-- **前置事件（PreChange）**：在数据操作执行前触发，可以记录日志、验证数据等
+- **前置事件（PreChange）**：在数据操作执行前触发，可以记录日志、验证数据、修改请求参数等
 - **后置事件（Changed）**：在数据操作执行后触发，可以执行后续操作如通知、缓存更新等
-- **事件类型**：支持 INSERT、UPDATE、DELETE 操作的前置和后置事件
+- **事件类型**：支持 INSERT、UPDATE、DELETE、QUERY 操作的前置和后置事件
+- **参数修改**：前置事件支持修改请求参数（data 和 Query），修改后的参数会被实际操作使用
 - **统一监听器接口**：使用统一的 `EventListener` 接口处理前置和后置事件
 - **优先级支持**：监听器支持优先级排序，数字越小优先级越高
 - **异常隔离**：监听器中的异常不会影响其他监听器和主业务流程
@@ -19,6 +20,7 @@ FlexModel 事件功能提供了前置事件（PreChange）和后置事件（Chan
 - `PRE_INSERT`：插入操作前
 - `PRE_UPDATE`：更新操作前  
 - `PRE_DELETE`：删除操作前
+- `PRE_QUERY`：查询操作前
 
 ### 后置事件
 - `INSERTED`：插入操作后
@@ -84,8 +86,14 @@ try (Session session = sessionFactory.createSession()) {
     
     // 删除数据 - 会触发PRE_DELETE和DELETED事件
     session.data().deleteById("users", 1);
+    
+    // 查询数据 - 会触发PRE_QUERY事件
+    Query query = new Query().where("name = '张三'");
+    List<User> users = session.data().find("users", query, User.class);
+    
+    // 统计查询 - 会触发PRE_QUERY事件
+    long count = session.data().count("users", query);
 }
-```
 
 ### 5. 手动发布事件示例
 
@@ -152,8 +160,11 @@ public abstract class BaseEvent {
 ```java
 public abstract class PreChangeEvent extends BaseEvent {
     public Object getNewData();  // 新数据
+    public void setNewData(Object newData);  // 设置新数据（允许修改）
     public Object getId();       // 记录ID
     public Object getOldData();  // 旧数据（更新和删除时）
+    public Query getQuery();     // 查询对象
+    public void setQuery(Query query);  // 设置查询对象（允许修改）
 }
 ```
 
@@ -175,6 +186,7 @@ public abstract class ChangedEvent extends BaseEvent {
 - `PreInsertEvent`：插入前置事件
 - `PreUpdateEvent`：更新前置事件  
 - `PreDeleteEvent`：删除前置事件
+- `PreQueryEvent`：查询前置事件
 
 #### 后置事件实现
 - `InsertedEvent`：插入完成事件
@@ -209,6 +221,325 @@ public interface EventPublisher {
 - 支持监听器优先级排序
 - 异常隔离：监听器异常不影响其他监听器
 - 支持事件类型过滤
+
+## 参数修改功能
+
+前置事件支持修改请求参数，这是 FlexModel 事件系统的一个重要特性。通过修改前置事件中的参数，你可以在数据操作执行前动态调整请求内容。
+
+### 支持的操作
+
+- **数据修改**：可以修改 `newData`（插入和更新时的数据）
+- **查询修改**：可以修改 `Query` 对象（查询条件、排序、分页等）
+- **所有操作**：支持 INSERT、UPDATE、DELETE、QUERY 操作
+
+### 使用方法
+
+#### 1. 修改插入数据
+
+```java
+public class DataModificationListener implements EventListener {
+    @Override
+    public void onPreChange(PreChangeEvent event) {
+        if ("PRE_INSERT".equals(event.getEventType())) {
+            // 修改插入的数据
+            Map<String, Object> data = (Map<String, Object>) event.getNewData();
+            data.put("createdBy", getCurrentUser());
+            data.put("createdAt", new Date());
+            event.setNewData(data);
+        }
+    }
+    
+    @Override
+    public void onChanged(ChangedEvent event) {
+        // 后置事件处理
+    }
+    
+    @Override
+    public boolean supports(String eventType) {
+        return "PRE_INSERT".equals(eventType);
+    }
+    
+    @Override
+    public int getOrder() {
+        return 100;
+    }
+}
+```
+
+#### 2. 修改更新数据
+
+```java
+public class UpdateModificationListener implements EventListener {
+    @Override
+    public void onPreChange(PreChangeEvent event) {
+        if ("PRE_UPDATE".equals(event.getEventType())) {
+            // 修改更新数据
+            Map<String, Object> data = (Map<String, Object>) event.getNewData();
+            data.put("updatedBy", getCurrentUser());
+            data.put("updatedAt", new Date());
+            event.setNewData(data);
+            
+            // 修改查询条件（如果有的话）
+            if (event.getQuery() != null) {
+                Query query = event.getQuery();
+                String currentFilter = query.getFilter();
+                if (currentFilter != null && !currentFilter.isEmpty()) {
+                    query.setFilter(currentFilter + " AND status != 'DELETED'");
+                } else {
+                    query.setFilter("status != 'DELETED'");
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void onChanged(ChangedEvent event) {
+        // 后置事件处理
+    }
+    
+    @Override
+    public boolean supports(String eventType) {
+        return "PRE_UPDATE".equals(eventType);
+    }
+    
+    @Override
+    public int getOrder() {
+        return 100;
+    }
+}
+```
+
+#### 3. 修改查询条件
+
+```java
+public class QueryModificationListener implements EventListener {
+    @Override
+    public void onPreChange(PreChangeEvent event) {
+        if ("PRE_QUERY".equals(event.getEventType())) {
+            Query query = event.getQuery();
+            
+            // 添加数据权限过滤条件
+            String currentFilter = query.getFilter();
+            String permissionFilter = getDataPermissionFilter(event.getModelName());
+            
+            if (currentFilter != null && !currentFilter.isEmpty()) {
+                query.setFilter(currentFilter + " AND " + permissionFilter);
+            } else {
+                query.setFilter(permissionFilter);
+            }
+            
+            // 记录查询审计日志
+            logQueryAudit(event.getModelName(), query, getCurrentUser());
+            
+            // 设置修改后的查询
+            event.setQuery(query);
+        }
+    }
+    
+    @Override
+    public void onChanged(ChangedEvent event) {
+        // 后置事件处理
+    }
+    
+    @Override
+    public boolean supports(String eventType) {
+        return "PRE_QUERY".equals(eventType);
+    }
+    
+    @Override
+    public int getOrder() {
+        return 10; // 高优先级，优先处理权限
+    }
+    
+    private String getDataPermissionFilter(String modelName) {
+        String currentUser = getCurrentUser();
+        
+        switch (modelName) {
+            case "User":
+                return isAdmin(currentUser) ? "1=1" : "id = '" + currentUser + "'";
+            case "Order":
+                return "userId = '" + currentUser + "'";
+            case "Product":
+                return "status = 'ACTIVE'";
+            default:
+                return "createdBy = '" + currentUser + "'";
+        }
+    }
+    
+    private void logQueryAudit(String modelName, Query query, String user) {
+        System.out.println(String.format("Query Audit - User: %s, Model: %s, Filter: %s, Time: %s", 
+            user, modelName, query.getFilter(), new Date()));
+    }
+}
+```
+
+#### 4. 实现软删除
+
+```java
+public class SoftDeleteListener implements EventListener {
+    @Override
+    public void onPreChange(PreChangeEvent event) {
+        if ("PRE_DELETE".equals(event.getEventType())) {
+            // 修改删除条件，实现软删除
+            if (event.getQuery() != null) {
+                Query query = event.getQuery();
+                String currentFilter = query.getFilter();
+                if (currentFilter != null && !currentFilter.isEmpty()) {
+                    query.setFilter(currentFilter + " AND status = 'ACTIVE'");
+                } else {
+                    query.setFilter("status = 'ACTIVE'");
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void onChanged(ChangedEvent event) {
+        // 后置事件处理
+    }
+    
+    @Override
+    public boolean supports(String eventType) {
+        return "PRE_DELETE".equals(eventType);
+    }
+    
+    @Override
+    public int getOrder() {
+        return 50;
+    }
+}
+```
+
+### 实际应用场景
+
+#### 1. 自动填充审计字段
+
+```java
+public class AuditFieldListener implements EventListener {
+    @Override
+    public void onPreChange(PreChangeEvent event) {
+        String eventType = event.getEventType();
+        Map<String, Object> data = (Map<String, Object>) event.getNewData();
+        
+        if ("PRE_INSERT".equals(eventType)) {
+            data.put("createdBy", getCurrentUser());
+            data.put("createdAt", new Date());
+        } else if ("PRE_UPDATE".equals(eventType)) {
+            data.put("updatedBy", getCurrentUser());
+            data.put("updatedAt", new Date());
+        }
+        
+        event.setNewData(data);
+    }
+    
+    @Override
+    public void onChanged(ChangedEvent event) {
+        // 后置事件处理
+    }
+    
+    @Override
+    public boolean supports(String eventType) {
+        return "PRE_INSERT".equals(eventType) || "PRE_UPDATE".equals(eventType);
+    }
+    
+    @Override
+    public int getOrder() {
+        return 1; // 最高优先级
+    }
+}
+```
+
+#### 2. 数据权限控制
+
+```java
+public class DataPermissionListener implements EventListener {
+    @Override
+    public void onPreChange(PreChangeEvent event) {
+        if ("PRE_QUERY".equals(event.getEventType())) {
+            Query query = event.getQuery();
+            String permissionFilter = buildPermissionFilter(event.getModelName());
+            
+            String currentFilter = query.getFilter();
+            if (currentFilter != null && !currentFilter.isEmpty()) {
+                query.setFilter(currentFilter + " AND " + permissionFilter);
+            } else {
+                query.setFilter(permissionFilter);
+            }
+            
+            event.setQuery(query);
+        }
+    }
+    
+    @Override
+    public void onChanged(ChangedEvent event) {
+        // 后置事件处理
+    }
+    
+    @Override
+    public boolean supports(String eventType) {
+        return "PRE_QUERY".equals(eventType);
+    }
+    
+    @Override
+    public int getOrder() {
+        return 10; // 高优先级
+    }
+    
+    private String buildPermissionFilter(String modelName) {
+        // 根据用户角色和模型构建权限过滤条件
+        return "1=1"; // 示例
+    }
+}
+```
+
+#### 3. 查询优化
+
+```java
+public class QueryOptimizationListener implements EventListener {
+    @Override
+    public void onPreChange(PreChangeEvent event) {
+        if ("PRE_QUERY".equals(event.getEventType())) {
+            Query query = event.getQuery();
+            
+            // 添加默认排序
+            if (query.getSort() == null) {
+                query.orderBy("id DESC");
+            }
+            
+            // 限制查询结果数量
+            if (query.getPage() == null) {
+                query.page(1, 100); // 默认每页100条
+            }
+            
+            event.setQuery(query);
+        }
+    }
+    
+    @Override
+    public void onChanged(ChangedEvent event) {
+        // 后置事件处理
+    }
+    
+    @Override
+    public boolean supports(String eventType) {
+        return "PRE_QUERY".equals(eventType);
+    }
+    
+    @Override
+    public int getOrder() {
+        return 200; // 较低优先级
+    }
+}
+```
+
+### 注意事项
+
+1. **参数修改时机**：参数修改在前置事件中进行，修改后的参数会被实际操作使用
+2. **类型安全**：修改数据时需要注意类型安全，建议使用 `@SuppressWarnings("unchecked")` 注解
+3. **性能考虑**：参数修改操作应该尽量快速，避免影响主业务流程性能
+4. **异常处理**：参数修改中的异常会被捕获，不会影响其他监听器
+5. **优先级**：多个监听器修改同一参数时，按优先级顺序执行
+6. **空值检查**：修改前应该检查参数是否为 null，避免空指针异常
 
 ## 实际应用场景
 
@@ -373,6 +704,9 @@ public class NotificationListener implements EventListener {
 6. **批量操作**：批量更新和删除操作只触发后置事件，不触发前置事件
 7. **事务支持**：事件在事务提交后触发，确保数据一致性
 8. **内存管理**：监听器会持有事件对象的引用，注意避免内存泄漏
+9. **参数修改**：前置事件支持修改请求参数，修改后的参数会被实际操作使用
+10. **查询事件**：查询操作（find、count、findById）会触发 PRE_QUERY 前置事件
+11. **类型安全**：修改数据时需要注意类型安全，建议使用 `@SuppressWarnings("unchecked")` 注解
 
 ## 扩展功能
 
@@ -385,3 +719,8 @@ public class NotificationListener implements EventListener {
 5. **实现事件持久化存储**：将事件存储到数据库或文件系统中
 6. **添加事件重试机制**：对于失败的事件处理添加重试逻辑
 7. **实现事件聚合**：将多个相关事件聚合成一个复合事件
+8. **参数验证框架**：基于前置事件实现统一的参数验证框架
+9. **数据转换管道**：利用参数修改功能实现数据格式转换和标准化
+10. **动态权限系统**：基于查询前置事件实现细粒度的数据权限控制
+11. **审计追踪系统**：利用参数修改功能记录详细的数据变更轨迹
+12. **缓存预热机制**：基于查询前置事件实现智能缓存预热

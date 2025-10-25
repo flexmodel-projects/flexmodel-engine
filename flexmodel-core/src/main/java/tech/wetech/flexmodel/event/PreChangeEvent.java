@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel.event;
 
+import tech.wetech.flexmodel.query.Query;
+
 /**
  * 前置事件基类
  *
@@ -7,9 +9,10 @@ package tech.wetech.flexmodel.event;
  */
 public abstract class PreChangeEvent extends BaseEvent {
 
-    private final Object newData;
+    private Object newData;
     private final Object id;
     private final Object oldData;
+    private Query query;
 
     protected PreChangeEvent(EventType eventType, String modelName, String schemaName, 
                              Object newData, Object id, String sessionId, Object source) {
@@ -27,6 +30,15 @@ public abstract class PreChangeEvent extends BaseEvent {
         this.id = id;
     }
 
+    protected PreChangeEvent(EventType eventType, String modelName, String schemaName, 
+                             Object oldData, Object newData, Object id, Query query, String sessionId, Object source) {
+        super(eventType, modelName, schemaName, sessionId, source);
+        this.oldData = oldData;
+        this.newData = newData;
+        this.id = id;
+        this.query = query;
+    }
+
     /**
      * 获取新数据
      *
@@ -34,6 +46,15 @@ public abstract class PreChangeEvent extends BaseEvent {
      */
     public Object getNewData() {
         return newData;
+    }
+
+    /**
+     * 设置新数据（允许事件处理器修改）
+     *
+     * @param newData 新数据
+     */
+    public void setNewData(Object newData) {
+        this.newData = newData;
     }
 
     /**
@@ -52,5 +73,23 @@ public abstract class PreChangeEvent extends BaseEvent {
      */
     public Object getOldData() {
         return oldData;
+    }
+
+    /**
+     * 获取查询对象
+     *
+     * @return 查询对象
+     */
+    public Query getQuery() {
+        return query;
+    }
+
+    /**
+     * 设置查询对象（允许事件处理器修改）
+     *
+     * @param query 查询对象
+     */
+    public void setQuery(Query query) {
+        this.query = query;
     }
 }

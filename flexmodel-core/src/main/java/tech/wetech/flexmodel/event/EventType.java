@@ -13,6 +13,7 @@ public enum EventType {
     PRE_INSERT("PRE_INSERT"),
     PRE_UPDATE("PRE_UPDATE"),
     PRE_DELETE("PRE_DELETE"),
+    PRE_QUERY("PRE_QUERY"),
     
     /**
      * 后置事件

@@ -191,7 +191,7 @@ public class EventTest {
 
     // 发布UPDATE事件，应该被处理
     PreUpdateEvent updateEvent = new PreUpdateEvent("test", "schema",
-      Map.of("id", 1, "name", "old"), Map.of("id", 1, "name", "new"), 1, "session1", this);
+      Map.of("id", 1, "name", "old"), Map.of("id", 1, "name", "new"), 1, null, "session1", this);
     eventPublisher.publishPreChangeEvent(updateEvent);
 
     assertEquals(1, supportedCount.get());

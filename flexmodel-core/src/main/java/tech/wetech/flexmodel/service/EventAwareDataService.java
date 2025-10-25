@@ -42,11 +42,12 @@ public class EventAwareDataService implements DataService {
   public int insert(String modelName, Object record) {
     log.debug("Starting insert operation for model: {}", modelName);
 
-    Object oldData = new JacksonObjectConverter().convertValue(record, Map.class);
-
     // 发布前置事件
-    PreInsertEvent preEvent = new PreInsertEvent(modelName, schemaName, oldData, extractId(modelName, record), sessionId, source);
+    PreInsertEvent preEvent = new PreInsertEvent(modelName, schemaName, record, extractId(modelName, record), sessionId, source);
     eventPublisher.publishPreChangeEvent(preEvent);
+
+    // 使用事件中可能被修改的数据
+    Object finalRecord = preEvent.getNewData() != null ? preEvent.getNewData() : record;
 
     int affectedRows = 0;
     Throwable exception = null;
@@ -54,7 +55,7 @@ public class EventAwareDataService implements DataService {
 
     try {
       // 执行插入操作
-      affectedRows = delegate.insert(modelName, record);
+      affectedRows = delegate.insert(modelName, finalRecord);
       success = affectedRows > 0;
       log.debug("Insert operation completed for model: {}, affected rows: {}", modelName, affectedRows);
     } catch (Throwable e) {
@@ -64,7 +65,7 @@ public class EventAwareDataService implements DataService {
     } finally {
       // 发布后置事件
       InsertedEvent changedEvent = new InsertedEvent(
-        modelName, schemaName, oldData, record, extractId(modelName, record),
+        modelName, schemaName, finalRecord, record, extractId(modelName, finalRecord),
         affectedRows, success, exception, sessionId, source
       );
       eventPublisher.publishChangedEvent(changedEvent);
@@ -81,8 +82,11 @@ public class EventAwareDataService implements DataService {
     Object oldData = delegate.findById(modelName, id);
 
     // 发布前置事件
-    PreUpdateEvent preEvent = new PreUpdateEvent(modelName, schemaName, oldData, record, id, sessionId, source);
+    PreUpdateEvent preEvent = new PreUpdateEvent(modelName, schemaName, oldData, record, id, null, sessionId, source);
     eventPublisher.publishPreChangeEvent(preEvent);
+
+    // 使用事件中可能被修改的数据
+    Object finalRecord = preEvent.getNewData() != null ? preEvent.getNewData() : record;
 
     int affectedRows = 0;
     Throwable exception = null;
@@ -90,7 +94,7 @@ public class EventAwareDataService implements DataService {
 
     try {
       // 执行更新操作
-      affectedRows = delegate.updateById(modelName, record, id);
+      affectedRows = delegate.updateById(modelName, finalRecord, id);
       success = affectedRows > 0;
       log.debug("Update operation completed for model: {}, affected rows: {}", modelName, affectedRows);
     } catch (Throwable e) {
@@ -100,7 +104,7 @@ public class EventAwareDataService implements DataService {
     } finally {
       // 发布后置事件
       UpdatedEvent changedEvent = new UpdatedEvent(
-        modelName, schemaName, oldData, record, id,
+        modelName, schemaName, oldData, finalRecord, id,
         affectedRows, success, exception, sessionId, source
       );
       eventPublisher.publishChangedEvent(changedEvent);
@@ -117,7 +121,7 @@ public class EventAwareDataService implements DataService {
     Object oldData = delegate.findById(modelName, id);
 
     // 发布前置事件
-    PreDeleteEvent preEvent = new PreDeleteEvent(modelName, schemaName, oldData, id, sessionId, source);
+    PreDeleteEvent preEvent = new PreDeleteEvent(modelName, schemaName, oldData, id, null, sessionId, source);
     eventPublisher.publishPreChangeEvent(preEvent);
 
     int affectedRows = 0;
@@ -149,15 +153,26 @@ public class EventAwareDataService implements DataService {
   public int update(String modelName, Object record, String filter) {
     log.debug("Starting update operation for model: {} with filter: {}", modelName, filter);
 
-    // 对于批量更新，我们无法获取所有旧数据，所以只发布后置事件
+    // 创建查询对象
+    Query query = new Query();
+    query.setFilter(filter);
+
+    // 发布前置事件
+    PreUpdateEvent preEvent = new PreUpdateEvent(modelName, schemaName, null, record, null, query, sessionId, source);
+    eventPublisher.publishPreChangeEvent(preEvent);
+
+    // 使用事件中可能被修改的数据和查询
+    Object finalRecord = preEvent.getNewData() != null ? preEvent.getNewData() : record;
+    Query finalQuery = preEvent.getQuery() != null ? preEvent.getQuery() : query;
+    String finalFilter = finalQuery.getFilter();
+
     int affectedRows = 0;
     Throwable exception = null;
     boolean success = false;
-    PreUpdateEvent preUpdateEvent = new PreUpdateEvent(modelName, schemaName, null, record, null, sessionId, source);
-    eventPublisher.publishPreChangeEvent(preUpdateEvent);
+
     try {
       // 执行更新操作
-      affectedRows = delegate.update(modelName, record, filter);
+      affectedRows = delegate.update(modelName, finalRecord, finalFilter);
       success = affectedRows > 0;
       log.debug("Update operation completed for model: {}, affected rows: {}", modelName, affectedRows);
     } catch (Throwable e) {
@@ -165,9 +180,9 @@ public class EventAwareDataService implements DataService {
       log.error("Update operation failed for model: {}", modelName, e);
       throw e;
     } finally {
-      // 发布后置事件（批量更新没有前置事件）
+      // 发布后置事件
       UpdatedEvent changedEvent = new UpdatedEvent(
-        modelName, schemaName, null, record, null,
+        modelName, schemaName, null, finalRecord, null,
         affectedRows, success, exception, sessionId, source
       );
       eventPublisher.publishChangedEvent(changedEvent);
@@ -180,15 +195,25 @@ public class EventAwareDataService implements DataService {
   public int delete(String modelName, String filter) {
     log.debug("Starting delete operation for model: {} with filter: {}", modelName, filter);
 
-    // 对于批量删除，我们无法获取所有旧数据，所以只发布后置事件
+    // 创建查询对象
+    Query query = new Query();
+    query.setFilter(filter);
+
+    // 发布前置事件
+    PreDeleteEvent preEvent = new PreDeleteEvent(modelName, schemaName, null, null, query, sessionId, source);
+    eventPublisher.publishPreChangeEvent(preEvent);
+
+    // 使用事件中可能被修改的查询
+    Query finalQuery = preEvent.getQuery() != null ? preEvent.getQuery() : query;
+    String finalFilter = finalQuery.getFilter();
+
     int affectedRows = 0;
     Throwable exception = null;
     boolean success = false;
-    PreDeleteEvent deleteEvent = new PreDeleteEvent(modelName, schemaName, null, null, sessionId, source);
-    eventPublisher.publishPreChangeEvent(deleteEvent);
+
     try {
       // 执行删除操作
-      affectedRows = delegate.delete(modelName, filter);
+      affectedRows = delegate.delete(modelName, finalFilter);
       success = affectedRows > 0;
       log.debug("Delete operation completed for model: {}, affected rows: {}", modelName, affectedRows);
     } catch (Throwable e) {
@@ -196,7 +221,7 @@ public class EventAwareDataService implements DataService {
       log.error("Delete operation failed for model: {}", modelName, e);
       throw e;
     } finally {
-      // 发布后置事件（批量删除没有前置事件）
+      // 发布后置事件
       DeletedEvent changedEvent = new DeletedEvent(
         modelName, schemaName, null, null, null,
         affectedRows, success, exception, sessionId, source
@@ -245,9 +270,13 @@ public class EventAwareDataService implements DataService {
       // 这里需要根据实际的模型定义来提取ID
       Map<String, Object> data;
       if (record instanceof Map) {
-        data = (Map<String, Object>) record;
+        @SuppressWarnings("unchecked")
+        Map<String, Object> mapRecord = (Map<String, Object>) record;
+        data = mapRecord;
       } else {
-        data = ReflectionUtils.toClassBean(new JacksonObjectConverter(), record, Map.class);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> convertedData = ReflectionUtils.toClassBean(new JacksonObjectConverter(), record, Map.class);
+        data = convertedData;
       }
       if (source instanceof SessionFactory sf) {
         SchemaObject schemaObject = sf.getModelRegistry().getRegistered(schemaName, modelName);
@@ -265,12 +294,41 @@ public class EventAwareDataService implements DataService {
   // 委托其他方法给原始DataService
   @Override
   public <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery) {
-    return delegate.findById(modelName, id, resultType, nestedQuery);
+    log.debug("Starting findById operation for model: {}, id: {}", modelName, id);
+
+    // 发布前置查询事件
+    PreQueryEvent preEvent = new PreQueryEvent(modelName, schemaName, null, sessionId, source);
+    eventPublisher.publishPreChangeEvent(preEvent);
+
+    try {
+      T result = delegate.findById(modelName, id, resultType, nestedQuery);
+      log.debug("FindById operation completed for model: {}, id: {}", modelName, id);
+      return result;
+    } catch (Exception e) {
+      log.error("FindById operation failed for model: {}, id: {}", modelName, id, e);
+      throw e;
+    }
   }
 
   @Override
   public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
-    return delegate.find(modelName, query, resultType);
+    log.debug("Starting find operation for model: {}", modelName);
+
+    // 发布前置查询事件
+    PreQueryEvent preEvent = new PreQueryEvent(modelName, schemaName, query, sessionId, source);
+    eventPublisher.publishPreChangeEvent(preEvent);
+
+    // 使用事件中可能被修改的查询
+    Query finalQuery = preEvent.getQuery() != null ? preEvent.getQuery() : query;
+
+    try {
+      List<T> result = delegate.find(modelName, finalQuery, resultType);
+      log.debug("Find operation completed for model: {}, result count: {}", modelName, result.size());
+      return result;
+    } catch (Exception e) {
+      log.error("Find operation failed for model: {}", modelName, e);
+      throw e;
+    }
   }
 
   @Override
@@ -285,6 +343,22 @@ public class EventAwareDataService implements DataService {
 
   @Override
   public long count(String modelName, Query query) {
-    return delegate.count(modelName, query);
+    log.debug("Starting count operation for model: {}", modelName);
+
+    // 发布前置查询事件
+    PreQueryEvent preEvent = new PreQueryEvent(modelName, schemaName, query, sessionId, source);
+    eventPublisher.publishPreChangeEvent(preEvent);
+
+    // 使用事件中可能被修改的查询
+    Query finalQuery = preEvent.getQuery() != null ? preEvent.getQuery() : query;
+
+    try {
+      long result = delegate.count(modelName, finalQuery);
+      log.debug("Count operation completed for model: {}, count: {}", modelName, result);
+      return result;
+    } catch (Exception e) {
+      log.error("Count operation failed for model: {}", modelName, e);
+      throw e;
+    }
   }
 }

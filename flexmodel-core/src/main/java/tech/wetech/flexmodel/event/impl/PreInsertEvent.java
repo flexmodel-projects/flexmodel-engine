@@ -9,8 +9,9 @@ import tech.wetech.flexmodel.event.PreChangeEvent;
  * @author cjbi
  */
 public class PreInsertEvent extends PreChangeEvent {
-    
+
     public PreInsertEvent(String modelName, String schemaName, Object newData, Object id, String sessionId, Object source) {
         super(EventType.PRE_INSERT, modelName, schemaName, newData, id, sessionId, source);
     }
+
 }
