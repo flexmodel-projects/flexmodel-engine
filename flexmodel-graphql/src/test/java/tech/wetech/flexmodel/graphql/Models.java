@@ -1,11 +1,10 @@
 package tech.wetech.flexmodel.graphql;
 
-import tech.wetech.flexmodel.JsonObjectConverter;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.EnumDefinition;
 import tech.wetech.flexmodel.model.field.*;
 import tech.wetech.flexmodel.session.Session;
-import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.util.List;
 import java.util.Map;
@@ -14,8 +13,6 @@ import java.util.Map;
  * @author cjbi
  */
 public class Models {
-
-    private static final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
 
     public static EntityDefinition createClassesEntity(Session session, String entityName) {
         return session.schema().createEntity(entityName, entity -> entity
@@ -112,7 +109,7 @@ public class Models {
                 }
               ]
             """;
-        List<Map<String, Object>> list = jsonObjectConverter.parseToObject(mockData, List.class);
+        List<Map<String, Object>> list = JsonUtils.parseToObject(mockData, List.class);
         session.data().insertAll(entityName, list);
     }
 
@@ -192,7 +189,7 @@ public class Models {
               }
             ]
             """;
-        List<Map<String, Object>> list = jsonObjectConverter.parseToObject(mockData, List.class);
+        List<Map<String, Object>> list = JsonUtils.parseToObject(mockData, List.class);
         session.data().insertAll(entityName, list);
     }
 
@@ -221,7 +218,7 @@ public class Models {
                  }
               ]
             """;
-        List<Map<String, Object>> list = jsonObjectConverter.parseToObject(mockData, List.class);
+        List<Map<String, Object>> list = JsonUtils.parseToObject(mockData, List.class);
         session.data().insertAll(entityName, list);
     }
 
@@ -275,7 +272,7 @@ public class Models {
               }
             ]
             """;
-        List<Map<String, Object>> list = jsonObjectConverter.parseToObject(mockData, List.class);
+        List<Map<String, Object>> list = JsonUtils.parseToObject(mockData, List.class);
         session.data().insertAll(entityName, list);
     }
 

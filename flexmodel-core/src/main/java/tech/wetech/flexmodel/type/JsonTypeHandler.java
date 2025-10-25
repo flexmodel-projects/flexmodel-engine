@@ -1,6 +1,5 @@
 package tech.wetech.flexmodel.type;
 
-import tech.wetech.flexmodel.JsonObjectConverter;
 import tech.wetech.flexmodel.model.field.Field;
 
 /**
@@ -8,10 +7,7 @@ import tech.wetech.flexmodel.model.field.Field;
  */
 public class JsonTypeHandler implements TypeHandler<Object> {
 
-  protected final JsonObjectConverter jsonObjectConverter;
-
-    public JsonTypeHandler(JsonObjectConverter jsonObjectConverter) {
-        this.jsonObjectConverter = jsonObjectConverter;
+    public JsonTypeHandler() {
     }
 
     @Override

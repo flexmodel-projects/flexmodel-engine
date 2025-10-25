@@ -1,7 +1,5 @@
 package tech.wetech.flexmodel;
 
-import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
-
 import java.util.*;
 
 /**
@@ -11,7 +9,6 @@ import java.util.*;
 public abstract class AbstractExpressionCalculator<T> implements ExpressionCalculator<T> {
 
   private static final Map<String, String> opMap = new HashMap<>();
-  private static final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
 
   static {
     opMap.put("_and", "and");
@@ -32,8 +29,8 @@ public abstract class AbstractExpressionCalculator<T> implements ExpressionCalcu
   }
 
   protected String transform(String input) {
-    Map<String, Object> inputMap = jsonObjectConverter.parseToMap(input);
-    return jsonObjectConverter.toJsonString(transform(inputMap));
+    Map<String, Object> inputMap = JsonUtils.parseToObject(input, Map.class);
+    return JsonUtils.toJsonString(transform(inputMap));
   }
 
   private Map<String, Object> transform(Map<String, Object> input) {

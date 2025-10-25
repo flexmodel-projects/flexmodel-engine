@@ -4,7 +4,6 @@ import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.field.TypedField;
 import tech.wetech.flexmodel.reflect.ReflectionUtils;
 import tech.wetech.flexmodel.session.Session;
-import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.util.Map;
 import java.util.Optional;
@@ -61,7 +60,7 @@ public class DSLMergeBuilder {
     EntityDefinition entity = (EntityDefinition) session.schema().getModel(modelName);
     Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
     if (idFieldOptional.isPresent()) {
-      Map<String, Object> data = ReflectionUtils.toClassBean(new JacksonObjectConverter(), values, Map.class);
+      Map<String, Object> data = ReflectionUtils.toClassBean(values, Map.class);
       Object id = data.get(idFieldOptional.get().getName());
       if (id == null) {
         return session.data().insert(modelName, values);

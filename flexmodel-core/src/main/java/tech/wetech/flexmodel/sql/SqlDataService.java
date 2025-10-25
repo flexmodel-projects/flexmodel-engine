@@ -49,11 +49,11 @@ public class SqlDataService extends BaseService implements DataService {
     log.debug("Starting SQL insert for model: {}", modelName);
     long startTime = System.currentTimeMillis();
 
-    Map<String, Object> data = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
+    Map<String, Object> data = ReflectionUtils.toClassBean(objR, Map.class);
     Map<String, Object> processedData = generateFieldValues(modelName, data, false);
 
     try {
-      Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), processedData, Map.class);
+      Map<String, Object> record = ReflectionUtils.toClassBean(processedData, Map.class);
       String sql = getInsertSqlString(modelName, record);
       log.debug("Generated INSERT SQL: {}", sql);
 
@@ -135,10 +135,10 @@ public class SqlDataService extends BaseService implements DataService {
     long startTime = System.currentTimeMillis();
 
     try {
-      Map<String, Object> data = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
+      Map<String, Object> data = ReflectionUtils.toClassBean(objR, Map.class);
       Map<String, Object> processedData = generateFieldValues(modelName, data, true);
 
-      Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), processedData, Map.class);
+      Map<String, Object> record = ReflectionUtils.toClassBean(processedData, Map.class);
       String physicalTableName = toPhysicalTablenameQuoteString(modelName);
       EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
       TypedField<?, ?> idField = entity.findIdField().orElseThrow();
@@ -182,7 +182,7 @@ public class SqlDataService extends BaseService implements DataService {
     long startTime = System.currentTimeMillis();
 
     try {
-      Map<String, Object> record = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
+      Map<String, Object> record = ReflectionUtils.toClassBean(objR, Map.class);
       Map<String, Object> processedData = generateFieldValues(modelName, record, true);
 
       String physicalTableName = toPhysicalTablenameQuoteString(modelName);
@@ -251,7 +251,7 @@ public class SqlDataService extends BaseService implements DataService {
         nestedQuery(List.of(dataMap), this::findMapList, (ModelDefinition) sessionContext.getModelDefinition(modelName), null, sessionContext.getNestedQueryMaxDepth());
       }
 
-      T result = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), dataMap, resultType);
+      T result = ReflectionUtils.toClassBean(dataMap, resultType);
       T finalResult = LazyObjProxy.createProxy(result, modelName, sessionContext);
 
       long duration = System.currentTimeMillis() - startTime;
@@ -278,7 +278,7 @@ public class SqlDataService extends BaseService implements DataService {
       if (query.isNestedEnabled()) {
         nestedQuery(mapList, this::findMapList, (ModelDefinition) sessionContext.getModelDefinition(modelName), query, sessionContext.getNestedQueryMaxDepth());
       }
-      List<T> results = ReflectionUtils.toClassBeanList(sessionContext.getJsonObjectConverter(), mapList, resultType);
+      List<T> results = ReflectionUtils.toClassBeanList(mapList, resultType);
       List<T> finalResults = LazyObjProxy.createProxyList(results, modelName, sessionContext);
 
       long duration = System.currentTimeMillis() - startTime;
@@ -302,7 +302,7 @@ public class SqlDataService extends BaseService implements DataService {
       String statement = model.getStatement();
       List<?> list = (List<?>) executeNativeStatement(statement, params);
 
-      List<T> results = ReflectionUtils.toClassBeanList(sessionContext.getJsonObjectConverter(), list, resultType);
+      List<T> results = ReflectionUtils.toClassBeanList(list, resultType);
 
       long duration = System.currentTimeMillis() - startTime;
       log.debug("SQL native query model completed for {} in {}ms, results: {}", modelName, duration, results.size());
@@ -320,7 +320,7 @@ public class SqlDataService extends BaseService implements DataService {
     long startTime = System.currentTimeMillis();
 
     try {
-      Map<String, Object> params = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), objR, Map.class);
+      Map<String, Object> params = ReflectionUtils.toClassBean(objR, Map.class);
       String processedStatement = StringHelper.replacePlaceholder(statement);
 
       // 判断 SQL 语句类型

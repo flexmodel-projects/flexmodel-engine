@@ -6,6 +6,7 @@ import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.field.RelationField;
 import tech.wetech.flexmodel.session.AbstractSessionContext;
@@ -30,7 +31,7 @@ public class LazyObjProxy {
         .implement(ProxyInterface.class)
         .method(ElementMatchers.namedOneOf(getLazyMethods(entity)))
         .intercept(MethodDelegation.to(new LazyLoadInterceptor(modelName,
-          sessionContext.getJsonObjectConverter().convertValue(obj, Map.class), sessionContext))) // 委托给 LazyLoadInterceptor
+          JsonUtils.convertValue(obj, Map.class), sessionContext))) // 委托给 LazyLoadInterceptor
         .method(ElementMatchers.named("entityInfo"))
         .intercept(FixedValue.value(sessionContext.getModelDefinition(modelName)))
         .method(ElementMatchers.named("originClass"))
@@ -39,7 +40,7 @@ public class LazyObjProxy {
         .load(obj.getClass().getClassLoader())
         .getLoaded();
 
-      return (T) sessionContext.getJsonObjectConverter().convertValue(obj, subClazz);
+      return (T) JsonUtils.convertValue(obj, subClazz);
     } catch (Throwable e) {
       log.trace("Failed to create lazy class, message: {}", e.toString());
       return obj;

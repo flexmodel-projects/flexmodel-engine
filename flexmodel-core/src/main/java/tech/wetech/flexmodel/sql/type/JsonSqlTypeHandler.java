@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel.sql.type;
 
-import tech.wetech.flexmodel.JsonObjectConverter;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.model.field.Field;
 import tech.wetech.flexmodel.type.JsonTypeHandler;
 
@@ -13,8 +13,8 @@ import java.sql.Types;
  */
 public class JsonSqlTypeHandler extends JsonTypeHandler implements SqlTypeHandler<Object> {
 
-  public JsonSqlTypeHandler(JsonObjectConverter jsonObjectConverter) {
-    super(jsonObjectConverter);
+  public JsonSqlTypeHandler() {
+    super();
   }
 
   @Override
@@ -29,7 +29,7 @@ public class JsonSqlTypeHandler extends JsonTypeHandler implements SqlTypeHandle
       if (jsonString == null) {
         return null;
       }
-      return jsonObjectConverter.parseToObject(jsonString, Object.class);
+      return JsonUtils.parseToObject(jsonString, Object.class);
     } catch (Exception e) {
       return jsonString;
     }
@@ -37,7 +37,7 @@ public class JsonSqlTypeHandler extends JsonTypeHandler implements SqlTypeHandle
 
   @Override
   public Object convertParameter(Field field, Object value) {
-    return jsonObjectConverter.toJsonString(value);
+    return JsonUtils.toJsonString(value);
   }
 
 }

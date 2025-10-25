@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel.query;
 
-import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
+import tech.wetech.flexmodel.JsonUtils;
 
 import java.util.Map;
 
@@ -16,7 +16,7 @@ public interface Expression {
     if (map == null || map.isEmpty()) {
       return null;
     }
-    return new JacksonObjectConverter().toJsonString(toMap());
+    return JsonUtils.toJsonString(toMap());
   }
 
 }

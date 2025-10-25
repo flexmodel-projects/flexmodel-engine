@@ -10,7 +10,6 @@ import tech.wetech.flexmodel.model.field.TypedField;
 import tech.wetech.flexmodel.query.Query;
 import tech.wetech.flexmodel.reflect.ReflectionUtils;
 import tech.wetech.flexmodel.session.SessionFactory;
-import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.util.List;
 import java.util.Map;
@@ -275,7 +274,7 @@ public class EventAwareDataService implements DataService {
         data = mapRecord;
       } else {
         @SuppressWarnings("unchecked")
-        Map<String, Object> convertedData = ReflectionUtils.toClassBean(new JacksonObjectConverter(), record, Map.class);
+        Map<String, Object> convertedData = ReflectionUtils.toClassBean(record, Map.class);
         data = convertedData;
       }
       if (source instanceof SessionFactory sf) {

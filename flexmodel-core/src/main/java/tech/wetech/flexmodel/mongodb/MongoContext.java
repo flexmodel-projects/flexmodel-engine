@@ -2,7 +2,6 @@ package tech.wetech.flexmodel.mongodb;
 
 import com.mongodb.client.MongoDatabase;
 import tech.wetech.flexmodel.ExpressionCalculator;
-import tech.wetech.flexmodel.JsonObjectConverter;
 import tech.wetech.flexmodel.ModelRegistry;
 import tech.wetech.flexmodel.model.field.ScalarType;
 import tech.wetech.flexmodel.session.AbstractSessionContext;
@@ -21,8 +20,8 @@ public class MongoContext extends AbstractSessionContext {
   private ExpressionCalculator<String> conditionCalculator;
   private final Map<String, TypeHandler<?>> typeHandlerMap = new HashMap<>();
 
-  public MongoContext(String schemaName, MongoDatabase mongoDatabase, ModelRegistry modelRegistry, JsonObjectConverter jsonObjectConverter, SessionFactory factory) {
-    super(schemaName, modelRegistry, jsonObjectConverter, factory);
+  public MongoContext(String schemaName, MongoDatabase mongoDatabase, ModelRegistry modelRegistry, SessionFactory factory) {
+    super(schemaName, modelRegistry, factory);
     this.mongoDatabase = mongoDatabase;
     this.conditionCalculator = new DefaultMongoExpressionCalculator();
 
@@ -34,7 +33,7 @@ public class MongoContext extends AbstractSessionContext {
     this.typeHandlerMap.put(ScalarType.DATETIME.getType(), new DateTimeTypeHandler());
     this.typeHandlerMap.put(ScalarType.DATE.getType(), new DateTypeHandler());
     this.typeHandlerMap.put(ScalarType.TIME.getType(), new TimeTypeHandler());
-    this.typeHandlerMap.put(ScalarType.JSON.getType(), new JsonTypeHandler(jsonObjectConverter));
+    this.typeHandlerMap.put(ScalarType.JSON.getType(), new JsonTypeHandler());
     this.typeHandlerMap.put(ScalarType.ENUM.getType(), new EnumTypeHandler());
   }
 

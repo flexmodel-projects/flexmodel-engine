@@ -4,7 +4,7 @@ import com.mongodb.client.MongoDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.DataSourceProvider;
-import tech.wetech.flexmodel.JsonObjectConverter;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.ModelImportBundle;
 import tech.wetech.flexmodel.ModelRegistry;
 import tech.wetech.flexmodel.cache.Cache;
@@ -25,7 +25,6 @@ import tech.wetech.flexmodel.parser.impl.ParseException;
 import tech.wetech.flexmodel.service.DataService;
 import tech.wetech.flexmodel.service.EventAwareDataService;
 import tech.wetech.flexmodel.sql.*;
-import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,14 +42,12 @@ public class SessionFactory {
   private final Map<String, DataSourceProvider> dataSourceProviders = new HashMap<>();
   private final Cache cache;
   private final Logger log = LoggerFactory.getLogger(SessionFactory.class);
-  private final JsonObjectConverter jsonObjectConverter;
-  private final boolean failsafe;
   private final MemoryScriptManager memoryScriptManager;
+  private final boolean failsafe;
   private final EventPublisher eventPublisher;
 
   SessionFactory(DataSourceProvider defaultDataSourceProvider, List<DataSourceProvider> dataSourceProviders, Cache cache, boolean failsafe, EventPublisher eventPublisher) {
     this.cache = cache;
-    this.jsonObjectConverter = new JacksonObjectConverter();
     this.memoryScriptManager = new MemoryScriptManager();
     this.eventPublisher = eventPublisher != null ? eventPublisher : new SimpleEventPublisher();
     this.defaultDataSourceProvider = defaultDataSourceProvider;
@@ -63,7 +60,7 @@ public class SessionFactory {
 
   private ModelRegistry initializeModelRegistry(DataSourceProvider dataSourceProvider) {
     if (dataSourceProvider instanceof JdbcDataSourceProvider jdbcDataSourceProvider) {
-      return new CachingModelRegistry(new JdbcModelRegistry(jdbcDataSourceProvider.dataSource(), jsonObjectConverter), cache);
+      return new CachingModelRegistry(new JdbcModelRegistry(jdbcDataSourceProvider.dataSource()), cache);
     } else if (dataSourceProvider instanceof MongoDataSourceProvider) {
       return new InMemoryModelRegistry();
     } else {
@@ -131,7 +128,7 @@ public class SessionFactory {
   }
 
   public void loadJSONString(String schemaName, String jsonString) {
-    ModelImportBundle bundle = jsonObjectConverter.parseToObject(jsonString, ModelImportBundle.class);
+    ModelImportBundle bundle = JsonUtils.parseToObject(jsonString, ModelImportBundle.class);
     try (Session session = createFailsafeSession(schemaName)) {
       processModels(bundle.getObjects(), session);
       processImportData(bundle.getData(), session);
@@ -276,7 +273,7 @@ public class SessionFactory {
       return switch (dataSourceProviders.get(id)) {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
-          SqlContext sqlContext = new SqlContext(id, new NamedParameterSqlExecutor(connection), modelRegistry, jsonObjectConverter, this);
+          SqlContext sqlContext = new SqlContext(id, new NamedParameterSqlExecutor(connection), modelRegistry, this);
           sqlContext.setFailsafe(true);
 
           // 创建原始的DataService
@@ -292,7 +289,7 @@ public class SessionFactory {
         }
         case MongoDataSourceProvider mongodb -> {
           MongoDatabase mongoDatabase = mongodb.mongoDatabase();
-          MongoContext mongoContext = new MongoContext(id, mongoDatabase, modelRegistry, jsonObjectConverter, this);
+          MongoContext mongoContext = new MongoContext(id, mongoDatabase, modelRegistry, this);
           mongoContext.setFailsafe(true);
 
           // MongoDB的事件支持暂时使用原始DataService
@@ -315,7 +312,7 @@ public class SessionFactory {
       return switch (dataSourceProviders.get(identifier)) {
         case JdbcDataSourceProvider jdbc -> {
           Connection connection = jdbc.dataSource().getConnection();
-          SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), modelRegistry, jsonObjectConverter, this);
+          SqlContext sqlContext = new SqlContext(identifier, new NamedParameterSqlExecutor(connection), modelRegistry, this);
 
           // 创建原始的DataService
           DataService originalDataService = new SqlDataService(sqlContext);
@@ -331,7 +328,7 @@ public class SessionFactory {
         }
         case MongoDataSourceProvider mongodb -> {
           MongoDatabase mongoDatabase = mongodb.mongoDatabase();
-          MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, modelRegistry, jsonObjectConverter, this);
+          MongoContext mongoContext = new MongoContext(identifier, mongoDatabase, modelRegistry, this);
 
           // MongoDB的事件支持暂时使用原始DataService
           // TODO: 实现MongoDB的事件支持
@@ -391,13 +388,6 @@ public class SessionFactory {
     }
   }
 
-  public JsonObjectConverter getJsonObjectConverter() {
-    return jsonObjectConverter;
-  }
-
-  /**
-   * 获取内存脚本管理器
-   */
   public MemoryScriptManager getMemoryScriptManager() {
     return memoryScriptManager;
   }

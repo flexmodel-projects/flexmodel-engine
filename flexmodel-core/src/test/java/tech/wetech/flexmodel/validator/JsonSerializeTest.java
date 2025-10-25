@@ -2,9 +2,9 @@ package tech.wetech.flexmodel.validator;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.field.*;
-import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 /**
  * @author cjbi
@@ -57,8 +57,8 @@ public class JsonSerializeTest {
     email.setLength(20);
     entity.addField(email);
 
-    String json = new JacksonObjectConverter().toJsonString(entity);
-    EntityDefinition deSerializeEntity = new JacksonObjectConverter().parseToObject(json, EntityDefinition.class);
+    String json = JsonUtils.toJsonString(entity);
+    EntityDefinition deSerializeEntity = JsonUtils.parseToObject(json, EntityDefinition.class);
     Assertions.assertNotNull(deSerializeEntity);
   }
 

@@ -16,7 +16,6 @@ import tech.wetech.flexmodel.query.Query;
 import tech.wetech.flexmodel.session.Session;
 import tech.wetech.flexmodel.session.SessionFactory;
 import tech.wetech.flexmodel.sql.JdbcDataSourceProvider;
-import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,8 +34,6 @@ public abstract class AbstractSessionTests {
 
     public static SessionFactory sessionFactory;
     public static Session session;
-    private final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
-
     // 用于生成唯一的实体名称，避免测试间冲突
     private final AtomicInteger entityCounter = new AtomicInteger(1);
 
@@ -255,7 +252,7 @@ public abstract class AbstractSessionTests {
                 }
               ]
             """;
-        List<Map<String, Object>> list = jsonObjectConverter.parseToMapList(mockData);
+        List<Map<String, Object>> list = JsonUtils.parseToObject(mockData, List.class);
         session.data().insertAll(entityName, list);
     }
 
@@ -331,7 +328,7 @@ public abstract class AbstractSessionTests {
               }
             ]
             """;
-        List<Map<String, Object>> list = jsonObjectConverter.parseToMapList(mockData);
+        List<Map<String, Object>> list = JsonUtils.parseToObject(mockData, List.class);
         session.data().insertAll(entityName, list);
     }
 
@@ -360,7 +357,7 @@ public abstract class AbstractSessionTests {
                  }
               ]
             """;
-        List<Map<String, Object>> list = jsonObjectConverter.parseToMapList(mockData);
+        List<Map<String, Object>> list = JsonUtils.parseToObject(mockData, List.class);
         session.data().insertAll(entityName, list);
     }
 
@@ -414,7 +411,7 @@ public abstract class AbstractSessionTests {
               }
             ]
             """;
-        List<Map<String, Object>> list = jsonObjectConverter.parseToMapList(mockData);
+        List<Map<String, Object>> list = JsonUtils.parseToObject(mockData, List.class);
         session.data().insertAll(entityName, list);
     }
 
@@ -592,7 +589,7 @@ public abstract class AbstractSessionTests {
               }
             ]
             """;
-        List<Map<String, Object>> list = jsonObjectConverter.parseToMapList(mockData);
+        List<Map<String, Object>> list = JsonUtils.parseToObject(mockData, List.class);
         session.data().insertAll(entityName, list);
     }
 
@@ -621,7 +618,7 @@ public abstract class AbstractSessionTests {
               { "teacher_id": 5, "c_name": "西班牙语", "c_score": 89 }
             ]
             """;
-        List<Map<String, Object>> list = jsonObjectConverter.parseToMapList(mockData);
+        List<Map<String, Object>> list = JsonUtils.parseToObject(mockData, List.class);
         session.schema().createEntity(teacherCourseEntity, sScore -> sScore
             .addField(new LongField("id").asIdentity().setDefaultValue(DefaultValue.AUTO_INCREMENT))
             .addField(new StringField("c_name"))
@@ -1239,7 +1236,7 @@ public abstract class AbstractSessionTests {
             }
         }
         // fixme 需要增加死循环检测
-//    System.out.println(new JacksonObjectConverter().toJsonString(classesList));
+//    System.out.println(JsonUtils.toJsonString(classesList));
     }
 
 }

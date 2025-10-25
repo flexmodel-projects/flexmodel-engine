@@ -2,7 +2,7 @@ package tech.wetech.flexmodel.sql;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.wetech.flexmodel.JsonObjectConverter;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.ModelRegistry;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.IndexDefinition;
@@ -33,11 +33,9 @@ public class JdbcModelRegistry implements ModelRegistry {
   private final DataSource dataSource;
   private final SqlDialect sqlDialect;
   private final Logger log = LoggerFactory.getLogger(JdbcModelRegistry.class);
-  private final JsonObjectConverter jsonObjectConverter;
 
-  public JdbcModelRegistry(DataSource dataSource, JsonObjectConverter jsonObjectConverter) {
+  public JdbcModelRegistry(DataSource dataSource) {
     this.dataSource = dataSource;
-    this.jsonObjectConverter = jsonObjectConverter;
     try (Connection connection = dataSource.getConnection()) {
       sqlDialect = SqlDialectFactory.create(dataSource.getConnection().getMetaData());
       if (!existSchema(connection)) {
@@ -330,7 +328,7 @@ public class JdbcModelRegistry implements ModelRegistry {
             field = jsonField;
             if (sqlColumn.getDefaultValue() != null) {
               try {
-                jsonField.setFixedDefaultValue(sqlContext.getJsonObjectConverter().parseToObject(sqlColumn.getDefaultValue(), Serializable.class));
+                jsonField.setFixedDefaultValue(JsonUtils.parseToObject(sqlColumn.getDefaultValue(), Serializable.class));
               } catch (Exception e) {
                 log.warn("Unexpected default value: {}, message: {}", sqlColumn.getDefaultValue(), e.getMessage());
               }
@@ -385,11 +383,11 @@ public class JdbcModelRegistry implements ModelRegistry {
         Object content = data.get("content");
         try {
           switch (content) {
-            case String contentStr -> result.add(jsonObjectConverter.parseToObject(contentStr, SchemaObject.class));
+            case String contentStr -> result.add(JsonUtils.parseToObject(contentStr, SchemaObject.class));
             case Blob blob ->
-              result.add(jsonObjectConverter.parseToObject(Arrays.toString(blob.getBinaryStream().readAllBytes()), SchemaObject.class));
+              result.add(JsonUtils.parseToObject(Arrays.toString(blob.getBinaryStream().readAllBytes()), SchemaObject.class));
             case byte[] bytes ->
-              result.add(jsonObjectConverter.parseToObject(Arrays.toString(bytes), SchemaObject.class));
+              result.add(JsonUtils.parseToObject(Arrays.toString(bytes), SchemaObject.class));
             case null, default -> {
               assert content != null;
               throw new RuntimeException("get model error, unknown data type:" + content.getClass());
@@ -432,13 +430,13 @@ public class JdbcModelRegistry implements ModelRegistry {
   @Override
   public void register(String schemaName, SchemaObject object) {
     try (Connection connection = dataSource.getConnection()) {
-      String content = jsonObjectConverter.toJsonString(object);
+      String content = JsonUtils.toJsonString(object);
       log.trace("Persist:\n{}", content);
       connection.setAutoCommit(false);
       NamedParameterSqlExecutor sqlExecutor = new NamedParameterSqlExecutor(connection);
       SchemaObject older;
       if ((older = this.getRegistered(schemaName, object.getName())) != null) {
-        String oldContent = jsonObjectConverter.toJsonString(older);
+        String oldContent = JsonUtils.toJsonString(older);
         if (!oldContent.equals(content)) {
           String updateString = "update " + sqlDialect.quoteIdentifier(STORED_TABLES) + "set " + sqlDialect.quoteIdentifier("content") + "=:content" +
                                 " \nwhere " + sqlDialect.quoteIdentifier("schema_name") + "=:schemaName and " + sqlDialect.quoteIdentifier("model_name") + "=:modelName";
@@ -478,7 +476,7 @@ public class JdbcModelRegistry implements ModelRegistry {
                                " \nwhere " + sqlDialect.quoteIdentifier("schema_name") + "=:schemaName and " + sqlDialect.quoteIdentifier("model_name") + "=:modelName";
       String content = sqlExecutor.queryForScalar(sqlSelectString,
         Map.of("schemaName", schemaName, "modelName", modelName), String.class);
-      return jsonObjectConverter.parseToObject(content, SchemaObject.class);
+      return JsonUtils.parseToObject(content, SchemaObject.class);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

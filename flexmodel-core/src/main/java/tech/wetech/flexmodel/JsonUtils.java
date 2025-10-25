@@ -1,4 +1,4 @@
-package tech.wetech.flexmodel.supports.jackson;
+package tech.wetech.flexmodel;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -7,9 +7,7 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import tech.wetech.flexmodel.JsonObjectConverter;
+import tech.wetech.flexmodel.supports.jackson.FlexmodelCoreModule;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,12 +19,15 @@ import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_
 /**
  * @author cjbi
  */
-public class JacksonObjectConverter implements JsonObjectConverter {
+public class JsonUtils {
 
-  private static final Logger log = LoggerFactory.getLogger(JacksonObjectConverter.class);
-  private final JsonMapper jsonMapper;
+  private static final JsonMapper JSON;
 
-  public JacksonObjectConverter() {
+  private JsonUtils() {
+
+  }
+
+  static  {
     JsonMapper.Builder builder = new JsonMapper().rebuild();
     //
 //        JSON.configure(SerializationFeature.INDENT_OUTPUT, false);
@@ -39,42 +40,38 @@ public class JacksonObjectConverter implements JsonObjectConverter {
     builder.addModule(new JavaTimeModule());
     builder.addModule(new FlexmodelCoreModule());
     ServiceLoader.load(Module.class).forEach(builder::addModule);
-    this.jsonMapper = builder.build();
+    JSON = builder.build();
   }
 
-  @Override
-  public String toJsonString(Object obj) {
+  public static String toJsonString(Object obj) {
     try {
-      return jsonMapper.writeValueAsString(obj);
+      return JSON.writeValueAsString(obj);
     } catch (JsonProcessingException e) {
       e.printStackTrace();
     }
     return null;
   }
 
-  @Override
-  public <T> T parseToObject(String jsonString, Class<T> cls) {
+  public static <T> T parseToObject(String jsonString, Class<T> cls) {
     try {
       if (jsonString == null) {
         return null;
       }
-      return jsonMapper.readValue(jsonString, cls);
+      return JSON.readValue(jsonString, cls);
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
     }
   }
 
-  @Override
   @SuppressWarnings("all")
-  public <T> T convertValue(Object fromValue, Class<T> cls) {
+  public static <T> T convertValue(Object fromValue, Class<T> cls) {
     if (fromValue != null && cls.isAssignableFrom(fromValue.getClass())) {
       return (T) fromValue;
     }
-    return jsonMapper.convertValue(fromValue, cls);
+    return JSON.convertValue(fromValue, cls);
   }
 
-  @Override
-  public <T> List<T> convertValueList(List<?> fromValues, Class<T> cls) {
+  public static <T> List<T> convertValueList(List<?> fromValues, Class<T> cls) {
     List<T> list = new ArrayList<>();
     for (Object fromValue : fromValues) {
       list.add(convertValue(fromValue, cls));

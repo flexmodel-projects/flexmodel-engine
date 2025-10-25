@@ -5,7 +5,7 @@ import graphql.execution.ValuesResolver;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
-import tech.wetech.flexmodel.JsonObjectConverter;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.field.RelationField;
 import tech.wetech.flexmodel.model.field.TypedField;
@@ -13,7 +13,6 @@ import tech.wetech.flexmodel.query.Direction;
 import tech.wetech.flexmodel.query.Query;
 import tech.wetech.flexmodel.session.Session;
 import tech.wetech.flexmodel.session.SessionFactory;
-import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,8 +30,6 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
   protected final String schemaName;
   protected final String modelName;
   protected final SessionFactory sessionFactory;
-
-  protected static final JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
 
   protected static final String PAGE_NUMBER = "page";
   protected static final String PAGE_SIZE = "size";
@@ -107,7 +104,7 @@ public abstract class FlexmodelAbstractDataFetcher<T> implements DataFetcher<T> 
       query.setOrderBy(sort);
     }
     if (where != null) {
-      query.setFilter(jsonObjectConverter.toJsonString(where));
+      query.setFilter(JsonUtils.toJsonString(where));
     }
     return query;
   }

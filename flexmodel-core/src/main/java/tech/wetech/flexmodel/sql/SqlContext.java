@@ -1,6 +1,5 @@
 package tech.wetech.flexmodel.sql;
 
-import tech.wetech.flexmodel.JsonObjectConverter;
 import tech.wetech.flexmodel.ModelRegistry;
 import tech.wetech.flexmodel.model.field.ScalarType;
 import tech.wetech.flexmodel.naming.PhysicalNamingStrategy;
@@ -29,11 +28,10 @@ public class SqlContext extends AbstractSessionContext {
   public SqlContext(String schemaName,
                     SqlExecutor sqlExecutor,
                     ModelRegistry mappedModels,
-                    JsonObjectConverter jsonObjectConverter,
                     SessionFactory factory
 
   ) {
-    super(schemaName, mappedModels, jsonObjectConverter, factory);
+    super(schemaName, mappedModels, factory);
     this.sqlExecutor = sqlExecutor;
     DatabaseMetaData databaseMetaData;
     Connection connection = sqlExecutor.getConnection();
@@ -61,7 +59,7 @@ public class SqlContext extends AbstractSessionContext {
       this.typeHandlerMap.put(ScalarType.DATE.getType(), new LegacyDateSqlTypeHandler());
       this.typeHandlerMap.put(ScalarType.TIME.getType(), new LegacyTimeSqlTypeHandler());
     }
-    this.typeHandlerMap.put(ScalarType.JSON.getType(), new JsonSqlTypeHandler(jsonObjectConverter));
+    this.typeHandlerMap.put(ScalarType.JSON.getType(), new JsonSqlTypeHandler());
     this.typeHandlerMap.put(ScalarType.ENUM.getType(), new EnumSqlTypeHandler());
   }
 

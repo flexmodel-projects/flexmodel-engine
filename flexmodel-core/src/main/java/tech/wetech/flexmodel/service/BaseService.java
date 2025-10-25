@@ -665,7 +665,7 @@ public abstract class BaseService {
     log.debug("Inserting relation records for model: {}, parentId: {}", modelName, parentId);
 
     try {
-      Map<String, Object> relationData = ReflectionUtils.toClassBean(sessionContext.getJsonObjectConverter(), relationObject, Map.class);
+      Map<String, Object> relationData = ReflectionUtils.toClassBean(relationObject, Map.class);
     EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
 
       log.debug("Processing {} relation fields for model: {}", relationData.size(), modelName);
@@ -708,7 +708,7 @@ public abstract class BaseService {
 
       relationCollection.forEach(relationItem -> {
         Map<String, Object> relationRecord = ReflectionUtils.toClassBean(
-          sessionContext.getJsonObjectConverter(), relationItem, Map.class);
+          relationItem, Map.class);
         relationRecord.put(relationField.getForeignField(), parentId);
 
         log.debug("Inserting relation record: {} -> {}", relationField.getFrom(), relationRecord);
@@ -717,7 +717,7 @@ public abstract class BaseService {
     } else {
       // 处理一对一关联
       Map<String, Object> relationRecord = ReflectionUtils.toClassBean(
-        sessionContext.getJsonObjectConverter(), fieldValue, Map.class);
+        fieldValue, Map.class);
       relationRecord.put(relationField.getForeignField(), parentId);
 
       log.debug("Inserting relation record: {} -> {}", relationField.getFrom(), relationRecord);

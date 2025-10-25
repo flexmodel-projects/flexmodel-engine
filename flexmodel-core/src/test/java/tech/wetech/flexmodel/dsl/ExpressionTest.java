@@ -2,10 +2,10 @@ package tech.wetech.flexmodel.dsl;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.query.Expressions;
 import tech.wetech.flexmodel.query.FilterExpression;
 import tech.wetech.flexmodel.query.Predicate;
-import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,7 +45,7 @@ public class ExpressionTest {
 
     // 转换为 JSON 格式
     Map<String, Object> map = condition.toMap();
-    String jsonString = new JacksonObjectConverter().toJsonString(map);
+    String jsonString = JsonUtils.toJsonString(map);
     System.out.println(jsonString);
     Assertions.assertEquals("{\"_and\":[{\"_and\":[{\"_and\":[{\"username\":{\"_eq\":\"john_doe\"}},{\"_or\":[{\"_or\":[{\"_or\":[{\"remark\":{\"_contains\":\"aa\"}},{\"locked\":{\"_eq\":false}}]},{\"email\":{\"_ne\":\"jane_doe@example.com\"}}]},{\"age\":{\"_gt\":18}}]}]},{\"_and\":[{\"_and\":[{\"_and\":[{\"registrationDate\":{\"_between\":[\"2020-01-01\",\"2023-01-01\"]}},{\"age\":{\"_lt\":65}}]},{\"lastLogin\":{\"_lte\":\"2023-01-01\"}}]},{\"createdAt\":{\"_starts_with\":\"2022\"}}]}]},{\"_or\":[{\"role\":{\"_nin\":[\"banned\"]}},{\"status\":{\"_in\":[\"active\",\"pending\"]}}]}]}", jsonString);
   }
@@ -57,7 +57,7 @@ public class ExpressionTest {
     condition = condition.or(Expressions.field("age").gt(18));
     // 转换为 JSON 格式
     Map<String, Object> map = condition.toMap();
-    String jsonString = new JacksonObjectConverter().toJsonString(map);
+    String jsonString = JsonUtils.toJsonString(map);
     System.out.println(jsonString);
   }
 

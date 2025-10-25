@@ -2,7 +2,6 @@ package tech.wetech.flexmodel.session;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.wetech.flexmodel.JsonObjectConverter;
 import tech.wetech.flexmodel.ModelRegistry;
 import tech.wetech.flexmodel.model.ModelDefinition;
 import tech.wetech.flexmodel.model.SchemaObject;
@@ -22,17 +21,15 @@ public abstract class AbstractSessionContext {
 
   protected final String schemaName;
   protected final ModelRegistry mappedModels;
-  protected final JsonObjectConverter jsonObjectConverter;
   protected PhysicalNamingStrategy physicalNamingStrategy = new DefaultPhysicalNamingStrategy();
   protected boolean failsafe = false;
   protected int nestedQueryMaxDepth = 5;
   protected final SessionFactory factory;
   protected final Map<String, ModelDefinition> aliasModelMap = new HashMap<>();
 
-  protected AbstractSessionContext(String schemaName, ModelRegistry mappedModels, JsonObjectConverter jsonObjectConverter, SessionFactory factory) {
+  protected AbstractSessionContext(String schemaName, ModelRegistry mappedModels, SessionFactory factory) {
     this.schemaName = schemaName;
     this.mappedModels = mappedModels;
-    this.jsonObjectConverter = jsonObjectConverter;
     this.factory = factory;
   }
 
@@ -74,10 +71,6 @@ public abstract class AbstractSessionContext {
 
   public void setFailsafe(boolean failsafe) {
     this.failsafe = failsafe;
-  }
-
-  public JsonObjectConverter getJsonObjectConverter() {
-    return jsonObjectConverter;
   }
 
   public int getNestedQueryMaxDepth() {

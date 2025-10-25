@@ -2,6 +2,7 @@ package tech.wetech.flexmodel.sql;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.ModelRegistry;
 import tech.wetech.flexmodel.model.*;
 import tech.wetech.flexmodel.model.field.*;
@@ -332,7 +333,7 @@ public class SqlSchemaService extends BaseService implements SchemaService {
         }
         case JSONField jsonField -> {
           if (defaultValue != null && defaultValue.isFixed()) {
-            aSqlColumn.setDefaultValue(sessionContext.getJsonObjectConverter().toJsonString(defaultValue.getValue()));
+            aSqlColumn.setDefaultValue(JsonUtils.toJsonString(defaultValue.getValue()));
           }
         }
         case BooleanField booleanField -> {

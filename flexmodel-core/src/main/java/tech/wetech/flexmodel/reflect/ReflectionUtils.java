@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel.reflect;
 
-import tech.wetech.flexmodel.JsonObjectConverter;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.annotation.ModelClass;
 import tech.wetech.flexmodel.annotation.ModelField;
 
@@ -81,7 +81,7 @@ public class ReflectionUtils {
   }
 
   @SuppressWarnings("all")
-  public static <T> T toClassBean(JsonObjectConverter converter, Object obj, Class<T> cls) {
+  public static <T> T toClassBean(Object obj, Class<T> cls) {
     if (obj == null) {
       return null;
     }
@@ -91,13 +91,13 @@ public class ReflectionUtils {
         ModelField modelFieldAnnotation = field.getAnnotation(ModelField.class);
         bindFields.put(modelFieldAnnotation != null ? modelFieldAnnotation.value() : field.getName(), field.getName());
       }
-      Map<String, Object> originValue = converter.convertValue(obj, Map.class);
+      Map<String, Object> originValue = JsonUtils.convertValue(obj, Map.class);
       Map<String, Object> result = new HashMap<>();
       originValue.forEach((k, v) -> {
         String fieldName = bindFields.get(k);
         result.put(fieldName, v);
       });
-      return converter.convertValue(result, cls);
+      return JsonUtils.convertValue(result, cls);
     }
     Class<?> objClass = findModelClass(obj.getClass());
     if (objClass != null) {
@@ -106,15 +106,15 @@ public class ReflectionUtils {
         ModelField modelFieldAnnotation = field.getAnnotation(ModelField.class);
         bindFields.put(field.getName(), modelFieldAnnotation != null ? modelFieldAnnotation.value() : field.getName());
       }
-      Map<String, Object> originValue = converter.convertValue(obj, Map.class);
+      Map<String, Object> originValue = JsonUtils.convertValue(obj, Map.class);
       Map<String, Object> result = new HashMap<>();
       originValue.forEach((k, v) -> {
         String fieldName = bindFields.get(k);
         result.put(fieldName, v);
       });
-      return converter.convertValue(result, cls);
+      return JsonUtils.convertValue(result, cls);
     }
-    return converter.convertValue(obj, cls);
+    return JsonUtils.convertValue(obj, cls);
   }
 
   public static Class<?> findModelClass(Class<?> objClass) {
@@ -128,10 +128,10 @@ public class ReflectionUtils {
   }
 
   @SuppressWarnings("all")
-  public static <T> List<T> toClassBeanList(JsonObjectConverter converter, List list, Class<T> cls) {
+  public static <T> List<T> toClassBeanList(List list, Class<T> cls) {
     List<T> result = new ArrayList<>();
     for (Object o : list) {
-      result.add(toClassBean(converter, o, cls));
+      result.add(toClassBean(o, cls));
     }
     return result;
   }

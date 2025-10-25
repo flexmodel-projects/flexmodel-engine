@@ -1,12 +1,11 @@
 package tech.wetech.flexmodel.codegen;
 
-import tech.wetech.flexmodel.JsonObjectConverter;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.ModelImportBundle;
 import tech.wetech.flexmodel.model.SchemaObject;
 import tech.wetech.flexmodel.parser.ASTNodeConverter;
 import tech.wetech.flexmodel.parser.impl.ModelParser;
 import tech.wetech.flexmodel.parser.impl.ParseException;
-import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -27,7 +26,6 @@ public class Configuration implements Serializable {
   private List<SchemaConfig> schemas = new ArrayList<>();
 
   public List<ModelImportBundle> getImportDescribes() {
-    JsonObjectConverter jsonObjectConverter = new JacksonObjectConverter();
     List<ModelImportBundle> importDescribes = new ArrayList<>();
     for (SchemaConfig schema : schemas) {
       List<SchemaObject> models = new ArrayList<>();
@@ -42,7 +40,7 @@ public class Configuration implements Serializable {
           if (importScript.endsWith(".json")) {
             try {
               String content = Files.readString(scriptFile.toPath());
-              ModelImportBundle describe = jsonObjectConverter.parseToObject(content, ModelImportBundle.class);
+              ModelImportBundle describe = JsonUtils.parseToObject(content, ModelImportBundle.class);
               models.addAll(describe.getObjects());
               data.addAll(describe.getData());
             } catch (IOException e) {

@@ -1,10 +1,10 @@
 package tech.wetech.flexmodel.parser;
 
 import org.junit.jupiter.api.Test;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.model.SchemaObject;
 import tech.wetech.flexmodel.parser.impl.ModelParser;
 import tech.wetech.flexmodel.parser.impl.ParseException;
-import tech.wetech.flexmodel.supports.jackson.JacksonObjectConverter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +26,7 @@ public class ASTNodeConverterTest {
     for (ModelParser.ASTNode astNode : list) {
       objectList.add(ASTNodeConverter.toSchemaObject(astNode));
     }
-    System.out.println(new JacksonObjectConverter().toJsonString(objectList));
+    System.out.println(JsonUtils.toJsonString(objectList));
     List<ModelParser.ASTNode> astNodeList = new ArrayList<>();
     for (SchemaObject schemaObject : objectList) {
       astNodeList.add(ASTNodeConverter.fromSchemaObject(schemaObject));
@@ -37,8 +37,8 @@ public class ASTNodeConverterTest {
   @Test
   void test2() throws IOException {
     byte[] bytes = this.getClass().getClassLoader().getResourceAsStream("sample_input.json").readAllBytes();
-    List<Map<String, Object>> list = new JacksonObjectConverter().parseToMapList(new String(bytes));
-    List<SchemaObject> schemaObjects = new JacksonObjectConverter().convertValueList(list, SchemaObject.class);
+    List<Map<String, Object>> list = JsonUtils.parseToMapList(new String(bytes));
+    List<SchemaObject> schemaObjects = JsonUtils.convertValueList(list, SchemaObject.class);
     StringBuilder sb = new StringBuilder();
     for (SchemaObject schemaObject : schemaObjects) {
       sb.append(ASTNodeConverter.fromSchemaObject(schemaObject)).append("\n");
