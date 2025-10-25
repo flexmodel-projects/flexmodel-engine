@@ -2,6 +2,7 @@ package tech.wetech.flexmodel.graphql;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.field.RelationField;
 import tech.wetech.flexmodel.model.field.TypedField;
@@ -33,7 +34,7 @@ public class FlexmodelFindOneDataFetcher extends FlexmodelAbstractDataFetcher<Ma
   private Map<String, Object> findRootData(DataFetchingEnvironment env) {
     List<SelectedField> selectedFields = env.getSelectionSet().getImmediateFields();
     Map<String, Object> where = getArgument(env, WHERE);
-    final String filter = where != null ? jsonObjectConverter.toJsonString(where) : null;
+    final String filter = where != null ? JsonUtils.toJsonString(where) : null;
     try (Session session = sessionFactory.createSession(schemaName)) {
       EntityDefinition entity = (EntityDefinition) session.schema().getModel(modelName);
       TypedField<?, ?> idField = entity.findIdField().orElseThrow();

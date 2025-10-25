@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.graphql;
 
 import graphql.schema.DataFetchingEnvironment;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.session.Session;
 import tech.wetech.flexmodel.session.SessionFactory;
 
@@ -18,7 +19,7 @@ public class FlexmodelMutationDeleteDataFetcher extends FlexmodelAbstractDataFet
   @Override
   public Map<String, Object> get(DataFetchingEnvironment environment) throws Exception {
     Map<String, Object> where = getArgument(environment, WHERE);
-    final String filter = where != null ? jsonObjectConverter.toJsonString(where) : null;
+    final String filter = where != null ? JsonUtils.toJsonString(where) : null;
     try (Session session = sessionFactory.createSession(schemaName)) {
 
       int rows = session.dsl()

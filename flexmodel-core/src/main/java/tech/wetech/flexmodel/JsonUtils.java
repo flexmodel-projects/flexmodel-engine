@@ -12,6 +12,7 @@ import tech.wetech.flexmodel.supports.jackson.FlexmodelCoreModule;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_BEANS;
@@ -77,6 +78,16 @@ public class JsonUtils {
       list.add(convertValue(fromValue, cls));
     }
     return list;
+  }
+
+  @SuppressWarnings("unchecked")
+   public static Map<String, Object> parseToMap(String jsonString) {
+    return parseToObject(jsonString, Map.class);
+  }
+
+  @SuppressWarnings("unchecked")
+   public static List<Map<String, Object>> parseToMapList(String jsonString) {
+    return parseToObject(jsonString, List.class);
   }
 
 }

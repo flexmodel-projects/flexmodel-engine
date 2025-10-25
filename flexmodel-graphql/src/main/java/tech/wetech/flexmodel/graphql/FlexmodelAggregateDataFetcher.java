@@ -2,6 +2,7 @@ package tech.wetech.flexmodel.graphql;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.SelectedField;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.field.TypedField;
 import tech.wetech.flexmodel.query.Direction;
@@ -40,7 +41,7 @@ public class FlexmodelAggregateDataFetcher extends FlexmodelAbstractDataFetcher<
 
       String whereString = null;
       if (where != null) {
-        whereString = jsonObjectConverter.toJsonString(where);
+        whereString = JsonUtils.toJsonString(where);
       }
 
       OrderBy sort;
