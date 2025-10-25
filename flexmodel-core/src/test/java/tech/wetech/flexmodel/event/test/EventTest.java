@@ -79,7 +79,7 @@ public class EventTest {
   void testEventPublishing() {
     // 测试事件发布
     PreInsertEvent preEvent = new PreInsertEvent("test", "schema",
-      Map.of("id", 1, "name", "test"), 1, "session1", this);
+      Map.of("id", 1, "name", "test"), 1, "session1", null);
 
     eventPublisher.publishPreChangeEvent(preEvent);
 
@@ -90,7 +90,7 @@ public class EventTest {
   void testChangedEventPublishing() {
     // 测试后置事件发布
     InsertedEvent changedEvent = new InsertedEvent("test", "schema",
-      null, Map.of("id", 1, "name", "test"), 1, 1, true, null, "session1", this);
+      null, Map.of("id", 1, "name", "test"), 1, 1, true, null, "session1", null);
 
     eventPublisher.publishChangedEvent(changedEvent);
 
@@ -148,7 +148,7 @@ public class EventTest {
     });
 
     PreInsertEvent preEvent = new PreInsertEvent("test", "schema",
-      Map.of("id", 1), 1, "session1", this);
+      Map.of("id", 1), 1, "session1", null);
 
     eventPublisher.publishPreChangeEvent(preEvent);
 
@@ -184,14 +184,14 @@ public class EventTest {
 
     // 发布INSERT事件，不应该被处理
     PreInsertEvent insertEvent = new PreInsertEvent("test", "schema",
-      Map.of("id", 1), 1, "session1", this);
+      Map.of("id", 1), 1, "session1", null);
     eventPublisher.publishPreChangeEvent(insertEvent);
 
     assertEquals(0, supportedCount.get());
 
     // 发布UPDATE事件，应该被处理
     PreUpdateEvent updateEvent = new PreUpdateEvent("test", "schema",
-      Map.of("id", 1, "name", "old"), Map.of("id", 1, "name", "new"), 1, null, "session1", this);
+      Map.of("id", 1, "name", "old"), Map.of("id", 1, "name", "new"), 1, null, "session1", null);
     eventPublisher.publishPreChangeEvent(updateEvent);
 
     assertEquals(1, supportedCount.get());
