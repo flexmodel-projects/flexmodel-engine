@@ -50,9 +50,8 @@ public class DSLUpdateBuilder {
   /**
    * 设置多个字段的值
    */
-  public DSLUpdateBuilder values(Object values) {
-    Map<String, Object> data = ReflectionUtils.toClassBean(values, Map.class);
-    this.values.putAll(data);
+  public DSLUpdateBuilder values(Map<String, Object> values) {
+    this.values.putAll(values);
     return this;
   }
 

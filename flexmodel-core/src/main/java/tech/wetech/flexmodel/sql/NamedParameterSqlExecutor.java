@@ -69,11 +69,6 @@ public class NamedParameterSqlExecutor implements SqlExecutor {
     return queryForScalar(sql, Collections.emptyMap(), type);
   }
 
-  @Override
-  public Map<String, Object> queryForMap(String sql) {
-    return queryForMap(sql, Collections.emptyMap());
-  }
-
   public Map<String, Object> queryForMap(String sql, Map<String, Object> paramMap) {
     return queryForObject(sql, paramMap, new SqlResultHandler<>(Map.class));
   }
@@ -102,19 +97,9 @@ public class NamedParameterSqlExecutor implements SqlExecutor {
   }
 
   @Override
-  public List<Map<String, Object>> queryForList(String sql) {
-    return queryForList(sql, Collections.emptyMap());
-  }
-
-  @Override
   @SuppressWarnings("all")
   public List<Map<String, Object>> queryForList(String sql, Map<String, Object> paramMap) {
     return (List) queryForList(sql, paramMap, new SqlResultHandler<>(Map.class));
-  }
-
-  @Override
-  public <T> List<T> queryForList(String sql, SqlResultHandler<T> sqlResultHandler) {
-    return queryForList(sql, Collections.emptyMap(), sqlResultHandler);
   }
 
   @Override
@@ -134,11 +119,6 @@ public class NamedParameterSqlExecutor implements SqlExecutor {
         closeStatement(stmt);
       }
     }, sql, paramMap);
-  }
-
-  @Override
-  public Stream<Map<String, Object>> queryForStream(String sql) {
-    return queryForStream(sql, Collections.emptyMap());
   }
 
   @Override
@@ -224,30 +204,6 @@ public class NamedParameterSqlExecutor implements SqlExecutor {
       }
     }, sql, paramMap);
 
-  }
-
-  @Override
-  public int batchUpdate(String sql, List<Map<String, Object>> params) {
-    return metrics(() -> {
-      NamedParamStatement stmt = null;
-      try {
-        stmt = new NamedParamStatement(connection, sql);
-        for (Map<String, Object> paramMap : params) {
-          setParameters(stmt, paramMap);
-          stmt.addBatch();
-        }
-        int[] batchRows = stmt.executeBatch();
-        int rows = 0;
-        for (int i : batchRows) {
-          rows += i;
-        }
-        return rows;
-      } catch (SQLException e) {
-        throw new SqlExecutionException("Could not execute JDBC Statement: " + sql + ", Reason: " + e.getMessage(), e);
-      } finally {
-        closeStatement(stmt);
-      }
-    }, sql, params);
   }
 
   @Override

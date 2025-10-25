@@ -3,6 +3,9 @@ package tech.wetech.flexmodel.event.impl;
 import tech.wetech.flexmodel.event.EventType;
 import tech.wetech.flexmodel.event.PreChangeEvent;
 import tech.wetech.flexmodel.query.Query;
+import tech.wetech.flexmodel.session.SessionFactory;
+
+import java.util.Map;
 
 /**
  * 前置更新事件
@@ -11,7 +14,7 @@ import tech.wetech.flexmodel.query.Query;
  */
 public class PreUpdateEvent extends PreChangeEvent {
 
-    public PreUpdateEvent(String modelName, String schemaName, Object oldData, Object newData, Object id, Query query, String sessionId, Object source) {
+    public PreUpdateEvent(String modelName, String schemaName, Map<String, Object> oldData, Map<String, Object> newData, Object id, Query query, String sessionId, SessionFactory source) {
         super(EventType.PRE_UPDATE, modelName, schemaName, oldData, newData, id, query, sessionId, source);
     }
 }

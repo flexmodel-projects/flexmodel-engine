@@ -19,21 +19,13 @@ public interface SqlExecutor {
 
   <T> T queryForScalar(String sql, Class<T> type);
 
-  Map<String, Object> queryForMap(String sql);
-
   Map<String, Object> queryForMap(String sql, Map<String, Object> paramMap);
 
   <T> T queryForObject(String sql, Map<String, Object> paramMap, SqlResultHandler<T> sqlResultHandler);
 
-  List<Map<String, Object>> queryForList(String sql);
-
   List<Map<String, Object>> queryForList(String sql, Map<String, Object> paramMap);
 
-  <T> List<T> queryForList(String sql, SqlResultHandler<T> sqlResultHandler);
-
   <T> List<T> queryForList(String sql, Map<String, Object> paramMap, SqlResultHandler<T> sqlResultHandler);
-
-  Stream<Map<String, Object>> queryForStream(String sql);
 
   Stream<Map<String, Object>> queryForStream(String sql, Map<String, Object> paramMap);
 
@@ -42,8 +34,6 @@ public interface SqlExecutor {
   int update(String sql);
 
   int update(String sql, Map<String, Object> paramMap);
-
-  int batchUpdate(String sql, List<Map<String, Object>> params);
 
   int updateAndReturnGeneratedKeys(String sql, String[] generatedKeyColumns, Consumer<List<?>> keyConsumer);
 

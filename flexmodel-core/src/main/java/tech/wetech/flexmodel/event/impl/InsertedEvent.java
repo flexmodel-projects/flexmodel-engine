@@ -2,6 +2,9 @@ package tech.wetech.flexmodel.event.impl;
 
 import tech.wetech.flexmodel.event.ChangedEvent;
 import tech.wetech.flexmodel.event.EventType;
+import tech.wetech.flexmodel.session.SessionFactory;
+
+import java.util.Map;
 
 /**
  * 插入完成事件
@@ -9,9 +12,9 @@ import tech.wetech.flexmodel.event.EventType;
  * @author cjbi
  */
 public class InsertedEvent extends ChangedEvent {
-    
-    public InsertedEvent(String modelName, String schemaName, Object oldData, Object newData, Object id, 
-                       int affectedRows, boolean success, Throwable exception, String sessionId, Object source) {
+
+    public InsertedEvent(String modelName, String schemaName, Map<String, Object> oldData, Map<String, Object> newData, Object id,
+                         int affectedRows, boolean success, Throwable exception, String sessionId, SessionFactory source) {
         super(EventType.INSERTED, modelName, schemaName, oldData, newData, id, affectedRows, success, exception, sessionId, source);
     }
 }

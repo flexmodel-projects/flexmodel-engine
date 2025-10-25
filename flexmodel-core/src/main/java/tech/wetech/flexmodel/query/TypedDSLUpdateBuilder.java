@@ -1,11 +1,17 @@
 package tech.wetech.flexmodel.query;
 
+import tech.wetech.flexmodel.reflect.ReflectionUtils;
+
+import java.util.Map;
+
 /**
  * 带类型的DSL更新构建器
  */
 public class TypedDSLUpdateBuilder<T> {
   private final DSLUpdateBuilder delegate;
   private final Class<T> entityClass;
+  private Map<String, Object> dataMap;
+  private T values;
 
   public TypedDSLUpdateBuilder(DSLUpdateBuilder delegate, Class<T> entityClass) {
     this.delegate = delegate;
@@ -29,7 +35,9 @@ public class TypedDSLUpdateBuilder<T> {
    * 设置多个字段的值
    */
   public TypedDSLUpdateBuilder<T> values(T values) {
-    delegate.values(values);
+    this.values = values;
+    dataMap = ReflectionUtils.toClassBean(values, Map.class);
+    delegate.values(dataMap);
     return this;
   }
 
@@ -62,6 +70,20 @@ public class TypedDSLUpdateBuilder<T> {
    * 执行更新操作
    */
   public int execute() {
-    return delegate.execute();
+    try {
+      return delegate.execute();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    } finally {
+      if (dataMap != null && values != null) {
+        dataMap.forEach((field, value) -> {
+          try {
+            ReflectionUtils.setFieldValue(values, field, value);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        });
+      }
+    }
   }
 }

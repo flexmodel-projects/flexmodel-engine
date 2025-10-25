@@ -92,9 +92,9 @@ public class MongoDataService extends BaseService implements DataService {
   }
 
   @Override
-  public int updateById(String modelName, Object objR, Object id) {
+  public int updateById(String modelName, Map<String, Object> objR, Object id) {
 
-    Map<String, Object> data = ReflectionUtils.toClassBean(objR, Map.class);
+    Map<String, Object> data = objR;
     Map<String, Object> processedData = generateFieldValues(modelName, data, true);
 
     Map<String, Object> record = ReflectionUtils.toClassBean(processedData, Map.class);
@@ -106,9 +106,9 @@ public class MongoDataService extends BaseService implements DataService {
   }
 
   @Override
-  public int update(String modelName, Object objR, String filter) {
+  public int update(String modelName, Map<String, Object> objR, String filter) {
 
-    Map<String, Object> data = ReflectionUtils.toClassBean(objR, Map.class);
+    Map<String, Object> data = objR;
     Map<String, Object> processedData = generateFieldValues(modelName, data, true);
 
     Map<String, Object> record = ReflectionUtils.toClassBean(processedData, Map.class);

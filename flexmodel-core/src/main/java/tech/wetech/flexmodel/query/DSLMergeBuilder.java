@@ -60,8 +60,7 @@ public class DSLMergeBuilder {
     EntityDefinition entity = (EntityDefinition) session.schema().getModel(modelName);
     Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
     if (idFieldOptional.isPresent()) {
-      Map<String, Object> data = ReflectionUtils.toClassBean(values, Map.class);
-      Object id = data.get(idFieldOptional.get().getName());
+      Object id = values.get(idFieldOptional.get().getName());
       if (id == null) {
         return session.data().insert(modelName, values);
       }

@@ -26,9 +26,9 @@ public class EventAwareDataService implements DataService {
   private final EventPublisher eventPublisher;
   private final String schemaName;
   private final String sessionId;
-  private final Object source;
+  private final SessionFactory source;
 
-  public EventAwareDataService(DataService delegate, EventPublisher eventPublisher, String schemaName, String sessionId, Object source) {
+  public EventAwareDataService(DataService delegate, EventPublisher eventPublisher, String schemaName, String sessionId, SessionFactory source) {
     this.delegate = delegate;
     this.eventPublisher = eventPublisher;
     this.schemaName = schemaName;
@@ -45,7 +45,7 @@ public class EventAwareDataService implements DataService {
     eventPublisher.publishPreChangeEvent(preEvent);
 
     // 使用事件中可能被修改的数据
-    Map<String, Object> finalRecord = preEvent.getNewData() != null ? (Map<String, Object>) preEvent.getNewData() : record;
+    Map<String, Object> finalRecord = preEvent.getNewData() != null ? preEvent.getNewData() : record;
 
     int affectedRows = 0;
     Throwable exception = null;
@@ -73,18 +73,18 @@ public class EventAwareDataService implements DataService {
   }
 
   @Override
-  public int updateById(String modelName, Object record, Object id) {
+  public int updateById(String modelName, Map<String, Object> record, Object id) {
     log.debug("Starting update operation for model: {}, id: {}", modelName, id);
 
     // 获取更新前的数据
-    Object oldData = delegate.findById(modelName, id);
+    Map<String, Object> oldData = delegate.findById(modelName, id);
 
     // 发布前置事件
     PreUpdateEvent preEvent = new PreUpdateEvent(modelName, schemaName, oldData, record, id, null, sessionId, source);
     eventPublisher.publishPreChangeEvent(preEvent);
 
     // 使用事件中可能被修改的数据
-    Object finalRecord = preEvent.getNewData() != null ? preEvent.getNewData() : record;
+    Map<String, Object> finalRecord = preEvent.getNewData() != null ? preEvent.getNewData() : record;
 
     int affectedRows = 0;
     Throwable exception = null;
@@ -116,7 +116,7 @@ public class EventAwareDataService implements DataService {
     log.debug("Starting delete operation for model: {}, id: {}", modelName, id);
 
     // 获取删除前的数据
-    Object oldData = delegate.findById(modelName, id);
+    Map<String, Object> oldData = delegate.findById(modelName, id);
 
     // 发布前置事件
     PreDeleteEvent preEvent = new PreDeleteEvent(modelName, schemaName, oldData, id, null, sessionId, source);
@@ -148,7 +148,7 @@ public class EventAwareDataService implements DataService {
   }
 
   @Override
-  public int update(String modelName, Object record, String filter) {
+  public int update(String modelName, Map<String, Object> record, String filter) {
     log.debug("Starting update operation for model: {} with filter: {}", modelName, filter);
 
     // 创建查询对象
@@ -160,7 +160,7 @@ public class EventAwareDataService implements DataService {
     eventPublisher.publishPreChangeEvent(preEvent);
 
     // 使用事件中可能被修改的数据和查询
-    Object finalRecord = preEvent.getNewData() != null ? preEvent.getNewData() : record;
+    Map<String, Object> finalRecord = preEvent.getNewData() != null ? preEvent.getNewData() : record;
     Query finalQuery = preEvent.getQuery() != null ? preEvent.getQuery() : query;
     String finalFilter = finalQuery.getFilter();
 
@@ -266,13 +266,10 @@ public class EventAwareDataService implements DataService {
   private Object extractId(String modelName, Map<String, Object> data) {
     try {
       // 这里需要根据实际的模型定义来提取ID
-      if (source instanceof SessionFactory sf) {
-        SchemaObject schemaObject = sf.getModelRegistry().getRegistered(schemaName, modelName);
-        EntityDefinition entity = (EntityDefinition) schemaObject;
-        TypedField<?, ?> field = entity.findIdField().orElseThrow();
-        return data.get(field.getName());
-      }
-      return null;
+      SchemaObject schemaObject = source.getModelRegistry().getRegistered(schemaName, modelName);
+      EntityDefinition entity = (EntityDefinition) schemaObject;
+      TypedField<?, ?> field = entity.findIdField().orElseThrow();
+      return data.get(field.getName());
     } catch (Exception e) {
       log.debug("Failed to extract ID from record: {}", e.getMessage());
       return null;

@@ -2,6 +2,8 @@ package tech.wetech.flexmodel.event;
 
 import tech.wetech.flexmodel.query.Query;
 
+import java.util.Map;
+
 /**
  * 前置事件基类
  *
@@ -9,29 +11,21 @@ import tech.wetech.flexmodel.query.Query;
  */
 public abstract class PreChangeEvent extends BaseEvent {
 
-    private Object newData;
+    private Map<String, Object> newData;
     private final Object id;
-    private final Object oldData;
+    private final Map<String, Object> oldData;
     private Query query;
 
-    protected PreChangeEvent(EventType eventType, String modelName, String schemaName, 
-                             Object newData, Object id, String sessionId, Object source) {
+    protected PreChangeEvent(EventType eventType, String modelName, String schemaName,
+                             Map<String, Object> newData, Object id, String sessionId, Object source) {
         super(eventType, modelName, schemaName, sessionId, source);
         this.newData = newData;
         this.id = id;
         this.oldData = null;
     }
 
-    protected PreChangeEvent(EventType eventType, String modelName, String schemaName, 
-                             Object oldData, Object newData, Object id, String sessionId, Object source) {
-        super(eventType, modelName, schemaName, sessionId, source);
-        this.oldData = oldData;
-        this.newData = newData;
-        this.id = id;
-    }
-
-    protected PreChangeEvent(EventType eventType, String modelName, String schemaName, 
-                             Object oldData, Object newData, Object id, Query query, String sessionId, Object source) {
+    protected PreChangeEvent(EventType eventType, String modelName, String schemaName,
+                             Map<String, Object> oldData, Map<String, Object> newData, Object id, Query query, String sessionId, Object source) {
         super(eventType, modelName, schemaName, sessionId, source);
         this.oldData = oldData;
         this.newData = newData;
@@ -44,7 +38,7 @@ public abstract class PreChangeEvent extends BaseEvent {
      *
      * @return 新数据
      */
-    public Object getNewData() {
+    public Map<String, Object> getNewData() {
         return newData;
     }
 
@@ -53,7 +47,7 @@ public abstract class PreChangeEvent extends BaseEvent {
      *
      * @param newData 新数据
      */
-    public void setNewData(Object newData) {
+    public void setNewData(Map<String, Object> newData) {
         this.newData = newData;
     }
 

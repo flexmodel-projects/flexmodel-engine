@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel.event;
 
+import tech.wetech.flexmodel.session.SessionFactory;
+
 /**
  * 简化的事件基类
  *
@@ -12,10 +14,10 @@ public abstract class BaseEvent {
   private final String schemaName;
   private final long timestamp;
   private final String sessionId;
-  private final Object source;
+  private final SessionFactory source;
 
   protected BaseEvent(EventType eventType, String modelName, String schemaName,
-                      String sessionId, Object source) {
+                      String sessionId, SessionFactory source) {
     this.eventType = eventType;
     this.modelName = modelName;
     this.schemaName = schemaName;
@@ -44,7 +46,7 @@ public abstract class BaseEvent {
     return sessionId;
   }
 
-  public Object getSource() {
+  public SessionFactory getSource() {
     return source;
   }
 

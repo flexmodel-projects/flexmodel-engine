@@ -5,11 +5,13 @@ import tech.wetech.flexmodel.reflect.ReflectionUtils;
 import java.util.Map;
 
 /**
- * 带类型的DSL插入构建器
+ * 带类型的DSL合并构建器
  */
 public class TypedDSLMergeBuilder<T> {
   private final DSLMergeBuilder delegate;
   private final Class<T> entityClass;
+  private Map<String, Object> dataMap;
+  private T values;
 
   public TypedDSLMergeBuilder(DSLMergeBuilder delegate, Class<T> entityClass) {
     this.delegate = delegate;
@@ -17,17 +19,33 @@ public class TypedDSLMergeBuilder<T> {
   }
 
   /**
-   * 设置要插入的值
+   * 设置要合并的值
    */
   public TypedDSLMergeBuilder<T> values(T values) {
-    delegate.values(ReflectionUtils.toClassBean(values, Map.class));
+    this.values = values;
+    dataMap = ReflectionUtils.toClassBean(values, Map.class);
+    delegate.values(dataMap);
     return this;
   }
 
   /**
-   * 执行插入操作
+   * 执行合并操作
    */
   public int execute() {
-    return delegate.execute();
+    try {
+      return delegate.execute();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    } finally {
+      if (dataMap != null && values != null) {
+        dataMap.forEach((field, value) -> {
+          try {
+            ReflectionUtils.setFieldValue(values, field, value);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        });
+      }
+    }
   }
 }

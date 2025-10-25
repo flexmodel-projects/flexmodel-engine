@@ -3,6 +3,7 @@ package tech.wetech.flexmodel.event.impl;
 import tech.wetech.flexmodel.event.EventType;
 import tech.wetech.flexmodel.event.PreChangeEvent;
 import tech.wetech.flexmodel.query.Query;
+import tech.wetech.flexmodel.session.SessionFactory;
 
 /**
  * 前置查询事件
@@ -10,8 +11,8 @@ import tech.wetech.flexmodel.query.Query;
  * @author cjbi
  */
 public class PreQueryEvent extends PreChangeEvent {
-    
-    public PreQueryEvent(String modelName, String schemaName, Query query, String sessionId, Object source) {
+
+    public PreQueryEvent(String modelName, String schemaName, Query query, String sessionId, SessionFactory source) {
         super(EventType.PRE_QUERY, modelName, schemaName, null, null, null, query, sessionId, source);
     }
 }

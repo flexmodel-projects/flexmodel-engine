@@ -62,7 +62,7 @@ public interface DataService {
    * @param id        ID
    * @return Number of affected rows
    */
-  int updateById(String modelName, Object record, Object id);
+  int updateById(String modelName, Map<String, Object> record, Object id);
 
   /**
    * Update records based on conditions
@@ -72,7 +72,7 @@ public interface DataService {
    * @param filter    Filter
    * @return Number of affected rows
    */
-  int update(String modelName, Object record, String filter);
+  int update(String modelName, Map<String, Object> record, String filter);
 
   /**
    * Delete a record by ID
@@ -228,7 +228,7 @@ public interface DataService {
    * @param predicate predicate
    * @return Number of affected rows
    */
-  default int update(String modelName, Object record, Predicate predicate) {
+  default int update(String modelName, Map<String, Object> record, Predicate predicate) {
     return update(modelName, record, predicate.toJsonString());
   }
 
