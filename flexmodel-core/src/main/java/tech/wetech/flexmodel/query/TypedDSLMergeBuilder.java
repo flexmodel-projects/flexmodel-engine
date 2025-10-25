@@ -1,5 +1,9 @@
 package tech.wetech.flexmodel.query;
 
+import tech.wetech.flexmodel.reflect.ReflectionUtils;
+
+import java.util.Map;
+
 /**
  * 带类型的DSL插入构建器
  */
@@ -16,7 +20,7 @@ public class TypedDSLMergeBuilder<T> {
    * 设置要插入的值
    */
   public TypedDSLMergeBuilder<T> values(T values) {
-    delegate.values(values);
+    delegate.values(ReflectionUtils.toClassBean(values, Map.class));
     return this;
   }
 

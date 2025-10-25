@@ -3,6 +3,8 @@ package tech.wetech.flexmodel.query;
 import tech.wetech.flexmodel.reflect.ReflectionUtils;
 import tech.wetech.flexmodel.session.Session;
 
+import java.util.Map;
+
 /**
  * DSL插入构建器
  */
@@ -10,7 +12,7 @@ public class DSLInsertBuilder {
   private final Session session;
   private String modelName;
   private Class<?> entityClass;
-  private Object values;
+  private Map<String, Object> values;
 
   public DSLInsertBuilder(Session session) {
     this.session = session;
@@ -37,7 +39,7 @@ public class DSLInsertBuilder {
   /**
    * 设置要插入的值
    */
-  public DSLInsertBuilder values(Object values) {
+  public DSLInsertBuilder values(Map<String, Object> values) {
     this.values = values;
     return this;
   }

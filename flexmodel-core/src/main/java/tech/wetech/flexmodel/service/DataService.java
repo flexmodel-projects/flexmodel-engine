@@ -21,7 +21,7 @@ public interface DataService {
    * @param record    Record (id should be included in the record map if needed)
    * @return Number of affected rows
    */
-  int insert(String modelName, Object record);
+  int insert(String modelName, Map<String, Object> record);
 
   /**
    * Find a record by ID
@@ -108,9 +108,9 @@ public interface DataService {
    * @return Number of affected rows
    */
   @SuppressWarnings("all")
-  default int insertAll(String modelName, List records) {
+  default int insertAll(String modelName, List<Map<String, Object>> records) {
     int rows = 0;
-    for (Object record : records) {
+    for (Map<String, Object> record : records) {
       rows += insert(modelName, record);
     }
     return rows;

@@ -47,10 +47,9 @@ public class MongoDataService extends BaseService implements DataService {
   }
 
   @Override
-  public int insert(String modelName, Object objR) {
+  public int insert(String modelName, Map<String, Object> objR) {
 
-    Map<String, Object> data = ReflectionUtils.toClassBean(objR, Map.class);
-    Map<String, Object> processedData = generateFieldValues(modelName, data, false);
+    Map<String, Object> processedData = generateFieldValues(modelName, objR, false);
 
     try {
       Map<String, Object> record = ReflectionUtils.toClassBean(processedData, Map.class);
@@ -71,12 +70,12 @@ public class MongoDataService extends BaseService implements DataService {
       if (idFieldOptional.isPresent()) {
         id = processedData.get(idFieldOptional.get().getName());
         // 将生成的ID放回到原始的data map中
-        data.put(idFieldOptional.get().getName(), id);
+        objR.put(idFieldOptional.get().getName(), id);
         ReflectionUtils.setFieldValue(objR, idFieldOptional.get().getName(), id);
       }
 
       // 处理关联关系
-      insertRelatedRecords(modelName, data, id);
+      insertRelatedRecords(modelName, objR, id);
     }
   }
 

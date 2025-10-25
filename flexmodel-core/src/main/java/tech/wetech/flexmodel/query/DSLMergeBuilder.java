@@ -15,7 +15,7 @@ public class DSLMergeBuilder {
   private final Session session;
   private String modelName;
   private Class<?> entityClass;
-  private Object values;
+  private Map<String, Object> values;
 
   public DSLMergeBuilder(Session session) {
     this.session = session;
@@ -42,7 +42,7 @@ public class DSLMergeBuilder {
   /**
    * 设置要插入的值
    */
-  public DSLMergeBuilder values(Object values) {
+  public DSLMergeBuilder values(Map<String, Object> values) {
     this.values = values;
     return this;
   }

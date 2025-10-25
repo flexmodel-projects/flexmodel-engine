@@ -8,7 +8,6 @@ import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.SchemaObject;
 import tech.wetech.flexmodel.model.field.TypedField;
 import tech.wetech.flexmodel.query.Query;
-import tech.wetech.flexmodel.reflect.ReflectionUtils;
 import tech.wetech.flexmodel.session.SessionFactory;
 
 import java.util.List;
@@ -38,7 +37,7 @@ public class EventAwareDataService implements DataService {
   }
 
   @Override
-  public int insert(String modelName, Object record) {
+  public int insert(String modelName, Map<String, Object> record) {
     log.debug("Starting insert operation for model: {}", modelName);
 
     // 发布前置事件
@@ -46,7 +45,7 @@ public class EventAwareDataService implements DataService {
     eventPublisher.publishPreChangeEvent(preEvent);
 
     // 使用事件中可能被修改的数据
-    Object finalRecord = preEvent.getNewData() != null ? preEvent.getNewData() : record;
+    Map<String, Object> finalRecord = preEvent.getNewData() != null ? (Map<String, Object>) preEvent.getNewData() : record;
 
     int affectedRows = 0;
     Throwable exception = null;
@@ -264,19 +263,9 @@ public class EventAwareDataService implements DataService {
   /**
    * 从记录中提取ID
    */
-  private Object extractId(String modelName, Object record) {
+  private Object extractId(String modelName, Map<String, Object> data) {
     try {
       // 这里需要根据实际的模型定义来提取ID
-      Map<String, Object> data;
-      if (record instanceof Map) {
-        @SuppressWarnings("unchecked")
-        Map<String, Object> mapRecord = (Map<String, Object>) record;
-        data = mapRecord;
-      } else {
-        @SuppressWarnings("unchecked")
-        Map<String, Object> convertedData = ReflectionUtils.toClassBean(record, Map.class);
-        data = convertedData;
-      }
       if (source instanceof SessionFactory sf) {
         SchemaObject schemaObject = sf.getModelRegistry().getRegistered(schemaName, modelName);
         EntityDefinition entity = (EntityDefinition) schemaObject;

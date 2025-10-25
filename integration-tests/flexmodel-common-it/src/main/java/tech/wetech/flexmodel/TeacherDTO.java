@@ -1,5 +1,7 @@
 package tech.wetech.flexmodel;
 
+import tech.wetech.flexmodel.annotation.ModelClass;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -7,6 +9,7 @@ import java.util.Map;
 /**
  * @author cjbi
  */
+@ModelClass("testTestInsertWhenDtoParam_teacher")
 public class TeacherDTO {
   private Long id;
   private String name;

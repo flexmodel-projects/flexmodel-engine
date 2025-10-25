@@ -45,15 +45,12 @@ public class SqlDataService extends BaseService implements DataService {
   }
 
   @Override
-  public int insert(String modelName, Object objR) {
+  public int insert(String modelName, Map<String, Object> data) {
     log.debug("Starting SQL insert for model: {}", modelName);
     long startTime = System.currentTimeMillis();
 
-    Map<String, Object> data = ReflectionUtils.toClassBean(objR, Map.class);
-    Map<String, Object> processedData = generateFieldValues(modelName, data, false);
-
+    Map<String, Object> record = generateFieldValues(modelName, data, false);
     try {
-      Map<String, Object> record = ReflectionUtils.toClassBean(processedData, Map.class);
       String sql = getInsertSqlString(modelName, record);
       log.debug("Generated INSERT SQL: {}", sql);
 
@@ -77,7 +74,7 @@ public class SqlDataService extends BaseService implements DataService {
           }
         }
         // 返回ID值
-        ReflectionUtils.setFieldValue(objR, idField.getName(), record.get(idField.getName()));
+        ReflectionUtils.setFieldValue(data, idField.getName(), record.get(idField.getName()));
       } else {
         rows = sqlExecutor.update(sql, record);
       }
@@ -95,7 +92,7 @@ public class SqlDataService extends BaseService implements DataService {
       Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
       Object id = null;
       if (idFieldOptional.isPresent()) {
-        id = processedData.get(idFieldOptional.get().getName());
+        id = record.get(idFieldOptional.get().getName());
         // 将生成的ID放回到原始的data map中
         data.put(idFieldOptional.get().getName(), id);
       }
