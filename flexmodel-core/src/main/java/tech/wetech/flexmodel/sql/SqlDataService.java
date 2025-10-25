@@ -127,12 +127,11 @@ public class SqlDataService extends BaseService implements DataService {
   }
 
   @Override
-  public int updateById(String modelName, Map<String, Object> objR, Object id) {
+  public int updateById(String modelName, Map<String, Object> data, Object id) {
     log.debug("Starting SQL updateById for model: {}, id: {}", modelName, id);
     long startTime = System.currentTimeMillis();
 
     try {
-      Map<String, Object> data = objR;
       Map<String, Object> processedData = generateFieldValues(modelName, data, true);
 
       Map<String, Object> record = ReflectionUtils.toClassBean(processedData, Map.class);
@@ -174,12 +173,11 @@ public class SqlDataService extends BaseService implements DataService {
   }
 
   @Override
-  public int update(String modelName, Map<String, Object> objR, String filter) {
+  public int update(String modelName, Map<String, Object> record, String filter) {
     log.debug("Starting SQL update for model: {}, filter: {}", modelName, filter);
     long startTime = System.currentTimeMillis();
 
     try {
-      Map<String, Object> record = objR;
       Map<String, Object> processedData = generateFieldValues(modelName, record, true);
 
       String physicalTableName = toPhysicalTablenameQuoteString(modelName);
