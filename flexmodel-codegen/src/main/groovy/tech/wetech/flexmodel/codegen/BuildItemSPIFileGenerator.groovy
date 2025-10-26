@@ -22,6 +22,8 @@ class BuildItemSPIFileGenerator extends AbstractGenerator {
 
   @Override
   void write(PrintWriter out, GenerationContext context) {
-    out.println "${context.packageName}.${context.schemaName.capitalize()}"
+    context.variables.get("buildItems").each {
+      out.println it
+    }
   }
 }
