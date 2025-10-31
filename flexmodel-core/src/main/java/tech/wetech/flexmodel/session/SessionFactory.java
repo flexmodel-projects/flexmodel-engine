@@ -225,8 +225,8 @@ public class SessionFactory {
     });
   }
 
-  public Set<String> getSchemaNames() {
-    return dataSourceProviders.keySet();
+  public List<String> getSchemaNames() {
+    return List.copyOf(dataSourceProviders.keySet());
   }
 
   public List<SchemaObject> getModels(String schemaName) {

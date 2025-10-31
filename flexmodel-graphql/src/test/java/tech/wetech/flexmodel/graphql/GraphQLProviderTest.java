@@ -33,9 +33,8 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     createStudentData(session, studentEntityName);
     createTeacherData(session, teacherEntityName);
 
-    GraphQLProvider graphQLProvider = new GraphQLProvider(session.getFactory());
-    graphQLProvider.init();
-    GraphQL graphQL = graphQLProvider.getGraphQL();
+    FlexmodelGraphQL graphQLProvider = new FlexmodelGraphQL();
+    GraphQL graphQL = graphQLProvider.generateGraphQLWithSchemaObject(session.getFactory(), session.getFactory().getSchemaNames());
     // 创建查询
     String query = """
       query {
@@ -120,9 +119,8 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     createStudentData(session, studentEntityName);
     createTeacherData(session, teacherEntityName);
 
-    GraphQLProvider graphQLProvider = new GraphQLProvider(session.getFactory());
-    graphQLProvider.init();
-    GraphQL graphQL = graphQLProvider.getGraphQL();
+    FlexmodelGraphQL graphQLProvider = new FlexmodelGraphQL();
+    GraphQL graphQL = graphQLProvider.generateGraphQLWithSchemaObject(session.getFactory(), session.getFactory().getSchemaNames());
     String query = """
       query {
         list: system_list_testDirectiveStudent {
@@ -167,9 +165,8 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     createStudentData(session, studentEntityName);
     createTeacherData(session, teacherEntityName);
 
-    GraphQLProvider graphQLProvider = new GraphQLProvider(session.getFactory());
-    graphQLProvider.init();
-    GraphQL graphQL = graphQLProvider.getGraphQL();
+    FlexmodelGraphQL graphQLProvider = new FlexmodelGraphQL();
+    GraphQL graphQL = graphQLProvider.generateGraphQLWithSchemaObject(session.getFactory(), session.getFactory().getSchemaNames());
     String query = """
       query ($classId: Int = 1, $studentId: Int @internal) {
         class: system_find_one_testJoinClasses(where: { id: { _eq: $classId } }) {
@@ -218,9 +215,8 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     createStudentData(session, studentEntityName);
     createTeacherData(session, teacherEntityName);
 
-    GraphQLProvider graphQLProvider = new GraphQLProvider(session.getFactory());
-    graphQLProvider.init();
-    GraphQL graphQL = graphQLProvider.getGraphQL();
+    FlexmodelGraphQL graphQLProvider = new FlexmodelGraphQL();
+    GraphQL graphQL = graphQLProvider.generateGraphQLWithSchemaObject(session.getFactory(), session.getFactory().getSchemaNames());
     // 创建查询
     String query = """
       mutation {

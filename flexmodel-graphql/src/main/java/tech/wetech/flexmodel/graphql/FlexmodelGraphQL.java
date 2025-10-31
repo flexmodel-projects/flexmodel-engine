@@ -28,16 +28,11 @@ import static graphql.schema.idl.RuntimeWiring.newRuntimeWiring;
 /**
  * @author cjbi
  */
-public class GraphQLProvider {
-  private final SessionFactory sf;
-  private GraphQL graphQL;
-  private final Logger log = LoggerFactory.getLogger(GraphQLProvider.class);
+public class FlexmodelGraphQL {
 
-  public GraphQLProvider(SessionFactory sessionFactory) {
-    this.sf = sessionFactory;
-  }
+  private final Logger log = LoggerFactory.getLogger(FlexmodelGraphQL.class);
 
-  public void init() {
+  public GraphQL generateGraphQLWithSchemaObject(SessionFactory sf, List<String> includeSchemaNames) {
     GraphQLSchemaGenerator generator = new GraphQLSchemaGenerator();
     GenerationContext context = new GenerationContext();
     Map<String, DataFetcher<?>> queryDataFetchers = new HashMap<>();
@@ -51,11 +46,15 @@ public class GraphQLProvider {
     joinDataFetchers.put("mutation_response", joinMap);
 
     for (String schemaName : sf.getSchemaNames()) {
-      log.debug("Generation graphQL schema: {}", schemaName);
+      if (!includeSchemaNames.contains(schemaName)) {
+        log.debug("Generate GraphQL,Ignore schema: {}", schemaName);
+        continue;
+      }
+      log.debug("Generate graphQL schema: {}", schemaName);
       List<SchemaObject> models = sf.getModels(schemaName);
       for (SchemaObject model : models) {
         if (model instanceof EntityDefinition entity) {
-          log.debug("Generation graphQL model: {}", model.getName());
+          log.debug("Generate graphQL model: {}", model.getName());
           context.getModelClassList().add(ModelClass.buildModelClass("", schemaName, entity));
           joinDataFetchers.put(schemaName + "_" + model.getName(), joinMap);
           joinDataFetchers.put(schemaName + "_" + model.getName() + "_aggregate", joinMap);
@@ -73,7 +72,7 @@ public class GraphQLProvider {
             }
           }
         } else if (model instanceof EnumDefinition andEnum) {
-          log.debug("Generation graphQL model: {}", model.getName());
+          log.debug("Generate graphQL model: {}", model.getName());
           context.getEnumClassList().add(EnumClass.buildEnumClass("", schemaName, andEnum));
         } else {
           log.debug("Ignore model: {}", model.getName());
@@ -108,12 +107,9 @@ public class GraphQLProvider {
       .build();
     SchemaGenerator schemaGenerator = new SchemaGenerator();
     GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeDefinitionRegistry, runtimeWiring);
-    this.graphQL = GraphQL.newGraphQL(graphQLSchema)
+    GraphQL graphQL = GraphQL.newGraphQL(graphQLSchema)
       .instrumentation(new FlexmodelInstrumentation())
       .build();
-  }
-
-  public GraphQL getGraphQL() {
     return graphQL;
   }
 
