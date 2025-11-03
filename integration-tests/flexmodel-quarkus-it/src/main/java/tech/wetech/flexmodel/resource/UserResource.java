@@ -1,13 +1,14 @@
 package tech.wetech.flexmodel.resource;
 
+import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.wetech.flexmodel.entity.FsUser;
 import tech.wetech.flexmodel.service.UserService;
-import tech.wetech.flexmodel.session.SessionManaged;
 
 import java.util.List;
 import java.util.Map;
@@ -21,26 +22,23 @@ import java.util.Map;
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@SessionManaged
 public class UserResource {
 
   private static final Logger log = LoggerFactory.getLogger(UserResource.class);
 
   @Inject
-  private UserService userService;
+  UserService userService;
 
   /**
    * 获取所有用户
    */
   @GET
-  @SessionManaged
-  public Response getAllUsers() {
+  public Uni<List<Map<String, Object>>> getAllUsers() {
     try {
-      List<Map<String, Object>> users = userService.getAllUsers();
-      return Response.ok(users).build();
+      return userService.getAllUsers();
     } catch (Exception e) {
       log.error("Error getting users", e);
-      return Response.serverError().entity("Error getting users: " + e.getMessage()).build();
+      return Uni.createFrom().failure(e);
     }
   }
 
@@ -49,7 +47,6 @@ public class UserResource {
    */
   @GET
   @Path("/{id}")
-  @SessionManaged
   public Response getUserById(@PathParam("id") String id) {
     try {
       Map<String, Object> user = userService.getUserById(id);
@@ -69,8 +66,7 @@ public class UserResource {
    * 创建新用户
    */
   @POST
-  @SessionManaged
-  public Response createUser(Map<String, Object> userData) {
+  public Response createUser(FsUser userData) {
     try {
       Map<String, Object> result = userService.createUser(userData);
       return Response.status(Response.Status.CREATED).entity(result).build();
@@ -85,8 +81,7 @@ public class UserResource {
    */
   @PUT
   @Path("/{id}")
-  @SessionManaged
-  public Response updateUser(@PathParam("id") String id, Map<String, Object> userData) {
+  public Response updateUser(@PathParam("id") String id, FsUser userData) {
     try {
       Map<String, Object> result = userService.updateUser(id, userData);
       return Response.ok(result).build();
@@ -101,7 +96,6 @@ public class UserResource {
    */
   @DELETE
   @Path("/{id}")
-  @SessionManaged
   public Response deleteUser(@PathParam("id") String id) {
     try {
       Map<String, Object> result = userService.deleteUser(id);
