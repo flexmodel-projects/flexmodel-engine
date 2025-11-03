@@ -69,7 +69,7 @@ public class UserService {
   public Map<String, Object> updateUser(String id, FsUser userData) {
     log.info("Updating user with id: {} using session: {}", id, session.getName());
 
-    int affectedRows = session.dsl().update(FsUser.class).values(userData).whereId(id).execute();
+    int affectedRows = session.dsl().update(FsUser.class).values(userData).execute();
 
     Map<String, Object> result = new HashMap<>();
     result.put("message", "User updated successfully");
