@@ -26,11 +26,11 @@ import java.util.concurrent.Callable;
  */
 public class LazyLoadInterceptor {
 
+  private static final ThreadLocal<Map<String, Object>> loadCache = ThreadLocal.withInitial(HashMap::new);
+  private final Logger log = LoggerFactory.getLogger(LazyLoadInterceptor.class);
   private final String modelName;
   private final AbstractSessionContext sessionContext;
   private final Map<String, Object> dataMap;
-  private static final ThreadLocal<Map<String, Object>> loadCache = ThreadLocal.withInitial(HashMap::new);
-  private final Logger log = LoggerFactory.getLogger(LazyLoadInterceptor.class);
 
   public LazyLoadInterceptor(String modelName, Map<String, Object> dataMap, AbstractSessionContext sessionContext) {
     this.modelName = modelName;
@@ -94,59 +94,87 @@ public class LazyLoadInterceptor {
 
   @RuntimeType
   public Object intercept(@This Object proxy, @Origin Class<?> clazz, @Origin Method method, @SuperCall Callable<?> superCall) throws Throwable {
-    String loadedKey = null;
-    Object loadedValue = null;
     Session session = sessionContext.getSession();
     if (session.isClosed()) {
-      return null;
-    }
-    try {
-      EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
-      String fieldName = ReflectionUtils.getFieldNameFromGetter(method);
-      TypedField<?, ?> field = entity.getField(fieldName);
-      if (field instanceof RelationField relationField) {
-        log.debug("intercept: {}", method.getName());
-        Object id = dataMap.get(relationField.getLocalField());
-        if (id == null) {
-          // 通过驼峰转换字段名
-          id = dataMap.get(underscoreToCamelCase(relationField.getLocalField()));
-        }
-        loadedKey = modelName + ":" + fieldName + ":" + id;
-        if (loadCache.get().containsKey(loadedKey)) {
-          return loadCache.get().get(loadedKey);
-        }
-        if (relationField.isMultiple()) {
-          if (id == null) {
-            return null;
-          }
-          ParameterizedType returnType = (ParameterizedType) method.getGenericReturnType();
-          Class<?> returnGenericType = (Class<?>) returnType.getActualTypeArguments()[0];
-          id = castValueType(relationField.getFrom(), relationField.getForeignField(), id);
-          List<?> list = session.data().find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(id), returnGenericType, false);
-          invokeSetter(proxy, list, clazz, fieldName, method.getReturnType());
-          loadedValue = list;
-          return list;
-        } else {
-          if (id == null) {
-            return null;
-          }
-          id = castValueType(relationField.getFrom(), relationField.getForeignField(), id);
-          List<?> list = session.data().find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(id), method.getReturnType(), false);
-          if (list.isEmpty()) {
-            return null;
-          }
-          Object result = list.getFirst();
-          invokeSetter(proxy, result, clazz, fieldName, method.getReturnType());
-          loadedValue = result;
-          return result;
-        }
-      }
       return superCall.call();
-    } finally {
-      if (loadedKey != null) {
-        loadCache.get().putIfAbsent(loadedKey, loadedValue);
+    }
+    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
+    String fieldName = ReflectionUtils.getFieldNameFromGetter(method);
+    TypedField<?, ?> field = entity.getField(fieldName);
+    if (field instanceof RelationField relationField) {
+      return handleRelationField(proxy, clazz, method, superCall, fieldName, relationField);
+    }
+    return superCall.call();
+  }
+
+  private Object handleRelationField(Object proxy,
+                                     Class<?> clazz,
+                                     Method method,
+                                     Callable<?> superCall,
+                                     String fieldName,
+                                     RelationField relationField) throws Exception {
+    Object id = resolveRelationIdentifier(relationField);
+    if (id == null) {
+      return superCall.call();
+    }
+    String cacheKey = buildCacheKey(fieldName, id);
+    Object cached = loadCache.get().get(cacheKey);
+    if (cached != null) {
+      applyLoadedValue(proxy, clazz, fieldName, method.getReturnType(), cached);
+      return cached;
+    }
+
+    RelationLoadResult loadResult = loadRelationValue(relationField, method, id);
+    if (!loadResult.loaded()) {
+      return superCall.call();
+    }
+
+    Object loadedValue = loadResult.value();
+    applyLoadedValue(proxy, clazz, fieldName, method.getReturnType(), loadedValue);
+    loadCache.get().putIfAbsent(cacheKey, loadedValue);
+    return loadedValue;
+  }
+
+  private RelationLoadResult loadRelationValue(RelationField relationField, Method method, Object identifier) {
+    Object convertedIdentifier = castValueType(relationField.getFrom(), relationField.getForeignField(), identifier);
+    if (relationField.isMultiple()) {
+      Class<?> elementType = resolveCollectionElementType(method);
+      List<?> list = sessionContext.getSession().data()
+        .find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(convertedIdentifier), elementType, false);
+      return RelationLoadResult.loaded(list);
+    }
+
+    List<?> result = sessionContext.getSession().data()
+      .find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(convertedIdentifier), method.getReturnType(), false);
+    if (result.isEmpty()) {
+      return RelationLoadResult.notLoaded();
+    }
+    return RelationLoadResult.loaded(result.getFirst());
+  }
+
+  private Object resolveRelationIdentifier(RelationField relationField) {
+    Object id = dataMap.get(relationField.getLocalField());
+    if (id == null) {
+      id = dataMap.get(underscoreToCamelCase(relationField.getLocalField()));
+    }
+    return id;
+  }
+
+  private String buildCacheKey(String fieldName, Object id) {
+    return modelName + ":" + fieldName + ":" + id;
+  }
+
+  private void applyLoadedValue(Object proxy, Class<?> clazz, String fieldName, Class<?> parameterType, Object value) {
+    invokeSetter(proxy, value, clazz, fieldName, parameterType);
+  }
+
+  private Class<?> resolveCollectionElementType(Method method) {
+    if (method.getGenericReturnType() instanceof ParameterizedType parameterizedType) {
+      if (parameterizedType.getActualTypeArguments().length == 1 && parameterizedType.getActualTypeArguments()[0] instanceof Class<?> elementType) {
+        return elementType;
       }
     }
+    throw new IllegalStateException("Unable to resolve collection element type for method: " + method);
   }
 
   public void invokeSetter(Object proxy, Object value, Class<?> clazz, String fieldName, Class<?> parameterType) {
@@ -154,9 +182,20 @@ public class LazyLoadInterceptor {
       Method setter = clazz.getMethod("set" + ReflectionUtils.toUpperCamelCase(fieldName), parameterType);
       setter.invoke(proxy, value);
     } catch (Throwable e) {
-      e.printStackTrace();
+      log.warn("Failed to invoke setter for field '{}.{}'", clazz.getName(), fieldName, e);
     }
   }
 
+  private record RelationLoadResult(boolean loaded, Object value) {
+      private static final RelationLoadResult NOT_LOADED = new RelationLoadResult(false, null);
+
+    static RelationLoadResult loaded(Object value) {
+        return new RelationLoadResult(true, value);
+      }
+
+      static RelationLoadResult notLoaded() {
+        return NOT_LOADED;
+      }
+    }
 
 }
