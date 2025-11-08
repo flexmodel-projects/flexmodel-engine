@@ -691,31 +691,34 @@ public abstract class BaseService {
     if (!(entity.getField(fieldName) instanceof RelationField relationField)) {
       return;
     }
-
-    log.debug("Processing relation field insertion: field={}, relationField={}, parentId={}",
-      fieldName, relationField.getName(), parentId);
-
+    log.debug("Processing relation field insertion: field={}, relationField={}, parentId={}", fieldName, relationField.getName(), parentId);
     if (relationField.isMultiple()) {
       // 处理一对多关联
       Collection<?> relationCollection = (Collection) fieldValue;
       log.debug("Processing one-to-many relation: {} items", relationCollection.size());
 
       relationCollection.forEach(relationItem -> {
-        Map<String, Object> relationRecord = ReflectionUtils.toClassBean(
-          relationItem, Map.class);
+        Map<String, Object> relationRecord = ReflectionUtils.toClassBean(relationItem, Map.class);
         relationRecord.put(relationField.getForeignField(), parentId);
 
         log.debug("Inserting relation record: {} -> {}", relationField.getFrom(), relationRecord);
-        getDataService().insert(relationField.getFrom(), relationRecord);
+        try {
+          getDataService().insert(relationField.getFrom(), relationRecord);
+        } catch (Exception e) {
+          log.error("Failed to insert relation record: {} -> {}, error: {}", relationField.getFrom(), relationRecord, e.getMessage(), e);
+        }
       });
     } else {
       // 处理一对一关联
-      Map<String, Object> relationRecord = ReflectionUtils.toClassBean(
-        fieldValue, Map.class);
+      Map<String, Object> relationRecord = ReflectionUtils.toClassBean(fieldValue, Map.class);
       relationRecord.put(relationField.getForeignField(), parentId);
 
       log.debug("Inserting relation record: {} -> {}", relationField.getFrom(), relationRecord);
-      getDataService().insert(relationField.getFrom(), relationRecord);
+      try {
+        getDataService().insert(relationField.getFrom(), relationRecord);
+      } catch (Exception e) {
+        log.error("Failed to insert relation record: {} -> {}, error: {}", relationField.getFrom(), relationRecord, e.getMessage(), e);
+      }
     }
   }
 }
