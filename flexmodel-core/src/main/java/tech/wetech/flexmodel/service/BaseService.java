@@ -143,7 +143,7 @@ public abstract class BaseService {
 
     for (Query.Join joinConfig : query.getJoins().getJoins()) {
       log.debug("Validating join config: from={}, as={}, localField={}, foreignField={}",
-                joinConfig.getFrom(), joinConfig.getAs(), joinConfig.getLocalField(), joinConfig.getForeignField());
+        joinConfig.getFrom(), joinConfig.getAs(), joinConfig.getLocalField(), joinConfig.getForeignField());
       validateJoinConfiguration(joinConfig, mainModel);
     }
 
@@ -203,7 +203,7 @@ public abstract class BaseService {
       joinConfig.setForeignField(relationField.getForeignField());
 
       log.debug("Auto-filled relation fields: localField={}, foreignField={}",
-                localFieldName, relationField.getForeignField());
+        localFieldName, relationField.getForeignField());
     } catch (Exception e) {
       log.error("Failed to auto-fill relation fields for join: {}, error: {}", joinConfig.getFrom(), e.getMessage(), e);
       throw e;
@@ -219,7 +219,7 @@ public abstract class BaseService {
   private void validateManualJoinFields(Query.Join joinConfig) {
     if (joinConfig.getLocalField() == null || joinConfig.getForeignField() == null) {
       log.error("Manual join validation failed: localField={}, foreignField={}",
-                joinConfig.getLocalField(), joinConfig.getForeignField());
+        joinConfig.getLocalField(), joinConfig.getForeignField());
       throw new SqlExecutionException("LocalField and foreignField must not be null when is not association field");
     }
   }
@@ -233,7 +233,7 @@ public abstract class BaseService {
    */
   public Map<String, RelationField> findRelationFields(ModelDefinition model, Query query) {
     log.debug("Finding relation fields for model: {}, hasProjection: {}",
-              model.getName(), hasProjectionFields(query));
+      model.getName(), hasProjectionFields(query));
 
     Map<String, RelationField> relationFieldMap = new HashMap<>();
 
@@ -273,7 +273,7 @@ public abstract class BaseService {
    */
   private void findRelationFieldsFromProjection(EntityDefinition entity, Query query, Map<String, RelationField> relationFieldMap) {
     log.debug("Finding relation fields from projection, projection fields count: {}",
-              query.getProjection().getFields().size());
+      query.getProjection().getFields().size());
 
     for (Map.Entry<String, Query.QueryCall> entry : query.getProjection().getFields().entrySet()) {
       String fieldAlias = entry.getKey();
@@ -325,7 +325,7 @@ public abstract class BaseService {
     Set<Object> foreignKeyValues) {
 
     log.debug("Finding relation data for field: {}, foreign key values count: {}",
-              relationField.getName(), foreignKeyValues.size());
+      relationField.getName(), foreignKeyValues.size());
 
     Query relationQuery = new Query();
     relationQuery.setFilter(field(relationField.getForeignField()).in(foreignKeyValues).toJsonString());
@@ -351,7 +351,7 @@ public abstract class BaseService {
                           Query query,
                           int maxDepth) {
     log.debug("Starting nested query for model: {}, parent data count: {}, max depth: {}",
-              model.getName(), parentDataList.size(), maxDepth);
+      model.getName(), parentDataList.size(), maxDepth);
 
     try {
       nestedQuery(parentDataList, relationQueryFunction, model, query, new AtomicInteger(maxDepth));
@@ -407,12 +407,12 @@ public abstract class BaseService {
    * @param relationField 关联字段定义
    */
   private void processRelationField(List<Map<String, Object>> parentDataList,
-                                   BiFunction<String, Query, List<Map<String, Object>>> relationQueryFunction,
-                                   ModelDefinition model,
-                                   Query query,
-                                   AtomicInteger remainingDepth,
-                                   String relationFieldAlias,
-                                   RelationField relationField) {
+                                    BiFunction<String, Query, List<Map<String, Object>>> relationQueryFunction,
+                                    ModelDefinition model,
+                                    Query query,
+                                    AtomicInteger remainingDepth,
+                                    String relationFieldAlias,
+                                    RelationField relationField) {
     // 收集所有外键值
     Set<Object> foreignKeyValues = parentDataList.stream()
       .map(dataItem -> dataItem.get(relationField.getLocalField()))
@@ -420,7 +420,7 @@ public abstract class BaseService {
       .collect(Collectors.toSet());
 
     log.debug("Collected {} foreign key values for relation field: {}",
-              foreignKeyValues.size(), relationField.getName());
+      foreignKeyValues.size(), relationField.getName());
 
     EntityDefinition relationModel = (EntityDefinition) sessionContext.getModelDefinition(relationField.getFrom());
 
@@ -457,12 +457,12 @@ public abstract class BaseService {
    * @param relationModel 关联模型定义
    */
   private void fillRelationDataToParent(Map<String, Object> parentDataItem,
-                                       RelationField relationField,
-                                       String relationFieldAlias,
-                                       Map<Object, List<Map<String, Object>>> relationDataGroup,
-                                       BiFunction<String, Query, List<Map<String, Object>>> relationQueryFunction,
-                                       AtomicInteger remainingDepth,
-                                       EntityDefinition relationModel) {
+                                        RelationField relationField,
+                                        String relationFieldAlias,
+                                        Map<Object, List<Map<String, Object>>> relationDataGroup,
+                                        BiFunction<String, Query, List<Map<String, Object>>> relationQueryFunction,
+                                        AtomicInteger remainingDepth,
+                                        EntityDefinition relationModel) {
     Object localKeyValue = parentDataItem.get(relationField.getLocalField());
 
     if (localKeyValue == null) {
@@ -487,8 +487,8 @@ public abstract class BaseService {
     parentDataItem.put(relationFieldAlias, relationValue);
 
     log.debug("Set relation value for field: {} (alias: {}), value type: {}",
-              relationField.getName(), relationFieldAlias,
-              relationValue != null ? relationValue.getClass().getSimpleName() : "null");
+      relationField.getName(), relationFieldAlias,
+      relationValue != null ? relationValue.getClass().getSimpleName() : "null");
   }
 
   /**
@@ -501,7 +501,7 @@ public abstract class BaseService {
    */
   protected Map<String, Object> generateFieldValues(String modelName, Map<String, Object> inputData, boolean isUpdate) {
     log.debug("Generating field values for model: {}, input data size: {}, isUpdate: {}",
-              modelName, inputData.size(), isUpdate);
+      modelName, inputData.size(), isUpdate);
 
     EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
     List<TypedField<?, ?>> entityFields = entity.getFields();
@@ -514,7 +514,7 @@ public abstract class BaseService {
     processDefaultAndGeneratedValues(entityFields, processedData, isUpdate);
 
     log.debug("Field value generation completed for model: {}, processed data size: {}",
-              modelName, processedData.size());
+      modelName, processedData.size());
     return processedData;
   }
 
@@ -548,8 +548,8 @@ public abstract class BaseService {
    * @param isUpdate 是否为更新操作
    */
   private void processDefaultAndGeneratedValues(List<TypedField<?, ?>> entityFields,
-                                               Map<String, Object> processedData,
-                                               boolean isUpdate) {
+                                                Map<String, Object> processedData,
+                                                boolean isUpdate) {
     log.debug("Processing default and generated values for {} fields", entityFields.size());
 
     for (TypedField<?, ?> field : entityFields) {
@@ -565,7 +565,7 @@ public abstract class BaseService {
 
         if (!Objects.equals(currentValue, generatedValue)) {
           log.debug("Generated value for field: {} = {} -> {}",
-                    field.getName(), currentValue, generatedValue);
+            field.getName(), currentValue, generatedValue);
         }
       }
     }
@@ -581,15 +581,15 @@ public abstract class BaseService {
   protected Object convertParameter(TypedField<?, ?> field, Object value) {
     try {
       Object convertedValue = sessionContext.getTypeHandlerMap().get(field.getType())
-      .convertParameter(field, value);
+        .convertParameter(field, value);
 
       log.debug("Converted parameter: field={}, type={}, value={} -> {}",
-                field.getName(), field.getType(), value, convertedValue);
+        field.getName(), field.getType(), value, convertedValue);
 
       return convertedValue;
     } catch (Exception e) {
       log.error("Failed to convert parameter: field={}, type={}, value={}, error: {}",
-                field.getName(), field.getType(), value, e.getMessage(), e);
+        field.getName(), field.getType(), value, e.getMessage(), e);
       throw e;
     }
   }
@@ -643,13 +643,13 @@ public abstract class BaseService {
    * @return 当前时间值
    */
   private Object generateCurrentTimeValue(TypedField<?, ?> field) {
-        if (field instanceof DateTimeField) {
-          return LocalDateTime.now();
-        } else if (field instanceof DateField) {
-          return LocalDate.now();
-        } else if (field instanceof TimeField) {
-          return LocalTime.now();
-        }
+    if (field instanceof DateTimeField) {
+      return LocalDateTime.now();
+    } else if (field instanceof DateField) {
+      return LocalDate.now();
+    } else if (field instanceof TimeField) {
+      return LocalTime.now();
+    }
     return null;
   }
 
@@ -661,25 +661,19 @@ public abstract class BaseService {
    * @param parentId 父级ID
    */
   @SuppressWarnings({"rawtypes", "unchecked"})
-  protected void insertRelatedRecords(String modelName, Object relationObject, Object parentId) {
+  protected void insertRelatedRecords(String modelName, Map<String, Object> relationObject, Object parentId) {
     log.debug("Inserting relation records for model: {}, parentId: {}", modelName, parentId);
-
     try {
-      Map<String, Object> relationData = ReflectionUtils.toClassBean(relationObject, Map.class);
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
-
-      log.debug("Processing {} relation fields for model: {}", relationData.size(), modelName);
-
-      relationData.forEach((fieldName, fieldValue) -> {
-        if (fieldValue != null) {
-          processRelationFieldInsertion(entity, fieldName, fieldValue, parentId);
+      EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
+      relationObject.forEach((fieldName, fieldValue) -> {
+        if (fieldValue != null && entity.getField(fieldName) instanceof RelationField relationField) {
+          processRelationFieldInsertion(entity, fieldName, fieldValue, relationObject.get(relationField.getLocalField()));
         }
       });
-
       log.debug("Relation record insertion completed for model: {}", modelName);
     } catch (Exception e) {
       log.error("Failed to insert relation records for model: {}, parentId: {}, error: {}",
-                modelName, parentId, e.getMessage(), e);
+        modelName, parentId, e.getMessage(), e);
       throw e;
     }
   }
@@ -699,7 +693,7 @@ public abstract class BaseService {
     }
 
     log.debug("Processing relation field insertion: field={}, relationField={}, parentId={}",
-              fieldName, relationField.getName(), parentId);
+      fieldName, relationField.getName(), parentId);
 
     if (relationField.isMultiple()) {
       // 处理一对多关联
