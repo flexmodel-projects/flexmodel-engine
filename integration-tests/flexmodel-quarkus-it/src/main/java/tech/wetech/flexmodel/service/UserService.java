@@ -3,11 +3,11 @@ package tech.wetech.flexmodel.service;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.entity.FsUser;
 import tech.wetech.flexmodel.quarkus.session.SessionManaged;
-import tech.wetech.flexmodel.quarkus.session.Transactional;
 import tech.wetech.flexmodel.query.Query;
 import tech.wetech.flexmodel.session.Session;
 
