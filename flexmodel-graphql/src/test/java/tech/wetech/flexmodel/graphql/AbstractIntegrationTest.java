@@ -24,7 +24,7 @@ public class AbstractIntegrationTest {
     HikariDataSource dataSource = new HikariDataSource();
     dataSource.setJdbcUrl("jdbc:sqlite:file::memory:?cache=shared");
     JdbcDataSourceProvider jdbcDataSourceProvider = new JdbcDataSourceProvider("system", dataSource);
-    SessionFactory sessionFactory = SessionFactory.builder()
+    sessionFactory = SessionFactory.builder()
       .setDefaultDataSourceProvider(jdbcDataSourceProvider)
       .build();
     sessionFactory.loadScript("system", "import.json");
