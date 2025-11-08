@@ -29,13 +29,17 @@ public class LazyLoadInterceptor {
   private final String modelName;
   private final AbstractSessionContext sessionContext;
   private final Map<String, Object> dataMap;
-  private final Map<Method, Boolean> loadCache = new HashMap<>();
+  private static final ThreadLocal<Map<String, Object>> loadCache = ThreadLocal.withInitial(HashMap::new);
   private final Logger log = LoggerFactory.getLogger(LazyLoadInterceptor.class);
 
   public LazyLoadInterceptor(String modelName, Map<String, Object> dataMap, AbstractSessionContext sessionContext) {
     this.modelName = modelName;
     this.dataMap = dataMap;
     this.sessionContext = sessionContext;
+  }
+
+  public static void clear(){
+    loadCache.get().clear();
   }
 
   /**
@@ -90,51 +94,58 @@ public class LazyLoadInterceptor {
 
   @RuntimeType
   public Object intercept(@This Object proxy, @Origin Class<?> clazz, @Origin Method method, @SuperCall Callable<?> superCall) throws Throwable {
+    String loadedKey = null;
+    Object loadedValue = null;
     try {
-      boolean loaded = loadCache.getOrDefault(method, false);
-      if (!loaded) {
-        EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
-        String fieldName = ReflectionUtils.getFieldNameFromGetter(method);
-        TypedField<?, ?> field = entity.getField(fieldName);
-        if (field instanceof RelationField relationField) {
-          log.debug("intercept: {}", method.getName());
-          Object localValue = dataMap.get(relationField.getLocalField());
-          if (localValue == null) {
-            // 通过驼峰转换字段名
-            localValue = dataMap.get(underscoreToCamelCase(relationField.getLocalField()));
+      EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
+      String fieldName = ReflectionUtils.getFieldNameFromGetter(method);
+      TypedField<?, ?> field = entity.getField(fieldName);
+      if (field instanceof RelationField relationField) {
+        log.debug("intercept: {}", method.getName());
+        Object id = dataMap.get(relationField.getLocalField());
+        if (id == null) {
+          // 通过驼峰转换字段名
+          id = dataMap.get(underscoreToCamelCase(relationField.getLocalField()));
+        }
+        loadedKey = modelName + ":" + fieldName + ":" + id;
+        if (loadCache.get().containsKey(loadedKey)) {
+          return loadCache.get().get(loadedKey);
+        }
+        if (relationField.isMultiple()) {
+          if (id == null) {
+            return null;
           }
-          if (relationField.isMultiple()) {
-            if (localValue == null) {
-              return List.of();
-            }
-            try (Session session = sessionContext.getFactory().createSession(sessionContext.getSchemaName())) {
-              ParameterizedType returnType = (ParameterizedType) method.getGenericReturnType();
-              Class<?> returnGenericType = (Class<?>) returnType.getActualTypeArguments()[0];
-              localValue = castValueType(relationField.getFrom(), relationField.getForeignField(), localValue);
-              List<?> list = session.data().find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(localValue), returnGenericType);
-              invokeSetter(proxy, list, clazz, fieldName, method.getReturnType());
-              return list;
-            }
-          } else {
-            if (localValue == null) {
+          try (Session session = sessionContext.getFactory().createSession(sessionContext.getSchemaName())) {
+            ParameterizedType returnType = (ParameterizedType) method.getGenericReturnType();
+            Class<?> returnGenericType = (Class<?>) returnType.getActualTypeArguments()[0];
+            id = castValueType(relationField.getFrom(), relationField.getForeignField(), id);
+            List<?> list = session.data().find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(id), returnGenericType);
+            invokeSetter(proxy, list, clazz, fieldName, method.getReturnType());
+            loadedValue = list;
+            return list;
+          }
+        } else {
+          if (id == null) {
+            return null;
+          }
+          try (Session session = sessionContext.getFactory().createSession(sessionContext.getSchemaName())) {
+            id = castValueType(relationField.getFrom(), relationField.getForeignField(), id);
+            List<?> list = session.data().find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(id), method.getReturnType());
+            if (list.isEmpty()) {
               return null;
             }
-            try (Session session = sessionContext.getFactory().createSession(sessionContext.getSchemaName())) {
-              localValue = castValueType(relationField.getFrom(), relationField.getForeignField(), localValue);
-              List<?> list = session.data().find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(localValue), method.getReturnType());
-              if (list.isEmpty()) {
-                return null;
-              }
-              Object result = list.getFirst();
-              invokeSetter(proxy, result, clazz, fieldName, method.getReturnType());
-              return result;
-            }
+            Object result = list.getFirst();
+            invokeSetter(proxy, result, clazz, fieldName, method.getReturnType());
+            loadedValue = result;
+            return result;
           }
         }
       }
       return superCall.call();
     } finally {
-      loadCache.put(method, true);
+      if (loadedKey != null) {
+        loadCache.get().putIfAbsent(loadedKey, loadedValue);
+      }
     }
 
   }
@@ -147,6 +158,7 @@ public class LazyLoadInterceptor {
       e.printStackTrace();
     }
   }
+
 
 
 }
