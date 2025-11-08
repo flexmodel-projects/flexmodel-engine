@@ -31,6 +31,8 @@ public interface Session extends Closeable {
    */
   void close();
 
+  boolean isClosed();
+
   SessionFactory getFactory();
 
   String getName();

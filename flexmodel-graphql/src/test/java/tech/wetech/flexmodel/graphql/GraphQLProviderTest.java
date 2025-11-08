@@ -34,7 +34,7 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     createTeacherData(session, teacherEntityName);
 
     FlexmodelGraphQL graphQLProvider = new FlexmodelGraphQL();
-    GraphQL graphQL = graphQLProvider.generateGraphQLWithSchemaObject(session.getFactory(), session.getFactory().getSchemaNames());
+    GraphQL graphQL = graphQLProvider.generateGraphQLWithSchemaObject(sessionFactory, sessionFactory.getSchemaNames());
     // 创建查询
     String query = """
       query {
@@ -120,7 +120,7 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     createTeacherData(session, teacherEntityName);
 
     FlexmodelGraphQL graphQLProvider = new FlexmodelGraphQL();
-    GraphQL graphQL = graphQLProvider.generateGraphQLWithSchemaObject(session.getFactory(), session.getFactory().getSchemaNames());
+    GraphQL graphQL = graphQLProvider.generateGraphQLWithSchemaObject(sessionFactory, sessionFactory.getSchemaNames());
     String query = """
       query {
         list: system_list_testDirectiveStudent {
@@ -166,7 +166,7 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     createTeacherData(session, teacherEntityName);
 
     FlexmodelGraphQL graphQLProvider = new FlexmodelGraphQL();
-    GraphQL graphQL = graphQLProvider.generateGraphQLWithSchemaObject(session.getFactory(), session.getFactory().getSchemaNames());
+    GraphQL graphQL = graphQLProvider.generateGraphQLWithSchemaObject(sessionFactory, sessionFactory.getSchemaNames());
     String query = """
       query ($classId: Int = 1, $studentId: Int @internal) {
         class: system_find_one_testJoinClasses(where: { id: { _eq: $classId } }) {
@@ -216,7 +216,7 @@ public class GraphQLProviderTest extends AbstractIntegrationTest {
     createTeacherData(session, teacherEntityName);
 
     FlexmodelGraphQL graphQLProvider = new FlexmodelGraphQL();
-    GraphQL graphQL = graphQLProvider.generateGraphQLWithSchemaObject(session.getFactory(), session.getFactory().getSchemaNames());
+    GraphQL graphQL = graphQLProvider.generateGraphQLWithSchemaObject(sessionFactory, sessionFactory.getSchemaNames());
     // 创建查询
     String query = """
       mutation {

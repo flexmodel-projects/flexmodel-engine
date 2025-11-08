@@ -19,6 +19,7 @@ public abstract class AbstractSession implements Session {
     public AbstractSession(AbstractSessionContext sessionContext, DataService dataService,
                            SchemaService schemaService) {
         this.sessionContext = sessionContext;
+        this.sessionContext.setSession(this);
         this.dataService = dataService;
         this.schemaService = schemaService;
     }

@@ -38,7 +38,7 @@ public class LazyLoadInterceptor {
     this.sessionContext = sessionContext;
   }
 
-  public static void clear(){
+  public static void clear() {
     loadCache.get().clear();
   }
 
@@ -96,6 +96,10 @@ public class LazyLoadInterceptor {
   public Object intercept(@This Object proxy, @Origin Class<?> clazz, @Origin Method method, @SuperCall Callable<?> superCall) throws Throwable {
     String loadedKey = null;
     Object loadedValue = null;
+    Session session = sessionContext.getSession();
+    if (session.isClosed()) {
+      return null;
+    }
     try {
       EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
       String fieldName = ReflectionUtils.getFieldNameFromGetter(method);
@@ -115,30 +119,26 @@ public class LazyLoadInterceptor {
           if (id == null) {
             return null;
           }
-          try (Session session = sessionContext.getFactory().createSession(sessionContext.getSchemaName())) {
-            ParameterizedType returnType = (ParameterizedType) method.getGenericReturnType();
-            Class<?> returnGenericType = (Class<?>) returnType.getActualTypeArguments()[0];
-            id = castValueType(relationField.getFrom(), relationField.getForeignField(), id);
-            List<?> list = session.data().find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(id), returnGenericType);
-            invokeSetter(proxy, list, clazz, fieldName, method.getReturnType());
-            loadedValue = list;
-            return list;
-          }
+          ParameterizedType returnType = (ParameterizedType) method.getGenericReturnType();
+          Class<?> returnGenericType = (Class<?>) returnType.getActualTypeArguments()[0];
+          id = castValueType(relationField.getFrom(), relationField.getForeignField(), id);
+          List<?> list = session.data().find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(id), returnGenericType, false);
+          invokeSetter(proxy, list, clazz, fieldName, method.getReturnType());
+          loadedValue = list;
+          return list;
         } else {
           if (id == null) {
             return null;
           }
-          try (Session session = sessionContext.getFactory().createSession(sessionContext.getSchemaName())) {
-            id = castValueType(relationField.getFrom(), relationField.getForeignField(), id);
-            List<?> list = session.data().find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(id), method.getReturnType());
-            if (list.isEmpty()) {
-              return null;
-            }
-            Object result = list.getFirst();
-            invokeSetter(proxy, result, clazz, fieldName, method.getReturnType());
-            loadedValue = result;
-            return result;
+          id = castValueType(relationField.getFrom(), relationField.getForeignField(), id);
+          List<?> list = session.data().find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(id), method.getReturnType(), false);
+          if (list.isEmpty()) {
+            return null;
           }
+          Object result = list.getFirst();
+          invokeSetter(proxy, result, clazz, fieldName, method.getReturnType());
+          loadedValue = result;
+          return result;
         }
       }
       return superCall.call();
@@ -147,7 +147,6 @@ public class LazyLoadInterceptor {
         loadCache.get().putIfAbsent(loadedKey, loadedValue);
       }
     }
-
   }
 
   public void invokeSetter(Object proxy, Object value, Class<?> clazz, String fieldName, Class<?> parameterType) {
@@ -158,7 +157,6 @@ public class LazyLoadInterceptor {
       e.printStackTrace();
     }
   }
-
 
 
 }

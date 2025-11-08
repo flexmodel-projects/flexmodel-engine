@@ -122,6 +122,13 @@ public interface DataService {
     return find(modelName, query, resultType);
   }
 
+  default <T> List<T> find(String modelName, Predicate predicate, Class<T> resultType, boolean nestedQuery) {
+    Query query = new Query();
+    query.setFilter(predicate.toJsonString());
+    query.setNestedEnabled(nestedQuery);
+    return find(modelName, query, resultType);
+  }
+
   /**
    * Find a record by ID
    *

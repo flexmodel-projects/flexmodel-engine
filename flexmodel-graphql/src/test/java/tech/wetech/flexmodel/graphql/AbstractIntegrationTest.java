@@ -17,6 +17,7 @@ public class AbstractIntegrationTest {
   protected static final Logger log = LoggerFactory.getLogger(AbstractIntegrationTest.class);
   protected static final String SCHEMA_NAME = "system";
   protected static Session session;
+  protected static SessionFactory sessionFactory;
 
   @BeforeAll
   static void init() {

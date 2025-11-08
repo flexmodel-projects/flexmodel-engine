@@ -25,6 +25,7 @@ public abstract class AbstractSessionContext {
   protected boolean failsafe = false;
   protected int nestedQueryMaxDepth = 5;
   protected final SessionFactory factory;
+  protected Session session;
   protected final Map<String, ModelDefinition> aliasModelMap = new HashMap<>();
 
   protected AbstractSessionContext(String schemaName, ModelRegistry mappedModels, SessionFactory factory) {
@@ -83,5 +84,13 @@ public abstract class AbstractSessionContext {
 
   public SessionFactory getFactory() {
     return factory;
+  }
+
+  public Session getSession() {
+    return session;
+  }
+
+  public void setSession(Session session) {
+    this.session = session;
   }
 }

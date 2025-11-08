@@ -17,6 +17,7 @@ import java.util.Map;
  */
 public class ReflectionUtils {
 
+  @SuppressWarnings("all")
   public static void setFieldValue(Object obj, String fieldName, Object value) {
     try {
       // 构造setter方法名
@@ -43,10 +44,14 @@ public class ReflectionUtils {
         }
       }
 
-      if (setter != null) {
-
+      if (setter != null && value != null) {
         setter.setAccessible(true);
-        setter.invoke(obj, value);
+        Class<?> parameterType = setter.getParameterTypes()[0];
+        if (parameterType.isAssignableFrom(Enum.class)) {
+          setter.invoke(obj, Enum.valueOf((Class<Enum>) parameterType, value.toString()));
+        } else {
+          setter.invoke(obj, value);
+        }
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -118,10 +123,10 @@ public class ReflectionUtils {
   }
 
   public static Class<?> findModelClass(Class<?> objClass) {
-    if(objClass.getAnnotation(ModelClass.class) != null) {
+    if (objClass.getAnnotation(ModelClass.class) != null) {
       return objClass;
     }
-    if(objClass.getSuperclass() != null) {
+    if (objClass.getSuperclass() != null) {
       return findModelClass(objClass.getSuperclass());
     }
     return null;

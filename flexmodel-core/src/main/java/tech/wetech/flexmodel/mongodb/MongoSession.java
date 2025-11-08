@@ -1,5 +1,6 @@
 package tech.wetech.flexmodel.mongodb;
 
+import tech.wetech.flexmodel.reflect.LazyLoadInterceptor;
 import tech.wetech.flexmodel.session.AbstractSession;
 
 /**
@@ -32,5 +33,11 @@ public class MongoSession extends AbstractSession {
   @Override
   public void close() {
     // MongoDB连接关闭（如果需要的话）
+    LazyLoadInterceptor.clear();
+  }
+
+  @Override
+  public boolean isClosed() {
+    return false;
   }
 }
