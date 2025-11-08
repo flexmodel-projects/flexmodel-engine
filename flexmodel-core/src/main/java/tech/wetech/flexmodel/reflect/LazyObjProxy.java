@@ -25,6 +25,14 @@ public class LazyObjProxy {
   @SuppressWarnings("unchecked")
   public static <T> T createProxy(T obj, String modelName, AbstractSessionContext sessionContext) {
     try {
+      return createProxyInner(obj, modelName, sessionContext);
+    } finally {
+      LazyLoadInterceptor.clear();
+    }
+  }
+
+  private static <T> T createProxyInner(T obj, String modelName, AbstractSessionContext sessionContext) {
+    try {
       EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
       Class<?> subClazz = new ByteBuddy()
         .subclass(obj.getClass())
@@ -49,11 +57,15 @@ public class LazyObjProxy {
   }
 
   public static <T> List<T> createProxyList(List<T> list, String modelName, AbstractSessionContext sessionContext) {
-    List<T> result = new ArrayList<>();
-    for (T o : list) {
-      result.add(createProxy(o, modelName, sessionContext));
+    try {
+      List<T> result = new ArrayList<>();
+      for (T o : list) {
+        result.add(createProxy(o, modelName, sessionContext));
+      }
+      return result;
+    } finally {
+      LazyLoadInterceptor.clear();
     }
-    return result;
   }
 
   private static String[] getLazyMethods(EntityDefinition entity) {
@@ -65,7 +77,6 @@ public class LazyObjProxy {
     });
     return methodNames.toArray(new String[]{});
   }
-
 
 
 }
