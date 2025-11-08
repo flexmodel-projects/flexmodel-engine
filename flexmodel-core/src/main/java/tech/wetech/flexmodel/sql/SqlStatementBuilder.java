@@ -33,6 +33,9 @@ public class SqlStatementBuilder extends BaseService {
     validateQuery(modelName, query);
     Map<String, Object> params = new HashMap<>();
     ModelDefinition model = (ModelDefinition) sqlContext.getModelDefinition(modelName);
+    if (model == null) {
+      throw new IllegalArgumentException("modelName " + modelName + " not found");
+    }
     StringBuilder sqlBuilder = new StringBuilder("\nselect ");
     Map<String, String> projectionMap = new HashMap<>();
     appendProjection(modelName, query, model, projectionMap, sqlBuilder);
