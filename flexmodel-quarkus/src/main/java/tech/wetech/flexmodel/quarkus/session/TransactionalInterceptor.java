@@ -46,16 +46,20 @@ public class TransactionalInterceptor {
 
     // 获取当前Session（应该已经由SessionInterceptor创建）
     Session session = sessionManager.getCurrentSessionOrNull();
-    if (session == null) {
-      throw new IllegalStateException(
-          "No active Session found. Please ensure @SessionManaged annotation is present on the method or class.");
+    if (session == null || session.isClosed()) {
+      return context.proceed();
     }
-
+//    if (session == null) {
+//      throw new IllegalStateException(
+//          "No active Session found. Please ensure @SessionManaged annotation is present on the method or class.");
+//    }
+//    if (session.isClosed()) {
+//      throw new IllegalStateException("Session is closed. Please ensure @SessionManaged annotation is present on the method or class.");
+//    }
     // 检查是否已有活跃的事务（嵌套调用场景）
     // 注意：这里简化处理，假设Session的状态可以告诉我们是否有活跃事务
     // 更精确的方法需要跟踪事务状态
     boolean transactionStarted = false;
-
     try {
       // 开启事务
       log.debug("Starting transaction for method: {}", context.getMethod().getName());
