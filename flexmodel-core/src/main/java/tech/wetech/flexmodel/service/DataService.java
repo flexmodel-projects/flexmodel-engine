@@ -32,9 +32,9 @@ public interface DataService {
    */
   <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery);
 
-  List<Map<String,Object>> find(String modelName, Query query);
+  List<Map<String, Object>> find(String modelName, Query query);
 
-  <T> List<T> findByNativeQuery(String modelName, Object params, Class<T> resultType);
+  List<Map<String, Object>> findByNativeQuery(String modelName, Object params);
 
   /**
    * 执行原生 SQL 语句（自动判断查询或更新操作）
@@ -116,7 +116,7 @@ public interface DataService {
     return rows;
   }
 
-  default List<Map<String,Object>> find(String modelName, Predicate predicate, boolean nestedQuery) {
+  default List<Map<String, Object>> find(String modelName, Predicate predicate, boolean nestedQuery) {
     Query query = new Query();
     query.setFilter(predicate.toJsonString());
     query.setNestedEnabled(nestedQuery);

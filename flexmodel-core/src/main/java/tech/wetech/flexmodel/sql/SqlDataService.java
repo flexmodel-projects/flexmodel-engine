@@ -288,20 +288,16 @@ public class SqlDataService extends BaseService implements DataService {
 
 
   @Override
-  public <T> List<T> findByNativeQuery(String modelName, Object params, Class<T> resultType) {
+  public List<Map<String, Object>> findByNativeQuery(String modelName, Object params) {
     log.debug("Starting SQL native query model: {}", modelName);
     long startTime = System.currentTimeMillis();
-
     try {
       NativeQueryDefinition model = (NativeQueryDefinition) sessionContext.getModelDefinition(modelName);
       String statement = model.getStatement();
-      List<?> list = (List<?>) executeNativeStatement(statement, params);
-
-      List<T> results = ReflectionUtils.toClassBeanList(list, resultType);
-
+      List<Map<String, Object>> list = (List<Map<String, Object>>) executeNativeStatement(statement, params);
       long duration = System.currentTimeMillis() - startTime;
-      log.debug("SQL native query model completed for {} in {}ms, results: {}", modelName, duration, results.size());
-      return results;
+      log.debug("SQL native query model completed for {} in {}ms, results: {}", modelName, duration, list.size());
+      return list;
     } catch (Exception e) {
       long duration = System.currentTimeMillis() - startTime;
       log.error("SQL native query model failed for {} after {}ms", modelName, duration, e);

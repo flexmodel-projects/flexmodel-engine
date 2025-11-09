@@ -317,8 +317,8 @@ public class EventAwareDataService implements DataService {
   }
 
   @Override
-  public <T> List<T> findByNativeQuery(String modelName, Object params, Class<T> resultType) {
-    return delegate.findByNativeQuery(modelName, params, resultType);
+  public List<Map<String, Object>> findByNativeQuery(String modelName, Object params) {
+    return delegate.findByNativeQuery(modelName, params);
   }
 
   @Override

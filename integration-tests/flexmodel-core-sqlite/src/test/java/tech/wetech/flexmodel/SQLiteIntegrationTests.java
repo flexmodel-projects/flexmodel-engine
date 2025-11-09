@@ -44,7 +44,7 @@ public class SQLiteIntegrationTests extends AbstractSessionTests {
     NativeQueryDefinition model = new NativeQueryDefinition(name);
     model.setStatement("select * from " + classesEntityName + " where id=${id} and className=${className} limit 10");
     session.schema().createNativeQuery(model);
-    List<Map> list = session.data().findByNativeQuery(name, Map.of("id", 3, "className", "二年级1班"), Map.class);
+    List<Map<String, Object>> list = session.data().findByNativeQuery(name, Map.of("id", 3, "className", "二年级1班"));
     Assertions.assertFalse(list.isEmpty());
 //    Assertions.assertNotNull(session.getAllModels());
   }

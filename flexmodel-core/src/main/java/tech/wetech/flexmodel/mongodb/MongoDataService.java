@@ -175,11 +175,10 @@ public class MongoDataService extends BaseService implements DataService {
   }
 
   @Override
-  public <T> List<T> findByNativeQuery(String modelName, Object obj, Class<T> resultType) {
+  public List<Map<String, Object>> findByNativeQuery(String modelName, Object obj) {
     Map<String, Object> params = ReflectionUtils.toClassBean(obj, Map.class);
     NativeQueryDefinition model = (NativeQueryDefinition) sessionContext.getModelDefinition(modelName);
-    List<?> list = (List<?>) executeNativeStatement(model.getStatement(), params);
-    return ReflectionUtils.toClassBeanList(list, resultType);
+    return (List<Map<String, Object>>) executeNativeStatement(model.getStatement(), params);
   }
 
   @Override
