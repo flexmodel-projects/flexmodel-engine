@@ -47,7 +47,7 @@ public class ReflectionUtils {
       if (setter != null && value != null) {
         setter.setAccessible(true);
         Class<?> parameterType = setter.getParameterTypes()[0];
-        if (parameterType.isAssignableFrom(Enum.class)) {
+        if (parameterType.isEnum()) {
           setter.invoke(obj, Enum.valueOf((Class<Enum>) parameterType, value.toString()));
         } else {
           setter.invoke(obj, value);
