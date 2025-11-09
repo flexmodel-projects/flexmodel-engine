@@ -2,6 +2,7 @@ package tech.wetech.flexmodel.query;
 
 import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.reflect.LazyObjProxy;
+import tech.wetech.flexmodel.reflect.ReflectionUtils;
 import tech.wetech.flexmodel.session.Session;
 
 import java.util.List;
@@ -61,6 +62,11 @@ public class DSLQueryBuilder {
   public DSLQueryBuilder from(String modelName) {
     this.modelName = modelName;
     return this;
+  }
+
+  public <T> TypedDSLQueryBuilder<T> from(Class<T> entityClass) {
+    this.modelName = ReflectionUtils.getModelNameFromClass(entityClass);
+    return new TypedDSLQueryBuilder<>(this, entityClass);
   }
 
   /**
