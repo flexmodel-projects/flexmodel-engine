@@ -1245,7 +1245,7 @@ public abstract class AbstractSessionTests {
   void testSnakeToCamels() {
     String modelName = "testSnakeToCamels_person";
     session.schema().createEntity(modelName, t ->
-      t.addField(new StringField("person_id").setNullable(false).setLength(20))
+      t.addField(new StringField("person_id").asIdentity().setNullable(false).setLength(20))
         .addField(new StringField("person_name").setNullable(false).setLength(100))
         .addField(new LongField("person_age").setNullable(false))
     );
