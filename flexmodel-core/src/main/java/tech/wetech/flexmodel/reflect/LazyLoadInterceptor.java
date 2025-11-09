@@ -6,11 +6,12 @@ import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import net.bytebuddy.implementation.bind.annotation.This;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.field.RelationField;
 import tech.wetech.flexmodel.model.field.TypedField;
 import tech.wetech.flexmodel.query.Expressions;
-import tech.wetech.flexmodel.session.AbstractSessionContext;
+import tech.wetech.flexmodel.session.AbstractSession;
 import tech.wetech.flexmodel.session.Session;
 import tech.wetech.flexmodel.type.TypeHandler;
 
@@ -29,13 +30,13 @@ public class LazyLoadInterceptor {
   private static final ThreadLocal<Map<String, Object>> loadCache = ThreadLocal.withInitial(HashMap::new);
   private final Logger log = LoggerFactory.getLogger(LazyLoadInterceptor.class);
   private final String modelName;
-  private final AbstractSessionContext sessionContext;
+  private final Session session;
   private final Map<String, Object> dataMap;
 
-  public LazyLoadInterceptor(String modelName, Map<String, Object> dataMap, AbstractSessionContext sessionContext) {
+  public LazyLoadInterceptor(String modelName, Map<String, Object> dataMap, Session session) {
     this.modelName = modelName;
     this.dataMap = dataMap;
-    this.sessionContext = sessionContext;
+    this.session = session;
   }
 
   public static void clear() {
@@ -51,10 +52,10 @@ public class LazyLoadInterceptor {
    * @return
    */
   private Object castValueType(String modelName, String fieldName, Object value) {
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
+    EntityDefinition entity = (EntityDefinition) session.schema().getModel(modelName);
     TypedField<?, ?> field = entity.getField(fieldName);
     if (field != null) {
-      TypeHandler<?> typeHandler = sessionContext.getTypeHandlerMap().get(field.getType());
+      TypeHandler<?> typeHandler = ((AbstractSession) session).getTypeHandlerMap().get(field.getType());
       if (typeHandler != null) {
         return typeHandler.convertParameter(field, value);
       }
@@ -94,11 +95,10 @@ public class LazyLoadInterceptor {
 
   @RuntimeType
   public Object intercept(@This Object proxy, @Origin Class<?> clazz, @Origin Method method, @SuperCall Callable<?> superCall) throws Throwable {
-    Session session = sessionContext.getSession();
     if (session.isClosed()) {
       return superCall.call();
     }
-    EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
+    EntityDefinition entity = (EntityDefinition) session.schema().getModel(modelName);
     String fieldName = ReflectionUtils.getFieldNameFromGetter(method);
     TypedField<?, ?> field = entity.getField(fieldName);
     if (field instanceof RelationField relationField) {
@@ -139,17 +139,21 @@ public class LazyLoadInterceptor {
     Object convertedIdentifier = castValueType(relationField.getFrom(), relationField.getForeignField(), identifier);
     if (relationField.isMultiple()) {
       Class<?> elementType = resolveCollectionElementType(method);
-      List<?> list = sessionContext.getSession().data()
-        .find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(convertedIdentifier), elementType, false);
-      return RelationLoadResult.loaded(list);
+      List<Map<String, Object>> list = session.data()
+        .find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(convertedIdentifier), false);
+      List<?> objects = JsonUtils.convertValueList(list, elementType);
+      List<?> proxyList = LazyObjProxy.createProxyList(objects, relationField.getFrom(), session);
+      return RelationLoadResult.loaded(proxyList);
     }
 
-    List<?> result = sessionContext.getSession().data()
-      .find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(convertedIdentifier), method.getReturnType(), false);
+    List<Map<String, Object>> result = session.data()
+      .find(relationField.getFrom(), Expressions.field(relationField.getForeignField()).eq(convertedIdentifier), false);
     if (result.isEmpty()) {
       return RelationLoadResult.notLoaded();
     }
-    return RelationLoadResult.loaded(result.getFirst());
+    Object value = JsonUtils.convertValue(result.getFirst(), method.getReturnType());
+    Object proxyValue = LazyObjProxy.createProxy(value, relationField.getFrom(), session);
+    return RelationLoadResult.loaded(proxyValue);
   }
 
   private Object resolveRelationIdentifier(RelationField relationField) {
@@ -187,15 +191,15 @@ public class LazyLoadInterceptor {
   }
 
   private record RelationLoadResult(boolean loaded, Object value) {
-      private static final RelationLoadResult NOT_LOADED = new RelationLoadResult(false, null);
+    private static final RelationLoadResult NOT_LOADED = new RelationLoadResult(false, null);
 
     static RelationLoadResult loaded(Object value) {
-        return new RelationLoadResult(true, value);
-      }
-
-      static RelationLoadResult notLoaded() {
-        return NOT_LOADED;
-      }
+      return new RelationLoadResult(true, value);
     }
+
+    static RelationLoadResult notLoaded() {
+      return NOT_LOADED;
+    }
+  }
 
 }

@@ -1,6 +1,7 @@
 package tech.wetech.flexmodel.query;
 
-import tech.wetech.flexmodel.reflect.ReflectionUtils;
+import tech.wetech.flexmodel.JsonUtils;
+import tech.wetech.flexmodel.reflect.LazyObjProxy;
 import tech.wetech.flexmodel.session.Session;
 
 import java.util.List;
@@ -13,7 +14,6 @@ import java.util.function.UnaryOperator;
 public class DSLQueryBuilder {
   private final Session session;
   private String modelName;
-  private Class<?> entityClass;
   private final Query query;
 
   public DSLQueryBuilder(Session session) {
@@ -60,17 +60,7 @@ public class DSLQueryBuilder {
    */
   public DSLQueryBuilder from(String modelName) {
     this.modelName = modelName;
-    this.entityClass = null; // 清除实体类，因为使用的是字符串
     return this;
-  }
-
-  /**
-   * 设置要查询的实体类
-   */
-  public <T> TypedDSLQueryBuilder<T> from(Class<T> entityClass) {
-    this.entityClass = entityClass;
-    this.modelName = ReflectionUtils.getModelNameFromClass(entityClass);
-    return new TypedDSLQueryBuilder<>(this, entityClass);
   }
 
   /**
@@ -204,31 +194,28 @@ public class DSLQueryBuilder {
     return this;
   }
 
-  /**
-   * 执行查询并返回指定类型的结果
-   */
-  public <T> List<T> execute(Class<T> resultType) {
-    if (modelName == null) {
-      throw new IllegalStateException("Model name or entity class must be specified using from() method");
-    }
-    return session.data().find(modelName, query, resultType);
-  }
 
   /**
    * 执行查询并返回Map结果
    */
   @SuppressWarnings("all")
   public List<Map<String, Object>> execute() {
-    List list = execute(Map.class);
+    List list = session.data().find(modelName, query);
     return list;
   }
 
+
   /**
-   * 执行查询并返回单个结果
+   * 执行查询并返回Map结果
    */
-  public <T> T executeOne(Class<T> resultType) {
-    List<T> results = execute(resultType);
-    return results.isEmpty() ? null : results.get(0);
+  @SuppressWarnings("all")
+  public <T> List<T> execute(Class<T> resultType) {
+    if (modelName == null) {
+      throw new IllegalStateException("Model name or entity class must be specified using from() method");
+    }
+    List<Map<String, Object>> list = execute();
+    List<T> typedResults = JsonUtils.convertValueList(list, resultType);
+    return LazyObjProxy.createProxyList(typedResults, modelName, session);
   }
 
   /**
@@ -236,7 +223,7 @@ public class DSLQueryBuilder {
    */
   public Map<String, Object> executeOne() {
     List<Map<String, Object>> results = execute();
-    return results.isEmpty() ? null : results.get(0);
+    return results.isEmpty() ? null : results.getFirst();
   }
 
   /**

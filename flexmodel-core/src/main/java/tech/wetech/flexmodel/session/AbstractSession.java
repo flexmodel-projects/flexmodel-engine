@@ -3,6 +3,9 @@ package tech.wetech.flexmodel.session;
 import tech.wetech.flexmodel.query.DSL;
 import tech.wetech.flexmodel.service.DataService;
 import tech.wetech.flexmodel.service.SchemaService;
+import tech.wetech.flexmodel.type.TypeHandler;
+
+import java.util.Map;
 
 /**
  * 统一的Session实现，完全合并了所有装饰器和中间层功能
@@ -39,7 +42,11 @@ public abstract class AbstractSession implements Session {
         return sessionContext.getFactory();
     }
 
-    @Override
+  public Map<String, ? extends TypeHandler<?>> getTypeHandlerMap() {
+    return sessionContext.getTypeHandlerMap();
+  }
+
+  @Override
     public String getName() {
         return sessionContext.getSchemaName();
     }

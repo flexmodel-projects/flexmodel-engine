@@ -32,7 +32,7 @@ public interface DataService {
    */
   <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery);
 
-  <T> List<T> find(String modelName, Query query, Class<T> resultType);
+  List<Map<String,Object>> find(String modelName, Query query);
 
   <T> List<T> findByNativeQuery(String modelName, Object params, Class<T> resultType);
 
@@ -116,17 +116,11 @@ public interface DataService {
     return rows;
   }
 
-  default <T> List<T> find(String modelName, Predicate predicate, Class<T> resultType) {
-    Query query = new Query();
-    query.setFilter(predicate.toJsonString());
-    return find(modelName, query, resultType);
-  }
-
-  default <T> List<T> find(String modelName, Predicate predicate, Class<T> resultType, boolean nestedQuery) {
+  default List<Map<String,Object>> find(String modelName, Predicate predicate, boolean nestedQuery) {
     Query query = new Query();
     query.setFilter(predicate.toJsonString());
     query.setNestedEnabled(nestedQuery);
-    return find(modelName, query, resultType);
+    return find(modelName, query);
   }
 
   /**
@@ -176,21 +170,14 @@ public interface DataService {
    */
   @SuppressWarnings("all")
   default List<Map<String, Object>> find(String modelName, UnaryOperator<Query.Builder> queryUnaryOperator) {
-    List list = find(modelName, queryUnaryOperator.apply(Query.Builder.create()).build(), Map.class);
+    List list = find(modelName, queryUnaryOperator.apply(Query.Builder.create()).build());
     return list;
   }
 
   default List<Map<String, Object>> find(String modelName, Predicate predicate) {
     Query query = new Query();
     query.setFilter(predicate.toJsonString());
-    List list = find(modelName, query, Map.class);
-    return list;
-  }
-
-  @SuppressWarnings("all")
-  default List<Map<String, Object>> find(String modelName, Query query) {
-    List list = find(modelName, query, Map.class);
-    return list;
+    return find(modelName, query);
   }
 
   default long count(String modelName, UnaryOperator<Query> queryUnaryOperator) {

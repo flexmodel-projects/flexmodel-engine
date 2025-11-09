@@ -1,6 +1,10 @@
 package tech.wetech.flexmodel.query;
 
+import tech.wetech.flexmodel.JsonUtils;
+import tech.wetech.flexmodel.reflect.ReflectionUtils;
+
 import java.util.List;
+import java.util.Map;
 import java.util.function.UnaryOperator;
 
 /**
@@ -159,28 +163,33 @@ public class TypedDSLQueryBuilder<T> {
    * 执行查询并返回指定类型的结果（自动使用from中指定的类型）
    */
   public List<T> execute() {
-    return delegate.execute(entityClass);
+    List<Map<String, Object>> list = delegate.execute();
+    List<T> beanList = ReflectionUtils.toClassBeanList(list, entityClass);
+    return beanList;
   }
 
   /**
    * 执行查询并返回指定类型的结果（可以覆盖from中指定的类型）
    */
   public <R> List<R> execute(Class<R> resultType) {
-    return delegate.execute(resultType);
+    List<Map<String, Object>> list = delegate.execute();
+    return JsonUtils.convertValueList(list, resultType);
   }
 
   /**
    * 执行查询并返回单个结果（自动使用from中指定的类型）
    */
   public T executeOne() {
-    return delegate.executeOne(entityClass);
+    Map<String, Object> result = delegate.executeOne();
+    return ReflectionUtils.toClassBean(result, entityClass);
   }
 
   /**
    * 执行查询并返回单个结果（可以覆盖from中指定的类型）
    */
   public <R> R executeOne(Class<R> resultType) {
-    return delegate.executeOne(resultType);
+    Map<String, Object> result = delegate.executeOne();
+    return ReflectionUtils.toClassBean(result, resultType);
   }
 
   /**

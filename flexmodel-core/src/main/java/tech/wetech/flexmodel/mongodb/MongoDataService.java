@@ -160,19 +160,18 @@ public class MongoDataService extends BaseService implements DataService {
     }
     T result = JsonUtils.convertValue(dataMap, resultType);
     if (result != null) {
-      return LazyObjProxy.createProxy(result, modelName, sessionContext);
+      return LazyObjProxy.createProxy(result, modelName, sessionContext.getSession());
     }
     return null;
   }
 
   @Override
-  public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
+  public List<Map<String, Object>> find(String modelName, Query query) {
     List<Map<String, Object>> mapList = queryAsMapList(modelName, query);
     if (query.isNestedEnabled()) {
       nestedQuery(mapList, this::queryAsMapList, (ModelDefinition) sessionContext.getModelDefinition(modelName), query, sessionContext.getNestedQueryMaxDepth());
     }
-    List<T> results = JsonUtils.convertValueList(mapList, resultType);
-    return LazyObjProxy.createProxyList(results, modelName, sessionContext);
+    return mapList;
   }
 
   @Override

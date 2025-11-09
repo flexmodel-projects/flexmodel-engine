@@ -904,7 +904,8 @@ public abstract class AbstractSessionTests {
   void testFindAllWhenResultDto() {
     String entityName = "testFindAllWhenResultDto_teacher";
     createTeacher2(entityName);
-    List<TeacherDTO> list = session.data().find(entityName, createSimpleQuery(), TeacherDTO.class);
+    List<Map<String, Object>> mapList = session.data().find(entityName, createSimpleQuery());
+    List<TeacherDTO> list = JsonUtils.convertValueList(mapList, TeacherDTO.class);
     Assertions.assertFalse(list.isEmpty());
     Assertions.assertNotNull(list.getFirst().getId());
   }
@@ -1223,7 +1224,7 @@ public abstract class AbstractSessionTests {
     createClassesData(classesEntityName);
     createStudentData(studentEntityName);
     createTeacherData(teacherEntityName);
-    List<Classes> classesList = session.data().find(classesEntityName, new Query(), Classes.class);
+    List<Classes> classesList = session.dsl().selectFrom(classesEntityName).execute(Classes.class);
     for (Classes classes : classesList) {
       for (Student student : classes.getStudents()) {
         StudentDetail studentDetail = student.getStudentDetail();

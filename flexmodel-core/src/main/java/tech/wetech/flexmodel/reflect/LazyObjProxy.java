@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.field.RelationField;
-import tech.wetech.flexmodel.session.AbstractSessionContext;
+import tech.wetech.flexmodel.session.Session;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,17 +23,17 @@ public class LazyObjProxy {
   private static final Logger log = LoggerFactory.getLogger(LazyObjProxy.class);
 
   @SuppressWarnings("unchecked")
-  public static <T> T createProxy(T obj, String modelName, AbstractSessionContext sessionContext) {
+  public static <T> T createProxy(T obj, String modelName, Session session) {
     try {
-      EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
+      EntityDefinition entity = (EntityDefinition) session.schema().getModel(modelName);
       Class<?> subClazz = new ByteBuddy()
         .subclass(obj.getClass())
         .implement(ProxyInterface.class)
         .method(ElementMatchers.namedOneOf(getLazyMethods(entity)))
         .intercept(MethodDelegation.to(new LazyLoadInterceptor(modelName,
-          JsonUtils.convertValue(obj, Map.class), sessionContext))) // 委托给 LazyLoadInterceptor
+          JsonUtils.convertValue(obj, Map.class), session))) // 委托给 LazyLoadInterceptor
         .method(ElementMatchers.named("entityInfo"))
-        .intercept(FixedValue.value(sessionContext.getModelDefinition(modelName)))
+        .intercept(FixedValue.value(session.schema().getModel(modelName)))
         .method(ElementMatchers.named("originClass"))
         .intercept(FixedValue.value(obj.getClass()))
         .make()
@@ -48,10 +48,10 @@ public class LazyObjProxy {
     }
   }
 
-  public static <T> List<T> createProxyList(List<T> list, String modelName, AbstractSessionContext sessionContext) {
+  public static <T> List<T> createProxyList(List<T> list, String modelName, Session session) {
     List<T> result = new ArrayList<>();
     for (T o : list) {
-      result.add(createProxy(o, modelName, sessionContext));
+      result.add(createProxy(o, modelName, session));
     }
     return result;
   }

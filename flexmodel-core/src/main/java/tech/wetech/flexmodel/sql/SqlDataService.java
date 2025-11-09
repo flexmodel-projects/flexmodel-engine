@@ -247,7 +247,7 @@ public class SqlDataService extends BaseService implements DataService {
       }
 
       T result = ReflectionUtils.toClassBean(dataMap, resultType);
-      T finalResult = LazyObjProxy.createProxy(result, modelName, sessionContext);
+      T finalResult = LazyObjProxy.createProxy(result, modelName, sessionContext.getSession());
 
       long duration = System.currentTimeMillis() - startTime;
       log.debug("SQL findById completed for model: {} in {}ms", modelName, duration);
@@ -261,7 +261,7 @@ public class SqlDataService extends BaseService implements DataService {
 
   @Override
   @SuppressWarnings("all")
-  public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
+  public List<Map<String, Object>> find(String modelName, Query query) {
     log.debug("Starting SQL find for model: {}", modelName);
     long startTime = System.currentTimeMillis();
 
@@ -273,12 +273,12 @@ public class SqlDataService extends BaseService implements DataService {
       if (query.isNestedEnabled()) {
         nestedQuery(mapList, this::findMapList, (ModelDefinition) sessionContext.getModelDefinition(modelName), query, sessionContext.getNestedQueryMaxDepth());
       }
-      List<T> results = ReflectionUtils.toClassBeanList(mapList, resultType);
-      List<T> finalResults = LazyObjProxy.createProxyList(results, modelName, sessionContext);
+//      List<T> results = ReflectionUtils.toClassBeanList(mapList, resultType);
+//      List<T> finalResults = LazyObjProxy.createProxyList(results, modelName, sessionContext);
 
       long duration = System.currentTimeMillis() - startTime;
-      log.debug("SQL find completed for model: {} in {}ms, results: {}", modelName, duration, finalResults.size());
-      return finalResults;
+      log.debug("SQL find completed for model: {} in {}ms, results: {}", modelName, duration, mapList.size());
+      return mapList;
     } catch (Exception e) {
       long duration = System.currentTimeMillis() - startTime;
       log.error("SQL find failed for model: {} after {}ms", modelName, duration, e);

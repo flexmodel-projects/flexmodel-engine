@@ -296,7 +296,7 @@ public class EventAwareDataService implements DataService {
   }
 
   @Override
-  public <T> List<T> find(String modelName, Query query, Class<T> resultType) {
+  public List<Map<String, Object>> find(String modelName, Query query) {
     log.debug("Starting find operation for model: {}", modelName);
 
     // 发布前置查询事件
@@ -307,7 +307,7 @@ public class EventAwareDataService implements DataService {
     Query finalQuery = preEvent.getQuery() != null ? preEvent.getQuery() : query;
 
     try {
-      List<T> result = delegate.find(modelName, finalQuery, resultType);
+      List<Map<String, Object>> result = delegate.find(modelName, finalQuery);
       log.debug("Find operation completed for model: {}, result count: {}", modelName, result.size());
       return result;
     } catch (Exception e) {
