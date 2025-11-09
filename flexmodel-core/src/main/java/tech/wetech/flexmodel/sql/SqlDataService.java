@@ -9,8 +9,6 @@ import tech.wetech.flexmodel.model.field.Field;
 import tech.wetech.flexmodel.model.field.RelationField;
 import tech.wetech.flexmodel.model.field.TypedField;
 import tech.wetech.flexmodel.query.Query;
-import tech.wetech.flexmodel.reflect.LazyObjProxy;
-import tech.wetech.flexmodel.reflect.ReflectionUtils;
 import tech.wetech.flexmodel.service.BaseService;
 import tech.wetech.flexmodel.service.DataService;
 import tech.wetech.flexmodel.sql.SqlStatementBuilder.Pair;
@@ -49,9 +47,9 @@ public class SqlDataService extends BaseService implements DataService {
     log.debug("Starting SQL insert for model: {}", modelName);
     long startTime = System.currentTimeMillis();
 
-    Map<String, Object> record = generateFieldValues(modelName, data, false);
+    Map<String, Object> processedData = generateFieldValues(modelName, data, false);
     try {
-      String sql = getInsertSqlString(modelName, record);
+      String sql = getInsertSqlString(modelName, processedData);
       log.debug("Generated INSERT SQL: {}", sql);
 
       EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
@@ -59,24 +57,24 @@ public class SqlDataService extends BaseService implements DataService {
       int rows;
       if (idFieldOptional.isPresent()) {
         TypedField<?, ?> idField = idFieldOptional.get();
-        if (record.get(idField.getName()) != null) {
+        if (processedData.get(idField.getName()) != null) {
           // ID already provided in the record, just insert
-          rows = sqlExecutor.update(sql, record);
+          rows = sqlExecutor.update(sql, processedData);
         } else {
           // Auto-generate ID and put it back into the record
           if (sqlDialect.useFirstGeneratedId()) {
-            rows = sqlExecutor.updateAndReturnFirstGeneratedKeys(sql, record, generatedId ->
-              record.put(idField.getName(), generatedId));
+            rows = sqlExecutor.updateAndReturnFirstGeneratedKeys(sql, processedData, generatedId ->
+              processedData.put(idField.getName(), generatedId));
           } else {
-            rows = sqlExecutor.updateAndReturnGeneratedKeys(sql, record,
+            rows = sqlExecutor.updateAndReturnGeneratedKeys(sql, processedData,
               new String[]{sqlDialect.getGeneratedKeyName(idField.getName())}, keys ->
-                record.put(idField.getName(), keys.getFirst()));
+                processedData.put(idField.getName(), keys.getFirst()));
           }
         }
         // 返回ID值
-        ReflectionUtils.setFieldValue(data, idField.getName(), record.get(idField.getName()));
+        data.put(idField.getName(), processedData.get(idField.getName()));
       } else {
-        rows = sqlExecutor.update(sql, record);
+        rows = sqlExecutor.update(sql, processedData);
       }
 
       long duration = System.currentTimeMillis() - startTime;
@@ -92,7 +90,7 @@ public class SqlDataService extends BaseService implements DataService {
       Optional<TypedField<?, ?>> idFieldOptional = entity.findIdField();
       Object id = null;
       if (idFieldOptional.isPresent()) {
-        id = record.get(idFieldOptional.get().getName());
+        id = processedData.get(idFieldOptional.get().getName());
         // 将生成的ID放回到原始的data map中
         data.put(idFieldOptional.get().getName(), id);
       }
@@ -133,8 +131,6 @@ public class SqlDataService extends BaseService implements DataService {
 
     try {
       Map<String, Object> processedData = generateFieldValues(modelName, data, true);
-
-      Map<String, Object> record = ReflectionUtils.toClassBean(processedData, Map.class);
       String physicalTableName = toPhysicalTablenameQuoteString(modelName);
       EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
       TypedField<?, ?> idField = entity.findIdField().orElseThrow();
@@ -144,7 +140,7 @@ public class SqlDataService extends BaseService implements DataService {
         .append(" set ");
       StringJoiner assignment = new StringJoiner(", ");
 
-      record.keySet().stream()
+      processedData.keySet().stream()
         .filter(col -> !col.equals(idField.getName()) && (data.containsKey(col) || processedData.get(col) != null))
         .forEach(col -> assignment.add(sqlDialect.quoteIdentifier(col) + "=:" + col));
 
@@ -214,7 +210,7 @@ public class SqlDataService extends BaseService implements DataService {
   }
 
   @Override
-  public <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery) {
+  public Map<String, Object> findById(String modelName, Object id, boolean nestedQuery) {
     log.debug("Starting SQL findById for model: {}, id: {}, nestedQuery: {}", modelName, id, nestedQuery);
     long startTime = System.currentTimeMillis();
 
@@ -242,16 +238,12 @@ public class SqlDataService extends BaseService implements DataService {
         return null;
       }
 
-      if (nestedQuery && dataMap != null) {
+      if (nestedQuery) {
         nestedQuery(List.of(dataMap), this::findMapList, (ModelDefinition) sessionContext.getModelDefinition(modelName), null, sessionContext.getNestedQueryMaxDepth());
       }
-
-      T result = ReflectionUtils.toClassBean(dataMap, resultType);
-      T finalResult = LazyObjProxy.createProxy(result, modelName, sessionContext.getSession());
-
       long duration = System.currentTimeMillis() - startTime;
       log.debug("SQL findById completed for model: {} in {}ms", modelName, duration);
-      return finalResult;
+      return dataMap;
     } catch (Exception e) {
       long duration = System.currentTimeMillis() - startTime;
       log.error("SQL findById failed for model: {}, id: {} after {}ms", modelName, id, duration, e);
@@ -273,9 +265,6 @@ public class SqlDataService extends BaseService implements DataService {
       if (query.isNestedEnabled()) {
         nestedQuery(mapList, this::findMapList, (ModelDefinition) sessionContext.getModelDefinition(modelName), query, sessionContext.getNestedQueryMaxDepth());
       }
-//      List<T> results = ReflectionUtils.toClassBeanList(mapList, resultType);
-//      List<T> finalResults = LazyObjProxy.createProxyList(results, modelName, sessionContext);
-
       long duration = System.currentTimeMillis() - startTime;
       log.debug("SQL find completed for model: {} in {}ms, results: {}", modelName, duration, mapList.size());
       return mapList;
@@ -288,7 +277,8 @@ public class SqlDataService extends BaseService implements DataService {
 
 
   @Override
-  public List<Map<String, Object>> findByNativeQuery(String modelName, Object params) {
+  @SuppressWarnings("unchecked")
+  public List<Map<String, Object>> findByNativeQuery(String modelName, Map<String, Object> params) {
     log.debug("Starting SQL native query model: {}", modelName);
     long startTime = System.currentTimeMillis();
     try {
@@ -306,12 +296,11 @@ public class SqlDataService extends BaseService implements DataService {
   }
 
   @Override
-  public Object executeNativeStatement(String statement, Object objR) {
+  public Object executeNativeStatement(String statement, Map<String, Object> params) {
     log.debug("Starting SQL native execute: {}", statement);
     long startTime = System.currentTimeMillis();
 
     try {
-      Map<String, Object> params = ReflectionUtils.toClassBean(objR, Map.class);
       String processedStatement = StringHelper.replacePlaceholder(statement);
 
       // 判断 SQL 语句类型

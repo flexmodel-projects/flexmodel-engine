@@ -30,11 +30,11 @@ public interface DataService {
    * @param id        ID
    * @return Record
    */
-  <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery);
+  Map<String, Object> findById(String modelName, Object id, boolean nestedQuery);
 
   List<Map<String, Object>> find(String modelName, Query query);
 
-  List<Map<String, Object>> findByNativeQuery(String modelName, Object params);
+  List<Map<String, Object>> findByNativeQuery(String modelName, Map<String, Object> params);
 
   /**
    * 执行原生 SQL 语句（自动判断查询或更新操作）
@@ -43,7 +43,7 @@ public interface DataService {
    * @param params    参数对象
    * @return 查询操作返回 List<Map<String, Object>>，更新操作返回 Integer（影响行数）
    */
-  Object executeNativeStatement(String statement, Object params);
+  Object executeNativeStatement(String statement, Map<String, Object> params);
 
   /**
    * Count records based on conditions
@@ -126,39 +126,12 @@ public interface DataService {
   /**
    * Find a record by ID
    *
-   * @param modelName  Model name
-   * @param id         ID
-   * @param resultType Result type
-   * @param <T>        Type parameter
-   * @return Record
-   */
-  default <T> T findById(String modelName, Object id, Class<T> resultType) {
-    return findById(modelName, id, resultType, false);
-  }
-
-  /**
-   * Find a record by ID
-   *
    * @param modelName Model name
    * @param id        ID
    * @return Record
    */
-  @SuppressWarnings("unchecked")
   default Map<String, Object> findById(String modelName, Object id) {
-    return findById(modelName, id, Map.class);
-  }
-
-  /**
-   * Find a record by ID
-   *
-   * @param modelName   Model name
-   * @param id          ID
-   * @param nestedQuery Whether to perform a nested fetch
-   * @return Record
-   */
-  @SuppressWarnings("unchecked")
-  default Map<String, Object> findById(String modelName, Object id, boolean nestedQuery) {
-    return findById(modelName, id, Map.class, nestedQuery);
+    return findById(modelName, id, false);
   }
 
   /**

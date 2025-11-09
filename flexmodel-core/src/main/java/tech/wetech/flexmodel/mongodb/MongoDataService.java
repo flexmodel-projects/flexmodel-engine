@@ -5,15 +5,12 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
-import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.ModelDefinition;
 import tech.wetech.flexmodel.model.NativeQueryDefinition;
 import tech.wetech.flexmodel.model.field.DefaultValue;
 import tech.wetech.flexmodel.model.field.TypedField;
 import tech.wetech.flexmodel.query.Query;
-import tech.wetech.flexmodel.reflect.LazyObjProxy;
-import tech.wetech.flexmodel.reflect.ReflectionUtils;
 import tech.wetech.flexmodel.service.BaseService;
 import tech.wetech.flexmodel.service.DataService;
 import tech.wetech.flexmodel.service.SchemaService;
@@ -47,20 +44,19 @@ public class MongoDataService extends BaseService implements DataService {
   }
 
   @Override
-  public int insert(String modelName, Map<String, Object> objR) {
+  public int insert(String modelName, Map<String, Object> data) {
 
-    Map<String, Object> processedData = generateFieldValues(modelName, objR, false);
+    Map<String, Object> processedData = generateFieldValues(modelName, data, false);
 
     try {
-      Map<String, Object> record = ReflectionUtils.toClassBean(processedData, Map.class);
       EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
       TypedField<?, ?> idField = entity.findIdField().orElseThrow();
       DefaultValue defaultValue = idField.getDefaultValue();
       if (defaultValue != null && defaultValue.isGenerated() && "autoIncrement".equals(defaultValue.getName())) {
-        assignAutoIncrementId(modelName, record);
+        assignAutoIncrementId(modelName, processedData);
       }
       String collectionName = getCollectionName(modelName);
-      InsertOneResult result = mongoDatabase.getCollection(collectionName, Map.class).insertOne(record);
+      InsertOneResult result = mongoDatabase.getCollection(collectionName, Map.class).insertOne(processedData);
       return result.wasAcknowledged() ? 1 : 0;
     } finally {
       // 获取生成的ID（如果有的话）
@@ -70,12 +66,11 @@ public class MongoDataService extends BaseService implements DataService {
       if (idFieldOptional.isPresent()) {
         id = processedData.get(idFieldOptional.get().getName());
         // 将生成的ID放回到原始的data map中
-        objR.put(idFieldOptional.get().getName(), id);
-        ReflectionUtils.setFieldValue(objR, idFieldOptional.get().getName(), id);
+        data.put(idFieldOptional.get().getName(), id);
       }
 
       // 处理关联关系
-      insertRelatedRecords(modelName, objR, id);
+      insertRelatedRecords(modelName, data, id);
     }
   }
 
@@ -92,30 +87,24 @@ public class MongoDataService extends BaseService implements DataService {
   }
 
   @Override
-  public int updateById(String modelName, Map<String, Object> objR, Object id) {
+  public int updateById(String modelName, Map<String, Object> data, Object id) {
 
-    Map<String, Object> data = objR;
     Map<String, Object> processedData = generateFieldValues(modelName, data, true);
 
-    Map<String, Object> record = ReflectionUtils.toClassBean(processedData, Map.class);
     String collectionName = getCollectionName(modelName);
     EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
-    UpdateResult result = mongoDatabase.getCollection(collectionName, Map.class).updateOne(Filters.eq(idField.getName(), id), new Document("$set", new Document(record)));
+    UpdateResult result = mongoDatabase.getCollection(collectionName, Map.class).updateOne(Filters.eq(idField.getName(), id), new Document("$set", new Document(processedData)));
     return (int) result.getModifiedCount();
   }
 
   @Override
-  public int update(String modelName, Map<String, Object> objR, String filter) {
-
-    Map<String, Object> data = objR;
+  public int update(String modelName, Map<String, Object> data, String filter) {
     Map<String, Object> processedData = generateFieldValues(modelName, data, true);
-
-    Map<String, Object> record = ReflectionUtils.toClassBean(processedData, Map.class);
     String collectionName = getCollectionName(modelName);
     String mongoCondition = builder.getMongoCondition(filter);
     Document mongoFilter = Document.parse(mongoCondition);
-    UpdateResult result = mongoDatabase.getCollection(collectionName).updateMany(mongoFilter, new Document("$set", new Document(record)));
+    UpdateResult result = mongoDatabase.getCollection(collectionName).updateMany(mongoFilter, new Document("$set", new Document(processedData)));
     return (int) result.getModifiedCount();
   }
 
@@ -146,7 +135,7 @@ public class MongoDataService extends BaseService implements DataService {
 
   @Override
   @SuppressWarnings({"rawtypes", "unchecked"})
-  public <T> T findById(String modelName, Object id, Class<T> resultType, boolean nestedQuery) {
+  public Map<String, Object> findById(String modelName, Object id, boolean nestedQuery) {
     String collectionName = getCollectionName(modelName);
     EntityDefinition entity = (EntityDefinition) sessionContext.getModelDefinition(modelName);
     TypedField<?, ?> idField = entity.findIdField().orElseThrow();
@@ -158,11 +147,7 @@ public class MongoDataService extends BaseService implements DataService {
       nestedQuery(List.of(dataMap), this::queryAsMapList, (ModelDefinition) sessionContext.getModelDefinition(modelName),
         null, sessionContext.getNestedQueryMaxDepth());
     }
-    T result = JsonUtils.convertValue(dataMap, resultType);
-    if (result != null) {
-      return LazyObjProxy.createProxy(result, modelName, sessionContext.getSession());
-    }
-    return null;
+    return dataMap;
   }
 
   @Override
@@ -175,15 +160,14 @@ public class MongoDataService extends BaseService implements DataService {
   }
 
   @Override
-  public List<Map<String, Object>> findByNativeQuery(String modelName, Object obj) {
-    Map<String, Object> params = ReflectionUtils.toClassBean(obj, Map.class);
+  @SuppressWarnings("unchecked")
+  public List<Map<String, Object>> findByNativeQuery(String modelName, Map<String, Object> params) {
     NativeQueryDefinition model = (NativeQueryDefinition) sessionContext.getModelDefinition(modelName);
     return (List<Map<String, Object>>) executeNativeStatement(model.getStatement(), params);
   }
 
   @Override
-  public Object executeNativeStatement(String statement, Object obj) {
-    Map<String, Object> params = ReflectionUtils.toClassBean(obj, Map.class);
+  public Object executeNativeStatement(String statement, Map<String, Object> params) {
     String json = StringHelper.simpleRenderTemplate(statement, params);
     Document command = Document.parse(json);
     Document result = mongoDatabase.runCommand(command);
