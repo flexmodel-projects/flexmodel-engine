@@ -2,6 +2,7 @@ package tech.wetech.flexmodel;
 
 import org.junit.jupiter.api.*;
 import tech.wetech.flexmodel.entity.Classes;
+import tech.wetech.flexmodel.entity.PersonEntity;
 import tech.wetech.flexmodel.entity.Student;
 import tech.wetech.flexmodel.entity.StudentDetail;
 import tech.wetech.flexmodel.model.EntityDefinition;
@@ -1238,6 +1239,31 @@ public abstract class AbstractSessionTests {
     }
     // fixme 需要增加死循环检测
 //    System.out.println(JsonUtils.toJsonString(classesList));
+  }
+
+  @Test
+  void testSnakeToCamels() {
+    String modelName = "testSnakeToCamels_person";
+    session.schema().createEntity(modelName, t ->
+      t.addField(new StringField("person_id").setNullable(false).setLength(20))
+        .addField(new StringField("person_name").setNullable(false).setLength(100))
+        .addField(new LongField("person_age").setNullable(false))
+    );
+
+    PersonEntity person = new PersonEntity();
+    person.setPersonId("1");
+    person.setPersonName("张三");
+    person.setPersonAge(18L);
+    int rows = session.dsl().insertInto(PersonEntity.class).values(person).execute();
+    Assertions.assertEquals(1, rows);
+    PersonEntity result = session.dsl().selectFrom(PersonEntity.class).executeOne();
+    Assertions.assertEquals(person.getPersonId(), result.getPersonId());
+    Assertions.assertEquals(person.getPersonName(), result.getPersonName());
+    Assertions.assertEquals(person.getPersonAge(), result.getPersonAge());
+    Map<String, Object> resultMap = session.dsl().selectFrom(modelName).executeOne();
+    Assertions.assertEquals(person.getPersonId(), resultMap.get("person_id"));
+    Assertions.assertEquals(person.getPersonName(), resultMap.get("person_name"));
+    Assertions.assertEquals(person.getPersonAge(), resultMap.get("person_age"));
   }
 
 }

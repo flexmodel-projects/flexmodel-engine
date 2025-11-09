@@ -51,4 +51,9 @@ public class FlexmodelCoreModule extends SimpleModule {
 //    addSerializer(ProxyInterface.class, LazyObjectSerializer.INSTANCE);
 
   }
+
+  @Override
+  public void setupModule(SetupContext context) {
+    super.setupModule(context);
+  }
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import tech.wetech.flexmodel.supports.jackson.FlexmodelCoreModule;
+import tech.wetech.flexmodel.supports.jackson.ModelFieldAnnotationIntrospector;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public class JsonUtils {
     builder.disable(FAIL_ON_EMPTY_BEANS);
     builder.addModule(new JavaTimeModule());
     builder.addModule(new FlexmodelCoreModule());
+    builder.annotationIntrospector(new ModelFieldAnnotationIntrospector());
     ServiceLoader.load(Module.class).forEach(builder::addModule);
     JSON = builder.build();
   }
