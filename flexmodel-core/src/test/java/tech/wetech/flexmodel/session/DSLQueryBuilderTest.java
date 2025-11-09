@@ -67,7 +67,7 @@ public class DSLQueryBuilderTest {
   @Test
   void testFromWithClass() {
     // 测试使用实体类指定模型
-    TypedDSLQueryBuilder<User> result = dslQueryBuilder.from(User.class);
+    TypedDSLQueryBuilder<User> result = new TypedDSLQueryBuilder<>(dslQueryBuilder,User.class);
 
     assertNotNull(result);
     assertNotSame(dslQueryBuilder, result);
@@ -77,7 +77,7 @@ public class DSLQueryBuilderTest {
   @Test
   void testTypedDSLQueryBuilderChaining() {
     // 测试带类型的DSL查询构建器的链式调用
-    TypedDSLQueryBuilder<User> typedBuilder = dslQueryBuilder.from(User.class);
+    TypedDSLQueryBuilder<User> typedBuilder =  new TypedDSLQueryBuilder<>(dslQueryBuilder,User.class);
 
     TypedDSLQueryBuilder<User> result = typedBuilder
       .select("id", "name")
@@ -92,7 +92,7 @@ public class DSLQueryBuilderTest {
   @Test
   void testModelNameExtraction() {
     // 测试从实体类提取模型名
-    TypedDSLQueryBuilder<User> typedBuilder = dslQueryBuilder.from(User.class);
+    TypedDSLQueryBuilder<User> typedBuilder =  new TypedDSLQueryBuilder<>(dslQueryBuilder,User.class);
 
     // 验证TypedDSLQueryBuilder正确创建
     assertNotNull(typedBuilder);

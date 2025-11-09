@@ -1,7 +1,6 @@
 package tech.wetech.flexmodel.query;
 
 import tech.wetech.flexmodel.JsonUtils;
-import tech.wetech.flexmodel.reflect.ReflectionUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -164,8 +163,7 @@ public class TypedDSLQueryBuilder<T> {
    */
   public List<T> execute() {
     List<Map<String, Object>> list = delegate.execute();
-    List<T> beanList = ReflectionUtils.toClassBeanList(list, entityClass);
-    return beanList;
+    return JsonUtils.convertValueList(list, entityClass);
   }
 
   /**
@@ -181,7 +179,7 @@ public class TypedDSLQueryBuilder<T> {
    */
   public T executeOne() {
     Map<String, Object> result = delegate.executeOne();
-    return ReflectionUtils.toClassBean(result, entityClass);
+    return JsonUtils.convertValue(result, entityClass);
   }
 
   /**
@@ -189,7 +187,7 @@ public class TypedDSLQueryBuilder<T> {
    */
   public <R> R executeOne(Class<R> resultType) {
     Map<String, Object> result = delegate.executeOne();
-    return ReflectionUtils.toClassBean(result, resultType);
+    return JsonUtils.convertValue(result, resultType);
   }
 
   /**

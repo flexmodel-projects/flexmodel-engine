@@ -2,11 +2,11 @@ package tech.wetech.flexmodel.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tech.wetech.flexmodel.JsonUtils;
 import tech.wetech.flexmodel.model.EntityDefinition;
 import tech.wetech.flexmodel.model.ModelDefinition;
 import tech.wetech.flexmodel.model.field.*;
 import tech.wetech.flexmodel.query.Query;
-import tech.wetech.flexmodel.reflect.ReflectionUtils;
 import tech.wetech.flexmodel.session.AbstractSessionContext;
 import tech.wetech.flexmodel.sql.SqlExecutionException;
 
@@ -698,7 +698,7 @@ public abstract class BaseService {
       log.debug("Processing one-to-many relation: {} items", relationCollection.size());
 
       relationCollection.forEach(relationItem -> {
-        Map<String, Object> relationRecord = ReflectionUtils.toClassBean(relationItem, Map.class);
+        Map<String, Object> relationRecord = JsonUtils.convertValue(relationItem, Map.class);
         relationRecord.put(relationField.getForeignField(), parentId);
 
         log.debug("Inserting relation record: {} -> {}", relationField.getFrom(), relationRecord);
@@ -710,7 +710,7 @@ public abstract class BaseService {
       });
     } else {
       // 处理一对一关联
-      Map<String, Object> relationRecord = ReflectionUtils.toClassBean(fieldValue, Map.class);
+      Map<String, Object> relationRecord = JsonUtils.convertValue(fieldValue, Map.class);
       relationRecord.put(relationField.getForeignField(), parentId);
 
       log.debug("Inserting relation record: {} -> {}", relationField.getFrom(), relationRecord);

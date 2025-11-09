@@ -17,47 +17,6 @@ import java.util.Map;
  */
 public class ReflectionUtils {
 
-  @SuppressWarnings("all")
-  public static void setFieldValue(Object obj, String fieldName, Object value) {
-    try {
-      // 构造setter方法名
-      String setterName = "set" + toUpperCamelCase(fieldName);
-      // 获取setter方法
-      Method setter = null;
-      Class<?> clazz = obj.getClass();
-
-      // 查找setter方法
-      for (Method method : clazz.getDeclaredMethods()) {
-        if (method.getName().equals(setterName) && method.getParameterCount() == 1) {
-          setter = method;
-          break;
-        }
-      }
-
-      // 如果没找到，尝试在父类中查找
-      if (setter == null) {
-        for (Method method : clazz.getMethods()) {
-          if (method.getName().equals(setterName) && method.getParameterCount() == 1) {
-            setter = method;
-            break;
-          }
-        }
-      }
-
-      if (setter != null && value != null) {
-        setter.setAccessible(true);
-        Class<?> parameterType = setter.getParameterTypes()[0];
-        if (parameterType.isEnum()) {
-          setter.invoke(obj, Enum.valueOf((Class<Enum>) parameterType, value.toString()));
-        } else {
-          setter.invoke(obj, value);
-        }
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
   public static String toUpperCamelCase(String str) {
     char[] cs = str.toCharArray();
     cs[0] -= 32;

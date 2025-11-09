@@ -1,10 +1,8 @@
 package tech.wetech.flexmodel;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import tech.wetech.flexmodel.supports.jackson.FlexmodelCoreModule;
@@ -28,7 +26,7 @@ public class JsonUtils {
 
   }
 
-  static  {
+  static {
     JsonMapper.Builder builder = new JsonMapper().rebuild();
     //
 //        JSON.configure(SerializationFeature.INDENT_OUTPUT, false);
@@ -72,6 +70,15 @@ public class JsonUtils {
     return JSON.convertValue(fromValue, cls);
   }
 
+  public static <T> T updateValue(T target, Object source) {
+    try {
+      return JSON.updateValue(target, source);
+    } catch (JsonMappingException e) {
+      e.printStackTrace();
+    }
+    return target;
+  }
+
   public static <T> List<T> convertValueList(List<?> fromValues, Class<T> cls) {
     List<T> list = new ArrayList<>();
     for (Object fromValue : fromValues) {
@@ -81,12 +88,12 @@ public class JsonUtils {
   }
 
   @SuppressWarnings("unchecked")
-   public static Map<String, Object> parseToMap(String jsonString) {
+  public static Map<String, Object> parseToMap(String jsonString) {
     return parseToObject(jsonString, Map.class);
   }
 
   @SuppressWarnings("unchecked")
-   public static List<Map<String, Object>> parseToMapList(String jsonString) {
+  public static List<Map<String, Object>> parseToMapList(String jsonString) {
     return parseToObject(jsonString, List.class);
   }
 

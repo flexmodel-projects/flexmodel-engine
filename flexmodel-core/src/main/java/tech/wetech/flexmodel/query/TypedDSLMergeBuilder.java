@@ -1,6 +1,6 @@
 package tech.wetech.flexmodel.query;
 
-import tech.wetech.flexmodel.reflect.ReflectionUtils;
+import tech.wetech.flexmodel.JsonUtils;
 
 import java.util.Map;
 
@@ -23,7 +23,7 @@ public class TypedDSLMergeBuilder<T> {
    */
   public TypedDSLMergeBuilder<T> values(T values) {
     this.values = values;
-    dataMap = ReflectionUtils.toClassBean(values, Map.class);
+    dataMap = JsonUtils.convertValue(values, Map.class);
     delegate.values(dataMap);
     return this;
   }
@@ -37,15 +37,7 @@ public class TypedDSLMergeBuilder<T> {
     } catch (Exception e) {
       throw new RuntimeException(e);
     } finally {
-      if (dataMap != null && values != null) {
-        dataMap.forEach((field, value) -> {
-          try {
-            ReflectionUtils.setFieldValue(values, field, value);
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-        });
-      }
+      values = JsonUtils.updateValue(values, dataMap);
     }
   }
 }
