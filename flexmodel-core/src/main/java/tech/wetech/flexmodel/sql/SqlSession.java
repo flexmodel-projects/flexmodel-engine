@@ -28,6 +28,8 @@ public class SqlSession extends AbstractSession {
       this.connection.setAutoCommit(false);
     } catch (SQLException e) {
       throw new RuntimeException(e);
+    } finally {
+      log.debug("Start Transaction Session {}", sessionId);
     }
   }
 
@@ -40,6 +42,8 @@ public class SqlSession extends AbstractSession {
       this.connection.setAutoCommit(true);
     } catch (SQLException e) {
       throw new RuntimeException(e);
+    } finally {
+      log.debug("Commit Session {}", sessionId);
     }
   }
 
@@ -50,6 +54,8 @@ public class SqlSession extends AbstractSession {
       this.connection.setAutoCommit(true);
     } catch (SQLException e) {
       throw new RuntimeException(e);
+    } finally {
+      log.debug("Rollback Session {}", sessionId);
     }
   }
 
@@ -59,10 +65,12 @@ public class SqlSession extends AbstractSession {
       if (!connection.getAutoCommit()) {
         connection.commit();
       }
-      LazyLoadInterceptor.clear();
       connection.close();
     } catch (SQLException e) {
       throw new RuntimeException(e);
+    } finally {
+      LazyLoadInterceptor.clear();
+      log.debug("Closed Session {}", sessionId);
     }
   }
 
