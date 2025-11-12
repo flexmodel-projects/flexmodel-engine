@@ -16,7 +16,6 @@ import graphql.util.TraversalControl;
 import graphql.util.TraverserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tech.wetech.flexmodel.jsonlogic.JsonLogic;
 
 import java.util.HashMap;
 import java.util.List;
@@ -114,8 +113,12 @@ public class FlexmodelInstrumentation implements Instrumentation {
     return result;
   }
 
+  public static boolean isEligible(Object data) {
+    return data != null && (data instanceof Iterable || data.getClass().isArray());
+  }
+
   private Object evaluatePartialVariable(String key, Object data) {
-    if (JsonLogic.isEligible(data)) {
+    if (isEligible(data)) {
       List list = (List) data;
       int index;
       try {
