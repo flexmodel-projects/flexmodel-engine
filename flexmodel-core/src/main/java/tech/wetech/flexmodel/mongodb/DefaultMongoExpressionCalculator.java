@@ -2,7 +2,8 @@ package tech.wetech.flexmodel.mongodb;
 
 import tech.wetech.flexmodel.AbstractExpressionCalculator;
 import tech.wetech.flexmodel.ExpressionCalculatorException;
-import tech.wetech.flexmodel.jsonlogic.JsonLogic;
+import tech.wetech.flexmodel.condition.ConditionNode;
+import tech.wetech.flexmodel.mongodb.condition.MongoConditionRenderer;
 
 import java.util.Map;
 
@@ -11,16 +12,15 @@ import java.util.Map;
  */
 public class DefaultMongoExpressionCalculator extends AbstractExpressionCalculator<String> {
 
-  private final JsonLogic jsonLogic = new JsonLogic();
-
   @Override
   public String calculate(String expression, Map<String, Object> dataMap) throws ExpressionCalculatorException {
+    if (expression == null) {
+      throw new ExpressionCalculatorException("Expression is null");
+    }
     try {
-      if (expression == null) {
-        throw new ExpressionCalculatorException("Expression is null");
-      }
-      return jsonLogic.evaluateMongoBsonString(transform(expression));
-    } catch (Exception e) {
+      ConditionNode conditionNode = parseCondition(expression);
+      return MongoConditionRenderer.render(conditionNode);
+    } catch (RuntimeException e) {
       throw new ExpressionCalculatorException(e.getMessage(), e);
     }
   }

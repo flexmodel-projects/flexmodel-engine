@@ -1,8 +1,11 @@
 package tech.wetech.flexmodel.sql;
 
 import tech.wetech.flexmodel.ExpressionCalculatorException;
-import tech.wetech.flexmodel.jsonlogic.evaluator.sql.NamedPlaceholderHandler;
-import tech.wetech.flexmodel.jsonlogic.evaluator.sql.SqlRuntimeContext;
+import tech.wetech.flexmodel.condition.ConditionNode;
+import tech.wetech.flexmodel.sql.condition.InlinePlaceholderHandler;
+import tech.wetech.flexmodel.sql.condition.NamedPlaceholderHandler;
+import tech.wetech.flexmodel.sql.condition.SqlConditionRenderer;
+import tech.wetech.flexmodel.sql.condition.SqlRenderContext;
 import tech.wetech.flexmodel.sql.dialect.SqlDialect;
 
 import java.util.Map;
@@ -18,31 +21,30 @@ public class DefaultSqlExpressionCalculator extends SqlExpressionCalculator {
 
   @Override
   public String calculateIncludeValue(String expression) throws ExpressionCalculatorException {
+    if (expression == null) {
+      throw new ExpressionCalculatorException("Expression is null");
+    }
     try {
-      if (expression == null) {
-        throw new ExpressionCalculatorException("Expression is null");
-      }
-      SqlRuntimeContext sqlRuntimeContext = new SqlRuntimeContext();
-      sqlRuntimeContext.setIdentifierQuoteString(sqlDialect.getIdentifierQuoteString());
-      return jsonLogic.evaluateSql(transform(expression), sqlRuntimeContext);
-    } catch (Exception e) {
+      ConditionNode condition = parseCondition(expression);
+      SqlRenderContext context = new SqlRenderContext(sqlDialect.getIdentifierQuoteString(), new InlinePlaceholderHandler());
+      return SqlConditionRenderer.render(condition, context);
+    } catch (RuntimeException e) {
       throw new ExpressionCalculatorException(e.getMessage(), e);
     }
   }
 
   @Override
   public SqlClauseResult calculate(String expression, Map<String, Object> dataMap) throws ExpressionCalculatorException {
+    if (expression == null) {
+      throw new ExpressionCalculatorException("Expression is null");
+    }
     try {
-      if (expression == null) {
-        throw new ExpressionCalculatorException("Expression is null");
-      }
-      SqlRuntimeContext sqlRuntimeContext = new SqlRuntimeContext();
-      sqlRuntimeContext.setIdentifierQuoteString(sqlDialect.getIdentifierQuoteString());
+      ConditionNode condition = parseCondition(expression);
       NamedPlaceholderHandler placeholderHandler = new NamedPlaceholderHandler();
-      sqlRuntimeContext.setPlaceholderHandler(placeholderHandler);
-      String sql = jsonLogic.evaluateSql(transform(expression), sqlRuntimeContext);
+      SqlRenderContext context = new SqlRenderContext(sqlDialect.getIdentifierQuoteString(), placeholderHandler);
+      String sql = SqlConditionRenderer.render(condition, context);
       return new SqlClauseResult(sql, placeholderHandler.getParameters());
-    } catch (Exception e) {
+    } catch (RuntimeException e) {
       throw new ExpressionCalculatorException(e.getMessage(), e);
     }
   }

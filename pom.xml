@@ -10,7 +10,6 @@
   <name>FlexModel Parent</name>
   <modules>
     <module>flexmodel-core</module>
-    <module>flexmodel-json-logic</module>
     <module>flexmodel-graphql</module>
     <module>flexmodel-quarkus</module>
     <module>integration-tests</module>

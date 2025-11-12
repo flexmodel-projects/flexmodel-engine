@@ -14,7 +14,6 @@
 - **动态数据建模** - 运行时动态创建和修改数据模型
 - **智能代码生成** - 自动生成DAO、DSL、Entity等代码
 - **GraphQL支持** - 内置GraphQL查询和变更支持
-- **JSON逻辑引擎** - 强大的JSON表达式计算引擎
 
 ### 数据库支持
 - **关系型数据库**: MySQL, PostgreSQL, Oracle, SQL Server, SQLite, MariaDB, TiDB, DB2, DM, GBase
@@ -53,9 +52,6 @@
 
 ### flexmodel-graphql
 GraphQL支持模块，提供GraphQL查询和变更功能。
-
-### flexmodel-json-logic
-JSON逻辑引擎，支持复杂的JSON表达式计算。
 
 ### flexmodel-maven-plugin
 Maven插件，集成到Maven构建流程中。
