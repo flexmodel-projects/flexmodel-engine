@@ -51,7 +51,7 @@ public class FilterExpression<T> implements Expression {
   }
 
   public Predicate endsWith(T value) {
-    return new Predicate(fieldName, "_end_with", value);
+    return new Predicate(fieldName, "_ends_with", value);
   }
 
   public Predicate in(Collection<T> values) {

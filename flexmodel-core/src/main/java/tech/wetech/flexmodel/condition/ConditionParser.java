@@ -110,7 +110,7 @@ public final class ConditionParser {
       case "_contains" -> ConditionOperator.CONTAINS;
       case "_not_contains" -> ConditionOperator.NOT_CONTAINS;
       case "_starts_with" -> ConditionOperator.STARTS_WITH;
-      case "_ends_with", "_end_with" -> ConditionOperator.ENDS_WITH;
+      case "_ends_with" -> ConditionOperator.ENDS_WITH;
       default -> throw new IllegalArgumentException("Unsupported operator: " + key);
     };
   }
